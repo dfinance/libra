@@ -328,7 +328,7 @@ fn error_output(err: VMStatus) -> TransactionOutput {
 }
 
 /// Convert the transaction arguments into move values.
-fn convert_txn_args(args: Vec<TransactionArgument>) -> VMResult<Vec<Value>> {
+pub fn convert_txn_args(args: Vec<TransactionArgument>) -> VMResult<Vec<Value>> {
     args.into_iter()
         .map(|arg| match arg {
             TransactionArgument::U64(i) => Ok(Value::u64(i)),
