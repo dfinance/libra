@@ -6,6 +6,7 @@ publish = false
 edition = "2018"
 
 [dependencies]
+anyhow = "1.0.24"
 codespan = "0.5.0"
 codespan-reporting = "0.5.0"
 hex = "0.3.2"

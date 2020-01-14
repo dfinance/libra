@@ -19,6 +19,7 @@ pub mod unique_map;
 // Address
 //**************************************************************************************************
 
+pub const ADDRESS_PREFIX: &'static str = "Wx";
 pub const ADDRESS_LENGTH: usize = 32;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Default, Clone, Copy)]
@@ -72,13 +73,13 @@ impl AsRef<[u8]> for Address {
 
 impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter) -> std::fmt::Result {
-        write!(f, "0x{:#x}", self)
+        write!(f, "{}{:#x}", ADDRESS_PREFIX, self)
     }
 }
 
 impl fmt::Debug for Address {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "0x{:#x}", self)
+        write!(f, "{}{:#x}", ADDRESS_PREFIX, self)
     }
 }
 
