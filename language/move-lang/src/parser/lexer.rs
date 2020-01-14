@@ -209,19 +209,7 @@ fn find_token(file: &'static str, text: &str, start_offset: usize) -> Result<(To
     }
 
     let (tok, len) = match c {
-        '0'..='9' => {
-            (Tok::U64Value, get_decimal_digits_len(&text))
-//            if (text.starts_with("0x") || text.starts_with("0X")) && text.len() > 2 {
-//                let hex_len = get_hex_digits_len(&text[2..]);
-//                if hex_len == 0 {
-//                    // Fall back to treating this as a "0" token.
-//                    (Tok::U64Value, 1)
-//                } else {
-//                    (Tok::AddressValue, 2 + hex_len)
-//                }
-//            } else {
-//            }
-        }
+        '0'..='9' => (Tok::U64Value, get_decimal_digits_len(&text)),
         'A'..='Z' | 'a'..='z' | '_' => {
             let len = get_name_len(&text);
             match &text[len..].chars().next() {
