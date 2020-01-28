@@ -130,6 +130,7 @@ pub mod runtime;
 pub mod system_module_names;
 
 pub use libra_vm::LibraVM;
+pub use counters::*;
 
 use libra_config::config::VMConfig;
 use libra_state_view::StateView;
