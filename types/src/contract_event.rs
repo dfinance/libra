@@ -26,13 +26,13 @@ use std::convert::{TryFrom, TryInto};
 #[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, CryptoHasher)]
 pub struct ContractEvent {
     /// The unique key that the event was emitted to
-    key: EventKey,
+    pub key: EventKey,
     /// The number of messages that have been emitted to the path previously
-    sequence_number: u64,
+    pub sequence_number: u64,
     /// The type of the data
-    type_tag: TypeTag,
+    pub type_tag: TypeTag,
     /// The data payload of the event
-    event_data: Vec<u8>,
+    pub event_data: Vec<u8>,
 }
 
 impl ContractEvent {

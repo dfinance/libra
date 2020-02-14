@@ -40,7 +40,8 @@ pub use module::Module;
 pub use script::{Script, SCRIPT_HASH_LENGTH};
 
 use std::ops::Deref;
-pub use transaction_argument::{parse_as_transaction_argument, TransactionArgument};
+pub use transaction_argument::{parse_as_transaction_argument, TransactionArgument, parse_as_address,
+                               parse_as_bool, parse_as_byte_array, parse_as_u64};
 
 pub type Version = u64; // Height - also used for MVCC in StateDB
 
@@ -73,15 +74,15 @@ pub struct RawTransaction {
 
 // TODO(#1307)
 fn serialize_duration<S>(d: &Duration, serializer: S) -> std::result::Result<S::Ok, S::Error>
-where
-    S: ser::Serializer,
+    where
+        S: ser::Serializer,
 {
     serializer.serialize_u64(d.as_secs())
 }
 
 fn deserialize_duration<'de, D>(deserializer: D) -> std::result::Result<Duration, D::Error>
-where
-    D: de::Deserializer<'de>,
+    where
+        D: de::Deserializer<'de>,
 {
     struct DurationVisitor;
     impl<'de> de::Visitor<'de> for DurationVisitor {
@@ -92,8 +93,8 @@ where
         }
 
         fn visit_u64<E>(self, v: u64) -> std::result::Result<Self::Value, E>
-        where
-            E: de::Error,
+            where
+                E: de::Error,
         {
             Ok(Duration::from_secs(v))
         }
