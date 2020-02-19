@@ -4,6 +4,7 @@
 #![forbid(unsafe_code)]
 
 pub mod loaded_data;
+#[macro_use]
 pub mod native_functions;
 pub mod native_structs;
 pub mod type_context;

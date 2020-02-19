@@ -13,7 +13,9 @@ use libra_types::{
     language_storage::{ModuleId, TypeTag},
     vm_error::{StatusCode, VMStatus},
 };
-use once_cell::sync::Lazy;
+use once_cell::sync::{
+    Lazy, OnceCell,
+};
 use std::collections::{HashMap, VecDeque};
 use vm::{
     errors::VMResult,
@@ -22,6 +24,7 @@ use vm::{
         AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, GasUnits, NativeCostIndex,
     },
 };
+use std::sync::Mutex;
 
 /// Result of a native function execution that requires charges for execution cost.
 ///
@@ -130,6 +133,8 @@ fn tstruct(
 }
 
 type NativeFunctionMap = HashMap<ModuleId, HashMap<Identifier, NativeFunction>>;
+
+pub static EXTERNAL_NATIVE_FUNCTIONS: OnceCell<Mutex<Option<NativeFunctionMap>>> = OnceCell::new();
 
 static NATIVE_FUNCTION_MAP: Lazy<NativeFunctionMap> = Lazy::new(|| {
     use SignatureToken::*;
@@ -375,6 +380,12 @@ static NATIVE_FUNCTION_MAP: Lazy<NativeFunctionMap> = Lazy::new(|| {
         ],
         vec![]
     );
+    if let Some(externals) = EXTERNAL_NATIVE_FUNCTIONS.get() {
+        if let Some(externals) = externals.lock().unwrap().take() {
+            m.extend(externals);
+        }
+    }
+
     m
 });
 
