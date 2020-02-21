@@ -432,6 +432,13 @@ impl<'a> TypeAndMemorySafetyAnalysis<'a> {
                 });
             }
 
+            Bytecode::LdU256(_) => {
+                self.stack.push(TypedAbstractValue {
+                    signature: SignatureToken::U256,
+                    value: AbstractValue::Value(Kind::Unrestricted),
+                });
+            }
+
             Bytecode::LdAddr(_) => {
                 self.stack.push(TypedAbstractValue {
                     signature: SignatureToken::Address,
@@ -772,6 +779,20 @@ impl<'a> TypeAndMemorySafetyAnalysis<'a> {
                 if operand.signature.is_integer() {
                     self.stack.push(TypedAbstractValue {
                         signature: SignatureToken::U128,
+                        value: AbstractValue::Value(Kind::Unrestricted),
+                    });
+                } else {
+                    errors.push(err_at_offset(
+                        StatusCode::INTEGER_OP_TYPE_MISMATCH_ERROR,
+                        offset,
+                    ))
+                }
+            }
+            Bytecode::CastU256 => {
+                let operand = self.stack.pop().unwrap();
+                if operand.signature.is_integer() {
+                    self.stack.push(TypedAbstractValue {
+                        signature: SignatureToken::U256,
                         value: AbstractValue::Value(Kind::Unrestricted),
                     });
                 } else {

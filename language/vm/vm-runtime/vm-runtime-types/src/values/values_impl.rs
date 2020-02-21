@@ -29,6 +29,7 @@ use vm::{
         CONST_SIZE, REFERENCE_SIZE, STRUCT_SIZE,
     },
 };
+use bigint::U256;
 
 /***************************************************************************************
  *
@@ -48,6 +49,7 @@ enum ValueImpl {
     U8(u8),
     U64(u64),
     U128(u128),
+    U256(U256),
     Bool(bool),
     Address(AccountAddress),
     ByteArray(ByteArray),
@@ -73,6 +75,7 @@ enum Container {
     U8(Vec<u8>),
     U64(Vec<u64>),
     U128(Vec<u128>),
+    U256(Vec<U256>),
     Bool(Vec<bool>),
 }
 
@@ -152,6 +155,7 @@ pub enum IntegerValue {
     U8(u8),
     U64(u64),
     U128(u128),
+    U256(U256),
 }
 
 /// A Move struct.
@@ -183,6 +187,7 @@ impl Container {
             U8(v) => v.len(),
             U64(v) => v.len(),
             U128(v) => v.len(),
+            U256(v) => v.len(),
             Bool(v) => v.len(),
         }
     }
@@ -200,6 +205,7 @@ impl Value {
             (SignatureToken::U8, ValueImpl::U8(_)) => true,
             (SignatureToken::U64, ValueImpl::U64(_)) => true,
             (SignatureToken::U128, ValueImpl::U128(_)) => true,
+            (SignatureToken::U256, ValueImpl::U256(_)) => true,
             (SignatureToken::Bool, ValueImpl::Bool(_)) => true,
             (SignatureToken::Address, ValueImpl::Address(_)) => true,
             (SignatureToken::ByteArray, ValueImpl::ByteArray(_)) => true,
@@ -277,14 +283,15 @@ macro_rules! impl_vm_value_ref {
 impl_vm_value_ref!(u8, U8);
 impl_vm_value_ref!(u64, U64);
 impl_vm_value_ref!(u128, U128);
+impl_vm_value_ref!(U256, U256);
 impl_vm_value_ref!(bool, Bool);
 impl_vm_value_ref!(AccountAddress, Address);
 impl_vm_value_ref!(ByteArray, ByteArray);
 
 impl ValueImpl {
     fn as_value_ref<T>(&self) -> VMResult<&T>
-    where
-        Self: VMValueRef<T>,
+        where
+            Self: VMValueRef<T>,
     {
         VMValueRef::value_ref(self)
     }
@@ -309,6 +316,7 @@ impl ValueImpl {
             U8(x) => U8(*x),
             U64(x) => U64(*x),
             U128(x) => U128(*x),
+            U256(x) => U256(*x),
             Bool(x) => Bool(*x),
             Address(x) => Address(*x),
             ByteArray(x) => ByteArray(x.clone()),
@@ -332,6 +340,7 @@ impl Container {
             U8(v) => U8(v.clone()),
             U64(v) => U64(v.clone()),
             U128(v) => U128(v.clone()),
+            U256(v) => U256(v.clone()),
             Bool(v) => Bool(v.clone()),
         }
     }
@@ -389,6 +398,7 @@ impl ValueImpl {
             (U8(l), U8(r)) => l == r,
             (U64(l), U64(r)) => l == r,
             (U128(l), U128(r)) => l == r,
+            (U256(l), U256(r)) => l == r,
             (Bool(l), Bool(r)) => l == r,
             (ByteArray(l), ByteArray(r)) => l == r,
             (Address(l), Address(r)) => l == r,
@@ -400,7 +410,7 @@ impl ValueImpl {
 
             _ => {
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                    .with_message(format!("cannot compare values: {:?}, {:?}", self, other)))
+                    .with_message(format!("cannot compare values: {:?}, {:?}", self, other)));
             }
         };
 
@@ -428,11 +438,12 @@ impl Container {
                 (U8(l), U8(r)) => l == r,
                 (U64(l), U64(r)) => l == r,
                 (U128(l), U128(r)) => l == r,
+                (U256(l), U256(r)) => l == r,
                 (Bool(l), Bool(r)) => l == r,
                 _ => {
                     return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(
                         format!("cannot compare container values: {:?}, {:?}", self, other),
-                    ))
+                    ));
                 }
             };
 
@@ -468,7 +479,9 @@ impl IndexedRef {
             (U64(v1), General(v2)) => v1[self.idx] == *v2[other.idx].as_value_ref::<u64>()?,
 
             (General(v1), U128(v2)) => *v1[self.idx].as_value_ref::<u128>()? == v2[other.idx],
+            (General(v1), U256(v2)) => *v1[self.idx].as_value_ref::<::bigint::U256>()? == v2[other.idx],
             (U128(v1), General(v2)) => v1[self.idx] == *v2[other.idx].as_value_ref::<u128>()?,
+            (U256(v1), General(v2)) => v1[self.idx] == *v2[other.idx].as_value_ref::<::bigint::U256>()?,
 
             (General(v1), Bool(v2)) => *v1[self.idx].as_value_ref::<bool>()? == v2[other.idx],
             (Bool(v1), General(v2)) => v1[self.idx] == *v2[other.idx].as_value_ref::<bool>()?,
@@ -476,7 +489,7 @@ impl IndexedRef {
             // All other combinations are illegal.
             _ => {
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                    .with_message(format!("cannot compare references {:?}, {:?}", self, other)))
+                    .with_message(format!("cannot compare references {:?}, {:?}", self, other)));
             }
         };
         Ok(res)
@@ -512,6 +525,7 @@ impl IndexedRef {
             U8(v) => ValueImpl::U8(v[self.idx]),
             U64(v) => ValueImpl::U64(v[self.idx]),
             U128(v) => ValueImpl::U128(v[self.idx]),
+            U256(v) => ValueImpl::U256(v[self.idx]),
             Bool(v) => ValueImpl::Bool(v[self.idx]),
         };
 
@@ -561,7 +575,7 @@ impl ContainerRef {
                         "cannot write value {:?} to container ref {:?}",
                         v, self
                     )),
-                )
+                );
             }
         }
         Ok(())
@@ -580,7 +594,7 @@ impl IndexedRef {
                         "cannot write value {:?} to indexed ref {:?}",
                         x, self
                     )),
-                )
+                );
             }
             _ => (),
         }
@@ -599,7 +613,7 @@ impl IndexedRef {
                         "cannot write value {:?} to indexed ref {:?}",
                         x, self
                     )),
-                )
+                );
             }
         }
         Ok(())
@@ -704,6 +718,7 @@ impl Locals {
                 ValueImpl::U8(_)
                 | ValueImpl::U64(_)
                 | ValueImpl::U128(_)
+                | ValueImpl::U256(_)
                 | ValueImpl::Bool(_)
                 | ValueImpl::Address(_)
                 | ValueImpl::ByteArray(_) => Ok(Value(ValueImpl::IndexedRef(IndexedRef {
@@ -824,6 +839,10 @@ impl Value {
         Self(ValueImpl::U128(x))
     }
 
+    pub fn u256(x: U256) -> Self {
+        Self(ValueImpl::U256(x))
+    }
+
     pub fn bool(x: bool) -> Self {
         Self(ValueImpl::Bool(x))
     }
@@ -880,6 +899,7 @@ macro_rules! impl_vm_value_cast {
 impl_vm_value_cast!(u8, U8);
 impl_vm_value_cast!(u64, U64);
 impl_vm_value_cast!(u128, U128);
+impl_vm_value_cast!(U256, U256);
 impl_vm_value_cast!(bool, Bool);
 impl_vm_value_cast!(AccountAddress, Address);
 impl_vm_value_cast!(ByteArray, ByteArray);
@@ -892,8 +912,9 @@ impl VMValueCast<IntegerValue> for Value {
             ValueImpl::U8(x) => Ok(IntegerValue::U8(x)),
             ValueImpl::U64(x) => Ok(IntegerValue::U64(x)),
             ValueImpl::U128(x) => Ok(IntegerValue::U128(x)),
+            ValueImpl::U256(x) => Ok(IntegerValue::U256(x)),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to integer", v,))),
+                .with_message(format!("cannot cast {:?} to integer", v, ))),
         }
     }
 }
@@ -904,7 +925,7 @@ impl VMValueCast<Reference> for Value {
             ValueImpl::ContainerRef(r) => Ok(Reference(ReferenceImpl::ContainerRef(r))),
             ValueImpl::IndexedRef(r) => Ok(Reference(ReferenceImpl::IndexedRef(r))),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to reference", v,))),
+                .with_message(format!("cannot cast {:?} to reference", v, ))),
         }
     }
 }
@@ -914,7 +935,7 @@ impl VMValueCast<Container> for Value {
         match self.0 {
             ValueImpl::Container(r) => take_unique_ownership(r),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to container", v,))),
+                .with_message(format!("cannot cast {:?} to container", v, ))),
         }
     }
 }
@@ -924,7 +945,7 @@ impl VMValueCast<Struct> for Value {
         match self.0 {
             ValueImpl::Container(r) => Ok(Struct(take_unique_ownership(r)?)),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to struct", v,))),
+                .with_message(format!("cannot cast {:?} to struct", v, ))),
         }
     }
 }
@@ -937,8 +958,8 @@ impl VMValueCast<StructRef> for Value {
 
 impl Value {
     pub fn value_as<T>(self) -> VMResult<T>
-    where
-        Self: VMValueCast<T>,
+        where
+            Self: VMValueCast<T>,
     {
         VMValueCast::cast(self)
     }
@@ -949,7 +970,7 @@ impl VMValueCast<u8> for IntegerValue {
         match self {
             Self::U8(x) => Ok(x),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to u8", v,))),
+                .with_message(format!("cannot cast {:?} to u8", v, ))),
         }
     }
 }
@@ -959,7 +980,7 @@ impl VMValueCast<u64> for IntegerValue {
         match self {
             Self::U64(x) => Ok(x),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to u64", v,))),
+                .with_message(format!("cannot cast {:?} to u64", v, ))),
         }
     }
 }
@@ -969,15 +990,36 @@ impl VMValueCast<u128> for IntegerValue {
         match self {
             Self::U128(x) => Ok(x),
             v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
-                .with_message(format!("cannot cast {:?} to u128", v,))),
+                .with_message(format!("cannot cast {:?} to u128", v, ))),
+        }
+    }
+}
+
+impl Into<U256> for IntegerValue {
+    fn into(self) -> U256 {
+        match self {
+            IntegerValue::U8(val) => U256::from(val),
+            IntegerValue::U64(val) => U256::from(val),
+            IntegerValue::U128(val) => U256::from_little_endian(&val.to_le_bytes()),
+            IntegerValue::U256(val) => val,
+        }
+    }
+}
+
+impl VMValueCast<U256> for IntegerValue {
+    fn cast(self) -> VMResult<U256> {
+        match self {
+            Self::U256(x) => Ok(x),
+            v => Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR)
+                .with_message(format!("cannot cast {:?} to u256", v, ))),
         }
     }
 }
 
 impl IntegerValue {
     pub fn value_as<T>(self) -> VMResult<T>
-    where
-        Self: VMValueCast<T>,
+        where
+            Self: VMValueCast<T>,
     {
         VMValueCast::cast(self)
     }
@@ -997,6 +1039,14 @@ impl IntegerValue {
             (U8(l), U8(r)) => u8::checked_add(l, r).map(IntegerValue::U8),
             (U64(l), U64(r)) => u64::checked_add(l, r).map(IntegerValue::U64),
             (U128(l), U128(r)) => u128::checked_add(l, r).map(IntegerValue::U128),
+            (U256(l), U256(r)) => {
+                let (res, overflow) = l.overflowing_add(r);
+                if overflow {
+                    None
+                } else {
+                    Some(IntegerValue::U256(res))
+                }
+            },
             (l, r) => {
                 let msg = format!("Cannot add {:?} and {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1011,6 +1061,14 @@ impl IntegerValue {
             (U8(l), U8(r)) => u8::checked_sub(l, r).map(IntegerValue::U8),
             (U64(l), U64(r)) => u64::checked_sub(l, r).map(IntegerValue::U64),
             (U128(l), U128(r)) => u128::checked_sub(l, r).map(IntegerValue::U128),
+            (U256(l), U256(r)) => {
+                let (res, overflow) = l.overflowing_sub(r);
+                if overflow {
+                    None
+                } else {
+                    Some(IntegerValue::U256(res))
+                }
+            },
             (l, r) => {
                 let msg = format!("Cannot sub {:?} from {:?}", r, l);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1025,6 +1083,14 @@ impl IntegerValue {
             (U8(l), U8(r)) => u8::checked_mul(l, r).map(IntegerValue::U8),
             (U64(l), U64(r)) => u64::checked_mul(l, r).map(IntegerValue::U64),
             (U128(l), U128(r)) => u128::checked_mul(l, r).map(IntegerValue::U128),
+            (U256(l), U256(r)) => {
+                let (res, overflow) = l.overflowing_mul(r);
+                if overflow {
+                    None
+                } else {
+                    Some(IntegerValue::U256(res))
+                }
+            },
             (l, r) => {
                 let msg = format!("Cannot mul {:?} and {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1039,6 +1105,14 @@ impl IntegerValue {
             (U8(l), U8(r)) => u8::checked_div(l, r).map(IntegerValue::U8),
             (U64(l), U64(r)) => u64::checked_div(l, r).map(IntegerValue::U64),
             (U128(l), U128(r)) => u128::checked_div(l, r).map(IntegerValue::U128),
+            (U256(l), U256(r)) => {
+                let (res, overflow) = l.overflowing_div(r);
+                if overflow {
+                    None
+                } else {
+                    Some(IntegerValue::U256(res))
+                }
+            },
             (l, r) => {
                 let msg = format!("Cannot div {:?} by {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1053,6 +1127,14 @@ impl IntegerValue {
             (U8(l), U8(r)) => u8::checked_rem(l, r).map(IntegerValue::U8),
             (U64(l), U64(r)) => u64::checked_rem(l, r).map(IntegerValue::U64),
             (U128(l), U128(r)) => u128::checked_rem(l, r).map(IntegerValue::U128),
+            (U256(l), U256(r)) => {
+                let (res, overflow) = l.overflowing_rem(r);
+                if overflow {
+                    None
+                } else {
+                    Some(IntegerValue::U256(res))
+                }
+            },
             (l, r) => {
                 let msg = format!("Cannot rem {:?} by {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1067,6 +1149,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => IntegerValue::U8(l | r),
             (U64(l), U64(r)) => IntegerValue::U64(l | r),
             (U128(l), U128(r)) => IntegerValue::U128(l | r),
+            (U256(l), U256(r)) => IntegerValue::U256(l | r),
             (l, r) => {
                 let msg = format!("Cannot bit_or {:?} and {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1080,6 +1163,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => IntegerValue::U8(l & r),
             (U64(l), U64(r)) => IntegerValue::U64(l & r),
             (U128(l), U128(r)) => IntegerValue::U128(l & r),
+            (U256(l), U256(r)) => IntegerValue::U256(l & r),
             (l, r) => {
                 let msg = format!("Cannot bit_and {:?} and {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1093,6 +1177,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => IntegerValue::U8(l ^ r),
             (U64(l), U64(r)) => IntegerValue::U64(l ^ r),
             (U128(l), U128(r)) => IntegerValue::U128(l ^ r),
+            (U256(l), U256(r)) => IntegerValue::U256(l ^ r),
             (l, r) => {
                 let msg = format!("Cannot bit_xor {:?} and {:?}", l, r);
                 return Err(VMStatus::new(StatusCode::INTERNAL_TYPE_ERROR).with_message(msg));
@@ -1122,6 +1207,12 @@ impl IntegerValue {
                 }
                 IntegerValue::U128(x << n_bits)
             }
+            U256(x) => {
+                if n_bits >= 255 {
+                    return Err(VMStatus::new(StatusCode::ARITHMETIC_ERROR))
+                }
+                IntegerValue::U256(x << n_bits as usize)
+            }
         })
     }
 
@@ -1147,6 +1238,12 @@ impl IntegerValue {
                 }
                 IntegerValue::U128(x >> n_bits)
             }
+            U256(x) => {
+                if n_bits >= 255 {
+                    return Err(VMStatus::new(StatusCode::ARITHMETIC_ERROR));
+                }
+                IntegerValue::U256(x >> n_bits as usize)
+            }
         })
     }
 
@@ -1157,6 +1254,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => l < r,
             (U64(l), U64(r)) => l < r,
             (U128(l), U128(r)) => l < r,
+            (U256(l), U256(r)) => l < r,
             (l, r) => {
                 let msg = format!(
                     "Cannot compare {:?} and {:?}: incompatible integer types",
@@ -1174,6 +1272,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => l <= r,
             (U64(l), U64(r)) => l <= r,
             (U128(l), U128(r)) => l <= r,
+            (U256(l), U256(r)) => l <= r,
             (l, r) => {
                 let msg = format!(
                     "Cannot compare {:?} and {:?}: incompatible integer types",
@@ -1191,6 +1290,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => l > r,
             (U64(l), U64(r)) => l > r,
             (U128(l), U128(r)) => l > r,
+            (U256(l), U256(r)) => l > r,
             (l, r) => {
                 let msg = format!(
                     "Cannot compare {:?} and {:?}: incompatible integer types",
@@ -1208,6 +1308,7 @@ impl IntegerValue {
             (U8(l), U8(r)) => l >= r,
             (U64(l), U64(r)) => l >= r,
             (U128(l), U128(r)) => l >= r,
+            (U256(l), U256(r)) => l >= r,
             (l, r) => {
                 let msg = format!(
                     "Cannot compare {:?} and {:?}: incompatible integer types",
@@ -1225,6 +1326,7 @@ impl IntegerValue {
             U8(x) => Value::u8(x),
             U64(x) => Value::u64(x),
             U128(x) => Value::u128(x),
+            U256(x)  => Value::u256(x),
         }
     }
 }
@@ -1236,6 +1338,7 @@ impl From<IntegerValue> for u8 {
             U8(x) => x as u8,
             U64(x) => x as u8,
             U128(x) => x as u8,
+            U256(x) => x.low_u64() as u8,
         }
     }
 }
@@ -1247,6 +1350,7 @@ impl From<IntegerValue> for u64 {
             U8(x) => x as u64,
             U64(x) => x as u64,
             U128(x) => x as u64,
+            U256(x) => x.low_u64(),
         }
     }
 }
@@ -1258,6 +1362,13 @@ impl From<IntegerValue> for u128 {
             U8(x) => x as u128,
             U64(x) => x as u128,
             U128(x) => x as u128,
+            U256(x) => {
+                let mut buf = [0u8;32];
+                x.to_little_endian(&mut buf);
+                let mut buf_16 = [0u8;16];
+                buf_16.copy_from_slice(&buf[..16]);
+                u128::from_le_bytes(buf_16)
+            }
         }
     }
 }
@@ -1458,6 +1569,10 @@ pub mod vector {
                 Some(x) => Value::u128(x),
                 None => err_pop_empty_vec!(),
             },
+            (TypeTag::U256, Container::U256(v)) => match v.pop() {
+                Some(x) => Value::u256(x),
+                None => err_pop_empty_vec!(),
+            },
             (TypeTag::Bool, Container::Bool(v)) => match v.pop() {
                 Some(x) => Value::bool(x),
                 None => err_pop_empty_vec!(),
@@ -1491,6 +1606,7 @@ pub mod vector {
             (TypeTag::U8, Container::U8(v)) => v.is_empty(),
             (TypeTag::U64, Container::U64(v)) => v.is_empty(),
             (TypeTag::U128, Container::U128(v)) => v.is_empty(),
+            (TypeTag::U256, Container::U256(v)) => v.is_empty(),
             (TypeTag::Bool, Container::Bool(v)) => v.is_empty(),
 
             (TypeTag::Struct(_), Container::General(v))
@@ -1568,6 +1684,7 @@ impl Container {
             Self::U8(v) => AbstractMemorySize::new((v.len() * size_of::<u8>()) as u64),
             Self::U64(v) => AbstractMemorySize::new((v.len() * size_of::<u64>()) as u64),
             Self::U128(v) => AbstractMemorySize::new((v.len() * size_of::<u128>()) as u64),
+            Self::U256(v) => AbstractMemorySize::new((v.len() * size_of::<U256>()) as u64),
             Self::Bool(v) => AbstractMemorySize::new((v.len() * size_of::<bool>()) as u64),
         }
     }
@@ -1590,7 +1707,7 @@ impl ValueImpl {
         use ValueImpl::*;
 
         match self {
-            Invalid | U8(_) | U64(_) | U128(_) | Bool(_) => *CONST_SIZE,
+            Invalid | U8(_) | U64(_) | U128(_) | U256(_) | Bool(_) => *CONST_SIZE,
             Address(_) => AbstractMemorySize::new(ADDRESS_LENGTH as u64),
             ByteArray(key) => AbstractMemorySize::new(key.len() as u64),
             ContainerRef(r) => r.size(),
@@ -1643,14 +1760,14 @@ impl GlobalValue {
  *
  **************************************************************************************/
 impl Struct {
-    pub fn pack<I: IntoIterator<Item = Value>>(vals: I) -> Self {
+    pub fn pack<I: IntoIterator<Item=Value>>(vals: I) -> Self {
         Self(Container::General(vals.into_iter().map(|v| v.0).collect()))
     }
 
-    pub fn unpack(self) -> VMResult<impl Iterator<Item = Value>> {
+    pub fn unpack(self) -> VMResult<impl Iterator<Item=Value>> {
         match self.0 {
             Container::General(v) => Ok(v.into_iter().map(Value)),
-            Container::U8(_) | Container::U64(_) | Container::U128(_) | Container::Bool(_) => {
+            Container::U8(_) | Container::U64(_) | Container::U128(_) | Container::U256(_) | Container::Bool(_) => {
                 Err(VMStatus::new(StatusCode::UNKNOWN_INVARIANT_VIOLATION_ERROR)
                     .with_message("not a struct".to_string()))
             }
@@ -1730,6 +1847,7 @@ impl Display for ValueImpl {
             Self::U8(x) => write!(f, "U8({})", x),
             Self::U64(x) => write!(f, "U64({})", x),
             Self::U128(x) => write!(f, "U128({})", x),
+            Self::U256(x) => write!(f, "U256({})", x),
             Self::Bool(x) => write!(f, "{}", x),
             Self::Address(addr) => write!(f, "Address({})", addr.short_str()),
             Self::ByteArray(x) => write!(f, "ByteArray({})", x),
@@ -1743,9 +1861,9 @@ impl Display for ValueImpl {
 }
 
 fn display_list_of_items<T, I>(items: I, f: &mut fmt::Formatter) -> fmt::Result
-where
-    T: Display,
-    I: IntoIterator<Item = T>,
+    where
+        T: Display,
+        I: IntoIterator<Item=T>,
 {
     write!(f, "[")?;
     let mut items = items.into_iter();
@@ -1787,6 +1905,7 @@ impl Display for Container {
             Self::U8(v) => display_list_of_items(v, f),
             Self::U64(v) => display_list_of_items(v, f),
             Self::U128(v) => display_list_of_items(v, f),
+            Self::U256(v) => display_list_of_items(v, f),
             Self::Bool(v) => display_list_of_items(v, f),
         }
     }
@@ -1852,7 +1971,7 @@ impl Value {
             layout,
             val: &self.0,
         })
-        .ok()
+            .ok()
     }
 }
 
@@ -1862,7 +1981,7 @@ impl Struct {
             layout,
             val: &self.0,
         })
-        .ok()
+            .ok()
     }
 }
 
@@ -1877,6 +1996,7 @@ impl<'a, 'b> serde::Serialize for AnnotatedValue<'a, 'b, Type, ValueImpl> {
             (Type::U8, ValueImpl::U8(x)) => serializer.serialize_u8(*x),
             (Type::U64, ValueImpl::U64(x)) => serializer.serialize_u64(*x),
             (Type::U128, ValueImpl::U128(x)) => serializer.serialize_u128(*x),
+            (Type::U256, ValueImpl::U256(x)) => x.serialize(serializer),
             (Type::Bool, ValueImpl::Bool(x)) => serializer.serialize_bool(*x),
             (Type::Address, ValueImpl::Address(x)) => x.serialize(serializer),
             (Type::ByteArray, ValueImpl::ByteArray(x)) => x.serialize(serializer),
@@ -1940,9 +2060,9 @@ impl<'a, 'b> serde::Serialize for AnnotatedValue<'a, 'b, StructDef, Container> {
 
             (
                 StructDef::Native(NativeStructType {
-                    tag: NativeStructTag::Vector,
-                    type_actuals,
-                }),
+                                      tag: NativeStructTag::Vector,
+                                      type_actuals,
+                                  }),
                 Container::General(v),
             ) => {
                 // TODO: This can cause a panic. Clean it up when we promote Vector to a primitive type.
@@ -1956,33 +2076,33 @@ impl<'a, 'b> serde::Serialize for AnnotatedValue<'a, 'b, StructDef, Container> {
 
             (
                 StructDef::Native(NativeStructType {
-                    tag: NativeStructTag::Vector,
-                    type_actuals,
-                }),
+                                      tag: NativeStructTag::Vector,
+                                      type_actuals,
+                                  }),
                 Container::U8(v),
             ) => serialize_vec!(U8, type_actuals, v),
 
             (
                 StructDef::Native(NativeStructType {
-                    tag: NativeStructTag::Vector,
-                    type_actuals,
-                }),
+                                      tag: NativeStructTag::Vector,
+                                      type_actuals,
+                                  }),
                 Container::U64(v),
             ) => serialize_vec!(U64, type_actuals, v),
 
             (
                 StructDef::Native(NativeStructType {
-                    tag: NativeStructTag::Vector,
-                    type_actuals,
-                }),
+                                      tag: NativeStructTag::Vector,
+                                      type_actuals,
+                                  }),
                 Container::U128(v),
             ) => serialize_vec!(U128, type_actuals, v),
 
             (
                 StructDef::Native(NativeStructType {
-                    tag: NativeStructTag::Vector,
-                    type_actuals,
-                }),
+                                      tag: NativeStructTag::Vector,
+                                      type_actuals,
+                                  }),
                 Container::Bool(v),
             ) => serialize_vec!(Bool, type_actuals, v),
 
@@ -2008,6 +2128,7 @@ impl<'d> serde::de::DeserializeSeed<'d> for &Type {
             Type::U8 => u8::deserialize(deserializer).map(Value::u8),
             Type::U64 => u64::deserialize(deserializer).map(Value::u64),
             Type::U128 => u128::deserialize(deserializer).map(Value::u128),
+            Type::U256 => U256::deserialize(deserializer).map(Value::u256),
             Type::ByteArray => ByteArray::deserialize(deserializer).map(Value::byte_array),
             Type::Address => AccountAddress::deserialize(deserializer).map(Value::address),
 
@@ -2041,8 +2162,8 @@ impl<'d> serde::de::DeserializeSeed<'d> for &StructDef {
                     }
 
                     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-                    where
-                        A: serde::de::SeqAccess<'d>,
+                        where
+                            A: serde::de::SeqAccess<'d>,
                     {
                         let mut val = Vec::new();
 
@@ -2064,9 +2185,9 @@ impl<'d> serde::de::DeserializeSeed<'d> for &StructDef {
                 )?))
             }
             StructDef::Native(NativeStructType {
-                tag: NativeStructTag::Vector,
-                type_actuals,
-            }) => {
+                                  tag: NativeStructTag::Vector,
+                                  type_actuals,
+                              }) => {
                 struct GeneralVectorVisitor<'a>(&'a Type);
                 impl<'d, 'a> serde::de::Visitor<'d> for GeneralVectorVisitor<'a> {
                     type Value = Container;
@@ -2076,8 +2197,8 @@ impl<'d> serde::de::DeserializeSeed<'d> for &StructDef {
                     }
 
                     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-                    where
-                        A: serde::de::SeqAccess<'d>,
+                        where
+                            A: serde::de::SeqAccess<'d>,
                     {
                         let mut vals = Vec::new();
                         while let Some(elem) = seq.next_element_seed(self.0)? {
@@ -2119,6 +2240,7 @@ impl<'d> serde::de::DeserializeSeed<'d> for &StructDef {
                     Type::U8 => deserialize_specialized_vec!(U8VectorVisitor, U8, u8),
                     Type::U64 => deserialize_specialized_vec!(U64VectorVisitor, U64, u64),
                     Type::U128 => deserialize_specialized_vec!(U128VectorVisitor, U128, u128),
+                    Type::U256 => deserialize_specialized_vec!(U256VectorVisitor, U256, U256),
                     Type::Bool => deserialize_specialized_vec!(BoolVectorVisitor, Bool, bool),
                     layout => Ok(Value(ValueImpl::Container(Rc::new(RefCell::new(
                         deserializer.deserialize_seq(GeneralVectorVisitor(layout))?,
@@ -2141,19 +2263,20 @@ pub mod prop {
     use super::*;
     use proptest::{collection::vec, prelude::*};
 
-    pub fn value_strategy_with_layout(layout: &Type) -> impl Strategy<Value = Value> {
+    pub fn value_strategy_with_layout(layout: &Type) -> impl Strategy<Value=Value> {
         match layout {
             Type::U8 => any::<u8>().prop_map(Value::u8).boxed(),
             Type::U64 => any::<u64>().prop_map(Value::u64).boxed(),
             Type::U128 => any::<u128>().prop_map(Value::u128).boxed(),
+            Type::U256 => any::<U256>().prop_map(Value::u256).boxed(),
             Type::Bool => any::<bool>().prop_map(Value::bool).boxed(),
             Type::Address => any::<AccountAddress>().prop_map(Value::address).boxed(),
             Type::ByteArray => any::<ByteArray>().prop_map(Value::byte_array).boxed(),
 
             Type::Struct(StructDef::Native(NativeStructType {
-                tag: NativeStructTag::Vector,
-                type_actuals,
-            })) => match &type_actuals[0] {
+                                               tag: NativeStructTag::Vector,
+                                               type_actuals,
+                                           })) => match &type_actuals[0] {
                 Type::U8 => vec(any::<u8>(), 0..10)
                     .prop_map(|vals| Value(ValueImpl::new_container(Container::U8(vals))))
                     .boxed(),
@@ -2162,6 +2285,9 @@ pub mod prop {
                     .boxed(),
                 Type::U128 => vec(any::<u128>(), 0..10)
                     .prop_map(|vals| Value(ValueImpl::new_container(Container::U128(vals))))
+                    .boxed(),
+                Type::U256 => vec(any::<U256>(), 0..10)
+                    .prop_map(|vals| Value(ValueImpl::new_container(Container::U256(vals))))
                     .boxed(),
                 Type::Bool => vec(any::<bool>(), 0..10)
                     .prop_map(|vals| Value(ValueImpl::new_container(Container::Bool(vals))))
@@ -2195,7 +2321,7 @@ pub mod prop {
         }
     }
 
-    pub fn layout_and_value_strategy() -> impl Strategy<Value = (Type, Value)> {
+    pub fn layout_and_value_strategy() -> impl Strategy<Value=(Type, Value)> {
         any::<Type>().no_shrink().prop_flat_map(|layout| {
             let value_strategy = value_strategy_with_layout(&layout);
             (Just(layout), value_strategy)

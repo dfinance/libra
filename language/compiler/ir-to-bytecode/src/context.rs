@@ -579,6 +579,7 @@ impl<'a> Context<'a> {
             | x @ SignatureToken::U8
             | x @ SignatureToken::U64
             | x @ SignatureToken::U128
+            | x @ SignatureToken::U256
             | x @ SignatureToken::ByteArray
             | x @ SignatureToken::Address
             | x @ SignatureToken::TypeParameter(_) => x,

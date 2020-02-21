@@ -515,8 +515,8 @@ impl BoundsCheck<(&CompiledModuleMut, &FunctionSignature)> for CodeUnit {
 
                     // List out the other options explicitly so there's a compile error if a new
                     // bytecode gets added.
-                    FreezeRef | Pop | Ret | LdU8(_) | LdU64(_) | LdU128(_) | CastU8 | CastU64
-                    | CastU128 | LdTrue | LdFalse | ReadRef | WriteRef | Add | Sub | Mul | Mod
+                    FreezeRef | Pop | Ret | LdU8(_) | LdU64(_) | LdU128(_) | LdU256(_) | CastU8 | CastU64
+                    | CastU128 | CastU256 | LdTrue | LdFalse | ReadRef | WriteRef | Add | Sub | Mul | Mod
                     | Div | BitOr | BitAnd | Xor | Shl | Shr | Or | And | Not | Eq | Neq | Lt
                     | Gt | Le | Ge | Abort | GetTxnGasUnitPrice | GetTxnMaxGasUnits
                     | GetGasRemaining | GetTxnSenderAddress | GetTxnSequenceNumber

@@ -134,6 +134,7 @@ enum InferredType {
     U8,
     U64,
     U128,
+    U256,
     ByteArray,
     Address,
     Struct(StructHandleIndex),
@@ -151,6 +152,7 @@ impl InferredType {
             S::U8 => I::U8,
             S::U64 => I::U64,
             S::U128 => I::U128,
+            S::U256 => I::U256,
             S::ByteArray => I::ByteArray,
             S::Address => I::Address,
             S::Struct(si, _) => I::Struct(*si),
@@ -173,6 +175,7 @@ impl InferredType {
             InferredType::U8 => bail!("no struct type for U8"),
             InferredType::U64 => bail!("no struct type for U64"),
             InferredType::U128 => bail!("no struct type for U128"),
+            InferredType::U256 => bail!("no struct type for U256"),
             InferredType::ByteArray => bail!("no struct type for ByteArray"),
             InferredType::Address => bail!("no struct type for Address"),
             InferredType::Reference(inner) | InferredType::MutableReference(inner) => {
@@ -495,6 +498,7 @@ fn compile_type(context: &mut Context, ty: &Type) -> Result<SignatureToken> {
         Type::U8 => SignatureToken::U8,
         Type::U64 => SignatureToken::U64,
         Type::U128 => SignatureToken::U128,
+        Type::U256 => SignatureToken::U256,
         Type::Bool => SignatureToken::Bool,
         Type::ByteArray => SignatureToken::ByteArray,
         Type::Reference(is_mutable, inner_type) => {
@@ -966,6 +970,7 @@ fn infer_int_bin_op_result_ty(
         (I::U8, I::U8) => I::U8,
         (I::U64, I::U64) => I::U64,
         (I::U128, I::U128) => I::U128,
+        (I::U256, I::U256) => I::U256,
         _ => I::Anything,
     }
 }
@@ -1029,6 +1034,11 @@ fn compile_expression(
                 push_instr!(exp.span, Bytecode::LdU128(i));
                 function_frame.push()?;
                 vec_deque![InferredType::U128]
+            }
+            CopyableVal_::U256(i) => {
+                push_instr!(exp.span, Bytecode::LdU256(i));
+                function_frame.push()?;
+                vec_deque![InferredType::U256]
             }
             CopyableVal_::ByteArray(buf) => {
                 let buf_idx = context.byte_array_index(&buf)?;
@@ -1327,6 +1337,12 @@ fn compile_call(
                     function_frame.pop()?;
                     function_frame.push()?;
                     vec_deque![InferredType::U128]
+                }
+                Builtin::ToU256 => {
+                    push_instr!(call.span, Bytecode::CastU256);
+                    function_frame.pop()?;
+                    function_frame.push()?;
+                    vec_deque![InferredType::U256]
                 }
             }
         }

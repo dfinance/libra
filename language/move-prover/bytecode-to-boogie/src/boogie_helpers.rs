@@ -31,7 +31,7 @@ pub fn boogie_synthetic_name(env: &ModuleEnv<'_>, name: &str) -> String {
 pub fn boogie_type_value(env: &GlobalEnv, sig: &GlobalType) -> String {
     match sig {
         GlobalType::Bool => "BooleanType()".to_string(),
-        GlobalType::U8 | GlobalType::U64 | GlobalType::U128 => "IntegerType()".to_string(),
+        GlobalType::U8 | GlobalType::U64 | GlobalType::U128 | GlobalType::U256 => "IntegerType()".to_string(),
         GlobalType::ByteArray => "ByteArrayType()".to_string(),
         GlobalType::Address => "AddressType()".to_string(),
         GlobalType::Reference(t) | GlobalType::MutableReference(t) => {
@@ -85,6 +85,7 @@ pub fn boogie_type_check_expr(env: &GlobalEnv, name: &str, sig: &GlobalType) -> 
         GlobalType::U8 => conds.push(format!("IsValidU8({})", name)),
         GlobalType::U64 => conds.push(format!("IsValidU64({})", name)),
         GlobalType::U128 => conds.push(format!("IsValidU128({})", name)),
+        GlobalType::U256 => conds.push(format!("IsValidU256({})", name)),
         GlobalType::Bool => conds.push(format!("is#Boolean({})", name)),
         GlobalType::Address => conds.push(format!("is#Address({})", name)),
         GlobalType::ByteArray => conds.push(format!("is#ByteArray({})", name)),

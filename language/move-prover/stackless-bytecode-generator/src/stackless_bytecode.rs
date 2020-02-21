@@ -5,6 +5,7 @@ use vm::file_format::{
     AddressPoolIndex, ByteArrayPoolIndex, CodeOffset, FieldDefinitionIndex, FunctionHandleIndex,
     LocalIndex, LocalsSignatureIndex, StructDefinitionIndex,
 };
+use bigint::U256;
 
 type TempIndex = usize;
 
@@ -74,12 +75,14 @@ pub enum StacklessBytecode {
     LdU8(TempIndex, u8),
     LdU64(TempIndex, u64),
     LdU128(TempIndex, u128),
+    LdU256(TempIndex, U256),
     LdAddr(TempIndex, AddressPoolIndex),
     LdByteArray(TempIndex, ByteArrayPoolIndex),
 
     CastU8(TempIndex, TempIndex),
     CastU64(TempIndex, TempIndex),
     CastU128(TempIndex, TempIndex),
+    CastU256(TempIndex, TempIndex),
 
     Not(TempIndex, TempIndex),            // t1 = !t2
     Add(TempIndex, TempIndex, TempIndex), // t1 = t2 binop t3

@@ -71,6 +71,7 @@ static BASE_SIG_TOKENS: Lazy<Vec<SignatureToken>> = Lazy::new(|| {
         SignatureToken::U8,
         SignatureToken::U64,
         SignatureToken::U128,
+        SignatureToken::U256,
         SignatureToken::ByteArray,
         SignatureToken::Address,
         // Bogus struct handle index, but it's fine since we disregard this in the generation of
@@ -84,6 +85,7 @@ static INTEGER_SIG_TOKENS: Lazy<Vec<SignatureToken>> = Lazy::new(|| {
         SignatureToken::U8,
         SignatureToken::U64,
         SignatureToken::U128,
+        SignatureToken::U256,
     ]
 });
 
@@ -142,6 +144,12 @@ fn u64s(num: u64) -> Vec<SignatureTy> {
 fn u128s(num: u64) -> Vec<SignatureTy> {
     (0..num)
         .map(|_| ty_of_sig_tok(SignatureToken::U128))
+        .collect()
+}
+
+fn u256s(num: u64) -> Vec<SignatureTy> {
+    (0..num)
+        .map(|_| ty_of_sig_tok(SignatureToken::U256))
         .collect()
 }
 
@@ -220,12 +228,14 @@ pub fn call_details(op: &Bytecode) -> Vec<CallDetails> {
             u8s(2) => u8s(1),
             u64s(2) => u64s(1),
             u128s(2) => u128s(1)
+            u256s(2) => u256s(1)
         },
         // TODO: rewrite in a more efficient way.
         Bytecode::Shl | Bytecode::Shr => type_transition! {
             vec![ty_of_sig_tok(SignatureToken::U8), ty_of_sig_tok(SignatureToken::U8)] => u8s(1),
             vec![ty_of_sig_tok(SignatureToken::U64), ty_of_sig_tok(SignatureToken::U8)] => u64s(1),
-            vec![ty_of_sig_tok(SignatureToken::U128), ty_of_sig_tok(SignatureToken::U8)] => u128s(1)
+            vec![ty_of_sig_tok(SignatureToken::U128), ty_of_sig_tok(SignatureToken::U8)] => u128s(1),
+            vec![ty_of_sig_tok(SignatureToken::U256), ty_of_sig_tok(SignatureToken::U8)] => u256s(1),
         },
         Bytecode::Eq | Bytecode::Neq => type_transition! {
             fixed: non_variable_values(2) => bools(1)
@@ -238,9 +248,11 @@ pub fn call_details(op: &Bytecode) -> Vec<CallDetails> {
         Bytecode::LdU8(_) => type_transition! { empty() => u8s(1) },
         Bytecode::LdU64(_) => type_transition! { empty() => u64s(1) },
         Bytecode::LdU128(_) => type_transition! { empty() => u128s(1) },
+        Bytecode::LdU256(_) => type_transition! { empty() => u256s(1) },
         Bytecode::CastU8 => type_transition! { fixed: integer_values(1) => u8s(1) },
         Bytecode::CastU64 => type_transition! { fixed: integer_values(1) => u64s(1) },
         Bytecode::CastU128 => type_transition! { fixed: integer_values(1) => u128s(1) },
+        Bytecode::CastU256 => type_transition! { fixed: integer_values(1) => u256s(1) },
         Bytecode::LdAddr(_) => type_transition! { empty() => simple_addrs(1) },
         Bytecode::LdByteArray(_) => type_transition! { empty() => byte_arrays(1) },
         Bytecode::LdFalse | Bytecode::LdTrue => type_transition! { empty() => bools(1) },

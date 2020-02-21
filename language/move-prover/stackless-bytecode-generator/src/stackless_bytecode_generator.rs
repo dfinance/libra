@@ -272,6 +272,15 @@ impl<'a> StacklessBytecodeGenerator<'a> {
                 self.temp_count += 1;
             }
 
+            Bytecode::LdU256(number) => {
+                let temp_index = self.temp_count;
+                self.temp_stack.push(temp_index);
+                self.local_types.push(SignatureToken::U256);
+                self.code
+                    .push(StacklessBytecode::LdU256(temp_index, *number));
+                self.temp_count += 1;
+            }
+
             Bytecode::CastU8 => {
                 let operand_index = self.temp_stack.pop().unwrap();
                 let temp_index = self.temp_count;
@@ -299,6 +308,16 @@ impl<'a> StacklessBytecodeGenerator<'a> {
                 self.local_types.push(SignatureToken::U128);
                 self.code
                     .push(StacklessBytecode::CastU128(temp_index, operand_index));
+                self.temp_count += 1;
+            }
+
+            Bytecode::CastU256 => {
+                let operand_index = self.temp_stack.pop().unwrap();
+                let temp_index = self.temp_count;
+                self.temp_stack.push(temp_index);
+                self.local_types.push(SignatureToken::U256);
+                self.code
+                    .push(StacklessBytecode::CastU256(temp_index, operand_index));
                 self.temp_count += 1;
             }
 

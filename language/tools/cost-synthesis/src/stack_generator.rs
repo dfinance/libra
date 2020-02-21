@@ -34,6 +34,7 @@ use vm_runtime::{
     loaded_data::loaded_module::LoadedModule, runtime::VMRuntime,
 };
 use vm_runtime_types::values::*;
+use bigint::U256;
 
 /// Specifies the data to be applied to the execution stack for the next valid stack state.
 ///
@@ -238,6 +239,22 @@ where
             )
         } else {
             u128::from(self.gen.gen_range(0, u32::max_value()))
+        }
+    }
+
+    fn next_u256(&mut self, stk: &[Value]) -> U256 {
+        if self.op == Bytecode::Sub && !stk.is_empty() {
+            let peek: VMResult<U256> = stk
+                .last()
+                .expect("[Next Integer] The impossible happened: the value stack became empty while still full.")
+                .copy_value()
+                .value_as();
+            U256::from(self.gen.gen_range(
+                0,
+                peek.expect("[Next Integer] Unable to cast peeked stack value to a u256.").as_u64(),
+            ))
+        } else {
+            U256::from((self.gen.gen_range(0, u32::max_value())))
         }
     }
 
@@ -496,6 +513,7 @@ where
             SignatureToken::U8 => Value::u8(self.next_u8(stk)),
             SignatureToken::U64 => Value::u64(self.next_u64(stk)),
             SignatureToken::U128 => Value::u128(self.next_u128(stk)),
+            SignatureToken::U256 => Value::u256(self.next_u256(stk)),
             SignatureToken::Address => Value::address(self.next_addr(false)),
             SignatureToken::Reference(sig) | SignatureToken::MutableReference(sig) => {
                 // TODO: The following code creates a dangling reference.

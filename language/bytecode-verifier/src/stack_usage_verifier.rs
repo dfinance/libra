@@ -86,6 +86,7 @@ impl<'a> StackUsageVerifier<'a> {
             Bytecode::LdU8(_)
             | Bytecode::LdU64(_)
             | Bytecode::LdU128(_)
+            | Bytecode::LdU256(_)
             | Bytecode::LdAddr(_)
             | Bytecode::LdTrue
             | Bytecode::LdFalse
@@ -113,7 +114,8 @@ impl<'a> StackUsageVerifier<'a> {
             | Bytecode::MoveFrom(_, _)
             | Bytecode::CastU8
             | Bytecode::CastU64
-            | Bytecode::CastU128 => (1, 1),
+            | Bytecode::CastU128
+            | Bytecode::CastU256 => (1, 1),
 
             // Binary operations (pop twice and push once)
             Bytecode::Add

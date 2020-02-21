@@ -46,6 +46,7 @@ pub enum GlobalType {
     U8,
     U64,
     U128,
+    U256,
     ByteArray,
     Address,
     Struct(ModuleIndex, StructDefinitionIndex, Vec<GlobalType>),
@@ -560,6 +561,7 @@ impl<'env> ModuleEnv<'env> {
             SignatureToken::U8 => GlobalType::U8,
             SignatureToken::U64 => GlobalType::U64,
             SignatureToken::U128 => GlobalType::U128,
+            SignatureToken::U256 => GlobalType::U256,
             SignatureToken::ByteArray => GlobalType::ByteArray,
             SignatureToken::Address => GlobalType::Address,
             SignatureToken::Reference(t) => {

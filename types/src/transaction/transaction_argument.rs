@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{account_address::AccountAddress, byte_array::ByteArray};
-use anyhow::Result;
+use anyhow::{Result, Error};
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, fmt};
 use thiserror::Error;
+use bigint::U256;
 
 #[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub enum TransactionArgument {
     U64(u64),
+    U256(U256),
     Address(AccountAddress),
     ByteArray(ByteArray),
     Bool(bool),
@@ -19,6 +21,7 @@ impl fmt::Debug for TransactionArgument {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TransactionArgument::U64(value) => write!(f, "{{U64: {}}}", value),
+            TransactionArgument::U256(value) =>  write!(f, "{{U256: {}}}", value),
             TransactionArgument::Bool(boolean) => write!(f, "{{BOOL: {}}}", boolean),
             TransactionArgument::Address(address) => write!(f, "{{ADDRESS: {:?}}}", address),
             TransactionArgument::ByteArray(byte_array) => {
@@ -86,6 +89,11 @@ pub fn parse_as_u64(s: &str) -> Result<TransactionArgument> {
     Ok(TransactionArgument::U64(s.parse::<u64>()?))
 }
 
+/// Parses the given string as u256.
+pub fn parse_as_u256(s: &str) -> Result<TransactionArgument, Error> {
+    Ok(TransactionArgument::U256(U256::from_dec_str(s).map_err(|err| Error::msg(format!("{:?}", err)))?))
+}
+
 /// Parses the given string as a bool.
 pub fn parse_as_bool(s: &str) -> Result<TransactionArgument> {
     Ok(TransactionArgument::Bool(s.parse::<bool>()?))
@@ -103,6 +111,7 @@ macro_rules! return_if_ok {
 pub fn parse_as_transaction_argument(s: &str) -> Result<TransactionArgument> {
     return_if_ok!(parse_as_address(s));
     return_if_ok!(parse_as_u64(s));
+    return_if_ok!(parse_as_u256(s));
     return_if_ok!(parse_as_bool(s));
     return_if_ok!(parse_as_byte_array(s));
     Err(ErrorKind::ParseError(format!("cannot parse \"{}\" as transaction argument", s)).into())

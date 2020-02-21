@@ -13,11 +13,13 @@
 use anyhow::{bail, Result};
 use byteorder::ReadBytesExt;
 use std::{io::Cursor, mem::size_of};
+use bigint::U256;
 
 /// Constant values for the binary format header.
 ///
 /// The binary header is magic +  version info + table count.
 pub enum BinaryConstants {}
+
 impl BinaryConstants {
     /// The blob that must start a binary.
     pub const LIBRA_MAGIC_SIZE: usize = 4;
@@ -39,19 +41,19 @@ impl BinaryConstants {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum TableType {
-    MODULE_HANDLES          = 0x1,
-    STRUCT_HANDLES          = 0x2,
-    FUNCTION_HANDLES        = 0x3,
-    ADDRESS_POOL            = 0x4,
-    IDENTIFIERS             = 0x5,
-    BYTE_ARRAY_POOL         = 0x6,
-    MAIN                    = 0x7,
-    STRUCT_DEFS             = 0x8,
-    FIELD_DEFS              = 0x9,
-    FUNCTION_DEFS           = 0xA,
-    TYPE_SIGNATURES         = 0xB,
-    FUNCTION_SIGNATURES     = 0xC,
-    LOCALS_SIGNATURES       = 0xD,
+    MODULE_HANDLES = 0x1,
+    STRUCT_HANDLES = 0x2,
+    FUNCTION_HANDLES = 0x3,
+    ADDRESS_POOL = 0x4,
+    IDENTIFIERS = 0x5,
+    BYTE_ARRAY_POOL = 0x6,
+    MAIN = 0x7,
+    STRUCT_DEFS = 0x8,
+    FIELD_DEFS = 0x9,
+    FUNCTION_DEFS = 0xA,
+    TYPE_SIGNATURES = 0xB,
+    FUNCTION_SIGNATURES = 0xC,
+    LOCALS_SIGNATURES = 0xD,
 }
 
 /// Constants for signature kinds (type, function, locals). Those values start a signature blob.
@@ -60,9 +62,9 @@ pub enum TableType {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum SignatureType {
-    TYPE_SIGNATURE          = 0x1,
-    FUNCTION_SIGNATURE      = 0x2,
-    LOCAL_SIGNATURE         = 0x3,
+    TYPE_SIGNATURE = 0x1,
+    FUNCTION_SIGNATURE = 0x2,
+    LOCAL_SIGNATURE = 0x3,
 }
 
 /// Constants for signature blob values.
@@ -71,16 +73,17 @@ pub enum SignatureType {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum SerializedType {
-    BOOL                    = 0x1,
-    U8                      = 0x2,
-    U64                     = 0x3,
-    U128                    = 0x4,
-    ADDRESS                 = 0x5,
-    REFERENCE               = 0x6,
-    MUTABLE_REFERENCE       = 0x7,
-    STRUCT                  = 0x8,
-    BYTEARRAY               = 0x9,
-    TYPE_PARAMETER          = 0xA,
+    BOOL = 0x1,
+    U8 = 0x2,
+    U64 = 0x3,
+    U128 = 0x4,
+    ADDRESS = 0x5,
+    REFERENCE = 0x6,
+    MUTABLE_REFERENCE = 0x7,
+    STRUCT = 0x8,
+    BYTEARRAY = 0x9,
+    TYPE_PARAMETER = 0xA,
+    U256 = 0xB,
 }
 
 #[rustfmt::skip]
@@ -88,8 +91,8 @@ pub enum SerializedType {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum SerializedNominalResourceFlag {
-    NOMINAL_RESOURCE        = 0x1,
-    NORMAL_STRUCT           = 0x2,
+    NOMINAL_RESOURCE = 0x1,
+    NORMAL_STRUCT = 0x2,
 }
 
 #[rustfmt::skip]
@@ -97,9 +100,9 @@ pub enum SerializedNominalResourceFlag {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum SerializedKind {
-    ALL                     = 0x1,
-    UNRESTRICTED            = 0x2,
-    RESOURCE                = 0x3,
+    ALL = 0x1,
+    UNRESTRICTED = 0x2,
+    RESOURCE = 0x3,
 }
 
 #[rustfmt::skip]
@@ -107,8 +110,8 @@ pub enum SerializedKind {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum SerializedNativeStructFlag {
-    NATIVE                  = 0x1,
-    DECLARED                = 0x2,
+    NATIVE = 0x1,
+    DECLARED = 0x2,
 }
 
 /// List of opcodes constants.
@@ -117,66 +120,69 @@ pub enum SerializedNativeStructFlag {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug)]
 pub enum Opcodes {
-    POP                     = 0x01,
-    RET                     = 0x02,
-    BR_TRUE                 = 0x03,
-    BR_FALSE                = 0x04,
-    BRANCH                  = 0x05,
-    LD_U64                  = 0x06,
-    LD_ADDR                 = 0x07,
-    LD_TRUE                 = 0x08,
-    LD_FALSE                = 0x09,
-    COPY_LOC                = 0x0A,
-    MOVE_LOC                = 0x0B,
-    ST_LOC                  = 0x0C,
-    MUT_BORROW_LOC          = 0x0D,
-    IMM_BORROW_LOC          = 0x0E,
-    MUT_BORROW_FIELD        = 0x0F,
-    IMM_BORROW_FIELD        = 0x10,
-    LD_BYTEARRAY            = 0x11,
-    CALL                    = 0x12,
-    PACK                    = 0x13,
-    UNPACK                  = 0x14,
-    READ_REF                = 0x15,
-    WRITE_REF               = 0x16,
-    ADD                     = 0x17,
-    SUB                     = 0x18,
-    MUL                     = 0x19,
-    MOD                     = 0x1A,
-    DIV                     = 0x1B,
-    BIT_OR                  = 0x1C,
-    BIT_AND                 = 0x1D,
-    XOR                     = 0x1E,
-    OR                      = 0x1F,
-    AND                     = 0x20,
-    NOT                     = 0x21,
-    EQ                      = 0x22,
-    NEQ                     = 0x23,
-    LT                      = 0x24,
-    GT                      = 0x25,
-    LE                      = 0x26,
-    GE                      = 0x27,
-    ABORT                   = 0x28,
-    GET_TXN_GAS_UNIT_PRICE  = 0x29,
-    GET_TXN_MAX_GAS_UNITS   = 0x2A,
-    GET_GAS_REMAINING       = 0x2B,
-    GET_TXN_SENDER          = 0x2C,
-    EXISTS                  = 0x2D,
-    MUT_BORROW_GLOBAL       = 0x2E,
-    IMM_BORROW_GLOBAL       = 0x2F,
-    MOVE_FROM               = 0x30,
-    MOVE_TO                 = 0x31,
+    POP = 0x01,
+    RET = 0x02,
+    BR_TRUE = 0x03,
+    BR_FALSE = 0x04,
+    BRANCH = 0x05,
+    LD_U64 = 0x06,
+    LD_ADDR = 0x07,
+    LD_TRUE = 0x08,
+    LD_FALSE = 0x09,
+    COPY_LOC = 0x0A,
+    MOVE_LOC = 0x0B,
+    ST_LOC = 0x0C,
+    MUT_BORROW_LOC = 0x0D,
+    IMM_BORROW_LOC = 0x0E,
+    MUT_BORROW_FIELD = 0x0F,
+    IMM_BORROW_FIELD = 0x10,
+    LD_BYTEARRAY = 0x11,
+    CALL = 0x12,
+    PACK = 0x13,
+    UNPACK = 0x14,
+    READ_REF = 0x15,
+    WRITE_REF = 0x16,
+    ADD = 0x17,
+    SUB = 0x18,
+    MUL = 0x19,
+    MOD = 0x1A,
+    DIV = 0x1B,
+    BIT_OR = 0x1C,
+    BIT_AND = 0x1D,
+    XOR = 0x1E,
+    OR = 0x1F,
+    AND = 0x20,
+    NOT = 0x21,
+    EQ = 0x22,
+    NEQ = 0x23,
+    LT = 0x24,
+    GT = 0x25,
+    LE = 0x26,
+    GE = 0x27,
+    ABORT = 0x28,
+    GET_TXN_GAS_UNIT_PRICE = 0x29,
+    GET_TXN_MAX_GAS_UNITS = 0x2A,
+    GET_GAS_REMAINING = 0x2B,
+    GET_TXN_SENDER = 0x2C,
+    EXISTS = 0x2D,
+    MUT_BORROW_GLOBAL = 0x2E,
+    IMM_BORROW_GLOBAL = 0x2F,
+    MOVE_FROM = 0x30,
+    MOVE_TO = 0x31,
     GET_TXN_SEQUENCE_NUMBER = 0x32,
-    GET_TXN_PUBLIC_KEY      = 0x33,
-    FREEZE_REF              = 0x34,
+    GET_TXN_PUBLIC_KEY = 0x33,
+    FREEZE_REF = 0x34,
     // TODO: reshuffle once file format stabilizes
-    SHL                     = 0x35,
-    SHR                     = 0x36,
-    LD_U8                   = 0x37,
-    LD_U128                 = 0x38,
-    CAST_U8                 = 0x39,
-    CAST_U64                = 0x3A,
-    CAST_U128               = 0x3B,
+    SHL = 0x35,
+    SHR = 0x36,
+    LD_U8 = 0x37,
+    LD_U128 = 0x38,
+    CAST_U8 = 0x39,
+    CAST_U64 = 0x3A,
+    CAST_U128 = 0x3B,
+    // U256 type.
+    LD_U256 = 0x3C,
+    CAST_U256 = 0x3D,
 }
 
 /// Upper limit on the binary size
@@ -295,6 +301,13 @@ pub fn write_u64(binary: &mut BinaryData, value: u64) -> Result<()> {
 /// Write a `u128` in Little Endian format.
 pub fn write_u128(binary: &mut BinaryData, value: u128) -> Result<()> {
     binary.extend(&value.to_le_bytes())
+}
+
+/// Write a `u256` in Little Endian format.
+pub fn write_u256(binary: &mut BinaryData, value: &U256) -> Result<()> {
+    let mut buff = [0; 32];
+    value.to_little_endian(&mut buff);
+    binary.extend(&buff)
 }
 
 /// Reads a `u16` in ULEB128 format from a `binary`.

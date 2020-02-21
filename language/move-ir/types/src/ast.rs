@@ -16,6 +16,7 @@ use std::{
     fmt,
     ops::Deref,
 };
+use bigint::U256;
 
 /// Generic wrapper that keeps file locations for any ast-node
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
@@ -174,6 +175,8 @@ pub enum Type {
     U64,
     /// `u128`
     U128,
+    /// `u256`
+    U256,
     /// `bool`
     Bool,
     /// `bytearray`
@@ -338,6 +341,8 @@ pub enum Builtin {
     ToU64,
     /// Cast an integer into u128.
     ToU128,
+    /// Cast an integer into u256.
+    ToU256
 }
 
 /// Enum for different function calls
@@ -456,6 +461,8 @@ pub enum CopyableVal_ {
     U64(u64),
     /// An unsigned 128-bit integer
     U128(u128),
+    /// An unsigned 256-bit integer
+    U256(U256),
     /// true or false
     Bool(bool),
     /// `b"<bytes>"`
@@ -1336,6 +1343,7 @@ impl fmt::Display for Type {
             Type::U8 => write!(f, "u8"),
             Type::U64 => write!(f, "u64"),
             Type::U128 => write!(f, "u128"),
+            Type::U256 => write!(f, "u256"),
             Type::Bool => write!(f, "bool"),
             Type::Address => write!(f, "address"),
             Type::ByteArray => write!(f, "bytearray"),
@@ -1377,6 +1385,7 @@ impl fmt::Display for Builtin {
             Builtin::ToU8 => write!(f, "to_u8"),
             Builtin::ToU64 => write!(f, "to_u64"),
             Builtin::ToU128 => write!(f, "to_u128"),
+            Builtin::ToU256 => write!(f, "to_u256"),
         }
     }
 }
@@ -1506,6 +1515,7 @@ impl fmt::Display for CopyableVal_ {
             CopyableVal_::U8(v) => write!(f, "{}u8", v),
             CopyableVal_::U64(v) => write!(f, "{}", v),
             CopyableVal_::U128(v) => write!(f, "{}u128", v),
+            CopyableVal_::U256(v) => write!(f, "{}u256", v),
             CopyableVal_::Bool(v) => write!(f, "{}", v),
             CopyableVal_::ByteArray(v) => write!(f, "{}", v),
             CopyableVal_::Address(v) => write!(f, "0x{}", hex::encode(&v)),

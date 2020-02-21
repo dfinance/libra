@@ -12,6 +12,7 @@ pub enum Type {
     U8,
     U64,
     U128,
+    U256,
     ByteArray,
     Address,
     Struct(StructDef),

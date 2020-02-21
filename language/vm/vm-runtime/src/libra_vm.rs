@@ -606,6 +606,7 @@ fn convert_txn_args(args: Vec<TransactionArgument>) -> Vec<Value> {
             TransactionArgument::Address(a) => Value::address(a),
             TransactionArgument::Bool(b) => Value::bool(b),
             TransactionArgument::ByteArray(b) => Value::byte_array(b),
+            TransactionArgument::U256(i) => Value::u256(i),
         })
         .collect()
 }

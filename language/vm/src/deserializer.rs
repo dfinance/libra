@@ -3,6 +3,7 @@
 
 use crate::{errors::*, file_format::*, file_format_common::*};
 use byteorder::{LittleEndian, ReadBytesExt};
+use bigint::U256;
 use libra_types::{
     account_address::ADDRESS_LENGTH,
     byte_array::ByteArray,
@@ -668,6 +669,7 @@ fn load_signature_token(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<Signat
             SerializedType::U8 => Ok(SignatureToken::U8),
             SerializedType::U64 => Ok(SignatureToken::U64),
             SerializedType::U128 => Ok(SignatureToken::U128),
+            SerializedType::U256 => Ok(SignatureToken::U256),
             SerializedType::BYTEARRAY => Ok(SignatureToken::ByteArray),
             SerializedType::ADDRESS => Ok(SignatureToken::Address),
             SerializedType::REFERENCE => {
@@ -899,9 +901,14 @@ fn load_code(cursor: &mut Cursor<&[u8]>, code: &mut Vec<Bytecode>) -> BinaryLoad
                 let value = read_u128_internal(cursor)?;
                 Bytecode::LdU128(value)
             }
+            Opcodes::LD_U256 => {
+                let value = read_u256_internal(cursor)?;
+                Bytecode::LdU256(value)
+            }
             Opcodes::CAST_U8 => Bytecode::CastU8,
             Opcodes::CAST_U64 => Bytecode::CastU64,
             Opcodes::CAST_U128 => Bytecode::CastU128,
+            Opcodes::CAST_U256 => Bytecode::CastU256,
             Opcodes::LD_ADDR => {
                 let idx = read_uleb_u16_internal(cursor)?;
                 Bytecode::LdAddr(AddressPoolIndex(idx))
@@ -1067,6 +1074,12 @@ fn read_u128_internal(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<u128> {
         .map_err(|_| VMStatus::new(StatusCode::MALFORMED))
 }
 
+fn read_u256_internal(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<U256> {
+    let mut buf = [0; 32];
+    cursor.read_exact(&mut buf).map_err(|_| VMStatus::new(StatusCode::MALFORMED))?;
+    Ok(U256::from_little_endian(&buf))
+}
+
 impl TableType {
     fn from_u8(value: u8) -> BinaryLoaderResult<TableType> {
         match value {
@@ -1113,6 +1126,7 @@ impl SerializedType {
             0x8 => Ok(SerializedType::STRUCT),
             0x9 => Ok(SerializedType::BYTEARRAY),
             0xA => Ok(SerializedType::TYPE_PARAMETER),
+            0xB => Ok(SerializedType::U256),
             _ => Err(VMStatus::new(StatusCode::UNKNOWN_SERIALIZED_TYPE)),
         }
     }
@@ -1211,6 +1225,9 @@ impl Opcodes {
             0x39 => Ok(Opcodes::CAST_U8),
             0x3A => Ok(Opcodes::CAST_U64),
             0x3B => Ok(Opcodes::CAST_U128),
+            // U256 type.
+            0x3C => Ok(Opcodes::LD_U256),
+            0x3D => Ok(Opcodes::CAST_U256),
             _ => Err(VMStatus::new(StatusCode::UNKNOWN_OPCODE)),
         }
     }

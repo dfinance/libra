@@ -64,6 +64,7 @@ fn derive_type_tag(
         U8 => Ok(TypeTag::U8),
         U64 => Ok(TypeTag::U64),
         U128 => Ok(TypeTag::U128),
+        U256 => Ok(TypeTag::U256),
         ByteArray => Ok(TypeTag::ByteArray),
         TypeParameter(idx) => type_actual_tags
             .get(*idx as usize)
@@ -350,6 +351,10 @@ impl<'txn> Interpreter<'txn> {
                         gas!(const_instr: context, self, Opcodes::LD_U128)?;
                         self.operand_stack.push(Value::u128(*int_const))?;
                     }
+                    Bytecode::LdU256(int_const) => {
+                        gas!(const_instr: context, self, Opcodes::LD_U256)?;
+                        self.operand_stack.push(Value::u256(*int_const))?;
+                    }
                     Bytecode::LdAddr(idx) => {
                         gas!(const_instr: context, self, Opcodes::LD_ADDR)?;
                         self.operand_stack
@@ -467,6 +472,11 @@ impl<'txn> Interpreter<'txn> {
                         gas!(const_instr: context, self, Opcodes::CAST_U128)?;
                         let integer_value = self.operand_stack.pop_as::<IntegerValue>()?;
                         self.operand_stack.push(Value::u128(integer_value.into()))?;
+                    }
+                    Bytecode::CastU256 => {
+                        gas!(const_instr: context, self, Opcodes::CAST_U256)?;
+                        let integer_value = self.operand_stack.pop_as::<IntegerValue>()?;
+                        self.operand_stack.push(Value::u256(integer_value.into()))?;
                     }
                     // Arithmetic Operations
                     Bytecode::Add => {
@@ -819,6 +829,7 @@ impl<'txn> Interpreter<'txn> {
                 IntegerValue::U8(x) => Value::u8(x),
                 IntegerValue::U64(x) => Value::u64(x),
                 IntegerValue::U128(x) => Value::u128(x),
+                IntegerValue::U256(x) => Value::u256(x),
             })
         })
     }

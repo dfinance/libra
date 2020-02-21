@@ -216,6 +216,7 @@ impl<'alloc> VMModuleCache<'alloc> {
             SignatureToken::U8 => Ok(Type::U8),
             SignatureToken::U64 => Ok(Type::U64),
             SignatureToken::U128 => Ok(Type::U128),
+            SignatureToken::U256 => Ok(Type::U256),
             SignatureToken::ByteArray => Ok(Type::ByteArray),
             SignatureToken::Address => Ok(Type::Address),
             SignatureToken::TypeParameter(idx) => Ok(type_context.get_type(*idx)?),

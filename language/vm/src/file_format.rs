@@ -44,6 +44,7 @@ use once_cell::sync::Lazy;
 use proptest::{collection::vec, prelude::*, strategy::BoxedStrategy};
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
+use bigint::U256;
 
 /// Generic index into one of the tables in the binary format.
 pub type TableIndex = u16;
@@ -498,6 +499,8 @@ pub enum SignatureToken {
     U64,
     /// Unsigned integers, 128 bits length.
     U128,
+    /// Unsigned integers, 256 bits length.
+    U256,
     /// ByteArray, variable size, immutable byte array.
     ByteArray,
     /// Address, a 32 bytes immutable type.
@@ -552,6 +555,7 @@ impl ::std::fmt::Debug for SignatureToken {
             SignatureToken::U8 => write!(f, "U8"),
             SignatureToken::U64 => write!(f, "U64"),
             SignatureToken::U128 => write!(f, "U128"),
+            SignatureToken::U256 => write!(f, "U256"),
             SignatureToken::ByteArray => write!(f, "ByteArray"),
             SignatureToken::Address => write!(f, "Address"),
             SignatureToken::Struct(idx, types) => write!(f, "Struct({:?}, {:?})", idx, types),
@@ -605,7 +609,7 @@ impl SignatureToken {
         match self {
             Reference(_) => SignatureTokenKind::Reference,
             MutableReference(_) => SignatureTokenKind::MutableReference,
-            Bool | U8 | U64 | U128 | ByteArray | Address | Struct(_, _) => {
+            Bool | U8 | U64 | U128 | U256 | ByteArray | Address | Struct(_, _) => {
                 SignatureTokenKind::Value
             }
             // TODO: This is a temporary hack to please the verifier. SignatureTokenKind will soon
@@ -623,7 +627,7 @@ impl SignatureToken {
         match self {
             Struct(sh_idx, _) => Some(*sh_idx),
             Reference(token) | MutableReference(token) => token.struct_index(),
-            Bool | U8 | U64 | U128 | ByteArray | Address | TypeParameter(_) => None,
+            Bool | U8 | U64 | U128 | U256 | ByteArray | Address | TypeParameter(_) => None,
         }
     }
 
@@ -631,7 +635,7 @@ impl SignatureToken {
     pub fn is_primitive(&self) -> bool {
         use SignatureToken::*;
         match self {
-            Bool | U8 | U64 | U128 | ByteArray | Address => true,
+            Bool | U8 | U64 | U128 | U256 | ByteArray | Address => true,
             Struct(_, _) | Reference(_) | MutableReference(_) | TypeParameter(_) => false,
         }
     }
@@ -640,7 +644,7 @@ impl SignatureToken {
     pub fn is_integer(&self) -> bool {
         use SignatureToken::*;
         match self {
-            U8 | U64 | U128 => true,
+            U8 | U64 | U128 | U256 => true,
             Bool
             | ByteArray
             | Address
@@ -712,6 +716,7 @@ impl SignatureToken {
             U8 => U8,
             U64 => U64,
             U128 => U128,
+            U256 => U256,
             ByteArray => ByteArray,
             Address => Address,
             Struct(idx, actuals) => Struct(
@@ -737,7 +742,7 @@ impl SignatureToken {
 
         match ty {
             // The primitive types & references have kind unrestricted.
-            Bool | U8 | U64 | U128 | ByteArray | Address | Reference(_) | MutableReference(_) => {
+            Bool | U8 | U64 | U128| U256 | ByteArray | Address | Reference(_) | MutableReference(_) => {
                 Kind::Unrestricted
             }
 
@@ -860,6 +865,12 @@ pub enum Bytecode {
     ///
     /// ```... -> ..., u128_value```
     LdU128(u128),
+    /// Push a U256 constant onto the stack.
+    ///
+    /// Stack transition:
+    ///
+    /// ```... -> ..., U256_value```
+    LdU256(U256),
     /// Convert the value at the top of the stack into u8.
     ///
     /// Stack transition:
@@ -878,6 +889,12 @@ pub enum Bytecode {
     ///
     /// ```..., integer_value -> ..., u128_value```
     CastU128,
+    /// Convert the value at the top of the stack into u256.
+    ///
+    /// Stack transition:
+    ///
+    /// ```..., integer_value -> ..., u256_value```
+    CastU256,
     /// Push a `ByteArray` literal onto the stack. The `ByteArray` is loaded from the
     /// `ByteArrayPool` via `ByteArrayPoolIndex`.
     ///
@@ -1237,9 +1254,11 @@ impl ::std::fmt::Debug for Bytecode {
             Bytecode::LdU8(a) => write!(f, "LdU8({})", a),
             Bytecode::LdU64(a) => write!(f, "LdU64({})", a),
             Bytecode::LdU128(a) => write!(f, "LdU128({})", a),
+            Bytecode::LdU256(a) => write!(f, "LdU256({})", a),
             Bytecode::CastU8 => write!(f, "CastU8"),
             Bytecode::CastU64 => write!(f, "CastU64"),
             Bytecode::CastU128 => write!(f, "CastU128"),
+            Bytecode::CastU256 => write!(f, "CastU256"),
             Bytecode::LdByteArray(a) => write!(f, "LdByteArray({})", a),
             Bytecode::LdAddr(a) => write!(f, "LdAddr({})", a),
             Bytecode::LdTrue => write!(f, "LdTrue"),

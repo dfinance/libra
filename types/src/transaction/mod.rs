@@ -41,7 +41,7 @@ pub use script::{Script, SCRIPT_HASH_LENGTH};
 
 use std::ops::Deref;
 pub use transaction_argument::{parse_as_transaction_argument, TransactionArgument, parse_as_address,
-                               parse_as_bool, parse_as_byte_array, parse_as_u64};
+                               parse_as_bool, parse_as_byte_array, parse_as_u64, parse_as_u256};
 
 pub type Version = u64; // Height - also used for MVCC in StateDB
 

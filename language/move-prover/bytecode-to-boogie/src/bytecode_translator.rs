@@ -827,6 +827,10 @@ impl<'env> ModuleTranslator<'env> {
                 emitln!(self.writer, "call __tmp := LdConst({});", num);
                 emitln!(self.writer, &update_and_track_local(*idx, "__tmp"));
             }
+            LdU256(idx, num) => {
+                emitln!(self.writer, "call __tmp := LdConst({});", num);
+                emitln!(self.writer, &update_and_track_local(*idx, "__tmp"));
+            }
             CastU8(dest, src) => {
                 emitln!(
                     self.writer,

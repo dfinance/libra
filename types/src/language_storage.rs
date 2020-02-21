@@ -20,6 +20,7 @@ pub enum TypeTag {
     U8,
     U64,
     U128,
+    U256,
     ByteArray,
     Address,
     Struct(StructTag),

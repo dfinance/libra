@@ -17,6 +17,7 @@ use vm_runtime::{
     system_module_names::GAS_SCHEDULE_MODULE,
 };
 use vm_runtime_types::{loaded_data::types::Type, values::Value};
+use bigint::U256;
 
 static INITIAL_GAS_SCHEDULE: Lazy<Vec<u8>> = Lazy::new(|| {
     use Bytecode::*;
@@ -56,9 +57,11 @@ static INITIAL_GAS_SCHEDULE: Lazy<Vec<u8>> = Lazy::new(|| {
         (LdU8(0), GasCost::new(29, 1)),
         (LdU64(0), GasCost::new(29, 1)),
         (LdU128(0), GasCost::new(29, 1)),
+        (LdU256(U256::zero()), GasCost::new(29, 1)),
         (CastU8, GasCost::new(29, 1)),
         (CastU64, GasCost::new(29, 1)),
         (CastU128, GasCost::new(29, 1)),
+        (CastU256, GasCost::new(29, 1)),
         (Abort, GasCost::new(39, 1)),
         (MutBorrowLoc(0), GasCost::new(45, 1)),
         (ImmBorrowLoc(0), GasCost::new(45, 1)),

@@ -10,6 +10,7 @@ pub enum Tok {
     U8Value,
     U64Value,
     U128Value,
+    U256Value,
     NameValue,
     NameBeginTyValue,
     DotNameValue,
@@ -70,6 +71,7 @@ pub enum Tok {
     ToU8,
     ToU64,
     ToU128,
+    ToU256,
     If,
     Import,
     /// For spec language
@@ -101,6 +103,7 @@ pub enum Tok {
     U8,
     U64,
     U128,
+    U256,
     Unrestricted,
     While,
     LBrace,
@@ -376,7 +379,10 @@ fn get_decimal_number(text: &str) -> (Tok, usize) {
         (Tok::U64Value, len + 3)
     } else if rest.starts_with("u128") {
         (Tok::U128Value, len + 4)
-    } else {
+    } else if rest.starts_with("u256") {
+        (Tok::U256Value, len + 4)
+    }
+    else {
         (Tok::U64Value, len)
     }
 }
@@ -424,6 +430,7 @@ fn get_name_token(name: &str) -> Tok {
         "to_u8" => Tok::ToU8,
         "to_u64" => Tok::ToU64,
         "to_u128" => Tok::ToU128,
+        "to_u256" => Tok::ToU256,
         "if" => Tok::If,
         "import" => Tok::Import,
         "let" => Tok::Let,
@@ -446,6 +453,7 @@ fn get_name_token(name: &str) -> Tok {
         "u8" => Tok::U8,
         "u64" => Tok::U64,
         "u128" => Tok::U128,
+        "u256" => Tok::U256,
         "unrestricted" => Tok::Unrestricted,
         "while" => Tok::While,
         _ => Tok::NameValue,

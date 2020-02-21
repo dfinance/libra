@@ -11,6 +11,7 @@ use hex;
 use libra_types::identifier::Identifier;
 use libra_types::{account_address::AccountAddress, byte_array::ByteArray};
 use move_ir_types::{ast::*, spec_language_ast::*};
+use bigint::U256;
 
 // FIXME: The following simplified version of ParseError copied from
 // lalrpop-util should be replaced.
@@ -246,6 +247,15 @@ fn parse_copyable_val<'input>(
             tokens.advance()?;
             CopyableVal_::U128(i)
         }
+        Tok::U256Value => {
+            let mut s = tokens.content();
+            if s.ends_with("u256") {
+                s = &s[..s.len() - 4]
+            }
+            let i = U256::from_dec_str(s).unwrap();
+            tokens.advance()?;
+            CopyableVal_::U256(i)
+        }
         Tok::ByteArrayValue => {
             let s = tokens.content();
             let buf = ByteArray::new(hex::decode(&s[2..s.len() - 1]).unwrap_or_else(|_| {
@@ -379,7 +389,8 @@ fn parse_qualified_function_name<'input>(
         | Tok::Freeze
         | Tok::ToU8
         | Tok::ToU64
-        | Tok::ToU128 => {
+        | Tok::ToU128
+        | Tok::ToU256 => {
             let f = parse_builtin(tokens)?;
             FunctionCall_::Builtin(f)
         }
@@ -516,7 +527,8 @@ fn parse_call_or_term_<'input>(
         | Tok::DotNameValue
         | Tok::ToU8
         | Tok::ToU64
-        | Tok::ToU128 => {
+        | Tok::ToU128
+        | Tok::ToU256 => {
             let f = parse_qualified_function_name(tokens)?;
             let exp = parse_call_or_term(tokens)?;
             Ok(Exp_::FunctionCall(f, Box::new(exp)))
@@ -604,6 +616,7 @@ fn parse_term_<'input>(
         | Tok::U8Value
         | Tok::U64Value
         | Tok::U128Value
+        | Tok::U256Value
         | Tok::ByteArrayValue => Ok(Exp_::Value(parse_copyable_val(tokens)?)),
         Tok::NameValue | Tok::NameBeginTyValue => {
             let (name, type_actuals) = parse_name_and_type_actuals(tokens)?;
@@ -746,6 +759,10 @@ fn parse_builtin<'input>(
         Tok::ToU128 => {
             tokens.advance()?;
             Ok(Builtin::ToU128)
+        }
+        Tok::ToU256 => {
+            tokens.advance()?;
+            Ok(Builtin::ToU256)
         }
         _ => Err(ParseError::InvalidToken {
             location: tokens.start_loc(),
@@ -909,7 +926,8 @@ fn parse_cmd_<'input>(
         | Tok::DotNameValue
         | Tok::ToU8
         | Tok::ToU64
-        | Tok::ToU128 => Ok(Cmd_::Exp(Box::new(parse_call(tokens)?))),
+        | Tok::ToU128
+        | Tok::ToU256 => Ok(Cmd_::Exp(Box::new(parse_call(tokens)?))),
         Tok::LParen => {
             tokens.advance()?;
             let v = parse_comma_list(tokens, &[Tok::RParen], parse_exp, true)?;
@@ -1160,6 +1178,10 @@ fn parse_type<'input>(
         Tok::U128 => {
             tokens.advance()?;
             Type::U128
+        }
+        Tok::U256 => {
+            tokens.advance()?;
+            Type::U256
         }
         Tok::Bool => {
             tokens.advance()?;
@@ -1440,6 +1462,7 @@ fn parse_unary_spec_exp<'input>(
         | Tok::U8Value
         | Tok::U64Value
         | Tok::U128Value
+        | Tok::U256Value
         | Tok::ByteArrayValue => SpecExp::Constant(parse_copyable_val(tokens)?.value),
         Tok::GlobalExists => {
             consume_token(tokens, Tok::GlobalExists)?;

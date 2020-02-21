@@ -778,7 +778,7 @@ impl<'env> SpecTranslator<'env> {
         let _ = self.require_type(rt, expected_operand_type);
         let _ = self.require_type(lt, expected_operand_type);
         let expr = match expected_operand_type {
-            GlobalType::U8 | GlobalType::U64 | GlobalType::U128 => {
+            GlobalType::U8 | GlobalType::U64 | GlobalType::U128 | GlobalType::U256 => {
                 format!("i#Integer({}) {} i#Integer({})", l, op, r)
             }
             GlobalType::Bool => format!("b#Boolean({}) {} b#Boolean({})", l, op, r),
@@ -790,7 +790,7 @@ impl<'env> SpecTranslator<'env> {
             _ => panic!("unexpected type: {:?}", expected_operand_type),
         };
         match result_type {
-            GlobalType::U8 | GlobalType::U64 | GlobalType::U128 => {
+            GlobalType::U8 | GlobalType::U64 | GlobalType::U128 | GlobalType::U256 => {
                 BoogieExpr(format!("Integer({})", expr), result_type)
             }
             GlobalType::Bool => BoogieExpr(format!("Boolean({})", expr), result_type),
@@ -813,6 +813,7 @@ impl<'env> SpecTranslator<'env> {
             CopyableVal_::U8(val) => BoogieExpr(format!("Integer({})", val), GlobalType::U8),
             CopyableVal_::U64(val) => BoogieExpr(format!("Integer({})", val), GlobalType::U64),
             CopyableVal_::U128(val) => BoogieExpr(format!("Integer({})", val), GlobalType::U128),
+            CopyableVal_::U256(val) => BoogieExpr(format!("Integer({})", val), GlobalType::U256),
             CopyableVal_::Bool(val) => BoogieExpr(format!("Boolean({})", val), GlobalType::Bool),
             // TODO: byte arrays
             CopyableVal_::ByteArray(_arr) => BoogieExpr(
