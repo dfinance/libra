@@ -10,7 +10,7 @@ use once_cell::sync::Lazy;
 pub static ACCOUNT_MODULE: Lazy<ModuleId> = Lazy::new(|| {
     ModuleId::new(
         account_config::core_code_address(),
-        Identifier::new("LibraAccount").unwrap(),
+        Identifier::new("WBAccount").unwrap(),
     )
 });
 /// The ModuleId for the LibraTransactionTimeout module
@@ -24,7 +24,7 @@ pub static LIBRA_TRANSACTION_TIMEOUT: Lazy<ModuleId> = Lazy::new(|| {
 pub static COIN_MODULE: Lazy<ModuleId> = Lazy::new(|| {
     ModuleId::new(
         account_config::core_code_address(),
-        Identifier::new("LibraCoin").unwrap(),
+        Identifier::new("WBCoins").unwrap(),
     )
 });
 /// The ModuleId for the Event
