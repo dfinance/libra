@@ -362,7 +362,7 @@ static NATIVE_FUNCTION_MAP: Lazy<NativeFunctionMap> = Lazy::new(|| {
     add!(
         m,
         addr,
-        "WBAccount",
+        "Account",
         "save_account",
         |_, _, _| {
             Err(VMStatus::new(StatusCode::UNREACHABLE)
