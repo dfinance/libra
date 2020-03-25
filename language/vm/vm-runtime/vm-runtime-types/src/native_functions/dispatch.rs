@@ -347,7 +347,7 @@ static NATIVE_FUNCTION_MAP: Lazy<NativeFunctionMap> = Lazy::new(|| {
     add!(
         m,
         addr,
-        "LibraAccount",
+        "Account",
         "write_to_event_store",
         |_, _, _| {
             Err(VMStatus::new(StatusCode::UNREACHABLE).with_message(
