@@ -39,7 +39,7 @@ where
     }
 }
 
-fn make_loc(file: &'static str, start: usize, end: usize) -> Loc {
+pub fn make_loc(file: &'static str, start: usize, end: usize) -> Loc {
     Loc::new(
         file,
         Span::new(ByteIndex(start as u32), ByteIndex(end as u32)),
