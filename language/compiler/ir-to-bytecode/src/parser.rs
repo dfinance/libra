@@ -56,7 +56,7 @@ fn verify_string(string: &str) -> Result<()> {
         })
 }
 
-fn strip_comments(source: &str) -> String {
+pub fn strip_comments(source: &str) -> String {
     const SLASH: char = '/';
     const SPACE: char = ' ';
 
