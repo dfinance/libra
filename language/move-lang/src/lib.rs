@@ -333,7 +333,7 @@ fn strip_comments(source: &str) -> String {
 
 // We restrict strings to only ascii visual characters (0x20 <= c <= 0x7E) or a permitted newline
 // character--\n--or a tab--\t.
-fn strip_comments_and_verify(fname: &'static str, string: &str) -> Result<String, Error> {
+pub fn strip_comments_and_verify(fname: &'static str, string: &str) -> Result<String, Error> {
     verify_string(fname, string)?;
     Ok(strip_comments(string))
 }
