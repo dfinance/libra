@@ -5,4 +5,4 @@ pub mod ast;
 pub(crate) mod core;
 mod expand;
 mod globals;
-pub(crate) mod translate;
+pub mod translate;
