@@ -47,11 +47,11 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cargo build --release -p compiler
+      run: cargo build --release -p move-lang --bin move-build
 
     - name: Rename artifact
       shell: bash
-      run: mv target/release/compiler movec-${{ runner.os }}
+      run: mv target/release/move-build movec-${{ runner.os }}
 
     - name: Transfer artifact for next job
       uses: actions/upload-artifact@master
@@ -114,5 +114,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: artifacts/movec-macOS
-        asset_name: movec-${{ steps.version_tag.outputs.value }}-macos
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-darwin
         asset_content_type: application/octet-stream
