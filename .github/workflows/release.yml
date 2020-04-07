@@ -33,12 +33,11 @@ jobs:
         toolchain: stable
         profile: minimal
         override: true
-        components: rustfmt, clippy
 
     - if: matrix.os == 'ubuntu-latest'
       run: sudo chown -R $(whoami):$(id -ng) ~/.cargo/
 
-    - name: Restore cargo cache from cache
+    - name: Restore Cargo cache
       uses: actions/cache@v1
       with:
         path: ~/.cargo
@@ -93,7 +92,7 @@ jobs:
         draft: true
         prerelease: true
 
-    - name: Upload Release Asset (linux)
+    - name: Upload Release (linux)
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -104,7 +103,7 @@ jobs:
         asset_name: movec-${{ steps.version_tag.outputs.value }}-linux
         asset_content_type: application/octet-stream
 
-    - name: Upload Release Asset (mac)
+    - name: Upload Release (mac)
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
