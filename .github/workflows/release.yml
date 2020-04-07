@@ -62,18 +62,18 @@ jobs:
     - name: Archive
       if: matrix.os != 'windows-latest'
       run: |
-        zip --junk-paths dvm-${{ runner.os }}.zip LICENSE target/release/compiler
+        zip --junk-paths movec-${{ runner.os }}.zip LICENSE target/release/compiler
     - name: Archive (win)
       if: matrix.os == 'windows-latest'
       uses: papeloto/action-zip@v1
       with:
         files: LICENSE target/release/compiler.exe
-        dest: dvm-${{ runner.os }}.zip
+        dest: movec-${{ runner.os }}.zip
 
     - uses: actions/upload-artifact@master
       with:
-        name: dvm-${{ runner.os }}
-        path: dvm-${{ runner.os }}.zip
+        name: movec-${{ runner.os }}
+        path: movec-${{ runner.os }}.zip
 
 
   release:
@@ -87,19 +87,19 @@ jobs:
     - name: Get macOS artifacts from Build Job
       uses: actions/download-artifact@v1
       with:
-        name: dvm-macOS
+        name: movec-macOS
         path: artifacts/
 
     - name: Get Linux artifacts from Build Job
       uses: actions/download-artifact@v1
       with:
-        name: dvm-Linux
+        name: movec-Linux
         path: artifacts/
 
     - name: Get Windows artifacts from Build Job
       uses: actions/download-artifact@v1
       with:
-        name: dvm-Windows
+        name: movec-Windows
         path: artifacts/
 
     - name: Extract the version tag
@@ -126,8 +126,8 @@ jobs:
       with:
         # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include an `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/dvm-Linux.zip
-        asset_name: dvm-${{ steps.version_tag.outputs.value }}-linux.zip
+        asset_path: artifacts/movec-Linux.zip
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-linux.zip
         asset_content_type: application/zip
 
     - name: Upload Release Asset (mac)
@@ -136,8 +136,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/dvm-macOS.zip
-        asset_name: dvm-${{ steps.version_tag.outputs.value }}-macos.zip
+        asset_path: artifacts/movec-macOS.zip
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-macos.zip
         asset_content_type: application/zip
 
     - name: Upload Release Asset (win)
@@ -146,6 +146,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/dvm-Windows.zip
-        asset_name: dvm-${{ steps.version_tag.outputs.value }}-windows.zip
+        asset_path: artifacts/movec-Windows.zip
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-windows.zip
         asset_content_type: application/zip
