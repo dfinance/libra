@@ -49,11 +49,15 @@ jobs:
       shell: bash
       run: cargo build --release -p compiler
 
+    - name: Rename artifact
+      shell: bash
+      run: mv target/release/compiler movec-${{ runner.os }}
+
     - name: Transfer artifact for next job
       uses: actions/upload-artifact@master
       with:
         name: movec-${{ runner.os }}
-        path: target/release/compiler
+        path: movec-${{ runner.os }}
 
   release:
     needs: build
