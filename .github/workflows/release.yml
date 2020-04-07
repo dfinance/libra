@@ -1,0 +1,118 @@
+name: Build Release
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    name: Build Release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+        - macos-latest
+        - ubuntu-latest
+
+    env:
+      RUSTFLAGS: -D warnings
+      RUST_BACKTRACE: full
+      CARGO_INCREMENTAL: 0
+      RUSTUP_MAX_RETRIES: 10
+      CARGO_NET_RETRY: 10
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - if: matrix.os == 'ubuntu-latest'
+      run: sudo chown -R $(whoami):$(id -ng) ~/.cargo/
+
+    - name: Restore Cargo cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-cargo
+        restore-keys: |
+          ${{ runner.os }}-cargo
+
+    - name: Build
+      shell: bash
+      run: cargo build --release -p compiler
+
+    - name: Rename artifact
+      shell: bash
+      run: mv target/release/compiler movec-${{ runner.os }}
+
+    - name: Transfer artifact for next job
+      uses: actions/upload-artifact@master
+      with:
+        name: movec-${{ runner.os }}
+        path: movec-${{ runner.os }}
+
+  release:
+    needs: build
+    name: Upload Artifacts
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Get macOS artifacts from Build Job
+      uses: actions/download-artifact@v1
+      with:
+        name: movec-macOS
+        path: artifacts/
+
+    - name: Get Linux artifacts from Build Job
+      uses: actions/download-artifact@v1
+      with:
+        name: movec-Linux
+        path: artifacts/
+
+    - name: Extract the version tag
+      id: version_tag
+      # or ${GITHUB_REF##*/}
+      shell: bash
+      run: echo ::set-output name=value::$(echo $GITHUB_REF | cut -d / -f 3)
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: true
+
+    - name: Upload Release (linux)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include an `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/movec-Linux
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-linux
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release (mac)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/movec-macOS
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-macos
+        asset_content_type: application/octet-stream
