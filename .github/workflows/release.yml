@@ -15,7 +15,6 @@ jobs:
         os:
         - macos-latest
         - ubuntu-latest
-        # - windows-latest
 
     env:
       RUSTFLAGS: -D warnings
@@ -27,14 +26,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    # # We need to disable the existing toolchain to avoid updating rust-docs
-    # # which takes a long time. The fastest way to do this is to rename the
-    # # existing folder, as deleting it takes about as much time as not doing
-    # # anything and just updating rust-docs.
-    # - name: Rename existing rust toolchain (Windows)
-    #   if: matrix.os == 'windows-latest'
-    #   run: Rename-Item C:\Users\runneradmin\.rustup\toolchains\stable-x86_64-pc-windows-msvc C:\Users\runneradmin\.rustup\toolchains\stable-x86_64-pc-windows-msvc.old
 
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -59,22 +50,11 @@ jobs:
       shell: bash
       run: cargo build --release -p compiler
 
-    - name: Archive
-      # if: matrix.os != 'windows-latest'
-      run: |
-        zip --junk-paths movec-${{ runner.os }}.zip LICENSE target/release/compiler
-    # - name: Archive (win)
-    #   if: matrix.os == 'windows-latest'
-    #   uses: papeloto/action-zip@v1
-    #   with:
-    #     files: LICENSE target/release/compiler.exe
-    #     dest: movec-${{ runner.os }}.zip
-
-    - uses: actions/upload-artifact@master
+    - name: Transfer artifact for next job
+      uses: actions/upload-artifact@master
       with:
         name: movec-${{ runner.os }}
-        path: movec-${{ runner.os }}.zip
-
+        path: target/release/compiler
 
   release:
     needs: build
@@ -95,12 +75,6 @@ jobs:
       with:
         name: movec-Linux
         path: artifacts/
-
-    # - name: Get Windows artifacts from Build Job
-    #   uses: actions/download-artifact@v1
-    #   with:
-    #     name: movec-Windows
-    #     path: artifacts/
 
     - name: Extract the version tag
       id: version_tag
@@ -126,9 +100,9 @@ jobs:
       with:
         # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include an `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/movec-Linux.zip
-        asset_name: movec-${{ steps.version_tag.outputs.value }}-linux.zip
-        asset_content_type: application/zip
+        asset_path: artifacts/movec-Linux
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-linux
+        asset_content_type: application/octet-stream
 
     - name: Upload Release Asset (mac)
       uses: actions/upload-release-asset@v1
@@ -136,16 +110,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: artifacts/movec-macOS.zip
-        asset_name: movec-${{ steps.version_tag.outputs.value }}-macos.zip
-        asset_content_type: application/zip
-
-    # - name: Upload Release Asset (win)
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: artifacts/movec-Windows.zip
-    #     asset_name: movec-${{ steps.version_tag.outputs.value }}-windows.zip
-    #     asset_content_type: application/zip
+        asset_path: artifacts/movec-macOS
+        asset_name: movec-${{ steps.version_tag.outputs.value }}-macos
+        asset_content_type: application/octet-stream
