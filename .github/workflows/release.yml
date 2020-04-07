@@ -96,14 +96,6 @@ jobs:
         draft: true
         prerelease: true
 
-    - name: debug
-      shell: bash
-      run: |
-        ls artifacts/*
-        ls artifacts/**
-        file artifacts/movec-Linux
-
-
     - name: Upload Release (linux)
       uses: actions/upload-release-asset@v1
       env:
