@@ -41,6 +41,7 @@ use vm::{
     gas_schedule::{CostTable, GasAlgebra, GasUnits},
     transaction_metadata::TransactionMetadata,
 };
+use move_vm_types::native_functions::dispatch::StdFunctions;
 
 // The seed is arbitrarily picked to produce a consistent key. XXX make this more formal?
 const GENESIS_SEED: [u8; 32] = [42; 32];
@@ -230,7 +231,7 @@ fn create_and_initialize_main_accounts(
     txn_data.sender = association_addr;
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &ASSOCIATION_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -243,7 +244,7 @@ fn create_and_initialize_main_accounts(
 
     // create  the LBR module
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LBR_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -256,7 +257,7 @@ fn create_and_initialize_main_accounts(
 
     // create the association account
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &CREATE_ACCOUNT_NAME,
             gas_schedule,
@@ -278,7 +279,7 @@ fn create_and_initialize_main_accounts(
     // create the transaction fee account
     let transaction_fee_address = account_config::transaction_fee_address();
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &CREATE_ACCOUNT_NAME,
             gas_schedule,
@@ -298,7 +299,7 @@ fn create_and_initialize_main_accounts(
         });
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_TRANSACTION_TIMEOUT,
             &INITIALIZE,
             &gas_schedule,
@@ -310,7 +311,7 @@ fn create_and_initialize_main_accounts(
         .expect("Failure initializing LibraTransactionTimeout");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_BLOCK_MODULE,
             &INITIALIZE_BLOCK,
             &gas_schedule,
@@ -322,7 +323,7 @@ fn create_and_initialize_main_accounts(
         .expect("Failure initializing block metadata");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_WRITESET_MANAGER_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -334,7 +335,7 @@ fn create_and_initialize_main_accounts(
         .expect("Failure initializing LibraWriteSetManager");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_CONFIG_MODULE,
             &INITIALIZE_CONFIG,
             &gas_schedule,
@@ -345,7 +346,7 @@ fn create_and_initialize_main_accounts(
         )
         .expect("Failure initializing block metadata");
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &GAS_SCHEDULE_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -357,7 +358,7 @@ fn create_and_initialize_main_accounts(
         .expect("Failure initializing gas module");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &MINT_TO_ADDRESS,
             &gas_schedule,
@@ -374,7 +375,7 @@ fn create_and_initialize_main_accounts(
 
     let genesis_auth_key = AuthenticationKey::ed25519(public_key).to_vec();
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &ROTATE_AUTHENTICATION_KEY,
             &gas_schedule,
@@ -400,7 +401,7 @@ fn create_and_initialize_main_accounts(
             .expect("Failure looking up LBR type"),
     ));
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &EPILOGUE,
             &gas_schedule,
@@ -418,7 +419,7 @@ fn create_and_initialize_main_accounts(
 
     txn_data.sender = account_config::transaction_fee_address();
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &TRANSACTION_FEE_MODULE,
             &INITIALIZE_TXN_FEES,
             &gas_schedule,
@@ -462,7 +463,7 @@ fn create_and_initialize_validator_set(
     txn_data.sender = validator_set_address;
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &CREATE_ACCOUNT_NAME,
             gas_schedule,
@@ -482,7 +483,7 @@ fn create_and_initialize_validator_set(
         });
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_SYSTEM_MODULE,
             &INITIALIZE_VALIDATOR_SET,
             &gas_schedule,
@@ -505,7 +506,7 @@ fn create_and_initialize_discovery_set(
     txn_data.sender = discovery_set_address;
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &account_config::ACCOUNT_MODULE,
             &CREATE_ACCOUNT_NAME,
             gas_schedule,
@@ -525,7 +526,7 @@ fn create_and_initialize_discovery_set(
         });
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_SYSTEM_MODULE,
             &INITIALIZE_DISCOVERY_SET,
             &gas_schedule,
@@ -586,7 +587,7 @@ fn initialize_validators(
                 )
             });
         move_vm
-            .execute_function(
+            .execute_function::<_, StdFunctions>(
                 &account_config::ACCOUNT_MODULE,
                 &CREATE_ACCOUNT_NAME,
                 gas_schedule,
@@ -608,7 +609,7 @@ fn initialize_validators(
         let mut validator_txn_data = TransactionMetadata::default();
         validator_txn_data.sender = validator_address;
         move_vm
-            .execute_function(
+            .execute_function::<_, StdFunctions>(
                 &VALIDATOR_CONFIG_MODULE,
                 &REGISTER_CANDIDATE_VALIDATOR,
                 &gas_schedule,
@@ -638,7 +639,7 @@ fn initialize_validators(
             .unwrap_or_else(|_| panic!("Failure initializing validator {:?}", validator_address));
         // Then, add the account to the validator set
         move_vm
-            .execute_function(
+            .execute_function::<_, StdFunctions>(
                 &LIBRA_SYSTEM_MODULE,
                 &ADD_VALIDATOR,
                 &gas_schedule,
@@ -663,7 +664,7 @@ fn setup_publishing_option(
     let option_bytes =
         lcs::to_bytes(&publishing_option).expect("Cannot serialize publishing option");
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &SCRIPT_WHITELIST_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -684,7 +685,7 @@ fn setup_libra_version(
     txn_data.sender = account_config::association_address();
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_VERSION_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -717,7 +718,7 @@ fn reconfigure(
     txn_data.sender = account_config::association_address();
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_TIME_MODULE,
             &INITIALIZE,
             &gas_schedule,
@@ -729,7 +730,7 @@ fn reconfigure(
         .expect("Failure reconfiguring the system");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_CONFIG_MODULE,
             &RECONFIGURE,
             &gas_schedule,
@@ -741,7 +742,7 @@ fn reconfigure(
         .expect("Failure reconfiguring the system");
 
     move_vm
-        .execute_function(
+        .execute_function::<_, StdFunctions>(
             &LIBRA_SYSTEM_MODULE,
             &EMIT_DISCOVERY_SET,
             &gas_schedule,

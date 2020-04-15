@@ -22,7 +22,7 @@ use vm::{
     errors::*,
     file_format::{Constant, SignatureToken},
     gas_schedule::{
-        words_in, AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, NativeCostIndex,
+        words_in, AbstractMemorySize, GasAlgebra, GasCarrier, NativeCostIndex,
         CONST_SIZE, REFERENCE_SIZE, STRUCT_SIZE,
     },
 };
@@ -1375,6 +1375,7 @@ macro_rules! ensure_len {
 
 pub mod vector {
     use super::*;
+    use crate::native_functions::context::NativeContext;
 
     pub const INDEX_OUT_OF_BOUNDS: u64 = NFE_VECTOR_ERROR_BASE + 1;
     pub const POP_EMPTY_VEC: u64 = NFE_VECTOR_ERROR_BASE + 2;
@@ -1418,14 +1419,14 @@ pub mod vector {
     }
 
     pub fn native_empty(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "empty");
         ensure_len!(args, 0, "arguments", "empty");
 
-        let cost = native_gas(cost_table, NativeCostIndex::EMPTY, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::EMPTY, 1);
         let container = match &ty_args[0] {
             Type::U8 => Container::U8(vec![]),
             Type::U64 => Container::U64(vec![]),
@@ -1447,14 +1448,14 @@ pub mod vector {
     }
 
     pub fn native_length(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "length");
         ensure_len!(args, 1, "arguments", "length");
 
-        let cost = native_gas(cost_table, NativeCostIndex::LENGTH, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::LENGTH, 1);
         let r = pop_arg_front!(args, ContainerRef);
         let v = r.borrow();
 
@@ -1472,9 +1473,9 @@ pub mod vector {
     }
 
     pub fn native_push_back(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "push back");
         ensure_len!(args, 2, "arguments", "push back");
@@ -1483,7 +1484,8 @@ pub mod vector {
         let mut v = r.borrow_mut();
         let e = args.pop_front().unwrap();
 
-        let cost = cost_table
+        let cost = context
+            .cost_table()
             .native_cost(NativeCostIndex::PUSH_BACK)
             .total()
             .mul(e.size());
@@ -1502,14 +1504,14 @@ pub mod vector {
     }
 
     pub fn native_borrow(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "borrow");
         ensure_len!(args, 2, "arguments", "borrow");
 
-        let cost = native_gas(cost_table, NativeCostIndex::BORROW, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::BORROW, 1);
         let r = pop_arg_front!(args, ContainerRef);
         let v = r.borrow();
         let idx = pop_arg_front!(args, u64) as usize;
@@ -1529,14 +1531,14 @@ pub mod vector {
     }
 
     pub fn native_pop(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "pop");
         ensure_len!(args, 1, "arguments", "pop");
 
-        let cost = native_gas(cost_table, NativeCostIndex::POP_BACK, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::POP_BACK, 1);
         let r = pop_arg_front!(args, ContainerRef);
         let mut v = r.borrow_mut();
 
@@ -1579,14 +1581,14 @@ pub mod vector {
     }
 
     pub fn native_destroy_empty(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "destroy empty");
         ensure_len!(args, 1, "arguments", "destroy empty");
 
-        let cost = native_gas(cost_table, NativeCostIndex::DESTROY_EMPTY, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::DESTROY_EMPTY, 1);
         let v = args.pop_front().unwrap().value_as::<Container>()?;
 
         check_elem_layout(&ty_args[0], &v)?;
@@ -1612,14 +1614,14 @@ pub mod vector {
     }
 
     pub fn native_swap(
+        context: &impl NativeContext,
         ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "swap");
         ensure_len!(args, 3, "arguments", "swap");
 
-        let cost = native_gas(cost_table, NativeCostIndex::SWAP, 1);
+        let cost = native_gas(context.cost_table(), NativeCostIndex::SWAP, 1);
         let r = pop_arg_front!(args, ContainerRef);
         let mut v = r.borrow_mut();
         let idx1 = pop_arg_front!(args, u64) as usize;
@@ -1918,6 +1920,7 @@ impl Display for Locals {
 #[allow(dead_code)]
 pub mod debug {
     use super::*;
+    use crate::native_functions::context::NativeContext;
     use std::fmt::Write;
     use vm::gas_schedule::ZERO_GAS_UNITS;
 
@@ -2118,9 +2121,9 @@ pub mod debug {
 
     #[allow(unused_mut)]
     pub fn native_print(
+        _context: &mut impl NativeContext,
         mut ty_args: Vec<Type>,
         mut args: VecDeque<Value>,
-        _cost_table: &CostTable,
     ) -> VMResult<NativeResult> {
         ensure_len!(ty_args, 1, "type arguments", "print");
         ensure_len!(args, 1, "arguments", "print");
@@ -2134,6 +2137,30 @@ pub mod debug {
             let mut buf = String::new();
             print_reference(&mut buf, &ty, &r)?;
             println!("[debug] {}", buf);
+        }
+
+        Ok(NativeResult::ok(ZERO_GAS_UNITS, vec![]))
+    }
+
+    pub fn native_print_stack_trace(
+        context: &mut impl NativeContext,
+        ty_args: Vec<Type>,
+        mut _arguments: VecDeque<Value>,
+    ) -> VMResult<NativeResult> {
+        if !ty_args.is_empty() {
+            return Err(
+                VMStatus::new(StatusCode::VERIFIER_INVARIANT_VIOLATION).with_message(format!(
+                    "print_stack_trace expects no type arguments got {}.",
+                    ty_args.len()
+                )),
+            );
+        }
+
+        #[cfg(feature = "debug_module")]
+        {
+            let mut s = String::new();
+            context.debug_print_stack_trace(&mut s)?;
+            println!("{}", s);
         }
 
         Ok(NativeResult::ok(ZERO_GAS_UNITS, vec![]))

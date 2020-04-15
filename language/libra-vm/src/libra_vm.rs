@@ -40,6 +40,7 @@ use vm::{
     },
     transaction_metadata::TransactionMetadata,
 };
+use move_vm_types::native_functions::dispatch::StdFunctions;
 
 #[derive(Clone)]
 /// A wrapper to make VMRuntime standalone and thread safe.
@@ -375,7 +376,7 @@ impl LibraVM {
                 };
                 let ret =
                     self.move_vm
-                        .execute_script(s, gas_schedule, &mut ctx, txn_data, ty_args, args);
+                        .execute_script::<_, StdFunctions>(s, gas_schedule, &mut ctx, txn_data, ty_args, args);
                 let gas_usage = txn_data.max_gas_amount().sub(ctx.remaining_gas()).get();
                 record_stats!(observe | TXN_EXECUTION_GAS_USAGE | gas_usage);
                 ret
@@ -507,7 +508,7 @@ impl LibraVM {
                 Value::vector_address(previous_vote),
                 Value::address(proposer),
             ];
-            self.move_vm.execute_function(
+            self.move_vm.execute_function::<_, StdFunctions>(
                 &LIBRA_BLOCK_MODULE,
                 &BLOCK_PROLOGUE,
                 &gas_schedule,
@@ -653,7 +654,7 @@ impl LibraVM {
         let txn_expiration_time = txn_data.expiration_time();
         record_stats! {time_hist | TXN_PROLOGUE_TIME_TAKEN | {
                 self.move_vm
-                    .execute_function(
+                    .execute_function::<_, StdFunctions>(
                         &account_config::ACCOUNT_MODULE,
                         &PROLOGUE_NAME,
                         self.get_gas_schedule()?,
@@ -686,7 +687,7 @@ impl LibraVM {
         let txn_max_gas_units = txn_data.max_gas_amount().get();
         let gas_remaining = chain_state.remaining_gas().get();
         record_stats! {time_hist | TXN_EPILOGUE_TIME_TAKEN | {
-                self.move_vm.execute_function(
+                self.move_vm.execute_function::<_, StdFunctions>(
                     &account_config::ACCOUNT_MODULE,
                     &EPILOGUE_NAME,
                     self.get_gas_schedule()?,
@@ -716,7 +717,7 @@ impl LibraVM {
         let gas_schedule = CostTable::zero();
         record_stats! {time_hist | TXN_PROLOGUE_TIME_TAKEN | {
                 self.move_vm
-                    .execute_function(
+                    .execute_function::<_, StdFunctions>(
                         &LIBRA_WRITESET_MANAGER_MODULE,
                         &PROLOGUE_NAME,
                         &gas_schedule,
@@ -746,7 +747,7 @@ impl LibraVM {
         let gas_schedule = CostTable::zero();
 
         record_stats! {time_hist | TXN_EPILOGUE_TIME_TAKEN | {
-                self.move_vm.execute_function(
+                self.move_vm.execute_function::<_, StdFunctions>(
                     &LIBRA_WRITESET_MANAGER_MODULE,
                     &EPILOGUE_NAME,
                     &gas_schedule,

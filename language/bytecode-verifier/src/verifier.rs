@@ -13,7 +13,7 @@ use libra_types::{
     language_storage::ModuleId,
     vm_error::{StatusCode, VMStatus},
 };
-use move_vm_types::native_functions::dispatch::NativeFunction;
+use move_vm_types::native_functions::dispatch::{FunctionResolver, StdFunctions};
 use std::collections::BTreeMap;
 use vm::{
     access::{ModuleAccess, ScriptAccess},
@@ -254,7 +254,7 @@ fn verify_native_functions(module_view: &ModuleView<VerifiedModule>) -> Vec<VMSt
         .filter(|fdv| fdv.1.is_native())
     {
         let function_name = native_function_definition_view.name();
-        match NativeFunction::resolve(&module_id, function_name) {
+        match StdFunctions::resolve(&module_id, function_name) {
             None => errors.push(verification_error(
                 IndexKind::FunctionHandle,
                 idx,

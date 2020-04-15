@@ -1,6 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::native_functions::context::NativeContext;
 use crate::{
     loaded_data::types::Type,
     native_functions::dispatch::{native_gas, NativeResult},
@@ -43,9 +44,9 @@ const OVERSIZED_PUBLIC_KEY_SIZE_FAILURE: u64 = DEFAULT_ERROR_CODE + 8;
 const INVALID_PUBLIC_KEY_SIZE_FAILURE: u64 = DEFAULT_ERROR_CODE + 9;
 
 pub fn native_ed25519_signature_verification(
+    context: &impl NativeContext,
     _ty_args: Vec<Type>,
     mut arguments: VecDeque<Value>,
-    cost_table: &CostTable,
 ) -> VMResult<NativeResult> {
     if arguments.len() != 3 {
         let msg = format!(
@@ -58,7 +59,11 @@ pub fn native_ed25519_signature_verification(
     let pubkey = pop_arg!(arguments, Vec<u8>);
     let signature = pop_arg!(arguments, Vec<u8>);
 
-    let cost = native_gas(cost_table, NativeCostIndex::ED25519_VERIFY, msg.len());
+    let cost = native_gas(
+        context.cost_table(),
+        NativeCostIndex::ED25519_VERIFY,
+        msg.len(),
+    );
 
     let sig = match ed25519::Ed25519Signature::try_from(signature.as_slice()) {
         Ok(sig) => sig,
@@ -88,9 +93,9 @@ pub fn native_ed25519_signature_verification(
 
 /// Batch verify a collection of signatures using a bitmap for matching signatures to keys.
 pub fn native_ed25519_threshold_signature_verification(
+    context: &impl NativeContext,
     _ty_args: Vec<Type>,
     mut arguments: VecDeque<Value>,
-    cost_table: &CostTable,
 ) -> VMResult<NativeResult> {
     if arguments.len() != 4 {
         let msg = format!(
@@ -109,7 +114,7 @@ pub fn native_ed25519_threshold_signature_verification(
         &signatures,
         &public_keys,
         &message,
-        cost_table,
+        context.cost_table(),
     ))
 }
 

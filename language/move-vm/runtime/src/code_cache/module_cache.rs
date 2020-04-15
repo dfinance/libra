@@ -2,12 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Cache for modules published on chain.
 
-use crate::{
-    interpreter_context::InterpreterContext,
-    loaded_data::{
-        function::{FunctionRef, FunctionReference},
-        loaded_module::LoadedModule,
-    },
+use crate::loaded_data::{
+    function::{FunctionRef, FunctionReference},
+    loaded_module::LoadedModule,
 };
 use bytecode_verifier::VerifiedModule;
 use libra_logger::prelude::*;
@@ -16,6 +13,7 @@ use libra_types::{
     vm_error::{StatusCode, VMStatus},
 };
 use move_vm_cache::{Arena, CacheRefMap};
+use move_vm_types::interpreter_context::InterpreterContext;
 use move_vm_types::loaded_data::types::{StructType, Type};
 use vm::{
     access::ModuleAccess,

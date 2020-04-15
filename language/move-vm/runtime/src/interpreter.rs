@@ -1,35 +1,30 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::native_context::FunctionContext;
 use crate::{
     gas,
-    interpreter_context::InterpreterContext,
     loaded_data::{
         function::{FunctionRef, FunctionReference},
         loaded_module::LoadedModule,
     },
     runtime::VMRuntime,
-    special_names::{EMIT_EVENT_NAME, PRINT_STACK_TRACE_NAME, SAVE_ACCOUNT_NAME},
 };
 use libra_logger::prelude::*;
 use libra_types::{
     access_path::AccessPath,
     account_address::AccountAddress,
-    account_config::{self, AccountResource, BalanceResource},
-    contract_event::ContractEvent,
-    event::EventKey,
-    move_resource::MoveResource,
     transaction::MAX_TRANSACTION_SIZE_IN_BYTES,
     vm_error::{StatusCode, StatusType, VMStatus},
 };
-use move_core_types::identifier::IdentStr;
+use move_vm_types::interpreter_context::InterpreterContext;
+use move_vm_types::native_functions::dispatch::{Function, FunctionResolver};
 use move_vm_types::{
     identifier::create_access_path,
     loaded_data::types::{StructType, Type},
-    native_functions::dispatch::NativeFunction,
     values::{self, IntegerValue, Locals, Reference, Struct, StructRef, VMValueCast, Value},
 };
-use std::{cmp::min, collections::VecDeque, convert::TryFrom, fmt::Write, marker::PhantomData};
+use std::{cmp::min, collections::VecDeque, fmt::Write, marker::PhantomData};
 use vm::{
     access::ModuleAccess,
     errors::*,
@@ -38,8 +33,7 @@ use vm::{
         StructDefinitionIndex,
     },
     gas_schedule::{
-        calculate_intrinsic_gas, AbstractMemorySize, CostTable, GasAlgebra, GasCarrier,
-        NativeCostIndex, Opcodes,
+        calculate_intrinsic_gas, AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, Opcodes,
     },
     transaction_metadata::TransactionMetadata,
 };
@@ -73,7 +67,7 @@ macro_rules! debug_writeln {
 // REVIEW: abstract the data store better (maybe a single Trait for both data and event?)
 // The ModuleCache should be a Loader with a proper API.
 // Resolve where GasMeter should live.
-pub(crate) struct Interpreter<'txn> {
+pub struct Interpreter<'txn, R: FunctionResolver> {
     /// Operand stack, where Move `Value`s are stored for stack operations.
     operand_stack: Stack,
     /// The stack of active functions.
@@ -82,9 +76,10 @@ pub(crate) struct Interpreter<'txn> {
     /// GetTxnSenderAddress, ...)
     txn_data: &'txn TransactionMetadata,
     gas_schedule: &'txn CostTable,
+    function_resolver: PhantomData<R>
 }
 
-impl<'txn> Interpreter<'txn> {
+impl<'txn, R> Interpreter<'txn, R> where R: FunctionResolver {
     /// Entrypoint into the interpreter. All external calls need to be routed through this
     /// function.
     pub(crate) fn entrypoint(
@@ -119,7 +114,12 @@ impl<'txn> Interpreter<'txn> {
             call_stack: CallStack::new(),
             gas_schedule,
             txn_data,
+            function_resolver: PhantomData
         }
+    }
+
+    pub fn gas_schedule(&self) -> &CostTable {
+        self.gas_schedule
     }
 
     /// Internal execution entry point.
@@ -754,7 +754,7 @@ impl<'txn> Interpreter<'txn> {
     ) -> VMResult<Option<Frame<'txn, FunctionRef<'txn>>>> {
         let func = runtime.resolve_function_ref(module, idx, context)?;
         if func.is_native() {
-            self.call_native(runtime, context, func, ty_args)?;
+            self.call_native(runtime, context, module, func, ty_args)?;
             Ok(None)
         } else {
             let mut locals = Locals::new(func.local_count());
@@ -771,6 +771,7 @@ impl<'txn> Interpreter<'txn> {
         &mut self,
         runtime: &'txn VMRuntime<'_>,
         context: &mut dyn InterpreterContext,
+        caller_module: &LoadedModule,
         function: FunctionRef<'txn>,
         ty_args: Vec<Type>,
     ) -> VMResult<()> {
@@ -778,138 +779,31 @@ impl<'txn> Interpreter<'txn> {
         let module_id = module.self_id();
         let function_name = function.name();
         let native_function = {
-            NativeFunction::resolve(&module_id, function_name)
+            R::resolve(&module_id, function_name)
                 .ok_or_else(|| VMStatus::new(StatusCode::LINKER_ERROR))?
         };
-        if module_id == *account_config::ACCOUNT_MODULE
-            && function_name == EMIT_EVENT_NAME.as_ident_str()
-        {
-            self.call_emit_event(context, ty_args)
-        } else if module_id == *account_config::ACCOUNT_MODULE
-            && function_name == SAVE_ACCOUNT_NAME.as_ident_str()
-        {
-            self.call_save_account(runtime, context, ty_args)
-        } else if module_id == *account_config::DEBUG_MODULE
-            && function_name == PRINT_STACK_TRACE_NAME.as_ident_str()
-        {
-            self.call_print_stack_trace(runtime, context, ty_args)
-        } else {
-            let mut arguments = VecDeque::new();
-            let expected_args = native_function.num_args();
-            // REVIEW: this is checked again in every functions, rationalize it!
-            if function.arg_count() != expected_args {
-                // Should not be possible due to bytecode verifier but this
-                // assertion is here to make sure
-                // the view the type checker had lines up with the
-                // execution of the native function
-                return Err(VMStatus::new(StatusCode::LINKER_ERROR));
+        let mut arguments = VecDeque::new();
+        let expected_args = native_function.num_args();
+        // REVIEW: this is checked again in every functions, rationalize it!
+        if function.arg_count() != expected_args {
+            // Should not be possible due to bytecode verifier but this
+            // assertion is here to make sure
+            // the view the type checker had lines up with the
+            // execution of the native function
+            return Err(VMStatus::new(StatusCode::LINKER_ERROR));
+        }
+        for _ in 0..expected_args {
+            arguments.push_front(self.operand_stack.pop()?);
+        }
+        let mut fn_cxt = FunctionContext::new(caller_module, module, self, runtime, context);
+        let result = native_function.dispatch(&mut fn_cxt, ty_args, arguments)?;
+        gas!(consume: context, result.cost)?;
+        result.result.and_then(|values| {
+            for value in values {
+                self.operand_stack.push(value)?;
             }
-            for _ in 0..expected_args {
-                arguments.push_front(self.operand_stack.pop()?);
-            }
-            let result = native_function.dispatch(ty_args, arguments, self.gas_schedule)?;
-            gas!(consume: context, result.cost)?;
-            result.result.and_then(|values| {
-                for value in values {
-                    self.operand_stack.push(value)?;
-                }
-                Ok(())
-            })
-        }
-    }
-
-    #[allow(unused_variables)]
-    fn call_print_stack_trace(
-        &mut self,
-        runtime: &'txn VMRuntime<'_>,
-        context: &mut dyn InterpreterContext,
-        ty_args: Vec<Type>,
-    ) -> VMResult<()> {
-        if !ty_args.is_empty() {
-            return Err(
-                VMStatus::new(StatusCode::VERIFIER_INVARIANT_VIOLATION).with_message(format!(
-                    "print_stack_trace expects no type arguments got {}.",
-                    ty_args.len()
-                )),
-            );
-        }
-
-        #[cfg(feature = "debug_module")]
-        {
-            let mut s = String::new();
-            self.debug_print_stack_trace(&mut s, runtime, context)?;
-            println!("{}", s);
-        }
-
-        Ok(())
-    }
-
-    /// Emit an event if the native function was `write_to_event_store`.
-    fn call_emit_event(
-        &mut self,
-        context: &mut dyn InterpreterContext,
-        mut ty_args: Vec<Type>,
-    ) -> VMResult<()> {
-        if ty_args.len() != 1 {
-            return Err(
-                VMStatus::new(StatusCode::VERIFIER_INVARIANT_VIOLATION).with_message(format!(
-                    "write_to_event_storage expects 1 type argument got {}.",
-                    ty_args.len()
-                )),
-            );
-        }
-
-        let ty = ty_args.pop().unwrap();
-
-        let msg = self
-            .operand_stack
-            .pop()?
-            .simple_serialize(&ty)
-            .ok_or_else(|| VMStatus::new(StatusCode::DATA_FORMAT_ERROR))?;
-        let count = self.operand_stack.pop_as::<u64>()?;
-        let key = self.operand_stack.pop_as::<Vec<u8>>()?;
-        let guid = EventKey::try_from(key.as_slice())
-            .map_err(|_| VMStatus::new(StatusCode::EVENT_KEY_MISMATCH))?;
-        context.push_event(ContractEvent::new(guid, count, ty.into_type_tag()?, msg));
-        Ok(())
-    }
-
-    /// Save an account into the data store.
-    fn call_save_account(
-        &mut self,
-        runtime: &'txn VMRuntime<'_>,
-        context: &mut dyn InterpreterContext,
-        ty_args: Vec<Type>,
-    ) -> VMResult<()> {
-        gas!(
-            consume: context,
-            self.gas_schedule
-                .native_cost(NativeCostIndex::SAVE_ACCOUNT)
-                .total()
-        )?;
-        let account_module = runtime.get_loaded_module(&account_config::ACCOUNT_MODULE, context)?;
-        let address = self.operand_stack.pop_as::<AccountAddress>()?;
-        if address == account_config::CORE_CODE_ADDRESS {
-            return Err(VMStatus::new(StatusCode::CREATE_NULL_ACCOUNT));
-        }
-        Self::save_under_address(
-            runtime,
-            context,
-            &[],
-            account_module,
-            &AccountResource::struct_identifier(),
-            self.operand_stack.pop_as::<Struct>()?,
-            address,
-        )?;
-        Self::save_under_address(
-            runtime,
-            context,
-            &ty_args,
-            account_module,
-            &BalanceResource::struct_identifier(),
-            self.operand_stack.pop_as::<Struct>()?,
-            address,
-        )
+            Ok(())
+        })
     }
 
     /// Perform a binary operation to two values at the top of the stack.
@@ -1034,25 +928,6 @@ impl<'txn> Interpreter<'txn> {
         Ok(size)
     }
 
-    // Save a resource under the address specified by `account_address`
-    fn save_under_address(
-        runtime: &'txn VMRuntime<'_>,
-        context: &mut dyn InterpreterContext,
-        ty_args: &[Type],
-        module: &LoadedModule,
-        struct_name: &IdentStr,
-        resource_to_save: Struct,
-        account_address: AccountAddress,
-    ) -> VMResult<()> {
-        let struct_id = module
-            .struct_defs_table
-            .get(struct_name)
-            .ok_or_else(|| VMStatus::new(StatusCode::LINKER_ERROR))?;
-        let struct_ty = runtime.resolve_struct_def(module, *struct_id, ty_args, context)?;
-        let path = create_access_path(account_address, struct_ty.clone().into_struct_tag()?);
-        context.move_resource_to(&path, struct_ty, resource_to_save)
-    }
-
     //
     // Debugging and logging helpers.
     //
@@ -1086,7 +961,7 @@ impl<'txn> Interpreter<'txn> {
         &self,
         buf: &mut B,
         runtime: &'txn VMRuntime<'_>,
-        context: &mut dyn InterpreterContext,
+        context: &dyn InterpreterContext,
         idx: usize,
         frame: &Frame<'txn, FunctionRef<'txn>>,
     ) -> VMResult<()> {
@@ -1156,11 +1031,11 @@ impl<'txn> Interpreter<'txn> {
     }
 
     #[allow(dead_code)]
-    fn debug_print_stack_trace<B: Write>(
+    pub fn debug_print_stack_trace<B: Write>(
         &self,
         buf: &mut B,
         runtime: &'txn VMRuntime<'_>,
-        context: &mut dyn InterpreterContext,
+        context: &dyn InterpreterContext,
     ) -> VMResult<()> {
         debug_writeln!(buf, "Call Stack:")?;
         for (i, frame) in self.call_stack.0.iter().enumerate() {

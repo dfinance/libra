@@ -4,7 +4,6 @@
 use crate::{
     code_cache::{module_cache::VMModuleCache, script_cache::ScriptCache},
     interpreter::Interpreter,
-    interpreter_context::InterpreterContext,
     loaded_data::{
         function::{FunctionRef, FunctionReference},
         loaded_module::LoadedModule,
@@ -19,8 +18,10 @@ use libra_types::{
 use move_core_types::identifier::{IdentStr, Identifier};
 use move_vm_cache::Arena;
 use move_vm_types::{
+    interpreter_context::InterpreterContext,
     loaded_data::types::{StructType, Type},
     values::Value,
+    native_functions::dispatch::FunctionResolver
 };
 use vm::{
     access::ModuleAccess,
@@ -39,7 +40,7 @@ use vm::{
 ///   in the whitelist, the VM will just reject it in `verify_transaction`.
 /// * Custom scripts, which will allow arbitrary valid scripts, but no module publishing
 /// * Open script and module publishing
-pub(crate) struct VMRuntime<'alloc> {
+pub struct VMRuntime<'alloc> {
     code_cache: VMModuleCache<'alloc>,
     script_cache: ScriptCache<'alloc>,
 }
@@ -105,7 +106,7 @@ impl<'alloc> VMRuntime<'alloc> {
         context.publish_module(module_id, module)
     }
 
-    pub fn execute_script(
+    pub fn execute_script<R: FunctionResolver>(
         &self,
         context: &mut dyn InterpreterContext,
         txn_data: &TransactionMetadata,
@@ -119,10 +120,10 @@ impl<'alloc> VMRuntime<'alloc> {
         verify_ty_args(&main.type_parameters(), &ty_args)?;
         verify_args(main.parameters(), &args)?;
 
-        Interpreter::entrypoint(context, self, txn_data, gas_schedule, main, ty_args, args)
+        Interpreter::<R>::entrypoint(context, self, txn_data, gas_schedule, main, ty_args, args)
     }
 
-    pub fn execute_function(
+    pub fn execute_function<R: FunctionResolver>(
         &self,
         context: &mut dyn InterpreterContext,
         txn_data: &TransactionMetadata,
@@ -146,7 +147,7 @@ impl<'alloc> VMRuntime<'alloc> {
 
         // TODO: we should also check if args match the parameter types.
 
-        Interpreter::entrypoint(
+        Interpreter::<R>::entrypoint(
             context,
             self,
             txn_data,

@@ -17,6 +17,7 @@ use vm::{
     gas_schedule::{CostTable, GasAlgebra, GasUnits},
     transaction_metadata::TransactionMetadata,
 };
+use move_vm_types::native_functions::dispatch::StdFunctions;
 
 /// Entry point for the bench, provide a function name to invoke in Module Bench in bench.move.
 pub fn bench(c: &mut Criterion, fun: &str) {
@@ -61,7 +62,7 @@ fn execute(c: &mut Criterion, move_vm: &MoveVM, fun: &str) {
     c.bench_function(fun, |b| {
         b.iter(|| {
             move_vm
-                .execute_function(
+                .execute_function::<_, StdFunctions>(
                     &module_id,
                     &fun_name,
                     &gas_schedule,

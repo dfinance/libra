@@ -4,7 +4,6 @@
 
 use crate::{
     code_cache::module_cache::load_and_verify_module_id,
-    interpreter_context::InterpreterContext,
     loaded_data::{
         function::{FunctionRef, FunctionReference},
         loaded_module::LoadedModule,
@@ -19,6 +18,7 @@ use libra_types::{
     vm_error::{StatusCode, VMStatus},
 };
 use move_vm_cache::{Arena, CacheMap};
+use move_vm_types::interpreter_context::InterpreterContext;
 use vm::{
     access::ScriptAccess,
     errors::{vm_error, Location, VMResult},

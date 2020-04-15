@@ -18,11 +18,10 @@ mod code_cache;
 #[macro_use]
 mod gas_meter;
 mod interpreter;
-mod interpreter_context;
 mod loaded_data;
 mod move_vm;
+mod native_context;
 mod runtime;
-mod special_names;
 #[cfg(test)]
 mod unit_tests;
 

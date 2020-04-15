@@ -1,21 +1,20 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{
-    interpreter_context::InterpreterContext, loaded_data::loaded_module::LoadedModule,
-    runtime::VMRuntime,
-};
+use crate::{loaded_data::loaded_module::LoadedModule, runtime::VMRuntime};
 use bytecode_verifier::VerifiedModule;
 use libra_types::language_storage::ModuleId;
 use move_core_types::identifier::{IdentStr, Identifier};
 use move_vm_cache::Arena;
 use move_vm_definition::MoveVMImpl;
+use move_vm_types::interpreter_context::InterpreterContext;
 use move_vm_types::{
     chain_state::ChainState,
     loaded_data::types::{StructType, Type},
     values::Value,
 };
 use vm::{errors::VMResult, gas_schedule::CostTable, transaction_metadata::TransactionMetadata};
+use move_vm_types::native_functions::dispatch::FunctionResolver;
 
 rental! {
     mod move_vm_definition {
@@ -38,7 +37,7 @@ impl MoveVM {
         }))
     }
 
-    pub fn execute_function<S: ChainState>(
+    pub fn execute_function<S: ChainState, R: FunctionResolver>(
         &self,
         module: &ModuleId,
         function_name: &IdentStr,
@@ -49,7 +48,7 @@ impl MoveVM {
         args: Vec<Value>,
     ) -> VMResult<()> {
         self.0.rent(|runtime| {
-            runtime.execute_function(
+            runtime.execute_function::<R>(
                 chain_state,
                 txn_data,
                 gas_schedule,
@@ -62,7 +61,7 @@ impl MoveVM {
     }
 
     #[allow(unused)]
-    pub fn execute_script<S: ChainState>(
+    pub fn execute_script<S: ChainState, R: FunctionResolver>(
         &self,
         script: Vec<u8>,
         gas_schedule: &CostTable,
@@ -72,7 +71,7 @@ impl MoveVM {
         args: Vec<Value>,
     ) -> VMResult<()> {
         self.0.rent(|runtime| {
-            runtime.execute_script(chain_state, txn_data, gas_schedule, script, ty_args, args)
+            runtime.execute_script::<R>(chain_state, txn_data, gas_schedule, script, ty_args, args)
         })
     }
 
