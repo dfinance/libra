@@ -76,10 +76,13 @@ pub struct Interpreter<'txn, R: FunctionResolver> {
     /// GetTxnSenderAddress, ...)
     txn_data: &'txn TransactionMetadata,
     gas_schedule: &'txn CostTable,
-    function_resolver: PhantomData<R>
+    function_resolver: PhantomData<R>,
 }
 
-impl<'txn, R> Interpreter<'txn, R> where R: FunctionResolver {
+impl<'txn, R> Interpreter<'txn, R>
+where
+    R: FunctionResolver,
+{
     /// Entrypoint into the interpreter. All external calls need to be routed through this
     /// function.
     pub(crate) fn entrypoint(
@@ -114,7 +117,7 @@ impl<'txn, R> Interpreter<'txn, R> where R: FunctionResolver {
             call_stack: CallStack::new(),
             gas_schedule,
             txn_data,
-            function_resolver: PhantomData
+            function_resolver: PhantomData,
         }
     }
 

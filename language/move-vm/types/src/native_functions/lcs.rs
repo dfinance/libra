@@ -9,10 +9,7 @@ use crate::{
 };
 use libra_types::vm_error::{sub_status::NFE_LCS_SERIALIZATION_FAILURE, StatusCode, VMStatus};
 use std::collections::VecDeque;
-use vm::{
-    errors::VMResult,
-    gas_schedule::NativeCostIndex,
-};
+use vm::{errors::VMResult, gas_schedule::NativeCostIndex};
 
 /// Rust implementation of Move's `native public fun to_bytes<T>(&T): vector<u8>`
 pub fn native_to_bytes(

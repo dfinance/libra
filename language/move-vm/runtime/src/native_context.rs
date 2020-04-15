@@ -24,7 +24,10 @@ pub struct FunctionContext<'a, 'alloc, 'txn, R: FunctionResolver> {
     context: &'a mut dyn InterpreterContext,
 }
 
-impl<'a, 'alloc, 'txn, R> FunctionContext<'a, 'alloc, 'txn, R> where R: FunctionResolver {
+impl<'a, 'alloc, 'txn, R> FunctionContext<'a, 'alloc, 'txn, R>
+where
+    R: FunctionResolver,
+{
     pub fn new(
         caller_module: &'a LoadedModule,
         self_module: &'a LoadedModule,
@@ -42,7 +45,10 @@ impl<'a, 'alloc, 'txn, R> FunctionContext<'a, 'alloc, 'txn, R> where R: Function
     }
 }
 
-impl<'a, 'alloc, 'txn, R> NativeContext for FunctionContext<'a, 'alloc, 'txn, R> where R: FunctionResolver {
+impl<'a, 'alloc, 'txn, R> NativeContext for FunctionContext<'a, 'alloc, 'txn, R>
+where
+    R: FunctionResolver,
+{
     type Mod = ModuleContext<'a, 'alloc>;
 
     fn caller_module(&self) -> ModuleContext<'a, 'alloc> {

@@ -8,13 +8,13 @@ use move_core_types::identifier::{IdentStr, Identifier};
 use move_vm_cache::Arena;
 use move_vm_definition::MoveVMImpl;
 use move_vm_types::interpreter_context::InterpreterContext;
+use move_vm_types::native_functions::dispatch::FunctionResolver;
 use move_vm_types::{
     chain_state::ChainState,
     loaded_data::types::{StructType, Type},
     values::Value,
 };
 use vm::{errors::VMResult, gas_schedule::CostTable, transaction_metadata::TransactionMetadata};
-use move_vm_types::native_functions::dispatch::FunctionResolver;
 
 rental! {
     mod move_vm_definition {

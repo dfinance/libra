@@ -27,6 +27,7 @@ use move_vm_state::{
     data_cache::{BlockDataCache, RemoteCache, RemoteStorage},
     execution_context::{ExecutionContext, SystemExecutionContext, TransactionExecutionContext},
 };
+use move_vm_types::native_functions::dispatch::StdFunctions;
 use move_vm_types::{
     chain_state::ChainState, identifier::create_access_path, loaded_data::types::Type,
     values::Value,
@@ -40,7 +41,6 @@ use vm::{
     },
     transaction_metadata::TransactionMetadata,
 };
-use move_vm_types::native_functions::dispatch::StdFunctions;
 
 #[derive(Clone)]
 /// A wrapper to make VMRuntime standalone and thread safe.
@@ -374,9 +374,14 @@ impl LibraVM {
                     Ok(s) => s,
                     Err(e) => return discard_error_output(e),
                 };
-                let ret =
-                    self.move_vm
-                        .execute_script::<_, StdFunctions>(s, gas_schedule, &mut ctx, txn_data, ty_args, args);
+                let ret = self.move_vm.execute_script::<_, StdFunctions>(
+                    s,
+                    gas_schedule,
+                    &mut ctx,
+                    txn_data,
+                    ty_args,
+                    args,
+                );
                 let gas_usage = txn_data.max_gas_amount().sub(ctx.remaining_gas()).get();
                 record_stats!(observe | TXN_EXECUTION_GAS_USAGE | gas_usage);
                 ret

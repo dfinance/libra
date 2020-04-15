@@ -20,8 +20,8 @@ use move_vm_cache::Arena;
 use move_vm_types::{
     interpreter_context::InterpreterContext,
     loaded_data::types::{StructType, Type},
+    native_functions::dispatch::FunctionResolver,
     values::Value,
-    native_functions::dispatch::FunctionResolver
 };
 use vm::{
     access::ModuleAccess,

@@ -22,8 +22,8 @@ use vm::{
     errors::*,
     file_format::{Constant, SignatureToken},
     gas_schedule::{
-        words_in, AbstractMemorySize, GasAlgebra, GasCarrier, NativeCostIndex,
-        CONST_SIZE, REFERENCE_SIZE, STRUCT_SIZE,
+        words_in, AbstractMemorySize, GasAlgebra, GasCarrier, NativeCostIndex, CONST_SIZE,
+        REFERENCE_SIZE, STRUCT_SIZE,
     },
 };
 

@@ -12,12 +12,12 @@ use move_core_types::identifier::{IdentStr, Identifier};
 use move_lang::{compiled_unit::CompiledUnit, shared::Address};
 use move_vm_runtime::MoveVM;
 use move_vm_state::{data_cache::BlockDataCache, execution_context::TransactionExecutionContext};
+use move_vm_types::native_functions::dispatch::StdFunctions;
 use std::path::PathBuf;
 use vm::{
     gas_schedule::{CostTable, GasAlgebra, GasUnits},
     transaction_metadata::TransactionMetadata,
 };
-use move_vm_types::native_functions::dispatch::StdFunctions;
 
 /// Entry point for the bench, provide a function name to invoke in Module Bench in bench.move.
 pub fn bench(c: &mut Criterion, fun: &str) {

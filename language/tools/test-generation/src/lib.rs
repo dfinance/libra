@@ -25,7 +25,9 @@ use libra_logger::{debug, error, info};
 use libra_state_view::StateView;
 use libra_types::{account_address::AccountAddress, vm_error::StatusCode};
 use libra_vm::LibraVM;
-use move_vm_types::{loaded_data::types::Type, values::Value, native_functions::dispatch::StdFunctions};
+use move_vm_types::{
+    loaded_data::types::Type, native_functions::dispatch::StdFunctions, values::Value,
+};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::{fs, io::Write, panic, thread};
 use utils::module_generation::generate_module;
