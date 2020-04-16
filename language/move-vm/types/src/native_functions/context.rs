@@ -1,3 +1,6 @@
+// Copyright (c) The Libra Core Contributors
+// SPDX-License-Identifier: Apache-2.0
+
 use crate::interpreter_context::InterpreterContext;
 use crate::loaded_data::types::{StructType, Type};
 use libra_types::access_path::AccessPath;

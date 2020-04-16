@@ -1,3 +1,6 @@
+// Copyright (c) The Libra Core Contributors
+// SPDX-License-Identifier: Apache-2.0
+
 use crate::loaded_data::types::Type;
 use crate::native_functions::context::{Module, NativeContext};
 use crate::native_functions::dispatch::{native_gas, NativeResult};
