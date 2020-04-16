@@ -32,7 +32,6 @@ use move_vm_state::{
     data_cache::BlockDataCache,
     execution_context::{ExecutionContext, TransactionExecutionContext},
 };
-use move_vm_types::native_functions::dispatch::StdFunctions;
 use move_vm_types::{chain_state::ChainState, loaded_data::types::Type, values::Value};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
