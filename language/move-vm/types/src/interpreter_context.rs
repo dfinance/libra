@@ -1,9 +1,11 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::chain_state::ChainState;
-use crate::loaded_data::types::StructType;
-use crate::values::{GlobalValue, Struct, Value};
+use crate::{
+    chain_state::ChainState,
+    loaded_data::types::StructType,
+    values::{GlobalValue, Struct, Value},
+};
 use libra_logger::prelude::*;
 use libra_types::{
     access_path::AccessPath,

@@ -1,13 +1,13 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::native_context::FunctionContext;
 use crate::{
     gas,
     loaded_data::{
         function::{FunctionRef, FunctionReference},
         loaded_module::LoadedModule,
     },
+    native_context::FunctionContext,
     runtime::VMRuntime,
 };
 use libra_logger::prelude::*;
@@ -17,11 +17,11 @@ use libra_types::{
     transaction::MAX_TRANSACTION_SIZE_IN_BYTES,
     vm_error::{StatusCode, StatusType, VMStatus},
 };
-use move_vm_types::interpreter_context::InterpreterContext;
-use move_vm_types::native_functions::dispatch::{Function, FunctionResolver};
 use move_vm_types::{
     identifier::create_access_path,
+    interpreter_context::InterpreterContext,
     loaded_data::types::{StructType, Type},
+    native_functions::dispatch::{Function, FunctionResolver},
     values::{self, IntegerValue, Locals, Reference, Struct, StructRef, VMValueCast, Value},
 };
 use std::{cmp::min, collections::VecDeque, fmt::Write, marker::PhantomData};

@@ -1,10 +1,12 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::native_functions::context::NativeContext;
 use crate::{
     loaded_data::types::Type,
-    native_functions::dispatch::{native_gas, NativeResult},
+    native_functions::{
+        context::NativeContext,
+        dispatch::{native_gas, NativeResult},
+    },
     values::{values_impl::Reference, Value},
 };
 use libra_types::vm_error::{sub_status::NFE_LCS_SERIALIZATION_FAILURE, StatusCode, VMStatus};

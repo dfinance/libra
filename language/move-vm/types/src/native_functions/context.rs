@@ -1,15 +1,16 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::interpreter_context::InterpreterContext;
-use crate::loaded_data::types::{StructType, Type};
-use libra_types::access_path::AccessPath;
-use libra_types::account_address::AccountAddress;
-use libra_types::language_storage::ModuleId;
+use crate::{
+    interpreter_context::InterpreterContext,
+    loaded_data::types::{StructType, Type},
+};
+use libra_types::{
+    access_path::AccessPath, account_address::AccountAddress, language_storage::ModuleId,
+};
 use move_core_types::identifier::IdentStr;
 use std::fmt::Write;
-use vm::errors::VMResult;
-use vm::gas_schedule::CostTable;
+use vm::{errors::VMResult, gas_schedule::CostTable};
 
 /// Native function context.
 pub trait NativeContext {

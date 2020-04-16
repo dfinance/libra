@@ -1,19 +1,18 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::loaded_data::types::Type;
-use crate::native_functions::context::NativeContext;
-use crate::native_functions::dispatch::NativeResult;
-use crate::values::Value;
-use libra_types::contract_event::ContractEvent;
+use crate::{
+    loaded_data::types::Type,
+    native_functions::{context::NativeContext, dispatch::NativeResult},
+    values::Value,
+};
 use libra_types::{
+    contract_event::ContractEvent,
     event::EventKey,
     vm_error::{StatusCode, VMStatus},
 };
-use std::collections::VecDeque;
-use std::convert::TryFrom;
-use vm::errors::VMResult;
-use vm::gas_schedule::ZERO_GAS_UNITS;
+use std::{collections::VecDeque, convert::TryFrom};
+use vm::{errors::VMResult, gas_schedule::ZERO_GAS_UNITS};
 
 pub fn native_emit_event(
     context: &mut impl NativeContext,

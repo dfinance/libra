@@ -1,23 +1,27 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::interpreter::Interpreter;
-use crate::loaded_data::loaded_module::LoadedModule;
-use crate::runtime::VMRuntime;
-use libra_types::access_path::AccessPath;
-use libra_types::account_address::AccountAddress;
-use libra_types::language_storage::ModuleId;
-use libra_types::vm_error::{StatusCode, VMStatus};
+use crate::{
+    interpreter::Interpreter, loaded_data::loaded_module::LoadedModule, runtime::VMRuntime,
+};
+use libra_types::{
+    access_path::AccessPath,
+    account_address::AccountAddress,
+    language_storage::ModuleId,
+    vm_error::{StatusCode, VMStatus},
+};
 use move_core_types::identifier::IdentStr;
-use move_vm_types::identifier::create_access_path;
-use move_vm_types::interpreter_context::InterpreterContext;
-use move_vm_types::loaded_data::types::{StructType, Type};
-use move_vm_types::native_functions::context::{Module, NativeContext};
-use move_vm_types::native_functions::dispatch::FunctionResolver;
+use move_vm_types::{
+    identifier::create_access_path,
+    interpreter_context::InterpreterContext,
+    loaded_data::types::{StructType, Type},
+    native_functions::{
+        context::{Module, NativeContext},
+        dispatch::FunctionResolver,
+    },
+};
 use std::fmt::Write;
-use vm::access::ModuleAccess;
-use vm::errors::VMResult;
-use vm::gas_schedule::CostTable;
+use vm::{access::ModuleAccess, errors::VMResult, gas_schedule::CostTable};
 
 pub struct FunctionContext<'a, 'alloc, 'txn, R: FunctionResolver> {
     caller_module: &'a LoadedModule,

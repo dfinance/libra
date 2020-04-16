@@ -1,18 +1,23 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::loaded_data::types::Type;
-use crate::native_functions::context::{Module, NativeContext};
-use crate::native_functions::dispatch::{native_gas, NativeResult};
-use crate::values::{Struct, Value};
-use libra_types::account_address::AccountAddress;
-use libra_types::account_config::{AccountResource, BalanceResource};
-use libra_types::move_resource::MoveResource;
-use libra_types::vm_error::{StatusCode, VMStatus};
+use crate::{
+    loaded_data::types::Type,
+    native_functions::{
+        context::{Module, NativeContext},
+        dispatch::{native_gas, NativeResult},
+    },
+    values::{Struct, Value},
+};
+use libra_types::{
+    account_address::AccountAddress,
+    account_config::{AccountResource, BalanceResource},
+    move_resource::MoveResource,
+    vm_error::{StatusCode, VMStatus},
+};
 use move_core_types::identifier::IdentStr;
 use std::collections::VecDeque;
-use vm::errors::VMResult;
-use vm::gas_schedule::NativeCostIndex;
+use vm::{errors::VMResult, gas_schedule::NativeCostIndex};
 
 pub fn native_save_account(
     context: &mut impl NativeContext,

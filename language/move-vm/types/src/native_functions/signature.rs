@@ -1,10 +1,12 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::native_functions::context::NativeContext;
 use crate::{
     loaded_data::types::Type,
-    native_functions::dispatch::{native_gas, NativeResult},
+    native_functions::{
+        context::NativeContext,
+        dispatch::{native_gas, NativeResult},
+    },
     values::Value,
 };
 use bit_vec::BitVec;

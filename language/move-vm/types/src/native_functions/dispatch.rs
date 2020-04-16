@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::{lcs, signature};
-use crate::native_functions::context::NativeContext;
-use crate::native_functions::{account, event, hash};
 use crate::{
     loaded_data::types::Type,
+    native_functions::{account, context::NativeContext, event, hash},
     values::{debug, vector, Value},
 };
 use libra_types::{

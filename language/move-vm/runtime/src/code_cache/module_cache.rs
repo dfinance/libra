@@ -13,8 +13,10 @@ use libra_types::{
     vm_error::{StatusCode, VMStatus},
 };
 use move_vm_cache::{Arena, CacheRefMap};
-use move_vm_types::interpreter_context::InterpreterContext;
-use move_vm_types::loaded_data::types::{StructType, Type};
+use move_vm_types::{
+    interpreter_context::InterpreterContext,
+    loaded_data::types::{StructType, Type},
+};
 use vm::{
     access::ModuleAccess,
     errors::*,
