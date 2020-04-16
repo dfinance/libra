@@ -17,6 +17,7 @@ use libra_types::{
 };
 use move_core_types::identifier::{IdentStr, Identifier};
 use move_vm_cache::Arena;
+use move_vm_types::native_functions::dispatch::StdFunctions;
 use move_vm_types::{
     interpreter_context::InterpreterContext,
     loaded_data::types::{StructType, Type},
@@ -106,7 +107,7 @@ impl<'alloc> VMRuntime<'alloc> {
         context.publish_module(module_id, module)
     }
 
-    pub fn execute_script<R: FunctionResolver>(
+    pub fn execute_script_of<R: FunctionResolver>(
         &self,
         context: &mut dyn InterpreterContext,
         txn_data: &TransactionMetadata,
@@ -123,7 +124,26 @@ impl<'alloc> VMRuntime<'alloc> {
         Interpreter::<R>::entrypoint(context, self, txn_data, gas_schedule, main, ty_args, args)
     }
 
-    pub fn execute_function<R: FunctionResolver>(
+    pub fn execute_script(
+        &self,
+        context: &mut dyn InterpreterContext,
+        txn_data: &TransactionMetadata,
+        gas_schedule: &CostTable,
+        script: Vec<u8>,
+        ty_args: Vec<Type>,
+        args: Vec<Value>,
+    ) -> VMResult<()> {
+        self.execute_script_of::<StdFunctions>(
+            context,
+            txn_data,
+            gas_schedule,
+            script,
+            ty_args,
+            args,
+        )
+    }
+
+    pub fn execute_function_of<R: FunctionResolver>(
         &self,
         context: &mut dyn InterpreterContext,
         txn_data: &TransactionMetadata,
@@ -153,6 +173,27 @@ impl<'alloc> VMRuntime<'alloc> {
             txn_data,
             gas_schedule,
             FunctionRef::new(loaded_module, *func_idx),
+            ty_args,
+            args,
+        )
+    }
+
+    pub fn execute_function(
+        &self,
+        context: &mut dyn InterpreterContext,
+        txn_data: &TransactionMetadata,
+        gas_schedule: &CostTable,
+        module: &ModuleId,
+        function_name: &IdentStr,
+        ty_args: Vec<Type>,
+        args: Vec<Value>,
+    ) -> VMResult<()> {
+        self.execute_function_of::<StdFunctions>(
+            context,
+            txn_data,
+            gas_schedule,
+            module,
+            function_name,
             ty_args,
             args,
         )

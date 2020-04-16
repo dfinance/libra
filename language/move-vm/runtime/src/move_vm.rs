@@ -37,7 +37,7 @@ impl MoveVM {
         }))
     }
 
-    pub fn execute_function<S: ChainState, R: FunctionResolver>(
+    pub fn execute_function_of<S: ChainState, R: FunctionResolver>(
         &self,
         module: &ModuleId,
         function_name: &IdentStr,
@@ -48,7 +48,30 @@ impl MoveVM {
         args: Vec<Value>,
     ) -> VMResult<()> {
         self.0.rent(|runtime| {
-            runtime.execute_function::<R>(
+            runtime.execute_function_of::<R>(
+                chain_state,
+                txn_data,
+                gas_schedule,
+                module,
+                function_name,
+                ty_args,
+                args,
+            )
+        })
+    }
+
+    pub fn execute_function<S: ChainState>(
+        &self,
+        module: &ModuleId,
+        function_name: &IdentStr,
+        gas_schedule: &CostTable,
+        chain_state: &mut S,
+        txn_data: &TransactionMetadata,
+        ty_args: Vec<Type>,
+        args: Vec<Value>,
+    ) -> VMResult<()> {
+        self.0.rent(|runtime| {
+            runtime.execute_function(
                 chain_state,
                 txn_data,
                 gas_schedule,
@@ -61,7 +84,7 @@ impl MoveVM {
     }
 
     #[allow(unused)]
-    pub fn execute_script<S: ChainState, R: FunctionResolver>(
+    pub fn execute_script_of<S: ChainState, R: FunctionResolver>(
         &self,
         script: Vec<u8>,
         gas_schedule: &CostTable,
@@ -71,7 +94,29 @@ impl MoveVM {
         args: Vec<Value>,
     ) -> VMResult<()> {
         self.0.rent(|runtime| {
-            runtime.execute_script::<R>(chain_state, txn_data, gas_schedule, script, ty_args, args)
+            runtime.execute_script_of::<R>(
+                chain_state,
+                txn_data,
+                gas_schedule,
+                script,
+                ty_args,
+                args,
+            )
+        })
+    }
+
+    #[allow(unused)]
+    pub fn execute_script<S: ChainState>(
+        &self,
+        script: Vec<u8>,
+        gas_schedule: &CostTable,
+        chain_state: &mut S,
+        txn_data: &TransactionMetadata,
+        ty_args: Vec<Type>,
+        args: Vec<Value>,
+    ) -> VMResult<()> {
+        self.0.rent(|runtime| {
+            runtime.execute_script(chain_state, txn_data, gas_schedule, script, ty_args, args)
         })
     }
 

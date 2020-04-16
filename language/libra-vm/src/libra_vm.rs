@@ -27,7 +27,6 @@ use move_vm_state::{
     data_cache::{BlockDataCache, RemoteCache, RemoteStorage},
     execution_context::{ExecutionContext, SystemExecutionContext, TransactionExecutionContext},
 };
-use move_vm_types::native_functions::dispatch::StdFunctions;
 use move_vm_types::{
     chain_state::ChainState, identifier::create_access_path, loaded_data::types::Type,
     values::Value,
@@ -374,14 +373,9 @@ impl LibraVM {
                     Ok(s) => s,
                     Err(e) => return discard_error_output(e),
                 };
-                let ret = self.move_vm.execute_script::<_, StdFunctions>(
-                    s,
-                    gas_schedule,
-                    &mut ctx,
-                    txn_data,
-                    ty_args,
-                    args,
-                );
+                let ret =
+                    self.move_vm
+                        .execute_script(s, gas_schedule, &mut ctx, txn_data, ty_args, args);
                 let gas_usage = txn_data.max_gas_amount().sub(ctx.remaining_gas()).get();
                 record_stats!(observe | TXN_EXECUTION_GAS_USAGE | gas_usage);
                 ret
@@ -513,7 +507,7 @@ impl LibraVM {
                 Value::vector_address(previous_vote),
                 Value::address(proposer),
             ];
-            self.move_vm.execute_function::<_, StdFunctions>(
+            self.move_vm.execute_function(
                 &LIBRA_BLOCK_MODULE,
                 &BLOCK_PROLOGUE,
                 &gas_schedule,
@@ -659,7 +653,7 @@ impl LibraVM {
         let txn_expiration_time = txn_data.expiration_time();
         record_stats! {time_hist | TXN_PROLOGUE_TIME_TAKEN | {
                 self.move_vm
-                    .execute_function::<_, StdFunctions>(
+                    .execute_function(
                         &account_config::ACCOUNT_MODULE,
                         &PROLOGUE_NAME,
                         self.get_gas_schedule()?,
@@ -692,7 +686,7 @@ impl LibraVM {
         let txn_max_gas_units = txn_data.max_gas_amount().get();
         let gas_remaining = chain_state.remaining_gas().get();
         record_stats! {time_hist | TXN_EPILOGUE_TIME_TAKEN | {
-                self.move_vm.execute_function::<_, StdFunctions>(
+                self.move_vm.execute_function(
                     &account_config::ACCOUNT_MODULE,
                     &EPILOGUE_NAME,
                     self.get_gas_schedule()?,
@@ -722,7 +716,7 @@ impl LibraVM {
         let gas_schedule = CostTable::zero();
         record_stats! {time_hist | TXN_PROLOGUE_TIME_TAKEN | {
                 self.move_vm
-                    .execute_function::<_, StdFunctions>(
+                    .execute_function(
                         &LIBRA_WRITESET_MANAGER_MODULE,
                         &PROLOGUE_NAME,
                         &gas_schedule,
@@ -752,7 +746,7 @@ impl LibraVM {
         let gas_schedule = CostTable::zero();
 
         record_stats! {time_hist | TXN_EPILOGUE_TIME_TAKEN | {
-                self.move_vm.execute_function::<_, StdFunctions>(
+                self.move_vm.execute_function(
                     &LIBRA_WRITESET_MANAGER_MODULE,
                     &EPILOGUE_NAME,
                     &gas_schedule,

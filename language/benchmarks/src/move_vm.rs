@@ -12,7 +12,6 @@ use move_core_types::identifier::{IdentStr, Identifier};
 use move_lang::{compiled_unit::CompiledUnit, shared::Address};
 use move_vm_runtime::MoveVM;
 use move_vm_state::{data_cache::BlockDataCache, execution_context::TransactionExecutionContext};
-use move_vm_types::native_functions::dispatch::StdFunctions;
 use std::path::PathBuf;
 use vm::{
     gas_schedule::{CostTable, GasAlgebra, GasUnits},
@@ -62,7 +61,7 @@ fn execute(c: &mut Criterion, move_vm: &MoveVM, fun: &str) {
     c.bench_function(fun, |b| {
         b.iter(|| {
             move_vm
-                .execute_function::<_, StdFunctions>(
+                .execute_function(
                     &module_id,
                     &fun_name,
                     &gas_schedule,

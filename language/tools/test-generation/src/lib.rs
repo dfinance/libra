@@ -25,9 +25,7 @@ use libra_logger::{debug, error, info};
 use libra_state_view::StateView;
 use libra_types::{account_address::AccountAddress, vm_error::StatusCode};
 use libra_vm::LibraVM;
-use move_vm_types::{
-    loaded_data::types::Type, native_functions::dispatch::StdFunctions, values::Value,
-};
+use move_vm_types::{loaded_data::types::Type, values::Value};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::{fs, io::Write, panic, thread};
 use utils::module_generation::generate_module;
@@ -109,7 +107,7 @@ fn execute_function_in_module(
         let gas_schedule = internals.gas_schedule()?;
         let txn_data = TransactionMetadata::default();
         internals.with_txn_context(&txn_data, state_view, |mut txn_context| {
-            move_vm.execute_function::<_, StdFunctions>(
+            move_vm.execute_function(
                 &module_id,
                 &entry_name,
                 gas_schedule,
