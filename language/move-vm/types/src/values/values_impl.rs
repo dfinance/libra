@@ -2143,7 +2143,7 @@ pub mod debug {
     }
 
     pub fn native_print_stack_trace(
-        context: &mut impl NativeContext,
+        #[allow(unused_variables)] context: &mut impl NativeContext,
         ty_args: Vec<Type>,
         mut _arguments: VecDeque<Value>,
     ) -> VMResult<NativeResult> {
