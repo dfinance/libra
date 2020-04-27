@@ -11,6 +11,7 @@ use move_vm_types::{
 };
 use std::collections::VecDeque;
 use vm::errors::VMResult;
+use move_vm_types::native_functions::oracle;
 
 /// The set of native functions the VM supports.
 /// The functions can leave in any crate linked in but the VM declares them here.
@@ -35,8 +36,10 @@ pub(crate) enum NativeFunction {
     VectorSwap,
     AccountWriteEvent,
     AccountSaveAccount,
+    AccountSaveBalance,
     DebugPrint,
     DebugPrintStackTrace,
+    OraclePrice,
 }
 
 // TODO: maybe we should go back to the single NativeFunction impl
@@ -71,6 +74,7 @@ impl FunctionResolver {
             (&CORE_CODE_ADDRESS, "LibraAccount", "save_account") => AccountSaveAccount,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
+            (&CORE_CODE_ADDRESS, "Oracle", "get_price") => OraclePrice,
             _ => return None,
         })
     }
@@ -104,6 +108,7 @@ impl NativeFunction {
             Self::LCSToBytes => lcs::native_to_bytes(ctx, t, v),
             Self::DebugPrint => debug::native_print(ctx, t, v),
             Self::DebugPrintStackTrace => debug::native_print_stack_trace(ctx, t, v),
+            Self::OraclePrice => oracle::native_oracle_get_price(ctx, t, v),
         }
     }
 }
