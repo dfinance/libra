@@ -42,6 +42,10 @@ impl FakeDataStore {
         FakeDataStore { data }
     }
 
+    pub fn data(&self) -> &HashMap<AccessPath, Vec<u8>> {
+        &self.data
+    }
+
     /// Adds a [`WriteSet`] to this data store.
     pub fn add_write_set(&mut self, write_set: &WriteSet) {
         for (access_path, write_op) in write_set {
