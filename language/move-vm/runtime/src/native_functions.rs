@@ -36,7 +36,6 @@ pub(crate) enum NativeFunction {
     VectorSwap,
     AccountWriteEvent,
     AccountSaveAccount,
-    AccountSaveBalance,
     DebugPrint,
     DebugPrintStackTrace,
     OraclePrice,
