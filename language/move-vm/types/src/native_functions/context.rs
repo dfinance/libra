@@ -11,6 +11,7 @@ use libra_types::{
 use move_core_types::{gas_schedule::CostTable, identifier::IdentStr};
 use std::fmt::Write;
 use vm::errors::VMResult;
+use libra_types::access_path::AccessPath;
 
 /// Native function context.
 pub trait NativeContext {
@@ -27,6 +28,8 @@ pub trait NativeContext {
         resource_to_save: Struct,
         account_address: AccountAddress,
     ) -> VMResult<()>;
+    /// Load from state view.
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
     /// Saves contract event.
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()>;
     /// Converts types to fet types.

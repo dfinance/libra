@@ -1,6 +1,5 @@
 use std::collections::VecDeque;
 use libra_types::vm_error::{VMStatus, StatusCode};
-use libra_state_view::StateView;
 use libra_types::access_path::AccessPath;
 use libra_crypto::hash::{DefaultHasher, CryptoHasher};
 use byteorder::{ByteOrder, LittleEndian};
@@ -17,17 +16,11 @@ use vm::errors::VMResult;
 use libra_types::account_address::AccountAddress;
 use once_cell::sync::OnceCell;
 
-static VIEW: OnceCell<Box<dyn StateView + Sync + Send>> = OnceCell::new();
-
 const COST: u64 = 929;
 const PRICE_ORACLE_TAG: u8 = 255;
 
-pub fn init(state_view: Box<dyn StateView + Sync + Send>) {
-    VIEW.get_or_init(|| state_view);
-}
-
 pub fn native_oracle_get_price(
-    _context: &impl NativeContext,
+    context: &impl NativeContext,
     _ty_args: Vec<Type>,
     mut arguments: VecDeque<Value>,
 ) -> VMResult<NativeResult> {
@@ -40,15 +33,10 @@ pub fn native_oracle_get_price(
     }
 
     let ticker = pop_arg!(arguments, u64);
-    let price = VIEW.get()
-        .ok_or_else(|| {
-            status(
-                StatusCode::GLOBAL_REFERENCE_ERROR,
-                "Expected global state view",
-            )
-        })
-        .and_then(|view| {
-            let value = view.get(&make_path(ticker)?).map_err(|err| {
+    let price =
+        make_path(ticker)
+        .and_then(|path| {
+            let value = context.raw_load(&path).map_err(|err| {
                 status(
                     StatusCode::STORAGE_ERROR,
                     &format!("Failed to load ticker [{}]", err),

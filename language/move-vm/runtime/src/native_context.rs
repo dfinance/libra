@@ -65,6 +65,10 @@ impl<'a, 'txn> NativeContext for FunctionContext<'a, 'txn> {
             .move_resource_to(&ap, libra_type.fat_type(), resource_to_save)
     }
 
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.interpreter_context.raw_load(path)
+    }
+
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()> {
         Ok(self.interpreter_context.push_event(event))
     }
