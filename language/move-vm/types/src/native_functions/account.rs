@@ -19,6 +19,8 @@ use libra_types::{
 use move_core_types::gas_schedule::NativeCostIndex;
 use std::collections::VecDeque;
 use vm::errors::VMResult;
+use once_cell::sync::Lazy;
+use move_core_types::identifier::Identifier;
 
 pub fn native_save_account(
     context: &mut impl NativeContext,
@@ -58,6 +60,29 @@ pub fn native_save_account(
         &[ty_args[1].clone()],
         &account_config::ACCOUNT_TYPE_MODULE,
         account_config::account_type_struct_name(),
+        pop_arg!(arguments, Struct),
+        address,
+    )?;
+    Ok(NativeResult::ok(cost, vec![]))
+}
+
+pub fn native_save_balance(
+    context: &mut impl NativeContext,
+    ty_args: Vec<Type>,
+    mut arguments: VecDeque<Value>,
+) -> VMResult<NativeResult> {
+    let cost = native_gas(context.cost_table(), NativeCostIndex::SAVE_ACCOUNT, 0);
+
+    let address = pop_arg!(arguments, AccountAddress);
+
+    if address == CORE_CODE_ADDRESS {
+        return Err(VMStatus::new(StatusCode::CREATE_NULL_ACCOUNT));
+    }
+
+    context.save_under_address(
+        &[ty_args[0].clone()],
+        &account_config::ACCOUNT_MODULE,
+        &BalanceResource::struct_identifier(),
         pop_arg!(arguments, Struct),
         address,
     )?;
