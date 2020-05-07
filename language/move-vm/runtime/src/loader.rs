@@ -399,14 +399,14 @@ impl ModuleCache {
 // entities. Each cache is protected by a `Mutex`. Operation in the Loader must be thread safe
 // (operating on values on the stack) and when cache needs updating the mutex must be taken.
 // The `pub(crate)` API is what a Loader offers to the runtime.
-pub(crate) struct Loader {
+pub struct Loader {
     scripts: Mutex<ScriptCache>,
     module_cache: Mutex<ModuleCache>,
     type_cache: Mutex<TypeCache>,
 }
 
 impl Loader {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         //println!("new loader");
         Self {
             scripts: Mutex::new(ScriptCache::new()),
