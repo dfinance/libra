@@ -22,9 +22,12 @@ use vm::errors::VMResult;
 use once_cell::sync::Lazy;
 use move_core_types::identifier::Identifier;
 
+static ACCOUNT_NAME: Lazy<Identifier> =
+    Lazy::new(|| Identifier::new("T").unwrap());
+
 pub fn native_save_account(
     context: &mut impl NativeContext,
-    ty_args: Vec<Type>,
+    _ty_args: Vec<Type>,
     mut arguments: VecDeque<Value>,
 ) -> VMResult<NativeResult> {
     let cost = native_gas(context.cost_table(), NativeCostIndex::SAVE_ACCOUNT, 0);
@@ -37,29 +40,8 @@ pub fn native_save_account(
 
     context.save_under_address(
         &[],
-        &account_config::EVENT_MODULE,
-        account_config::event_handle_generator_struct_name(),
-        pop_arg!(arguments, Struct),
-        address,
-    )?;
-    context.save_under_address(
-        &[],
         &account_config::ACCOUNT_MODULE,
-        &AccountResource::struct_identifier(),
-        pop_arg!(arguments, Struct),
-        address,
-    )?;
-    context.save_under_address(
-        &[ty_args[0].clone()],
-        &account_config::ACCOUNT_MODULE,
-        &BalanceResource::struct_identifier(),
-        pop_arg!(arguments, Struct),
-        address,
-    )?;
-    context.save_under_address(
-        &[ty_args[1].clone()],
-        &account_config::ACCOUNT_TYPE_MODULE,
-        account_config::account_type_struct_name(),
+        &ACCOUNT_NAME,
         pop_arg!(arguments, Struct),
         address,
     )?;
