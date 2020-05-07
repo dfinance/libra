@@ -36,7 +36,7 @@ use move_vm_types::{
 use vm::errors::VMResult;
 
 /// A context that holds state for generating the genesis write set
-pub(crate) struct GenesisContext<'a> {
+pub struct GenesisContext<'a> {
     vm: MoveVM,
     gas_schedule: CostTable,
     interpreter_context: GenesisExecutionContext<'a>,
@@ -126,7 +126,7 @@ impl<'a> GenesisContext<'a> {
 }
 
 // `StateView` has no data given we are creating the genesis
-pub(crate) struct GenesisStateView {
+pub struct GenesisStateView {
     data: HashMap<AccessPath, Vec<u8>>,
 }
 
