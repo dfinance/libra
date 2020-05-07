@@ -406,7 +406,7 @@ pub(crate) struct Loader {
 }
 
 impl Loader {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         //println!("new loader");
         Self {
             scripts: Mutex::new(ScriptCache::new()),
