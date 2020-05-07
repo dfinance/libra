@@ -5,4 +5,4 @@ mod aliases;
 pub mod ast;
 mod byte_string;
 mod hex_string;
-pub(crate) mod translate;
+pub mod translate;
