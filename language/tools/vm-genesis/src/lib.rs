@@ -3,8 +3,8 @@
 
 #![forbid(unsafe_code)]
 
-mod genesis_context;
-mod genesis_gas_schedule;
+pub mod genesis_context;
+pub mod genesis_gas_schedule;
 
 use crate::{
     genesis_context::{GenesisContext, GenesisStateView},
