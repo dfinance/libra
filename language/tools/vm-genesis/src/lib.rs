@@ -4,7 +4,7 @@
 #![forbid(unsafe_code)]
 
 mod genesis_context;
-mod genesis_gas_schedule;
+pub mod genesis_gas_schedule;
 
 use crate::{genesis_context::GenesisStateView, genesis_gas_schedule::INITIAL_GAS_SCHEDULE};
 use compiled_stdlib::{stdlib_modules, transaction_scripts::StdlibScript, StdLibOptions};
