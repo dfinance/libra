@@ -12,7 +12,7 @@ mod liveness;
 mod locals;
 mod remove_no_ops;
 mod simplify_jumps;
-pub(crate) mod translate;
+pub mod translate;
 
 use crate::{
     errors::Errors,
