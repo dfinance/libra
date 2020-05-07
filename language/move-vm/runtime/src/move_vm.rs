@@ -11,7 +11,7 @@ use move_vm_types::{
 use vm::errors::VMResult;
 
 pub struct MoveVM {
-    runtime: VMRuntime,
+    pub runtime: VMRuntime,
 }
 
 impl MoveVM {

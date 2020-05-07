@@ -14,7 +14,7 @@ extern crate mirai_annotations;
 
 mod gas_meter;
 mod interpreter;
-mod loader;
+pub mod loader;
 mod move_vm;
 mod native_functions;
 mod runtime;
