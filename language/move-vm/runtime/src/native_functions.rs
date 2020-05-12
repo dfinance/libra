@@ -6,8 +6,8 @@ use libra_types::{
     access_path::AccessPath, account_address::AccountAddress, account_config::CORE_CODE_ADDRESS,
     contract_event::ContractEvent,
 };
-use move_core_types::{gas_schedule::CostTable, identifier::IdentStr, language_storage::ModuleId};
-use move_vm_natives::{account, event, hash, lcs, signature};
+use move_core_types::{gas_schedule::CostTable, identifier::IdentStr,  language_storage::ModuleId};
+use move_vm_natives::{account, event, hash, lcs, signature, oracle, dfinance};
 use move_vm_types::{
     interpreter_context::InterpreterContext,
     loaded_data::{runtime_types::Type, types::FatType},
@@ -41,8 +41,11 @@ pub(crate) enum NativeFunction {
     VectorSwap,
     AccountWriteEvent,
     AccountSaveAccount,
+    AccountSaveBalance,
     DebugPrint,
     DebugPrintStackTrace,
+    OraclePrice,
+    DfinanceSaveInfo,
 }
 
 impl NativeFunction {
@@ -72,9 +75,12 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Vector", "destroy_empty") => VectorDestroyEmpty,
             (&CORE_CODE_ADDRESS, "Vector", "swap") => VectorSwap,
             (&CORE_CODE_ADDRESS, "Event", "write_to_event_store") => AccountWriteEvent,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "save_account") => AccountSaveAccount,
+            (&CORE_CODE_ADDRESS, "Account", "save_account") => AccountSaveAccount,
+            (&CORE_CODE_ADDRESS, "Account", "save_balance") => AccountSaveBalance,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
+            (&CORE_CODE_ADDRESS, "Oracle", "get_price") => OraclePrice,
+            (&CORE_CODE_ADDRESS, "Dfinance", "register_token_info") => DfinanceSaveInfo,
             _ => return None,
         })
     }
@@ -105,9 +111,12 @@ impl NativeFunction {
             // natives that need the full API of `NativeContext`
             Self::AccountWriteEvent => event::native_emit_event(ctx, t, v),
             Self::AccountSaveAccount => account::native_save_account(ctx, t, v),
+            Self::AccountSaveBalance => account::native_save_balance(ctx, t, v),
             Self::LCSToBytes => lcs::native_to_bytes(ctx, t, v),
             Self::DebugPrint => debug::native_print(ctx, t, v),
             Self::DebugPrintStackTrace => debug::native_print_stack_trace(ctx, t, v),
+            Self::OraclePrice => oracle::native_oracle_get_price(ctx, t, v),
+            Self::DfinanceSaveInfo => dfinance::native_register_token_info(ctx, t, v),
         }
     }
 }
@@ -160,7 +169,9 @@ impl<'a, 'txn> NativeContext for FunctionContext<'a, 'txn> {
         self.interpreter_context
             .move_resource_to(&ap, libra_type.fat_type(), resource_to_save)
     }
-
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.interpreter_context.raw_load(path)
+    }
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()> {
         Ok(self.interpreter_context.push_event(event))
     }

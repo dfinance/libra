@@ -35,7 +35,9 @@ pub trait ChainState {
     /// Get the serialized format of a `CompiledModule` from chain given a `ModuleId`.
     fn load_module(&self, module: &ModuleId) -> VMResult<Vec<u8>>;
 
-    /// Get a reference to a resource stored on chain.
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
+
+        /// Get a reference to a resource stored on chain.
     fn borrow_resource(
         &mut self,
         ap: &AccessPath,

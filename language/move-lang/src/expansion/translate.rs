@@ -238,7 +238,6 @@ fn module_(
         name: name.clone(),
     };
     let current_module = ModuleIdent(sp(name_loc, mident_));
-    let is_source_module = is_source_module && !fake_natives::is_fake_native(&current_module);
     let self_aliases = module_self_aliases(&current_module);
     context.set_and_shadow_aliases(self_aliases);
     let alias_map = aliases(context, uses);
