@@ -4,13 +4,13 @@
 #![allow(clippy::unit_arg)]
 
 use anyhow::Result;
+use enum_iterator::IntoEnumIterator;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest::prelude::*;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{de, ser, Deserialize, Serialize};
 use std::{convert::TryFrom, fmt};
-use enum_iterator::IntoEnumIterator;
 
 /// The minimum status code for validation statuses
 pub static VALIDATION_STATUS_MIN_CODE: u64 = 0;

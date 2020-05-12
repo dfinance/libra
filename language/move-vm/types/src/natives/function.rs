@@ -22,9 +22,8 @@ use crate::{
     values::{Struct, Value},
 };
 use libra_types::{
-    account_address::AccountAddress, contract_event::ContractEvent,
+    access_path::AccessPath, account_address::AccountAddress, contract_event::ContractEvent,
     vm_error::VMStatus,
-    access_path::AccessPath
 };
 use move_core_types::{
     gas_schedule::{AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, GasUnits},
@@ -58,6 +57,8 @@ pub trait NativeContext {
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()>;
     /// Converts types to fet types.
     fn convert_to_fat_types(&self, types: Vec<Type>) -> VMResult<Vec<FatType>>;
+    /// Load from state view.
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
     /// Whether a type is a resource or not.
     fn is_resource(&self, ty: &Type) -> VMResult<bool>;
 }

@@ -234,4 +234,8 @@ impl<'txn> DataStore for GenesisDataCache<'txn> {
     fn emit_event(&mut self, event: ContractEvent) {
         self.data_store.emit_event(event)
     }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.data_store.raw_load(path)
+    }
 }
