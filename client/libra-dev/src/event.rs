@@ -190,7 +190,7 @@ fn test_libra_LibraEvent_from() {
     let sent_event_handle = EventHandle::new(EventKey::new_from_address(&sender_address, 0), 0);
     let sequence_number = sent_event_handle.count();
     let event_key = sent_event_handle.key();
-    let module = "LibraAccount";
+    let module = "Account";
     let name = "SentPaymentEvent";
 
     let type_tag = Struct(StructTag {

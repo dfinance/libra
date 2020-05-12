@@ -40,6 +40,7 @@ pub(crate) enum NativeFunction {
     VectorSwap,
     AccountWriteEvent,
     AccountSaveAccount,
+    AccountSaveBalance,
     DebugPrint,
     DebugPrintStackTrace,
 }
@@ -70,7 +71,8 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Vector", "destroy_empty") => VectorDestroyEmpty,
             (&CORE_CODE_ADDRESS, "Vector", "swap") => VectorSwap,
             (&CORE_CODE_ADDRESS, "Event", "write_to_event_store") => AccountWriteEvent,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "save_account") => AccountSaveAccount,
+            (&CORE_CODE_ADDRESS, "Account", "save_account") => AccountSaveAccount,
+            (&CORE_CODE_ADDRESS, "Account", "save_balance") => AccountSaveBalance,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
             _ => return None,
@@ -102,6 +104,7 @@ impl NativeFunction {
             // natives that need the full API of `NativeContext`
             Self::AccountWriteEvent => event::native_emit_event(ctx, t, v),
             Self::AccountSaveAccount => account::native_save_account(ctx, t, v),
+            Self::AccountSaveBalance => account::native_save_balance(ctx, t, v),
             Self::LCSToBytes => lcs::native_to_bytes(ctx, t, v),
             Self::DebugPrint => debug::native_print(ctx, t, v),
             Self::DebugPrintStackTrace => debug::native_print_stack_trace(ctx, t, v),
