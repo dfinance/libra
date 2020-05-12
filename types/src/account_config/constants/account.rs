@@ -8,11 +8,11 @@ use move_core_types::{
 };
 use once_cell::sync::Lazy;
 
-pub const ACCOUNT_MODULE_NAME: &str = "LibraAccount";
+pub const ACCOUNT_MODULE_NAME: &str = "Account";
 
 // Account
 static ACCOUNT_MODULE_IDENTIFIER: Lazy<Identifier> =
-    Lazy::new(|| Identifier::new("LibraAccount").unwrap());
+    Lazy::new(|| Identifier::new("Account").unwrap());
 static ACCOUNT_STRUCT_NAME: Lazy<Identifier> = Lazy::new(|| Identifier::new("T").unwrap());
 static ACCOUNT_BALANCE_STRUCT_NAME: Lazy<Identifier> =
     Lazy::new(|| Identifier::new("Balance").unwrap());

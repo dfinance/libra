@@ -130,6 +130,10 @@ impl<'txn> ChainState for TransactionExecutionContext<'txn> {
     fn emit_event(&mut self, event: ContractEvent) {
         self.event_data.push(event)
     }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.data_view.data_cache.get(path)
+    }
 }
 
 pub struct SystemExecutionContext<'txn>(TransactionExecutionContext<'txn>);
@@ -201,6 +205,10 @@ impl<'txn> ChainState for SystemExecutionContext<'txn> {
 
     fn emit_event(&mut self, event: ContractEvent) {
         self.0.emit_event(event)
+    }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.0.raw_load(path)
     }
 }
 

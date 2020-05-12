@@ -49,6 +49,8 @@ pub trait InterpreterContext {
     fn load_module(&self, module: &ModuleId) -> VMResult<Vec<u8>>;
 
     fn publish_module(&mut self, module_id: ModuleId, module: Vec<u8>) -> VMResult<()>;
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
 }
 
 impl<T: ChainState> InterpreterContext for T {
@@ -147,5 +149,9 @@ impl<T: ChainState> InterpreterContext for T {
 
     fn publish_module(&mut self, module_id: ModuleId, module: Vec<u8>) -> VMResult<()> {
         self.publish_module(module_id, module)
+    }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.raw_load(path)
     }
 }
