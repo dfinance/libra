@@ -236,4 +236,8 @@ impl<'txn> ChainState for GenesisExecutionContext<'txn> {
     fn emit_event(&mut self, event: ContractEvent) {
         self.ctx.emit_event(event)
     }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.ctx.raw_load(path)
+    }
 }

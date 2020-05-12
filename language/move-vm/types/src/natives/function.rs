@@ -24,6 +24,7 @@ use crate::{
 use libra_types::{
     account_address::AccountAddress, contract_event::ContractEvent, language_storage::ModuleId,
     vm_error::VMStatus,
+    access_path::AccessPath
 };
 use move_core_types::{
     gas_schedule::{AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, GasUnits},
@@ -52,6 +53,8 @@ pub trait NativeContext {
         resource_to_save: Struct,
         account_address: AccountAddress,
     ) -> VMResult<()>;
+    /// Load from state view.
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
     /// Saves contract event.
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()>;
     /// Converts types to fet types.

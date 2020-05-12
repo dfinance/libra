@@ -116,7 +116,7 @@ pub struct TransactionDataCache<'txn> {
     // Also need to relate this to a ResourceKey.
     data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
     module_map: BTreeMap<ModuleId, Vec<u8>>,
-    data_cache: &'txn dyn RemoteCache,
+    pub data_cache: &'txn dyn RemoteCache,
 }
 
 impl<'txn> TransactionDataCache<'txn> {
