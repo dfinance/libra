@@ -156,7 +156,10 @@ pub async fn get_account(
 /// Returns the blockchain metadata for a specified version. If no version is specified, default to
 /// returning the current blockchain metadata
 /// Can be used to verify that target Full Node is up-to-date
-pub async fn get_metadata(service: JsonRpcService, request: JsonRpcRequest) -> Result<BlockMetadata> {
+pub async fn get_metadata(
+    service: JsonRpcService,
+    request: JsonRpcRequest,
+) -> Result<BlockMetadata> {
     match serde_json::from_value::<u64>(request.get_param(0)) {
         Ok(version) => Ok(BlockMetadata {
             version,
@@ -272,7 +275,10 @@ pub async fn get_account_transaction(
 }
 
 /// Returns events by given access path
-pub async fn get_events(service: JsonRpcService, request: JsonRpcRequest) -> Result<Vec<EventView>> {
+pub async fn get_events(
+    service: JsonRpcService,
+    request: JsonRpcRequest,
+) -> Result<Vec<EventView>> {
     let raw_event_key: String = serde_json::from_value(request.get_param(0))?;
     let start: u64 = serde_json::from_value(request.get_param(1))?;
     let limit: u64 = serde_json::from_value(request.get_param(2))?;

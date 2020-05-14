@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! Consensus for the Libra Core blockchain
 //!
 //! The consensus protocol implemented is LibraBFT (based on

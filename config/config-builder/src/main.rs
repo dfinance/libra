@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use config_builder::{FullNodeConfig, KeyManagerConfig, ValidatorConfig};
 use libra_config::config::{KeyManagerConfig as KMConfig, NodeConfig, PersistableConfig};
 use libra_network_address::NetworkAddress;

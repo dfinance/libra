@@ -32,10 +32,7 @@ pub static THROUGHPUT_COUNTER: Lazy<IntCounterVec> = Lazy::new(|| {
     .unwrap()
 });
 
-pub fn reply_with_lcs_bytes<R: Serialize>(
-    endpoint: &str,
-    record: &R,
-) -> Result<Box<dyn Reply>> {
+pub fn reply_with_lcs_bytes<R: Serialize>(endpoint: &str, record: &R) -> Result<Box<dyn Reply>> {
     let bytes = lcs::to_bytes(record)?;
     THROUGHPUT_COUNTER
         .with_label_values(&[endpoint])

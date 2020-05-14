@@ -243,7 +243,10 @@ where
 
     /// Computes the root hash of an accumulator given the frozen subtree roots and the number of
     /// leaves in this accumulator.
-    pub fn compute_root_hash(frozen_subtree_roots: &[HashValue], num_leaves: LeafCount) -> HashValue {
+    pub fn compute_root_hash(
+        frozen_subtree_roots: &[HashValue],
+        num_leaves: LeafCount,
+    ) -> HashValue {
         match frozen_subtree_roots.len() {
             0 => return *ACCUMULATOR_PLACEHOLDER_HASH,
             1 => return frozen_subtree_roots[0],

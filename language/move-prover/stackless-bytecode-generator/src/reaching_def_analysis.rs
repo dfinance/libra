@@ -76,7 +76,10 @@ impl ReachingDefProcessor {
             .collect()
     }
 
-    pub fn get_src_local(idx: TempIndex, reaching_defs: &BTreeMap<TempIndex, TempIndex>) -> TempIndex {
+    pub fn get_src_local(
+        idx: TempIndex,
+        reaching_defs: &BTreeMap<TempIndex, TempIndex>,
+    ) -> TempIndex {
         let mut res = idx;
         while reaching_defs.contains_key(&res) {
             res = *reaching_defs.get(&res).unwrap();

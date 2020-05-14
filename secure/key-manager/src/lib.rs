@@ -18,7 +18,6 @@
 //! `LibraDB`/`Executor`, JSON-RPC, or some other concoction.
 //! KeyManager talks to its own storage through the `LibraSecureStorage::Storage trait.
 
-
 use crate::{
     counters::COUNTERS,
     libra_interface::LibraInterface,

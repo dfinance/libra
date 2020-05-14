@@ -25,7 +25,7 @@ impl<'r, 'l, R: RemoteCache> Session<'r, 'l, R> {
         function_name: &IdentStr,
         ty_args: Vec<TypeTag>,
         args: Vec<Value>,
-        _sender: AccountAddress,
+        sender: AccountAddress,
         cost_strategy: &mut CostStrategy,
     ) -> VMResult<()> {
         self.runtime.execute_function(
@@ -35,6 +35,7 @@ impl<'r, 'l, R: RemoteCache> Session<'r, 'l, R> {
             args,
             &mut self.data_cache,
             cost_strategy,
+            sender,
         )
     }
 

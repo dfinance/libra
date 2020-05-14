@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use libra_config::config::PersistableConfig;
 use libra_logger::prelude::*;
 use libra_network_address::NetworkAddress;
@@ -59,7 +57,10 @@ fn main() {
 }
 
 /// Retrieve validator set from the JSON-RPC endpoint
-pub fn get_validator_set(endpoint: String, peer_id: PeerId) -> anyhow::Result<Option<ValidatorSet>> {
+pub fn get_validator_set(
+    endpoint: String,
+    peer_id: PeerId,
+) -> anyhow::Result<Option<ValidatorSet>> {
     let json_rpc = JsonRpcClient::new(endpoint);
     let account_state = json_rpc.get_account_state(peer_id, None)?;
     Ok(account_state.get_validator_set()?)

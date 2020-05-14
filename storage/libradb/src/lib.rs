@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! This crate provides [`LibraDB`] which represents physical storage of the core Libra data
 //! structures.
 //!

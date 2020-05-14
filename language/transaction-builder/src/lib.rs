@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use compiled_stdlib::{transaction_scripts::StdlibScript, StdLibOptions};
 use libra_types::{
     access_path::AccessPath,

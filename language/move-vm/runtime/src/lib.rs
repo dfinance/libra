@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! The core Move VM logic.
 //!
 //! It is a design goal for the Move VM to be independent of the Libra blockchain, so that

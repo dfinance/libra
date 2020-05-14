@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use anyhow::{format_err, Result};
 use reqwest::{header::USER_AGENT, Url};
 use serde::Deserialize;

@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! Functionality related to the command line interface of the Move prover.
 
 use abigen::AbigenOptions;

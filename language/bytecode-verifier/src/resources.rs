@@ -51,7 +51,11 @@ impl<'a> ResourceTransitiveChecker<'a> {
     ///   3) it is a pub struct that
     ///       a) is marked as resource.
     ///       b) has a type actual which is a nominal resource.
-    pub fn contains_nominal_resource(&self, token: &SignatureToken, type_parameters: &[Kind]) -> bool {
+    pub fn contains_nominal_resource(
+        &self,
+        token: &SignatureToken,
+        type_parameters: &[Kind],
+    ) -> bool {
         match token {
             SignatureToken::Signer => true,
             SignatureToken::Struct(sh_idx) => {

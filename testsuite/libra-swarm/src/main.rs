@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use libra_config::config::NodeConfig;
 use libra_genesis_tool::config_builder::FullnodeType;
 use libra_swarm::{client, swarm::LibraSwarm};

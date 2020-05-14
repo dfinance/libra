@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use move_lang::{ir_translation::fix_syntax_and_write, test_utils::*};
 use regex::Regex;
 use std::{fs, path::Path};

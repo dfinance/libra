@@ -536,7 +536,7 @@ pub mod test {
         ))
     }
 
-   pub enum Auth {
+    pub enum Auth {
         Mutual,
         ServerOnly,
     }

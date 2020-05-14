@@ -24,7 +24,7 @@ use vm::{
 
 /// An instantiation of the MoveVM.
 pub struct VMRuntime {
-    loader: Loader,
+    pub loader: Loader,
 }
 
 impl VMRuntime {
@@ -121,6 +121,7 @@ impl VMRuntime {
             data_store,
             cost_strategy,
             &self.loader,
+            sender,
         )
     }
 
@@ -132,6 +133,7 @@ impl VMRuntime {
         args: Vec<Value>,
         data_store: &mut impl DataStore,
         cost_strategy: &mut CostStrategy,
+        sender: AccountAddress,
     ) -> VMResult<()> {
         // load the function in the given module, perform verification of the module and
         // its dependencies if the module was not loaded
@@ -150,6 +152,7 @@ impl VMRuntime {
             data_store,
             cost_strategy,
             &self.loader,
+            sender,
         )
     }
 }

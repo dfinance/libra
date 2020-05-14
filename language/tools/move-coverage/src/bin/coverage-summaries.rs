@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use move_coverage::{
     coverage_map::CoverageMap,
     summary::{self, ModuleSummary, ModuleSummaryOptions},
@@ -71,7 +69,11 @@ pub fn get_modules(args: &Args) -> Vec<CompiledModule> {
     modules
 }
 
-pub fn format_human_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
+pub fn format_human_summary<W: Write>(
+    args: &Args,
+    coverage_map: &CoverageMap,
+    summary_writer: &mut W,
+) {
     writeln!(summary_writer, "+-------------------------+").unwrap();
     writeln!(summary_writer, "| Move Coverage Summary   |").unwrap();
     writeln!(summary_writer, "+-------------------------+").unwrap();
@@ -99,7 +101,11 @@ pub fn format_human_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, s
     writeln!(summary_writer, "+-------------------------+").unwrap();
 }
 
-pub fn format_csv_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
+pub fn format_csv_summary<W: Write>(
+    args: &Args,
+    coverage_map: &CoverageMap,
+    summary_writer: &mut W,
+) {
     writeln!(summary_writer, "ModuleName,FunctionName,Covered,Uncovered").unwrap();
 
     for module in get_modules(&args).iter() {

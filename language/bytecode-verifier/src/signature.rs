@@ -214,7 +214,11 @@ impl<'a> SignatureChecker<'a> {
         Ok(())
     }
 
-    pub fn check_type_instantiation(&self, ty: &SignatureToken, kinds: &[Kind]) -> PartialVMResult<()> {
+    pub fn check_type_instantiation(
+        &self,
+        ty: &SignatureToken,
+        kinds: &[Kind],
+    ) -> PartialVMResult<()> {
         match ty {
             SignatureToken::StructInstantiation(idx, type_arguments) => {
                 // Check that the instantiation satisfies the `idx` struct's constraints

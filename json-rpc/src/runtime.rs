@@ -255,7 +255,11 @@ pub async fn rpc_request_handler(
 
 // Sets the JSON RPC error value for a given response.
 // If a counter label is supplied, also increments the invalid request counter using the label,
-pub fn set_response_error(response: &mut Map<String, Value>, error: JsonRpcError, label: Option<&str>) {
+pub fn set_response_error(
+    response: &mut Map<String, Value>,
+    error: JsonRpcError,
+    label: Option<&str>,
+) {
     response.insert("error".to_string(), error.serialize());
 
     if let Some(label) = label {

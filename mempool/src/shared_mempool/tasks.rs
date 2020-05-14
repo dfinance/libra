@@ -66,7 +66,11 @@ pub fn execute_broadcast<V>(
 
 /// broadcasts txns to `peer` if alive
 /// Returns whether the next broadcast scheduled for this peer should be in backpressure mode or not
-pub fn broadcast_single_peer<V>(peer: PeerNetworkId, backoff: bool, smp: &mut SharedMempool<V>) -> bool
+pub fn broadcast_single_peer<V>(
+    peer: PeerNetworkId,
+    backoff: bool,
+    smp: &mut SharedMempool<V>,
+) -> bool
 where
     V: TransactionValidation,
 {
@@ -451,10 +455,7 @@ pub fn log_txn_process_results(results: &[SubmissionStatus], sender: Option<Peer
 // ================================= //
 // intra-node communication handlers //
 // ================================= //
-pub async fn process_state_sync_request(
-    mempool: Arc<Mutex<CoreMempool>>,
-    req: CommitNotification,
-) {
+pub async fn process_state_sync_request(mempool: Arc<Mutex<CoreMempool>>, req: CommitNotification) {
     let start_time = Instant::now();
     counters::MEMPOOL_SERVICE_TXNS
         .with_label_values(&[counters::COMMIT_STATE_SYNC_LABEL])

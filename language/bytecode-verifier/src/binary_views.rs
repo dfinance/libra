@@ -124,10 +124,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub fn struct_def_at(
-        &self,
-        idx: StructDefinitionIndex,
-    ) -> PartialVMResult<&StructDefinition> {
+    pub fn struct_def_at(&self, idx: StructDefinitionIndex) -> PartialVMResult<&StructDefinition> {
         match self {
             BinaryIndexedView::Module(module) => Ok(module.struct_def_at(idx)),
             BinaryIndexedView::Script(_) => {

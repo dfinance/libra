@@ -1,7 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
 use libra_types::transaction::{SignedTransaction, TransactionOutput};
 
 pub type Block<Txn> = Vec<Txn>;

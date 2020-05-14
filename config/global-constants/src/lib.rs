@@ -7,7 +7,6 @@
 //! the Key Manager, and Secure Storage). To avoid duplicating these definitions across crates
 //! (and better allow these constants to be updated in a single location), we define them here.
 
-
 /// Definitions of global cryptographic keys (e.g., as held in secure storage)
 pub const CONSENSUS_KEY: &str = "consensus";
 pub const EXECUTION_KEY: &str = "execution";

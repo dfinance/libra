@@ -177,17 +177,11 @@ impl BlockTree {
         Arc::clone(&self.highest_commit_cert)
     }
 
-    pub fn get_quorum_cert_for_block(
-        &self,
-        block_id: &HashValue,
-    ) -> Option<Arc<QuorumCert>> {
+    pub fn get_quorum_cert_for_block(&self, block_id: &HashValue) -> Option<Arc<QuorumCert>> {
         self.id_to_quorum_cert.get(block_id).cloned()
     }
 
-    pub fn insert_block(
-        &mut self,
-        block: ExecutedBlock,
-    ) -> anyhow::Result<Arc<ExecutedBlock>> {
+    pub fn insert_block(&mut self, block: ExecutedBlock) -> anyhow::Result<Arc<ExecutedBlock>> {
         let block_id = block.id();
         if let Some(existing_block) = self.get_block(&block_id) {
             debug!("Already had block {:?} for id {:?} when trying to add another block {:?} for the same id",

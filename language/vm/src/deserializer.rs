@@ -105,7 +105,9 @@ pub fn load_signature_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<Si
     )?))
 }
 
-pub fn load_module_handle_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<ModuleHandleIndex> {
+pub fn load_module_handle_index(
+    cursor: &mut Cursor<&[u8]>,
+) -> BinaryLoaderResult<ModuleHandleIndex> {
     Ok(ModuleHandleIndex(read_uleb_internal(
         cursor,
         MODULE_HANDLE_INDEX_MAX,
@@ -119,7 +121,9 @@ pub fn load_identifier_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<I
     )?))
 }
 
-pub fn load_struct_handle_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<StructHandleIndex> {
+pub fn load_struct_handle_index(
+    cursor: &mut Cursor<&[u8]>,
+) -> BinaryLoaderResult<StructHandleIndex> {
     Ok(StructHandleIndex(read_uleb_internal(
         cursor,
         STRUCT_HANDLE_INDEX_MAX,
@@ -135,7 +139,9 @@ pub fn load_address_identifier_index(
     )?))
 }
 
-pub fn load_struct_def_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<StructDefinitionIndex> {
+pub fn load_struct_def_index(
+    cursor: &mut Cursor<&[u8]>,
+) -> BinaryLoaderResult<StructDefinitionIndex> {
     Ok(StructDefinitionIndex(read_uleb_internal(
         cursor,
         STRUCT_DEF_INDEX_MAX,
@@ -185,7 +191,9 @@ pub fn load_struct_def_inst_index(
     )?))
 }
 
-pub fn load_constant_pool_index(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<ConstantPoolIndex> {
+pub fn load_constant_pool_index(
+    cursor: &mut Cursor<&[u8]>,
+) -> BinaryLoaderResult<ConstantPoolIndex> {
     Ok(ConstantPoolIndex(read_uleb_internal(
         cursor,
         CONSTANT_INDEX_MAX,
@@ -812,7 +820,9 @@ pub fn load_signatures(
     Ok(())
 }
 
-pub fn load_signature_tokens(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<Vec<SignatureToken>> {
+pub fn load_signature_tokens(
+    cursor: &mut Cursor<&[u8]>,
+) -> BinaryLoaderResult<Vec<SignatureToken>> {
     let len = load_signature_size(cursor)?;
     let mut tokens = vec![];
     for _ in 0..len {
@@ -822,9 +832,7 @@ pub fn load_signature_tokens(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<V
 }
 
 /// Deserializes a `SignatureToken`.
-pub fn load_signature_token(
-    cursor: &mut Cursor<&[u8]>,
-) -> BinaryLoaderResult<SignatureToken> {
+pub fn load_signature_token(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<SignatureToken> {
     // The following algorithm works by storing partially constructed types on a stack.
     //
     // Example:
@@ -850,7 +858,7 @@ pub fn load_signature_token(
 
     use SerializedType as S;
 
-   pub enum TypeBuilder {
+    pub enum TypeBuilder {
         Saturated(SignatureToken),
         Vector,
         Reference,

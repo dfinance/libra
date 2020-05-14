@@ -9,7 +9,6 @@
 //! Note: While a JSON RPC client implementation already exists in the Libra codebase, this
 //! provides a simpler and (hopefully) more secure implementation with fewer dependencies.
 
-
 use hex::FromHexError;
 use libra_types::{
     account_address::AccountAddress, account_state::AccountState,
@@ -394,7 +393,10 @@ pub mod test {
     /// and the server is a JSON server that serves the JSON RPC requests. The server communicates
     /// with the given database to handle each JSON RPC request. If mock_validator is set to true,
     /// the server is also given a mock vm validator to validate any submitted transactions.
-    pub fn create_client_and_server(db: MockLibraDB, mock_validator: bool) -> (JsonRpcClient, Runtime) {
+    pub fn create_client_and_server(
+        db: MockLibraDB,
+        mock_validator: bool,
+    ) -> (JsonRpcClient, Runtime) {
         let address = "0.0.0.0";
         let port = utils::get_available_port();
         let host = format!("{}:{}", address, port);

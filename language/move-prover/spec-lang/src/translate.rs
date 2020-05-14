@@ -891,7 +891,10 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Converts a ModuleAccess into its parts, an optional ModuleName and base name.
-    pub fn module_access_to_parts(&self, access: &EA::ModuleAccess) -> (Option<ModuleName>, Symbol) {
+    pub fn module_access_to_parts(
+        &self,
+        access: &EA::ModuleAccess,
+    ) -> (Option<ModuleName>, Symbol) {
         match &access.value {
             EA::ModuleAccess_::Name(n) => (None, self.symbol_pool().make(n.value.as_str())),
             EA::ModuleAccess_::ModuleAccess(m, n) => {
@@ -1405,7 +1408,12 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         props
     }
 
-    pub fn add_bool_property(&self, mut properties: PropertyBag, name: &str, val: bool) -> PropertyBag {
+    pub fn add_bool_property(
+        &self,
+        mut properties: PropertyBag,
+        name: &str,
+        val: bool,
+    ) -> PropertyBag {
         let sym = self.symbol_pool().make(name);
         properties.insert(sym, Value::Bool(val));
         properties
@@ -1865,7 +1873,11 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Definition analysis for a specification helper function.
-    pub fn def_ana_spec_fun(&mut self, _signature: &EA::FunctionSignature, body: &EA::FunctionBody) {
+    pub fn def_ana_spec_fun(
+        &mut self,
+        _signature: &EA::FunctionSignature,
+        body: &EA::FunctionBody,
+    ) {
         if let EA::FunctionBody_::Defined(seq) = &body.value {
             let entry = &self.spec_funs[self.spec_fun_index];
             let type_params = entry.type_params.clone();
@@ -3138,7 +3150,13 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     /// if the name already exists. The invariant option is used for names
     /// which appear as locals in expressions, but are actually implicit selections
     /// of fields of an underlying struct.
-    pub fn define_local(&mut self, loc: &Loc, name: Symbol, type_: Type, operation: Option<Operation>) {
+    pub fn define_local(
+        &mut self,
+        loc: &Loc,
+        name: Symbol,
+        type_: Type,
+        operation: Option<Operation>,
+    ) {
         let entry = LocalVarEntry {
             loc: loc.clone(),
             type_,
@@ -3186,7 +3204,10 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
     /// Analyzes the sequence of function parameters as they are provided via the source AST and
     /// enters them into the environment. Returns a vector for representing them in the target AST.
-    pub fn analyze_and_add_params(&mut self, params: &[(PA::Var, EA::Type)]) -> Vec<(Symbol, Type)> {
+    pub fn analyze_and_add_params(
+        &mut self,
+        params: &[(PA::Var, EA::Type)],
+    ) -> Vec<(Symbol, Type)> {
         params
             .iter()
             .map(|(v, ty)| {
@@ -3542,7 +3563,10 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                 self.new_error_exp()
             }
             _ => {
-                self.error(&loc, "expression conpub struct not supported in specifications");
+                self.error(
+                    &loc,
+                    "expression conpub struct not supported in specifications",
+                );
                 self.new_error_exp()
             }
         }

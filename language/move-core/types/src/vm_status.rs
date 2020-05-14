@@ -5,13 +5,13 @@
 
 use crate::language_storage::ModuleId;
 use anyhow::Result;
+use enum_iterator::IntoEnumIterator;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest::prelude::*;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
 use serde::{de, ser, Deserialize, Serialize};
 use std::{convert::TryFrom, fmt};
-use enum_iterator::IntoEnumIterator;
 
 /// The minimum status code for validation statuses
 pub static VALIDATION_STATUS_MIN_CODE: u64 = 0;
@@ -371,7 +371,7 @@ pub mod known_locations {
     use once_cell::sync::Lazy;
 
     /// The name of the Account module.
-    pub const ACCOUNT_MODULE_NAME: &str = "LibraAccount";
+    pub const ACCOUNT_MODULE_NAME: &str = "Account";
     /// The Identifier for the Account module.
     pub static ACCOUNT_MODULE_IDENTIFIER: Lazy<Identifier> =
         Lazy::new(|| Identifier::new(ACCOUNT_MODULE_NAME).unwrap());

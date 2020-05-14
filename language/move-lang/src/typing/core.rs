@@ -296,7 +296,11 @@ impl Context {
             .expect("ICE should have failed in naming")
     }
 
-    pub fn constant_info(&mut self, m_opt: &Option<ModuleIdent>, n: &ConstantName) -> &ConstantInfo {
+    pub fn constant_info(
+        &mut self,
+        m_opt: &Option<ModuleIdent>,
+        n: &ConstantName,
+    ) -> &ConstantInfo {
         let constants = match m_opt {
             None => self.current_script_constants.as_ref().unwrap(),
             Some(m) => &self.module_info(m).constants,
@@ -607,7 +611,10 @@ pub fn make_field_type(
             context.error(vec![
                 (
                     loc,
-                    format!("Unbound field '{}' for native pub struct '{}::{}'", field, m, n),
+                    format!(
+                        "Unbound field '{}' for native pub struct '{}::{}'",
+                        field, m, n
+                    ),
                 ),
                 (nloc, "Declared 'native' here".into()),
             ]);

@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use libra_logger::debug;
 use std::{future::Future, pin::Pin, thread, time::Duration};
 

@@ -182,11 +182,15 @@ pub fn parse_account_address<'input>(
 //     <n:Name> =>? Var::parse(n),
 // };
 
-pub fn parse_var_<'input>(tokens: &mut Lexer<'input>) -> Result<Var_, ParseError<Loc, anyhow::Error>> {
+pub fn parse_var_<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Var_, ParseError<Loc, anyhow::Error>> {
     Ok(Var_::new(parse_name(tokens)?))
 }
 
-pub fn parse_var<'input>(tokens: &mut Lexer<'input>) -> Result<Var, ParseError<Loc, anyhow::Error>> {
+pub fn parse_var<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Var, ParseError<Loc, anyhow::Error>> {
     let start_loc = tokens.start_loc();
     let var = parse_var_(tokens)?;
     let end_loc = tokens.previous_end_loc();
@@ -316,7 +320,9 @@ pub fn get_precedence(token: Tok) -> u32 {
     }
 }
 
-pub fn parse_exp<'input>(tokens: &mut Lexer<'input>) -> Result<Exp, ParseError<Loc, anyhow::Error>> {
+pub fn parse_exp<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Exp, ParseError<Loc, anyhow::Error>> {
     let lhs = parse_unary_exp(tokens)?;
     parse_rhs_of_binary_exp(tokens, lhs, /* min_prec */ 1)
 }
@@ -501,7 +507,9 @@ pub fn parse_unary_exp<'input>(
 //     <f: Sp<QualifiedFunctionName>> <exp: Sp<CallOrTerm>> => Exp::FunctionCall(f, Box::new(exp)),
 // }
 
-pub fn parse_call<'input>(tokens: &mut Lexer<'input>) -> Result<Exp, ParseError<Loc, anyhow::Error>> {
+pub fn parse_call<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Exp, ParseError<Loc, anyhow::Error>> {
     let start_loc = tokens.start_loc();
     let f = parse_qualified_function_name(tokens)?;
     let exp = parse_call_or_term(tokens)?;
@@ -588,7 +596,9 @@ pub fn parse_pack_<'input>(
     ))
 }
 
-pub fn parse_term_<'input>(tokens: &mut Lexer<'input>) -> Result<Exp_, ParseError<Loc, anyhow::Error>> {
+pub fn parse_term_<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Exp_, ParseError<Loc, anyhow::Error>> {
     match tokens.peek() {
         Tok::Move => {
             tokens.advance()?;
@@ -863,7 +873,9 @@ pub fn parse_unpack_<'input>(
     ))
 }
 
-pub fn parse_cmd_<'input>(tokens: &mut Lexer<'input>) -> Result<Cmd_, ParseError<Loc, anyhow::Error>> {
+pub fn parse_cmd_<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Cmd_, ParseError<Loc, anyhow::Error>> {
     match tokens.peek() {
         Tok::NameValue => {
             // This could be either an LValue for an assignment or
@@ -1124,7 +1136,9 @@ pub fn parse_function_block_<'input>(
 //     "copyable" => Kind::Copyable,
 // }
 
-pub fn parse_kind<'input>(tokens: &mut Lexer<'input>) -> Result<Kind, ParseError<Loc, anyhow::Error>> {
+pub fn parse_kind<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Kind, ParseError<Loc, anyhow::Error>> {
     let k = match tokens.peek() {
         Tok::Resource => Kind::Resource,
         Tok::Copyable => Kind::Copyable,
@@ -1150,7 +1164,9 @@ pub fn parse_kind<'input>(tokens: &mut Lexer<'input>) -> Result<Kind, ParseError
 //     <n: Name> =>? Ok(Type::TypeParameter(TypeVar::parse(n)?)),
 // }
 
-pub fn parse_type<'input>(tokens: &mut Lexer<'input>) -> Result<Type, ParseError<Loc, anyhow::Error>> {
+pub fn parse_type<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<Type, ParseError<Loc, anyhow::Error>> {
     let t = match tokens.peek() {
         Tok::Address => {
             tokens.advance()?;

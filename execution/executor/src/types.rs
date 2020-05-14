@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use executor_types::{ExecutedTrees, StateComputeResult};
 use libra_crypto::{hash::EventAccumulatorHasher, HashValue};
 use libra_types::{

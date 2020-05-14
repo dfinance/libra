@@ -2434,7 +2434,12 @@ pub mod debug {
         print_container(buf, r.container())
     }
 
-    pub fn print_slice_elem<B, X, F>(buf: &mut B, v: &[X], idx: usize, print: F) -> PartialVMResult<()>
+    pub fn print_slice_elem<B, X, F>(
+        buf: &mut B,
+        v: &[X],
+        idx: usize,
+        print: F,
+    ) -> PartialVMResult<()>
     where
         B: Write,
         F: FnOnce(&mut B, &X) -> PartialVMResult<()>,

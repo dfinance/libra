@@ -1069,7 +1069,10 @@ pub fn parse_quant<'input>(tokens: &mut Lexer<'input>) -> Result<Exp_, Error> {
 }
 
 // Parses quantifier bindings recursively until the body is reached.
-pub fn parse_quant_cont<'input>(is_forall: bool, tokens: &mut Lexer<'input>) -> Result<Exp_, Error> {
+pub fn parse_quant_cont<'input>(
+    is_forall: bool,
+    tokens: &mut Lexer<'input>,
+) -> Result<Exp_, Error> {
     // Parse the next quantifier variable binding
     let start_loc = tokens.start_loc();
     let ident = parse_identifier(tokens)?;
@@ -1124,7 +1127,10 @@ pub fn parse_quant_cont<'input>(is_forall: bool, tokens: &mut Lexer<'input>) -> 
 }
 
 // Parse quantifier body.
-pub fn parse_quant_body<'input>(is_forall: bool, tokens: &mut Lexer<'input>) -> Result<Exp_, Error> {
+pub fn parse_quant_body<'input>(
+    is_forall: bool,
+    tokens: &mut Lexer<'input>,
+) -> Result<Exp_, Error> {
     let opt_cond = match tokens.peek() {
         Tok::IdentifierValue if tokens.content() == "where" => {
             tokens.advance()?;
@@ -1149,7 +1155,12 @@ pub fn parse_quant_body<'input>(is_forall: bool, tokens: &mut Lexer<'input>) -> 
     }
 }
 
-pub fn make_builtin_call(loc: Loc, name: &str, type_args: Option<Vec<Type>>, args: Vec<Exp>) -> Exp {
+pub fn make_builtin_call(
+    loc: Loc,
+    name: &str,
+    type_args: Option<Vec<Type>>,
+    args: Vec<Exp>,
+) -> Exp {
     let maccess = sp(loc, ModuleAccess_::Name(sp(loc, name.to_string())));
     sp(loc, Exp_::Call(maccess, type_args, sp(loc, args)))
 }
@@ -1419,7 +1430,9 @@ pub fn parse_parameter<'input>(tokens: &mut Lexer<'input>) -> Result<(Var, Type)
 //          | <DocComments> "native" "resource"? "struct" <StructDefName> ";"
 //      StructDefName =
 //          <Identifier> <OptionalTypeParameters>
-pub fn parse_struct_definition<'input>(tokens: &mut Lexer<'input>) -> Result<StructDefinition, Error> {
+pub fn parse_struct_definition<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<StructDefinition, Error> {
     tokens.match_doc_comments();
     let start_loc = tokens.start_loc();
 
@@ -1769,7 +1782,9 @@ pub fn parse_spec_block<'input>(tokens: &mut Lexer<'input>) -> Result<SpecBlock,
 // Parse a spec block member:
 //    SpecBlockMember = <DocComments ( <Invariant> | <Condition> | <SpecFunction> | <SpecVariable>
 //                                   | <SpecInclude> | <SpecApply> | <SpecPragma> )
-pub fn parse_spec_block_member<'input>(tokens: &mut Lexer<'input>) -> Result<SpecBlockMember, Error> {
+pub fn parse_spec_block_member<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<SpecBlockMember, Error> {
     tokens.match_doc_comments();
     match tokens.peek() {
         Tok::Invariant => parse_invariant(tokens),
@@ -2055,7 +2070,9 @@ pub fn parse_spec_apply<'input>(tokens: &mut Lexer<'input>) -> Result<SpecBlockM
 
 // Parse a function pattern:
 //     SpecApplyPattern = <SpecApplyFragment>+ <OptionalTypeArgs>
-pub fn parse_spec_apply_pattern<'input>(tokens: &mut Lexer<'input>) -> Result<SpecApplyPattern, Error> {
+pub fn parse_spec_apply_pattern<'input>(
+    tokens: &mut Lexer<'input>,
+) -> Result<SpecApplyPattern, Error> {
     let start_loc = tokens.start_loc();
     let public_opt = consume_optional_token_with_loc(tokens, Tok::Public)?;
     let visibility = if let Some(loc) = public_opt {

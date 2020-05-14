@@ -297,7 +297,11 @@ impl<'input> Lexer<'input> {
 }
 
 // Find the next token and its length without changing the state of the lexer.
-pub fn find_token(file: &'static str, text: &str, start_offset: usize) -> Result<(Tok, usize), Error> {
+pub fn find_token(
+    file: &'static str,
+    text: &str,
+    start_offset: usize,
+) -> Result<(Tok, usize), Error> {
     let c: char = match text.chars().next() {
         Some(next_char) => next_char,
         None => {

@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use crate::instance::{Instance, ValidatorGroup};
 use config_builder::ValidatorConfig;
 use libra_crypto::{

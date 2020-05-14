@@ -70,11 +70,7 @@ impl TransactionStore {
     }
 
     /// fetch transaction by account address + sequence_number
-    pub fn get(
-        &self,
-        address: &AccountAddress,
-        sequence_number: u64,
-    ) -> Option<SignedTransaction> {
+    pub fn get(&self, address: &AccountAddress, sequence_number: u64) -> Option<SignedTransaction> {
         if let Some(txn) = self
             .transactions
             .get(&address)
@@ -290,11 +286,7 @@ impl TransactionStore {
     /// handles transaction commit
     /// it includes deletion of all transactions with sequence number <= `account_sequence_number`
     /// and potential promotion of sequential txns to PriorityIndex/TimelineIndex
-    pub fn commit_transaction(
-        &mut self,
-        account: &AccountAddress,
-        account_sequence_number: u64,
-    ) {
+    pub fn commit_transaction(&mut self, account: &AccountAddress, account_sequence_number: u64) {
         self.clean_committed_transactions(account, account_sequence_number);
         self.process_ready_transactions(account, account_sequence_number);
     }

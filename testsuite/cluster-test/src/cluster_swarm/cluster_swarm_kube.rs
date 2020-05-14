@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use std::{collections::HashMap, sync::Arc};
 
 use anyhow::{bail, format_err, Result};

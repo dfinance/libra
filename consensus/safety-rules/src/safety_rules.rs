@@ -127,7 +127,10 @@ impl SafetyRules {
     }
 
     /// Second voting rule
-    pub fn verify_and_update_preferred_round(&mut self, quorum_cert: &QuorumCert) -> Result<(), Error> {
+    pub fn verify_and_update_preferred_round(
+        &mut self,
+        quorum_cert: &QuorumCert,
+    ) -> Result<(), Error> {
         let preferred_round = self.persistent_storage.preferred_round()?;
         let one_chain_round = quorum_cert.certified_block().round();
         let two_chain_round = quorum_cert.parent_block().round();

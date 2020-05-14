@@ -38,7 +38,9 @@ pub struct BlockInvariant<State> {
 /// A map from block id's to the pre/post of each block after a fixed point is reached.
 type InvariantMap<State> = BTreeMap<Label, BlockInvariant<State>>;
 
-pub fn collect_states_and_errors<State>(map: InvariantMap<State>) -> (BTreeMap<Label, State>, Errors) {
+pub fn collect_states_and_errors<State>(
+    map: InvariantMap<State>,
+) -> (BTreeMap<Label, State>, Errors) {
     let mut errors = Errors::new();
     let final_states = map
         .into_iter()

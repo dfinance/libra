@@ -272,7 +272,7 @@ fn invalid_utf8() {
 #[test]
 fn uleb_encoding_and_variant() {
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
-   pub enum Test {
+    pub enum Test {
         One,
         Two,
     };
@@ -456,7 +456,7 @@ fn cow() {
     large_map.insert(1, 2);
 
     #[derive(Serialize, Deserialize, Debug)]
-   pub enum Message<'a> {
+    pub enum Message<'a> {
         M1(Cow<'a, Vec<u32>>),
         M2(Cow<'a, BTreeMap<u32, u32>>),
     }

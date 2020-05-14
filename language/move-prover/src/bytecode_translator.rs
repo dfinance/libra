@@ -114,7 +114,9 @@ impl BytecodeContext {
         mutable_refs
     }
 
-    pub fn collect_loop_targets(func_target: &FunctionTarget<'_>) -> BTreeMap<Label, BTreeSet<usize>> {
+    pub fn collect_loop_targets(
+        func_target: &FunctionTarget<'_>,
+    ) -> BTreeMap<Label, BTreeSet<usize>> {
         let code = func_target.get_bytecode();
         let cfg = StacklessControlFlowGraph::new_forward(code);
         let entry = cfg.entry_blocks()[0];

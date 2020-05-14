@@ -48,7 +48,13 @@ impl<'a> Context<'a> {
         }
     }
 
-    pub fn add_usage(&mut self, loc: Loc, module: &ModuleIdent, fname: &FunctionName, targs: &[Type]) {
+    pub fn add_usage(
+        &mut self,
+        loc: Loc,
+        module: &ModuleIdent,
+        fname: &FunctionName,
+        targs: &[Type],
+    ) {
         if &self.current_module != module {
             return;
         }
@@ -276,7 +282,11 @@ pub fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
 // Errors
 //**************************************************************************************************
 
-pub fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&TParam>) -> Error {
+pub fn cycle_error(
+    context: &Context,
+    graph: &DiGraphMap<&TParam, Edge>,
+    scc: Vec<&TParam>,
+) -> Error {
     let critical_edge = scc_edges!(graph, &scc).find(|(_, e, _)| e == &Edge::Nested);
     // tail -> head
     let (critical_tail, _, critical_head) = critical_edge.unwrap();

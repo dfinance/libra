@@ -175,7 +175,10 @@ pub fn check_breaks(context: &ControlFlowVerifier, labels: &[Label]) -> PartialV
     })
 }
 
-pub fn check_no_loop_splits(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
+pub fn check_no_loop_splits(
+    context: &ControlFlowVerifier,
+    labels: &[Label],
+) -> PartialVMResult<()> {
     let is_break = |loop_stack: &Vec<(CodeOffset, CodeOffset)>, jump_target: CodeOffset| -> bool {
         match loop_stack.last() {
             None => false,

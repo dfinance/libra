@@ -58,7 +58,10 @@ impl<'a> UnusedEntryChecker<'a> {
         }
     }
 
-    pub fn collect_errors<'b, F>(pool: &'b [bool], f: F) -> impl Iterator<Item = PartialVMError> + 'b
+    pub fn collect_errors<'b, F>(
+        pool: &'b [bool],
+        f: F,
+    ) -> impl Iterator<Item = PartialVMError> + 'b
     where
         F: Fn(usize) -> PartialVMError + 'b,
     {

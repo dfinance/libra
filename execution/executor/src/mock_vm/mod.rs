@@ -191,11 +191,17 @@ pub fn read_seqnum(
     }
 }
 
-pub fn read_balance_from_storage(state_view: &dyn StateView, balance_access_path: &AccessPath) -> u64 {
+pub fn read_balance_from_storage(
+    state_view: &dyn StateView,
+    balance_access_path: &AccessPath,
+) -> u64 {
     read_u64_from_storage(state_view, &balance_access_path)
 }
 
-pub fn read_seqnum_from_storage(state_view: &dyn StateView, seqnum_access_path: &AccessPath) -> u64 {
+pub fn read_seqnum_from_storage(
+    state_view: &dyn StateView,
+    seqnum_access_path: &AccessPath,
+) -> u64 {
     read_u64_from_storage(state_view, &seqnum_access_path)
 }
 

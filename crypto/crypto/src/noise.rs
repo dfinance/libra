@@ -605,7 +605,11 @@ pub struct NoiseSession {
 }
 
 impl NoiseSession {
-    pub fn new(write_key: Vec<u8>, read_key: Vec<u8>, remote_public_key: x25519::PublicKey) -> Self {
+    pub fn new(
+        write_key: Vec<u8>,
+        read_key: Vec<u8>,
+        remote_public_key: x25519::PublicKey,
+    ) -> Self {
         Self {
             valid: true,
             remote_public_key,

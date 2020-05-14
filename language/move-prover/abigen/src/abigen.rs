@@ -143,7 +143,10 @@ impl<'env> Abigen<'env> {
         Ok(bytes)
     }
 
-    pub fn get_type_tag_skipping_references(&self, ty0: &ty::Type) -> anyhow::Result<Option<TypeTag>> {
+    pub fn get_type_tag_skipping_references(
+        &self,
+        ty0: &ty::Type,
+    ) -> anyhow::Result<Option<TypeTag>> {
         use ty::Type::*;
         let tag = match ty0 {
             Primitive(prim) => {

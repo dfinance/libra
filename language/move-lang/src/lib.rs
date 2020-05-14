@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
+// ༼ つ ◕_◕ ༽つ  #![forbid(unsafe_code)]
 
 #[macro_use(sp)]
 extern crate move_ir_types;
@@ -13,6 +13,7 @@ pub mod errors;
 pub mod expansion;
 pub mod hlir;
 pub mod ir_translation;
+pub mod name_pool;
 pub mod naming;
 pub mod parser;
 pub mod shared;
@@ -20,6 +21,7 @@ pub mod test_utils;
 pub mod to_bytecode;
 pub mod typing;
 
+use crate::name_pool::ConstPool;
 use anyhow::anyhow;
 use codespan::{ByteIndex, Span};
 use compiled_unit::CompiledUnit;
@@ -236,11 +238,11 @@ pub fn parse_program(
 )> {
     let targets = find_move_filenames(targets)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     let deps = find_move_filenames(deps)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     let mut files: FilesSourceText = HashMap::new();
     let mut source_definitions = Vec::new();
@@ -311,12 +313,7 @@ pub fn find_move_filenames(files: &[String]) -> anyhow::Result<Vec<String>> {
     Ok(result)
 }
 
-// TODO replace with some sort of intern table
-pub fn leak_str(s: &str) -> &'static str {
-    Box::leak(Box::new(s.to_owned()))
-}
-
-pub fn parse_file(
+fn parse_file(
     files: &mut FilesSourceText,
     fname: &'static str,
 ) -> anyhow::Result<(Vec<parser::ast::Definition>, MatchedFileCommentMap, Errors)> {
@@ -411,14 +408,17 @@ pub type FileCommentMap = BTreeMap<Span, String>;
 /// (`/// .. <newline>` and `/** .. */`) will be not included in extracted comment string. The
 /// span in the returned map, however, covers the whole region of the comment, including the
 /// delimiters.
-pub fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileCommentMap), Errors> {
+pub fn strip_comments(
+    fname: &'static str,
+    input: &str,
+) -> Result<(String, FileCommentMap), Errors> {
     const SLASH: char = '/';
     const SPACE: char = ' ';
     const STAR: char = '*';
     const QUOTE: char = '"';
     const BACKSLASH: char = '\\';
 
-   pub enum State {
+    pub enum State {
         Source,
         String,
         LineComment,

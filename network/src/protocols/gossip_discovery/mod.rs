@@ -405,7 +405,12 @@ pub struct Note {
 }
 
 impl Note {
-    pub fn new(peer_id: PeerId, addrs: Vec<NetworkAddress>, dns_seed_addr: &[u8], epoch: u64) -> Self {
+    pub fn new(
+        peer_id: PeerId,
+        addrs: Vec<NetworkAddress>,
+        dns_seed_addr: &[u8],
+        epoch: u64,
+    ) -> Self {
         Self {
             peer_id,
             peer_info: PeerInfo { addrs, epoch },

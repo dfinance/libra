@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! # Derive macros for crypto operations
 //! This crate contains four types of derive macros:
 //!

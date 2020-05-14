@@ -89,7 +89,11 @@ impl<TSocket> NoiseStream<TSocket>
 where
     TSocket: AsyncRead + Unpin,
 {
-    pub fn poll_read(&mut self, mut context: &mut Context, buf: &mut [u8]) -> Poll<io::Result<usize>> {
+    pub fn poll_read(
+        &mut self,
+        mut context: &mut Context,
+        buf: &mut [u8],
+    ) -> Poll<io::Result<usize>> {
         loop {
             trace!("NoiseStream ReadState::{:?}", self.read_state);
             match self.read_state {

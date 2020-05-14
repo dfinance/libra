@@ -334,7 +334,11 @@ impl<'a> BorrowAnalysis<'a> {
         indices
     }
 
-    pub fn remap_borrow_node(&self, node: &BorrowNode, id_map: &BTreeMap<RefID, RefID>) -> BorrowNode {
+    pub fn remap_borrow_node(
+        &self,
+        node: &BorrowNode,
+        id_map: &BTreeMap<RefID, RefID>,
+    ) -> BorrowNode {
         match node {
             BorrowNode::Reference(idx) => {
                 let ref_id = RefID::new(*idx);

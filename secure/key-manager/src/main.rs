@@ -3,8 +3,6 @@
 
 //! Usage: ./key-manager node.config
 
-
-
 use libra_config::config::KeyManagerConfig;
 use libra_key_manager::{
     counters::COUNTERS,

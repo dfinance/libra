@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! Used to perform catching up between nodes for committed states.
 //! Used for node restarts, network partitions, full node syncs
 #![recursion_limit = "1024"]

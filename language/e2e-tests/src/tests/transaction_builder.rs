@@ -6,8 +6,6 @@
 //! functional tests; these tests are only to ensure that the script encoding functions take the
 //! correct types + produce a runnable script.
 
-
-
 use crate::{
     account::{self, Account, AccountData},
     common_transactions::rotate_key_txn,

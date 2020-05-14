@@ -5,6 +5,7 @@ use crate::{
     loaded_data::runtime_types::Type,
     values::{GlobalValue, Value},
 };
+use libra_types::access_path::AccessPath;
 use move_core_types::{account_address::AccountAddress, language_storage::ModuleId};
 use vm::errors::{PartialVMResult, VMResult};
 
@@ -44,6 +45,8 @@ pub trait DataStore {
     /// Get the serialized format of a `CompiledModule` given a `ModuleId`.
     fn load_module(&self, module_id: &ModuleId) -> VMResult<Vec<u8>>;
 
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
+
     /// Publish a module.
     fn publish_module(&mut self, module_id: &ModuleId, blob: Vec<u8>) -> VMResult<()>;
 
@@ -55,5 +58,5 @@ pub trait DataStore {
     // ---
 
     /// Emit an event to the EventStore
-    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value);
+    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value, caller: Option<ModuleId>);
 }

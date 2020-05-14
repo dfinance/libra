@@ -472,10 +472,9 @@ impl<Location: Clone + Eq> SourceMap<Location> {
         struct_def_idx: StructDefinitionIndex,
         location: Location,
     ) -> Result<()> {
-        let struct_entry = self
-            .struct_map
-            .get_mut(&struct_def_idx.0)
-            .ok_or_else(|| format_err!("Tried to add file mapping to undefined pub struct index"))?;
+        let struct_entry = self.struct_map.get_mut(&struct_def_idx.0).ok_or_else(|| {
+            format_err!("Tried to add file mapping to undefined pub struct index")
+        })?;
         struct_entry.add_field_location(location);
         Ok(())
     }
@@ -496,7 +495,9 @@ impl<Location: Clone + Eq> SourceMap<Location> {
         name: SourceName<Location>,
     ) -> Result<()> {
         let struct_entry = self.struct_map.get_mut(&struct_def_idx.0).ok_or_else(|| {
-            format_err!("Tried to add pub struct type parameter mapping to undefined pub struct index")
+            format_err!(
+                "Tried to add pub struct type parameter mapping to undefined pub struct index"
+            )
         })?;
         struct_entry.add_type_parameter(name);
         Ok(())

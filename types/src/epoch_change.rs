@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use crate::ledger_info::{LedgerInfo, LedgerInfoWithSignatures};
 use anyhow::{ensure, format_err, Result};
 #[cfg(any(test, feature = "fuzzing"))]

@@ -3,6 +3,7 @@
 
 use crate::loader::Loader;
 
+use libra_types::access_path::AccessPath;
 use move_core_types::{
     account_address::AccountAddress,
     language_storage::{ModuleId, TypeTag},
@@ -27,6 +28,7 @@ pub trait RemoteCache {
         address: &AccountAddress,
         tag: &TypeTag,
     ) -> PartialVMResult<Option<Vec<u8>>>;
+    fn get_raw(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
 }
 
 pub struct AccountDataCache {
@@ -60,7 +62,7 @@ pub struct TransactionDataCache<'r, 'l, R> {
     remote: &'r R,
     loader: &'l Loader,
     account_map: BTreeMap<AccountAddress, AccountDataCache>,
-    event_data: Vec<(Vec<u8>, u64, Type, Value)>,
+    event_data: Vec<(Vec<u8>, u64, Type, Value, Option<ModuleId>)>,
 }
 
 pub struct TransactionEffects {
@@ -69,7 +71,7 @@ pub struct TransactionEffects {
         Vec<(TypeTag, Option<(MoveTypeLayout, Value)>)>,
     )>,
     pub modules: Vec<(ModuleId, Vec<u8>)>,
-    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value)>,
+    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value, Option<ModuleId>)>,
 }
 
 impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
@@ -121,10 +123,10 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
         }
 
         let mut events = vec![];
-        for (guid, seq_num, ty, val) in self.event_data {
+        for (guid, seq_num, ty, val, caller) in self.event_data {
             let ty_tag = self.loader.type_to_type_tag(&ty)?;
             let ty_layout = self.loader.type_to_type_layout(&ty)?;
-            events.push((guid, seq_num, ty_tag, ty_layout, val))
+            events.push((guid, seq_num, ty_tag, ty_layout, val, caller))
         }
 
         Ok(TransactionEffects {
@@ -138,7 +140,11 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
         self.account_map.keys().len() as u64
     }
 
-    pub fn get_mut_or_insert_with<'a, K, V, F>(map: &'a mut BTreeMap<K, V>, k: &K, gen: F) -> &'a mut V
+    pub fn get_mut_or_insert_with<'a, K, V, F>(
+        map: &'a mut BTreeMap<K, V>,
+        k: &K,
+        gen: F,
+    ) -> &'a mut V
     where
         F: FnOnce() -> (K, V),
         K: Ord,
@@ -231,6 +237,10 @@ impl<'r, 'l, C: RemoteCache> DataStore for TransactionDataCache<'r, 'l, C> {
         }
     }
 
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        Ok(self.remote.get_raw(path)?)
+    }
+
     fn publish_module(&mut self, module_id: &ModuleId, blob: Vec<u8>) -> VMResult<()> {
         let account_cache =
             Self::get_mut_or_insert_with(&mut self.account_map, module_id.address(), || {
@@ -251,7 +261,7 @@ impl<'r, 'l, C: RemoteCache> DataStore for TransactionDataCache<'r, 'l, C> {
         Ok(self.remote.get_module(module_id)?.is_some())
     }
 
-    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value) {
-        self.event_data.push((guid, seq_num, ty, val))
+    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value, caller: Option<ModuleId>) {
+        self.event_data.push((guid, seq_num, ty, val, caller))
     }
 }

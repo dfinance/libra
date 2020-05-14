@@ -306,7 +306,7 @@ pub mod eliminate {
         }
     }
 
-   pub enum LRes {
+    pub enum LRes {
         Same(LValue),
         Elim(Var),
     }

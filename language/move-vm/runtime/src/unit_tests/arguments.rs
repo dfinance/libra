@@ -21,6 +21,7 @@ use vm::{
         SignatureIndex, SignatureToken, StructHandle, StructHandleIndex,
     },
 };
+use libra_types::access_path::AccessPath;
 
 fn make_script(signature: Signature) -> Vec<u8> {
     let mut blob = vec![];
@@ -99,6 +100,10 @@ impl RemoteCache for RemoteStore {
         _address: &AccountAddress,
         _tag: &TypeTag,
     ) -> PartialVMResult<Option<Vec<u8>>> {
+        Ok(None)
+    }
+
+    fn get_raw(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
         Ok(None)
     }
 }

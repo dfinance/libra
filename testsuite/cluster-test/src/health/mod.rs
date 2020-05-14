@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 pub mod commit_check;
 pub mod debug_interface_log_tail;
 pub mod fullnode_check;

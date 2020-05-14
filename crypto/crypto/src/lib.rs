@@ -1,9 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
-
 //! A library supplying various cryptographic primitives
 pub mod compat;
 pub mod ed25519;

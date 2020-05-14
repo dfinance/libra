@@ -264,7 +264,10 @@ pub fn function_info_map(
     (function_name, function_info)
 }
 
-pub fn main_function_info(source_map: &SourceMap<Loc>, (params, specs): CollectedInfo) -> FunctionInfo {
+pub fn main_function_info(
+    source_map: &SourceMap<Loc>,
+    (params, specs): CollectedInfo,
+) -> FunctionInfo {
     let idx = F::FunctionDefinitionIndex(0);
     let function_source_map = source_map.get_function_source_map(idx).unwrap();
     let local_map = function_source_map.make_local_name_to_index_map();
@@ -450,7 +453,10 @@ pub fn visibility(v: FunctionVisibility) -> IR::FunctionVisibility {
     }
 }
 
-pub fn function_signature(context: &mut Context, sig: H::FunctionSignature) -> IR::FunctionSignature {
+pub fn function_signature(
+    context: &mut Context,
+    sig: H::FunctionSignature,
+) -> IR::FunctionSignature {
     let return_type = types(context, sig.return_type);
     let formals = sig
         .parameters
@@ -920,7 +926,11 @@ pub fn module_call(
     code.push(sp(loc, B::Call(m, n, base_types(context, tys))))
 }
 
-pub fn builtin(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, b_): H::BuiltinFunction) {
+pub fn builtin(
+    context: &mut Context,
+    code: &mut IR::BytecodeBlock,
+    sp!(loc, b_): H::BuiltinFunction,
+) {
     use H::BuiltinFunction_ as HB;
     use IR::Bytecode_ as B;
     code.push(sp(

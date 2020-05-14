@@ -654,7 +654,11 @@ where
     }
 
     /// Sends a `ConnectionNotification` to all event handlers, warns on failures
-    pub fn send_conn_notification(&mut self, peer_id: PeerId, notification: ConnectionNotification) {
+    pub fn send_conn_notification(
+        &mut self,
+        peer_id: PeerId,
+        notification: ConnectionNotification,
+    ) {
         for handler in self.connection_event_handlers.iter_mut() {
             if let Err(e) = handler.push(peer_id, notification.clone()) {
                 warn!(

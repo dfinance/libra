@@ -3,7 +3,6 @@
 
 //! Add an associated constant to anpub enum describing the number of variants it has.
 
-
 #![warn(missing_docs)]
 
 extern crate proc_macro;

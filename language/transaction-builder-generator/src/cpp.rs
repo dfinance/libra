@@ -103,7 +103,11 @@ pub fn output_builder_declaration(out: &mut dyn Write, abi: &ScriptABI) -> Resul
     Ok(())
 }
 
-pub fn output_builder_definition(out: &mut dyn Write, abi: &ScriptABI, inlined: bool) -> Result<()> {
+pub fn output_builder_definition(
+    out: &mut dyn Write,
+    abi: &ScriptABI,
+    inlined: bool,
+) -> Result<()> {
     if inlined {
         write!(out, "\n{}", quote_doc(abi.doc()))?;
     }

@@ -39,7 +39,11 @@ impl<'a> Resolver<'a> {
         Resolver { state, cache }
     }
 
-    pub fn get_module(&self, address: &AccountAddress, name: &IdentStr) -> Result<Rc<CompiledModule>> {
+    pub fn get_module(
+        &self,
+        address: &AccountAddress,
+        name: &IdentStr,
+    ) -> Result<Rc<CompiledModule>> {
         let module_id = ModuleId::new(*address, name.to_owned());
         if let Some(module) = self.cache.get(&module_id) {
             return Ok(module);

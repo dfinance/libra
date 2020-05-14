@@ -120,7 +120,11 @@ impl<'a> WritebackAnalysis<'a> {
         attr_id
     }
 
-    pub fn writeback_bytecodes(&mut self, before: &BorrowInfo, after: &BorrowInfo) -> Vec<Bytecode> {
+    pub fn writeback_bytecodes(
+        &mut self,
+        before: &BorrowInfo,
+        after: &BorrowInfo,
+    ) -> Vec<Bytecode> {
         let before_refs = before.all_refs();
         let after_refs = after.all_refs();
         let writeback_refs: BTreeSet<TempIndex> = before_refs

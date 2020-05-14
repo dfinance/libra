@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use codespan_reporting::term::termcolor::{ColorChoice, StandardStream};
 
 use move_prover::{cli::Options, run_move_prover};

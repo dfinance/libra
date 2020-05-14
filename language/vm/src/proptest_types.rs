@@ -409,7 +409,10 @@ impl StructDefinitionGen {
             )
     }
 
-    pub fn materialize(self, state: &mut StDefnMaterializeState) -> (Option<StructDefinition>, usize) {
+    pub fn materialize(
+        self,
+        state: &mut StDefnMaterializeState,
+    ) -> (Option<StructDefinition>, usize) {
         let mut field_names = HashSet::new();
         let mut fields = vec![];
         match self.field_defs {

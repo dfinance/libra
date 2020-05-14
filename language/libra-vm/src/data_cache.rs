@@ -102,6 +102,12 @@ impl<'block> RemoteCache for StateViewCache<'block> {
     ) -> PartialVMResult<Option<Vec<u8>>> {
         RemoteStorage::new(self).get_resource(address, tag)
     }
+
+    fn get_raw(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.data_view
+            .get(path)
+            .map_err(|_e| PartialVMError::new(StatusCode::STORAGE_ERROR).finish(Location::Undefined))
+    }
 }
 
 impl<'block> ConfigStorage for StateViewCache<'block> {
@@ -143,6 +149,10 @@ impl<'a, S: StateView> RemoteCache for RemoteStorage<'a, S> {
         };
         let ap = create_access_path(*address, struct_tag);
         self.get(&ap)
+    }
+
+    fn get_raw(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.get(path).map_err(|e| e.finish(Location::Undefined))
     }
 }
 

@@ -241,7 +241,10 @@ pub fn function(context: &mut Context, _name: FunctionName, f: T::Function) -> H
     }
 }
 
-pub fn function_signature(context: &mut Context, sig: N::FunctionSignature) -> H::FunctionSignature {
+pub fn function_signature(
+    context: &mut Context,
+    sig: N::FunctionSignature,
+) -> H::FunctionSignature {
     let type_parameters = sig.type_parameters;
     let parameters = sig
         .parameters
@@ -1398,12 +1401,20 @@ pub fn needs_freeze(sp!(_, actual): &H::Type, sp!(_, expected): &H::Type) -> Fre
     }
 }
 
-pub fn needs_freeze_single(sp!(_, actual): &H::SingleType, sp!(_, expected): &H::SingleType) -> bool {
+pub fn needs_freeze_single(
+    sp!(_, actual): &H::SingleType,
+    sp!(_, expected): &H::SingleType,
+) -> bool {
     use H::SingleType_ as T;
     matches!((actual, expected), (T::Ref(true, _), T::Ref(false, _)))
 }
 
-pub fn freeze(context: &mut Context, result: &mut Block, expected_type: &H::Type, e: H::Exp) -> H::Exp {
+pub fn freeze(
+    context: &mut Context,
+    result: &mut Block,
+    expected_type: &H::Type,
+    e: H::Exp,
+) -> H::Exp {
     use H::{Type_ as T, UnannotatedExp_ as E};
 
     match needs_freeze(&e.ty, expected_type) {

@@ -3,8 +3,6 @@
 
 //! Usage: ./executor-service node.config
 
-
-
 use execution_correctness::Process;
 use libra_config::config::NodeConfig;
 use std::{env, process};

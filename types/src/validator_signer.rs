@@ -114,7 +114,9 @@ pub mod proptests {
         ]
     }
 
-    pub fn select_keypair(keys: Vec<Ed25519PrivateKey>) -> impl Strategy<Value = Ed25519PrivateKey> {
+    pub fn select_keypair(
+        keys: Vec<Ed25519PrivateKey>,
+    ) -> impl Strategy<Value = Ed25519PrivateKey> {
         sample::select(keys)
     }
 

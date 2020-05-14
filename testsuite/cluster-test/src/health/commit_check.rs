@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use crate::health::{Event, HealthCheck, HealthCheckContext, ValidatorEvent};
 use async_trait::async_trait;
 use std::collections::{hash_map::Entry, HashMap, HashSet};

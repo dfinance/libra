@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! `RateLimiter` converts any [`futures::stream::Stream`] into a rate-limited
 //! stream, allowing only a certain number of elements to be polled in a given time interval.
 //!

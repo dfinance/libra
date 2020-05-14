@@ -255,7 +255,11 @@ pub fn fold_binary_op(
     Some(evalue_(loc, v))
 }
 
-pub fn fold_cast(loc: Loc, sp!(_, bt_): &BuiltinTypeName, v: FoldableValue) -> Option<UnannotatedExp_> {
+pub fn fold_cast(
+    loc: Loc,
+    sp!(_, bt_): &BuiltinTypeName,
+    v: FoldableValue,
+) -> Option<UnannotatedExp_> {
     use BuiltinTypeName_ as BT;
     use FoldableValue as FV;
     let cast = match (bt_, v) {

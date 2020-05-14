@@ -256,7 +256,11 @@ impl EpochManager {
         // state_computer notifies reconfiguration in another channel
     }
 
-    pub async fn start_round_manager(&mut self, recovery_data: RecoveryData, epoch_state: EpochState) {
+    pub async fn start_round_manager(
+        &mut self,
+        recovery_data: RecoveryData,
+        epoch_state: EpochState,
+    ) {
         // Release the previous RoundManager, especially the SafetyRule client
         self.processor = None;
         counters::EPOCH.set(epoch_state.epoch as i64);

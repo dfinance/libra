@@ -1276,7 +1276,11 @@ pub fn compile_expression(
                 // Check that the fields are specified in order matching the definition.
                 let (_, _, decl_order) = context.field(sh_idx, field.value.clone())?;
                 if field_order != decl_order {
-                    bail!("Field {} defined out of order for pub struct {}", field, name);
+                    bail!(
+                        "Field {} defined out of order for pub struct {}",
+                        field,
+                        name
+                    );
                 }
 
                 compile_expression(context, function_frame, code, e)?;

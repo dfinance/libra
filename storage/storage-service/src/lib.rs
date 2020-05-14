@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! This crate implements the storage service.
 //!
 //! The user of storage service is supposed to use it via client lib provided in

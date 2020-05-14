@@ -702,7 +702,10 @@ impl<'env> Docgen<'env> {
     }
 
     /// Creates a type display context for a function.
-    pub fn type_display_context_for_fun(&self, func_env: &FunctionEnv<'_>) -> TypeDisplayContext<'_> {
+    pub fn type_display_context_for_fun(
+        &self,
+        func_env: &FunctionEnv<'_>,
+    ) -> TypeDisplayContext<'_> {
         let type_param_names = Some(
             func_env
                 .get_named_type_parameters()

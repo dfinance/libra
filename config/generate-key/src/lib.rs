@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use libra_crypto::{ed25519::Ed25519PrivateKey, Uniform};
 use rand::{rngs::OsRng, Rng, SeedableRng};
 use std::{

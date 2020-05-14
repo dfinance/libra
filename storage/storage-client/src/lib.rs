@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use anyhow::Result;
 use libra_crypto::HashValue;
 use libra_secure_net::NetworkClient;

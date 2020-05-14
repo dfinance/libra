@@ -1,7 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
 use crate::execution_strategies::types::{Block, Executor, ExecutorResult};
 use libra_types::transaction::TransactionOutput;
 use std::{collections::BTreeMap, error::Error, fmt};

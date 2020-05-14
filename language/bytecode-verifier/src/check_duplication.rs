@@ -75,7 +75,9 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    pub fn check_address_identifiers(address_identifiers: &[AccountAddress]) -> PartialVMResult<()> {
+    pub fn check_address_identifiers(
+        address_identifiers: &[AccountAddress],
+    ) -> PartialVMResult<()> {
         match Self::first_duplicate_element(address_identifiers) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,

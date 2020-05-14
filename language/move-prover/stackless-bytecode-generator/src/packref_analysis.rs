@@ -34,7 +34,10 @@ pub struct CopyAnalysis<'a> {
 }
 
 impl<'a> CopyAnalysis<'a> {
-    pub fn new(func_target: &'a FunctionTarget<'a>, borrow_annotation: &'a BorrowAnnotation) -> Self {
+    pub fn new(
+        func_target: &'a FunctionTarget<'a>,
+        borrow_annotation: &'a BorrowAnnotation,
+    ) -> Self {
         Self {
             func_target,
             borrow_annotation,

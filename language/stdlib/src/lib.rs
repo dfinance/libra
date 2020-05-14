@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use bytecode_verifier::{verify_module, DependencyChecker};
 use log::LevelFilter;
 use move_lang::{compiled_unit::CompiledUnit, move_compile, shared::Address};
@@ -151,7 +149,12 @@ pub fn build_doc(output_path: &str, doc_path: &str, sources: &[String], dep_path
     move_prover::run_move_prover_errors_to_stderr(options).unwrap();
 }
 
-pub fn build_abi(output_path: &str, sources: &[String], dep_path: &str, compiled_script_path: &str) {
+pub fn build_abi(
+    output_path: &str,
+    sources: &[String],
+    dep_path: &str,
+    compiled_script_path: &str,
+) {
     let mut options = move_prover::cli::Options::default();
     options.move_sources = sources.to_vec();
     if !dep_path.is_empty() {

@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 //! This provides a simple networking substrate between a client and server. It is assumed that all
 //! operations are blocking and return only complete blocks of data. The intended use case has the
 //! server blocking on read.  Upon receiving a payload during a read, the server should process the

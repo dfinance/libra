@@ -27,7 +27,10 @@ pub struct LocalsSafety<'a> {
 }
 
 impl<'a> LocalsSafety<'a> {
-    pub fn new(local_types: &'a UniqueMap<Var, SingleType>, signature: &'a FunctionSignature) -> Self {
+    pub fn new(
+        local_types: &'a UniqueMap<Var, SingleType>,
+        signature: &'a FunctionSignature,
+    ) -> Self {
         Self {
             local_types,
             signature,

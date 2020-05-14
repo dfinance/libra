@@ -43,7 +43,11 @@ impl<'a> StackUsageVerifier<'a> {
         Ok(())
     }
 
-    pub fn verify_block(&self, block_id: BlockId, cfg: &dyn ControlFlowGraph) -> PartialVMResult<()> {
+    pub fn verify_block(
+        &self,
+        block_id: BlockId,
+        cfg: &dyn ControlFlowGraph,
+    ) -> PartialVMResult<()> {
         let code = &self.code.code;
         let mut stack_size_increment = 0;
         let block_start = cfg.block_start(block_id);

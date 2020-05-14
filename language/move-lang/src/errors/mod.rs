@@ -117,7 +117,11 @@ pub fn convert_loc(files: &Files<String>, file_mapping: &FileMapping, loc: Loc) 
     (id, Span::new(begin_index, end_index))
 }
 
-pub fn render_error(files: &Files<String>, file_mapping: &FileMapping, mut error: Error) -> Diagnostic {
+pub fn render_error(
+    files: &Files<String>,
+    file_mapping: &FileMapping,
+    mut error: Error,
+) -> Diagnostic {
     let mk_lbl = |err: (Loc, String)| -> Label {
         let (id, span) = convert_loc(files, file_mapping, err.0);
         Label::new(id, span, err.1)

@@ -16,13 +16,20 @@
 //! This module contains the declarations and utilities to implement a native
 //! function.
 
-use crate::{gas_schedule::NativeCostIndex, loaded_data::runtime_types::Type, values::Value};
+use crate::{
+    gas_schedule::NativeCostIndex,
+    loaded_data::runtime_types::Type,
+    values::{Struct, Value},
+};
+use libra_types::access_path::AccessPath;
 use move_core_types::{
+    account_address::AccountAddress,
     gas_schedule::{AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, GasUnits},
+    language_storage::{ModuleId, TypeTag},
     value::MoveTypeLayout,
 };
 use std::fmt::Write;
-use vm::errors::PartialVMResult;
+use vm::errors::{PartialVMResult, VMResult};
 
 /// `NativeContext` - Native function context.
 ///
@@ -39,14 +46,30 @@ pub trait NativeContext {
     fn save_event(
         &mut self,
         guid: Vec<u8>,
-        count: u64,
+        seq_num: u64,
         ty: Type,
         val: Value,
+        caller: Option<ModuleId>
     ) -> PartialVMResult<()>;
+    /// Load from state view.
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
     /// Get the a data layout via the type.
     fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout>;
+
+    fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag>;
     /// Whether a type is a resource or not.
     fn is_resource(&self, ty: &Type) -> PartialVMResult<bool>;
+    /// Caller module.
+    fn caller(&self) -> Option<&ModuleId>;
+    /// Tx sender.
+    fn sender(&self) -> AccountAddress;
+    // Save a resource under the address specified by `account_address`
+    fn save_under_address(
+        &mut self,
+        ty_args: Type,
+        resource_to_save: Struct,
+        account_address: AccountAddress,
+    ) -> PartialVMResult<()>;
 }
 
 /// Result of a native function execution requires charges for execution cost.

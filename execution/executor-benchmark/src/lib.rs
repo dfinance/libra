@@ -101,7 +101,12 @@ impl TransactionGenerator {
         }
     }
 
-    pub fn run(&mut self, init_account_balance: u64, block_size: usize, num_transfer_blocks: usize) {
+    pub fn run(
+        &mut self,
+        init_account_balance: u64,
+        block_size: usize,
+        num_transfer_blocks: usize,
+    ) {
         self.gen_account_creations(block_size);
         self.gen_mint_transactions(init_account_balance, block_size);
         self.gen_transfer_transactions(block_size, num_transfer_blocks);

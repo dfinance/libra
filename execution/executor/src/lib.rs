@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 #[cfg(test)]
 pub mod executor_test;
 #[cfg(test)]
@@ -437,7 +435,11 @@ where
         Ok((updated_blobs, state_tree))
     }
 
-    pub fn update_account_state(account_state: &mut AccountState, path: Vec<u8>, write_op: WriteOp) {
+    pub fn update_account_state(
+        account_state: &mut AccountState,
+        path: Vec<u8>,
+        write_op: WriteOp,
+    ) {
         match write_op {
             WriteOp::Value(new_value) => account_state.insert(path, new_value),
             WriteOp::Deletion => account_state.remove(&path),

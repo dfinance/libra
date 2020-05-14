@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 pub mod annotations;
 pub mod borrow_analysis;
 pub mod dataflow_analysis;

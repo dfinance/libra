@@ -1,8 +1,6 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-
-
 use crate::{
     boogie_wrapper::BoogieWrapper,
     bytecode_translator::BoogieTranslator,

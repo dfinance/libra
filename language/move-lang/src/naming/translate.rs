@@ -390,7 +390,10 @@ pub fn function(context: &mut Context, _name: FunctionName, f: E::Function) -> N
     }
 }
 
-pub fn function_signature(context: &mut Context, sig: E::FunctionSignature) -> N::FunctionSignature {
+pub fn function_signature(
+    context: &mut Context,
+    sig: E::FunctionSignature,
+) -> N::FunctionSignature {
     let type_parameters = type_parameters(context, sig.type_parameters);
     let parameters = sig
         .parameters
@@ -527,7 +530,12 @@ pub fn struct_fields(context: &mut Context, efields: E::StructFields) -> N::Stru
     }
 }
 
-pub fn check_no_nominal_resources(context: &mut Context, s: &StructName, field: &Field, ty: &N::Type) {
+pub fn check_no_nominal_resources(
+    context: &mut Context,
+    s: &StructName,
+    field: &Field,
+    ty: &N::Type,
+) {
     use N::Type_ as T;
     let sp!(tloc, ty_) = ty;
     match ty_ {
@@ -709,7 +717,10 @@ pub fn sequence_item(context: &mut Context, sp!(loc, ns_): E::SequenceItem) -> N
     sp(loc, s_)
 }
 
-pub fn call_args(context: &mut Context, sp!(loc, es): Spanned<Vec<E::Exp>>) -> Spanned<Vec<N::Exp>> {
+pub fn call_args(
+    context: &mut Context,
+    sp!(loc, es): Spanned<Vec<E::Exp>>,
+) -> Spanned<Vec<N::Exp>> {
     sp(loc, exps(context, es))
 }
 
@@ -905,7 +916,11 @@ pub enum LValueCase {
     Assign,
 }
 
-pub fn lvalue(context: &mut Context, case: LValueCase, sp!(loc, l_): E::LValue) -> Option<N::LValue> {
+pub fn lvalue(
+    context: &mut Context,
+    case: LValueCase,
+    sp!(loc, l_): E::LValue,
+) -> Option<N::LValue> {
     use LValueCase as C;
     use E::LValue_ as EL;
     use N::LValue_ as NL;

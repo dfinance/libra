@@ -219,7 +219,10 @@ pub fn set_sender_address(context: &mut Context, loc: Loc, sender: Option<Addres
     })
 }
 
-pub fn module_(context: &mut Context, mdef: P::ModuleDefinition) -> (ModuleIdent, E::ModuleDefinition) {
+pub fn module_(
+    context: &mut Context,
+    mdef: P::ModuleDefinition,
+) -> (ModuleIdent, E::ModuleDefinition) {
     let P::ModuleDefinition { loc, name, members } = mdef;
     let _ = check_restricted_self_name(context, "module", &name.0);
 
@@ -879,7 +882,10 @@ pub fn spec_member(
     Some(sp(loc, em))
 }
 
-pub fn pragma_property(context: &mut Context, sp!(loc, pp_): P::PragmaProperty) -> E::PragmaProperty {
+pub fn pragma_property(
+    context: &mut Context,
+    sp!(loc, pp_): P::PragmaProperty,
+) -> E::PragmaProperty {
     let P::PragmaProperty_ {
         name,
         value: pv_opt,
@@ -940,7 +946,10 @@ pub fn types(context: &mut Context, pts: Vec<P::Type>) -> Vec<E::Type> {
     pts.into_iter().map(|pt| type_(context, pt)).collect()
 }
 
-pub fn optional_types(context: &mut Context, pts_opt: Option<Vec<P::Type>>) -> Option<Vec<E::Type>> {
+pub fn optional_types(
+    context: &mut Context,
+    pts_opt: Option<Vec<P::Type>>,
+) -> Option<Vec<E::Type>> {
     pts_opt.map(|pts| pts.into_iter().map(|pt| type_(context, pt)).collect())
 }
 
@@ -1428,7 +1437,10 @@ pub fn unbound_names_spec_block(unbound: &mut BTreeSet<Name>, sp!(_, sb_): &E::S
         .for_each(|member| unbound_names_spec_block_member(unbound, member))
 }
 
-pub fn unbound_names_spec_block_member(unbound: &mut BTreeSet<Name>, sp!(_, m_): &E::SpecBlockMember) {
+pub fn unbound_names_spec_block_member(
+    unbound: &mut BTreeSet<Name>,
+    sp!(_, m_): &E::SpecBlockMember,
+) {
     use E::SpecBlockMember_ as M;
     match m_ {
         M::Condition { exp, .. } => unbound_names_exp(unbound, exp),
@@ -1508,7 +1520,10 @@ pub fn unbound_names_exp(unbound: &mut BTreeSet<Name>, sp!(_, e_): &E::Exp) {
     }
 }
 
-pub fn unbound_names_exps<'a>(unbound: &mut BTreeSet<Name>, es: impl IntoIterator<Item = &'a E::Exp>) {
+pub fn unbound_names_exps<'a>(
+    unbound: &mut BTreeSet<Name>,
+    es: impl IntoIterator<Item = &'a E::Exp>,
+) {
     es.into_iter().for_each(|e| unbound_names_exp(unbound, e))
 }
 
