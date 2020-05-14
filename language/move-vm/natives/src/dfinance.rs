@@ -1,4 +1,3 @@
-use libra_types::language_storage::ModuleId;
 use once_cell::sync::Lazy;
 use libra_types::account_config::CORE_CODE_ADDRESS;
 use move_core_types::identifier::Identifier;
@@ -9,6 +8,7 @@ use move_vm_types::gas_schedule::NativeCostIndex;
 use std::collections::VecDeque;
 use vm::errors::VMResult;
 use move_vm_types::values::Struct;
+use move_core_types::language_storage::ModuleId;
 
 pub static DFINANCE_MODULE: Lazy<ModuleId> =
     Lazy::new(|| ModuleId::new(CORE_CODE_ADDRESS, Identifier::new("Dfinance").unwrap()));

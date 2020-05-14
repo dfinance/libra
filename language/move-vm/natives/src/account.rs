@@ -5,7 +5,6 @@ use libra_types::{
     account_address::AccountAddress,
     account_config,
     account_config::{BalanceResource, CORE_CODE_ADDRESS},
-    move_resource::MoveResource,
     vm_error::{StatusCode, VMStatus},
 };
 use std::collections::VecDeque;
@@ -17,6 +16,7 @@ use move_vm_types::loaded_data::runtime_types::Type;
 use move_vm_types::values::Value;
 use move_vm_types::gas_schedule::NativeCostIndex;
 use move_vm_types::values::Struct;
+use move_core_types::move_resource::MoveResource;
 
 static ACCOUNT_NAME: Lazy<Identifier> =
     Lazy::new(|| Identifier::new("T").unwrap());
