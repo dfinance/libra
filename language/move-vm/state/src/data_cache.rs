@@ -114,7 +114,7 @@ pub struct TransactionDataCache<'txn> {
     // TODO: an AccessPath corresponds to a top level resource but that may not be the
     // case moving forward, so we need to review this.
     // Also need to relate this to a ResourceKey.
-    data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
+    pub data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
     module_map: BTreeMap<ModuleId, Vec<u8>>,
     data_cache: &'txn dyn RemoteCache,
 }

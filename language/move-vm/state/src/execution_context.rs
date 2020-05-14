@@ -14,6 +14,7 @@ use move_vm_types::{
     chain_state::ChainState, loaded_data::types::FatStructType, values::GlobalValue,
 };
 use vm::errors::VMResult;
+use std::collections::BTreeMap;
 
 /// An `ExecutionContext` represents mutable state that is retained in-memory between invocations of
 /// the Move VM.
@@ -135,6 +136,10 @@ pub struct SystemExecutionContext<'txn>(TransactionExecutionContext<'txn>);
 impl<'txn> SystemExecutionContext<'txn> {
     pub fn new(data_cache: &'txn dyn RemoteCache, gas_left: GasUnits<GasCarrier>) -> Self {
         SystemExecutionContext(TransactionExecutionContext::new(gas_left, data_cache))
+    }
+
+    pub fn data_map(self) -> BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>> {
+        self.0.data_view.data_map
     }
 }
 
