@@ -22,7 +22,9 @@ use crate::{
     values::{Struct, Value},
 };
 use libra_types::{
-    account_address::AccountAddress, contract_event::ContractEvent, vm_error::VMStatus,
+    account_address::AccountAddress, contract_event::ContractEvent,
+    vm_error::VMStatus,
+    access_path::AccessPath
 };
 use move_core_types::{
     gas_schedule::{AbstractMemorySize, CostTable, GasAlgebra, GasCarrier, GasUnits},

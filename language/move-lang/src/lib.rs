@@ -227,7 +227,7 @@ pub fn compile_program(
 // Parsing
 //**************************************************************************************************
 
-fn parse_program(
+pub fn parse_program(
     targets: &[String],
     deps: &[String],
 ) -> anyhow::Result<(
