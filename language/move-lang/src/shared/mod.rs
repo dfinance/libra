@@ -19,14 +19,15 @@ pub mod unique_map;
 // Address
 //**************************************************************************************************
 
-pub const ADDRESS_LENGTH: usize = 16;
+pub const ADDRESS_LENGTH: usize = 20;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Default, Clone, Copy)]
 pub struct Address([u8; ADDRESS_LENGTH]);
 
 impl Address {
     pub const LIBRA_CORE: Address = Address::new([
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 1u8,
     ]);
 
     pub const fn new(address: [u8; ADDRESS_LENGTH]) -> Self {

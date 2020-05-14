@@ -12,7 +12,7 @@ use move_vm_types::{data_store::DataStore, gas_schedule::CostStrategy, values::V
 use vm::errors::VMResult;
 
 pub struct MoveVM {
-    runtime: VMRuntime,
+    pub runtime: VMRuntime,
 }
 
 impl MoveVM {

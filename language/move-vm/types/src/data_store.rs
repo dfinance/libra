@@ -41,6 +41,8 @@ pub trait DataStore {
     /// Get the serialized format of a `CompiledModule` given a `ModuleId`.
     fn load_module(&self, module: &ModuleId) -> VMResult<Vec<u8>>;
 
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
+
     /// Publish a module.
     fn publish_module(&mut self, module_id: ModuleId, module: Vec<u8>) -> VMResult<()>;
 

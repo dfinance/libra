@@ -60,7 +60,7 @@ pub fn report_errors_to_color_buffer(files: FilesSourceText, errors: Errors) -> 
     writer.into_inner()
 }
 
-fn output_errors<W: WriteColor>(writer: &mut W, sources: FilesSourceText, errors: Errors) {
+pub fn output_errors<W: WriteColor>(writer: &mut W, sources: FilesSourceText, errors: Errors) {
     assert!(!errors.is_empty());
     let mut files = Files::new();
     let mut file_mapping = HashMap::new();

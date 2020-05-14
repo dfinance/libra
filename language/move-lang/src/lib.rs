@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+// ༼ つ ◕_◕ ༽つ  #![forbid(unsafe_code)]
 
 #[macro_use(sp)]
 extern crate move_ir_types;
@@ -13,6 +13,7 @@ pub mod errors;
 pub mod expansion;
 pub mod hlir;
 pub mod ir_translation;
+pub mod name_pool;
 pub mod naming;
 pub mod parser;
 pub mod shared;
@@ -20,6 +21,7 @@ pub mod test_utils;
 mod to_bytecode;
 pub mod typing;
 
+use crate::name_pool::ConstPool;
 use anyhow::anyhow;
 use codespan::{ByteIndex, Span};
 use compiled_unit::CompiledUnit;
@@ -227,7 +229,7 @@ pub fn compile_program(
 // Parsing
 //**************************************************************************************************
 
-fn parse_program(
+pub fn parse_program(
     targets: &[String],
     deps: &[String],
 ) -> anyhow::Result<(
@@ -236,11 +238,11 @@ fn parse_program(
 )> {
     let targets = find_move_filenames(targets)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     let deps = find_move_filenames(deps)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     let mut files: FilesSourceText = HashMap::new();
     let mut source_definitions = Vec::new();
@@ -309,11 +311,6 @@ pub fn find_move_filenames(files: &[String]) -> anyhow::Result<Vec<String>> {
         }
     }
     Ok(result)
-}
-
-// TODO replace with some sort of intern table
-fn leak_str(s: &str) -> &'static str {
-    Box::leak(Box::new(s.to_owned()))
 }
 
 fn parse_file(
