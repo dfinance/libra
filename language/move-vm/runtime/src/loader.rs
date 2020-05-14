@@ -79,12 +79,12 @@ where
 // A script cache is a map from the hash value of a script and the `Script` itself.
 // Script are added in the cache once verified and so getting a script out the cache
 // does not require further verification (except for parameters and type parameters)
-struct ScriptCache {
+pub struct ScriptCache {
     scripts: BinaryCache<HashValue, Script>,
 }
 
 impl ScriptCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             scripts: BinaryCache::new(),
         }
@@ -106,14 +106,14 @@ impl ScriptCache {
 // It holds all Modules, Types and Functions loaded.
 // Types and Functions are pushed globally to the ModuleCache.
 // A ModuleCache is accessed under lock.
-struct ModuleCache {
+pub struct ModuleCache {
     modules: BinaryCache<ModuleId, Module>,
     structs: Vec<Arc<StructType>>,
     functions: Vec<Arc<Function>>,
 }
 
 impl ModuleCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             modules: BinaryCache::new(),
             structs: vec![],
@@ -305,9 +305,9 @@ impl ModuleCache {
 // (operating on values on the stack) and when cache needs updating the mutex must be taken.
 // The `pub(crate)` API is what a Loader offers to the runtime.
 pub struct Loader {
-    scripts: Mutex<ScriptCache>,
-    module_cache: Mutex<ModuleCache>,
-    libra_cache: Mutex<HashMap<ModuleId, LibraCache>>,
+    pub scripts: Mutex<ScriptCache>,
+    pub module_cache: Mutex<ModuleCache>,
+    pub libra_cache: Mutex<HashMap<ModuleId, LibraCache>>,
 }
 
 impl Loader {
@@ -920,7 +920,7 @@ impl Module {
 // When code executes indexes in instructions are resolved against those runtime structure
 // so that any data needed for execution is immediately available
 #[derive(Debug)]
-struct Script {
+pub struct Script {
     // primitive pools
     script: VerifiedScript,
 
@@ -1334,7 +1334,7 @@ impl LibraTypeInfo {
 }
 
 #[derive(Debug)]
-struct LibraCache {
+pub struct LibraCache {
     cache: HashMap<Identifier, LibraTypeInfo>,
 }
 

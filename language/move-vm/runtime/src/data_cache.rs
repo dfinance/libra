@@ -48,7 +48,7 @@ pub struct TransactionDataCache<'txn> {
     pub data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
     module_map: BTreeMap<ModuleId, Vec<u8>>,
     event_data: Vec<ContractEvent>,
-    data_cache: &'txn dyn RemoteCache,
+    pub data_cache: &'txn dyn RemoteCache,
 }
 
 impl<'txn> TransactionDataCache<'txn> {
@@ -195,6 +195,10 @@ impl<'a> DataStore for TransactionDataCache<'a> {
                 })
             }
         }
+    }
+
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.data_cache.get(&path)
     }
 
     fn publish_module(&mut self, m: ModuleId, bytes: Vec<u8>) -> VMResult<()> {

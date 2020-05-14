@@ -7,7 +7,9 @@ use libra_types::{
     contract_event::ContractEvent,
 };
 use move_core_types::{gas_schedule::CostTable, identifier::IdentStr, language_storage::ModuleId};
-use move_vm_natives::{account, debug, event, hash, lcs, signature, signer, vector};
+use move_vm_natives::{
+    account, debug, dfinance, event, hash, lcs, oracle, signature, signer, vector,
+};
 use move_vm_types::{
     data_store::DataStore,
     gas_schedule::CostStrategy,
@@ -46,6 +48,8 @@ pub(crate) enum NativeFunction {
     SignerBorrowAddress,
     CreateSigner,
     DestroySigner,
+    OraclePrice,
+    DfinanceSaveInfo,
 }
 
 impl NativeFunction {
@@ -75,11 +79,13 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Vector", "destroy_empty") => VectorDestroyEmpty,
             (&CORE_CODE_ADDRESS, "Vector", "swap") => VectorSwap,
             (&CORE_CODE_ADDRESS, "Event", "write_to_event_store") => AccountWriteEvent,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "create_signer") => CreateSigner,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "destroy_signer") => DestroySigner,
+            (&CORE_CODE_ADDRESS, "Account", "create_signer") => CreateSigner,
+            (&CORE_CODE_ADDRESS, "Account", "destroy_signer") => DestroySigner,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
             (&CORE_CODE_ADDRESS, "Signer", "borrow_address") => SignerBorrowAddress,
+            (&CORE_CODE_ADDRESS, "Oracle", "get_price") => OraclePrice,
+            (&CORE_CODE_ADDRESS, "Dfinance", "register_token_info") => DfinanceSaveInfo,
             _ => return None,
         })
     }
@@ -115,6 +121,8 @@ impl NativeFunction {
             Self::SignerBorrowAddress => signer::native_borrow_address(ctx, t, v),
             Self::CreateSigner => account::native_create_signer(ctx, t, v),
             Self::DestroySigner => account::native_destroy_signer(ctx, t, v),
+            Self::OraclePrice => oracle::native_oracle_get_price(ctx, t, v),
+            Self::DfinanceSaveInfo => dfinance::native_register_token_info(ctx, t, v),
         }
     }
 }
@@ -171,7 +179,9 @@ impl<'a> NativeContext for FunctionContext<'a> {
             resource_to_save,
         )
     }
-
+    fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>> {
+        self.data_store.raw_load(path)
+    }
     fn save_event(&mut self, event: ContractEvent) -> VMResult<()> {
         Ok(self.data_store.emit_event(event))
     }

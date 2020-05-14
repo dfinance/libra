@@ -247,9 +247,6 @@ fn module_(context: &mut Context, mdef: P::ModuleDefinition) -> (ModuleIdent, E:
     };
     let current_module = ModuleIdent(sp(name_loc, mident_));
     let old_is_source_module = context.is_source_module;
-    context.is_source_module =
-        context.is_source_module && !fake_natives::is_fake_native(&current_module);
-
     let mut new_scope = AliasMap::new();
     module_self_aliases(&mut new_scope, &current_module);
     let members = members

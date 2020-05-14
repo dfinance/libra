@@ -6,7 +6,7 @@ use std::fmt;
 
 #[derive(Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Module {
-    code: Vec<u8>,
+    pub code: Vec<u8>,
 }
 
 impl Module {
