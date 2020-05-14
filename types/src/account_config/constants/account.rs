@@ -5,11 +5,11 @@ use crate::account_config::constants::CORE_CODE_ADDRESS;
 use move_core_types::{identifier::Identifier, language_storage::ModuleId};
 use once_cell::sync::Lazy;
 
-pub const ACCOUNT_MODULE_NAME: &str = "LibraAccount";
+pub const ACCOUNT_MODULE_NAME: &str = "Account";
 
 // Account
 pub static ACCOUNT_MODULE_IDENTIFIER: Lazy<Identifier> =
-    Lazy::new(|| Identifier::new("LibraAccount").unwrap());
+    Lazy::new(|| Identifier::new("Account").unwrap());
 
 /// The ModuleId for the Account module.
 pub static ACCOUNT_MODULE: Lazy<ModuleId> =
