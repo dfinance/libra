@@ -23,8 +23,8 @@ use vm::{
 };
 
 /// An instantiation of the MoveVM.
-pub(crate) struct VMRuntime {
-    loader: Loader,
+pub struct VMRuntime {
+    pub loader: Loader,
 }
 
 impl VMRuntime {

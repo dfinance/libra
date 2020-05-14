@@ -22,7 +22,7 @@ use crate::{
     values::{Struct, Value},
 };
 use libra_types::{
-    account_address::AccountAddress, contract_event::ContractEvent, language_storage::ModuleId,
+    account_address::AccountAddress, contract_event::ContractEvent,
     vm_error::VMStatus,
     access_path::AccessPath
 };

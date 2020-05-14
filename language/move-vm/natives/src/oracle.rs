@@ -11,6 +11,7 @@ use byteorder::{LittleEndian, ByteOrder};
 use move_core_types::{
     gas_schedule::{GasUnits, GasAlgebra},
 };
+use std::io::Write;
 
 const COST: u64 = 929;
 const PRICE_ORACLE_TAG: u8 = 255;
@@ -65,7 +66,7 @@ pub fn make_path(ticker_pair: u64) -> Result<AccessPath, VMStatus> {
     let mut hasher = DefaultHasher::default();
     let mut buf = [0; 8];
     LittleEndian::write_u64(&mut buf, ticker_pair);
-    hasher.write(&buf);
+    hasher.write(&buf).map_err(|_| VMStatus::new(StatusCode::BAD_U64))?;
     let mut hash = hasher.finish().to_vec();
     hash.insert(0, PRICE_ORACLE_TAG);
     Ok(AccessPath::new(AccountAddress::DEFAULT, hash))
