@@ -17,7 +17,7 @@ pub mod naming;
 pub mod parser;
 pub mod shared;
 pub mod test_utils;
-mod to_bytecode;
+pub mod to_bytecode;
 pub mod typing;
 
 use anyhow::anyhow;
@@ -219,7 +219,7 @@ pub fn output_compiled_units(
 // Translations
 //**************************************************************************************************
 
-fn check_program(
+pub fn check_program(
     prog: Result<parser::ast::Program, Errors>,
     sender_opt: Option<Address>,
 ) -> Result<cfgir::ast::Program, Errors> {
@@ -233,7 +233,7 @@ fn check_program(
     Ok(cprog)
 }
 
-fn compile_program(
+pub fn compile_program(
     prog: Result<parser::ast::Program, Errors>,
     sender_opt: Option<Address>,
 ) -> Result<Vec<CompiledUnit>, Errors> {
@@ -570,7 +570,7 @@ fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileComme
 
 // We restrict strings to only ascii visual characters (0x20 <= c <= 0x7E) or a permitted newline
 // character--\n--or a tab--\t.
-fn strip_comments_and_verify(
+pub fn strip_comments_and_verify(
     fname: &'static str,
     string: &str,
 ) -> Result<(String, FileCommentMap), Errors> {
