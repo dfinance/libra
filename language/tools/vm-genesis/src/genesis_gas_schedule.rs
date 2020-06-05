@@ -14,7 +14,7 @@ use vm::{
     file_format_common::instruction_key,
 };
 
-pub(crate) static INITIAL_GAS_SCHEDULE: Lazy<(Vec<u8>, Vec<u8>)> = Lazy::new(|| {
+pub static INITIAL_GAS_SCHEDULE: Lazy<(Vec<u8>, Vec<u8>)> = Lazy::new(|| {
     use Bytecode::*;
     let mut instrs = vec![
         (
