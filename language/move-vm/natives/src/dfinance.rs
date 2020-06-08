@@ -1,20 +1,19 @@
-use once_cell::sync::Lazy;
 use libra_types::account_config::CORE_CODE_ADDRESS;
-use move_core_types::identifier::Identifier;
-use move_vm_types::natives::function::{NativeContext, native_gas, NativeResult};
-use move_vm_types::values::Value;
-use move_vm_types::loaded_data::runtime_types::Type;
-use move_vm_types::gas_schedule::NativeCostIndex;
+use move_core_types::{identifier::Identifier, language_storage::ModuleId};
+use move_vm_types::{
+    gas_schedule::NativeCostIndex,
+    loaded_data::runtime_types::Type,
+    natives::function::{native_gas, NativeContext, NativeResult},
+    values::{Struct, Value},
+};
+use once_cell::sync::Lazy;
 use std::collections::VecDeque;
 use vm::errors::VMResult;
-use move_vm_types::values::Struct;
-use move_core_types::language_storage::ModuleId;
 
 pub static DFINANCE_MODULE: Lazy<ModuleId> =
     Lazy::new(|| ModuleId::new(CORE_CODE_ADDRESS, Identifier::new("Dfinance").unwrap()));
 
-static INFO_NAME: Lazy<Identifier> =
-    Lazy::new(|| Identifier::new("Info").unwrap());
+static INFO_NAME: Lazy<Identifier> = Lazy::new(|| Identifier::new("Info").unwrap());
 
 pub fn native_register_token_info(
     context: &mut impl NativeContext,

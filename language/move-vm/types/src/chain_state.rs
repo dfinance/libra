@@ -37,7 +37,7 @@ pub trait ChainState {
 
     fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
 
-        /// Get a reference to a resource stored on chain.
+    /// Get a reference to a resource stored on chain.
     fn borrow_resource(
         &mut self,
         ap: &AccessPath,

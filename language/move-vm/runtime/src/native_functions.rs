@@ -6,8 +6,8 @@ use libra_types::{
     access_path::AccessPath, account_address::AccountAddress, account_config::CORE_CODE_ADDRESS,
     contract_event::ContractEvent,
 };
-use move_core_types::{gas_schedule::CostTable, identifier::IdentStr,  language_storage::ModuleId};
-use move_vm_natives::{account, event, hash, lcs, signature, oracle, dfinance};
+use move_core_types::{gas_schedule::CostTable, identifier::IdentStr, language_storage::ModuleId};
+use move_vm_natives::{account, dfinance, event, hash, lcs, oracle, signature};
 use move_vm_types::{
     interpreter_context::InterpreterContext,
     loaded_data::{runtime_types::Type, types::FatType},

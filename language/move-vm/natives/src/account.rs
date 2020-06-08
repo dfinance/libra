@@ -7,19 +7,18 @@ use libra_types::{
     account_config::{BalanceResource, CORE_CODE_ADDRESS},
     vm_error::{StatusCode, VMStatus},
 };
+use move_core_types::{identifier::Identifier, move_resource::MoveResource};
+use move_vm_types::{
+    gas_schedule::NativeCostIndex,
+    loaded_data::runtime_types::Type,
+    natives::function::{native_gas, NativeContext, NativeResult},
+    values::{Struct, Value},
+};
+use once_cell::sync::Lazy;
 use std::collections::VecDeque;
 use vm::errors::VMResult;
-use once_cell::sync::Lazy;
-use move_core_types::identifier::Identifier;
-use move_vm_types::natives::function::{NativeContext, native_gas, NativeResult};
-use move_vm_types::loaded_data::runtime_types::Type;
-use move_vm_types::values::Value;
-use move_vm_types::gas_schedule::NativeCostIndex;
-use move_vm_types::values::Struct;
-use move_core_types::move_resource::MoveResource;
 
-static ACCOUNT_NAME: Lazy<Identifier> =
-    Lazy::new(|| Identifier::new("T").unwrap());
+static ACCOUNT_NAME: Lazy<Identifier> = Lazy::new(|| Identifier::new("T").unwrap());
 
 pub fn native_save_account(
     context: &mut impl NativeContext,
