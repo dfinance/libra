@@ -56,11 +56,11 @@ impl AccountDataCache {
 /// The Move VM takes a `DataStore` in input and this is the default and correct implementation
 /// for a data store related to a transaction. Clients should create an instance of this type
 /// and pass it to the Move VM.
-pub(crate) struct TransactionDataCache<'r, 'l, R> {
-    remote: &'r R,
-    loader: &'l Loader,
-    account_map: BTreeMap<AccountAddress, AccountDataCache>,
-    event_data: Vec<(Vec<u8>, u64, Type, Value)>,
+pub struct TransactionDataCache<'r, 'l, R> {
+    pub remote: &'r R,
+    pub loader: &'l Loader,
+    pub account_map: BTreeMap<AccountAddress, AccountDataCache>,
+    pub event_data: Vec<(Vec<u8>, u64, Type, Value)>,
 }
 
 pub struct TransactionEffects {
