@@ -45,7 +45,7 @@ impl ConfigStorage for &dyn RemoteCache {
 /// for a data store related to a transaction. Clients should create an instance of this type
 /// and pass it to the Move VM.
 pub struct TransactionDataCache<'txn> {
-    data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
+    pub data_map: BTreeMap<AccessPath, Option<(FatStructType, GlobalValue)>>,
     module_map: BTreeMap<ModuleId, Vec<u8>>,
     event_data: Vec<ContractEvent>,
     data_cache: &'txn dyn RemoteCache,
