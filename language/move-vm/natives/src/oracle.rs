@@ -37,7 +37,7 @@ pub fn native_oracle_get_price(
         .and_then(|ticker_part| {
             type_parameter_name(&ty_args[1])
                 .and_then(|ticker_part_2| {
-                    Ok(format!("{}{}", ticker_part, ticker_part_2).to_lowercase())
+                    Ok(format!("{}_{}", ticker_part, ticker_part_2).to_lowercase())
                 })
                 .and_then(|ticker| {
                     let mut hash = XxHash64::default();
