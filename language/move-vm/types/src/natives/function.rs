@@ -61,6 +61,10 @@ pub trait NativeContext {
     fn raw_load(&self, path: &AccessPath) -> VMResult<Option<Vec<u8>>>;
     /// Whether a type is a resource or not.
     fn is_resource(&self, ty: &Type) -> VMResult<bool>;
+    /// Caller module.
+    fn caller(&self) -> Option<&ModuleId>;
+    /// Tx sender.
+    fn sender(&self) -> AccountAddress;
 }
 
 /// Result of a native function execution requires charges for execution cost.
