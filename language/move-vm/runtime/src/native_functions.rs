@@ -78,7 +78,7 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Vector", "pop_back") => VectorPopBack,
             (&CORE_CODE_ADDRESS, "Vector", "destroy_empty") => VectorDestroyEmpty,
             (&CORE_CODE_ADDRESS, "Vector", "swap") => VectorSwap,
-            (&CORE_CODE_ADDRESS, "Event", "write_to_event_store") => AccountWriteEvent,
+            (&CORE_CODE_ADDRESS, "Event", "emit") => AccountWriteEvent,
             (&CORE_CODE_ADDRESS, "Account", "create_signer") => CreateSigner,
             (&CORE_CODE_ADDRESS, "Account", "destroy_signer") => DestroySigner,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
@@ -132,6 +132,8 @@ pub(crate) struct FunctionContext<'a> {
     data_store: &'a mut dyn DataStore,
     cost_strategy: &'a CostStrategy<'a>,
     resolver: &'a Resolver<'a>,
+    caller: Option<&'a ModuleId>,
+    sender: AccountAddress,
 }
 
 impl<'a> FunctionContext<'a> {
@@ -140,12 +142,16 @@ impl<'a> FunctionContext<'a> {
         data_store: &'a mut dyn DataStore,
         cost_strategy: &'a mut CostStrategy,
         resolver: &'a Resolver<'a>,
+        caller: Option<&'a ModuleId>,
+        sender: AccountAddress,
     ) -> FunctionContext<'a> {
         FunctionContext {
             interpreter,
             data_store,
             cost_strategy,
             resolver,
+            caller,
+            sender,
         }
     }
 }
@@ -195,5 +201,13 @@ impl<'a> NativeContext for FunctionContext<'a> {
 
     fn is_resource(&self, ty: &Type) -> VMResult<bool> {
         self.resolver.is_resource(ty)
+    }
+
+    fn caller(&self) -> Option<&ModuleId> {
+        self.caller
+    }
+
+    fn sender(&self) -> AccountAddress {
+        self.sender
     }
 }
