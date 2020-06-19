@@ -12,8 +12,10 @@ use move_vm_types::{
     natives::function::{NativeContext, NativeResult},
     values::Value,
 };
-use std::{collections::VecDeque, convert::TryFrom};
+use std::collections::VecDeque;
 use vm::errors::VMResult;
+use rand::rngs::OsRng;
+use rand::RngCore;
 
 pub fn native_emit_event(
     context: &mut impl NativeContext,
@@ -21,7 +23,7 @@ pub fn native_emit_event(
     mut arguments: VecDeque<Value>,
 ) -> VMResult<NativeResult> {
     debug_assert!(ty_args.len() == 1);
-    debug_assert!(arguments.len() == 3);
+    debug_assert!(arguments.len() == 1);
 
     let mut ty_args = context.convert_to_fat_types(ty_args)?;
     let ty = ty_args.pop().unwrap();
@@ -32,11 +34,15 @@ pub fn native_emit_event(
         .simple_serialize(&ty)
         .ok_or_else(|| VMStatus::new(StatusCode::DATA_FORMAT_ERROR))?;
 
-    let count = pop_arg!(arguments, u64);
-    let key = pop_arg!(arguments, Vec<u8>);
-    let guid = EventKey::try_from(key.as_slice())
-        .map_err(|_| VMStatus::new(StatusCode::EVENT_KEY_MISMATCH))?;
-    context.save_event(ContractEvent::new(guid, count, ty.type_tag()?, msg))?;
+    let mut rng = OsRng;
+    let event = ContractEvent::with_caller(
+        EventKey::new_from_address(&context.sender(), rng.next_u64()),
+        0,
+        ty.type_tag()?,
+        msg,
+        context.caller().cloned(),
+    );
 
+    context.save_event(event)?;
     Ok(NativeResult::ok(ZERO_GAS_UNITS, vec![]))
 }
