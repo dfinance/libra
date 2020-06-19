@@ -109,6 +109,7 @@ impl VMRuntime {
             data_store,
             cost_strategy,
             &self.loader,
+            sender
         )
     }
 
@@ -120,6 +121,7 @@ impl VMRuntime {
         args: Vec<Value>,
         data_store: &mut dyn DataStore,
         cost_strategy: &mut CostStrategy,
+        sender: AccountAddress,
     ) -> VMResult<()> {
         // load the function in the given module, perform verification of the module and
         // its dependencies if the module was not loaded
@@ -138,6 +140,7 @@ impl VMRuntime {
             data_store,
             cost_strategy,
             &self.loader,
+            sender
         )
     }
 }

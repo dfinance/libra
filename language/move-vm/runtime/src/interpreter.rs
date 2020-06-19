@@ -13,7 +13,10 @@ use libra_types::{
     account_address::AccountAddress,
     vm_status::{StatusCode, StatusType, VMStatus},
 };
-use move_core_types::gas_schedule::{AbstractMemorySize, GasAlgebra, GasCarrier};
+use move_core_types::{
+    gas_schedule::{AbstractMemorySize, GasAlgebra, GasCarrier},
+    language_storage::ModuleId,
+};
 use move_vm_types::{
     data_store::DataStore,
     gas_schedule::CostStrategy,
@@ -57,6 +60,7 @@ pub(crate) struct Interpreter {
     operand_stack: Stack,
     /// The stack of active functions.
     call_stack: CallStack,
+    sender: AccountAddress,
 }
 
 impl Interpreter {
@@ -69,19 +73,21 @@ impl Interpreter {
         data_store: &mut dyn DataStore,
         cost_strategy: &mut CostStrategy,
         loader: &Loader,
+        sender: AccountAddress,
     ) -> VMResult<()> {
         // We count the intrinsic cost of the transaction here, since that needs to also cover the
         // setup of the function.
-        let mut interp = Self::new();
+        let mut interp = Self::new(sender);
         interp.execute(loader, data_store, cost_strategy, function, ty_args, args)
     }
 
     /// Create a new instance of an `Interpreter` in the context of a transaction with a
     /// given module cache and gas schedule.
-    fn new() -> Self {
+    fn new(sender: AccountAddress) -> Self {
         Interpreter {
             operand_stack: Stack::new(),
             call_stack: CallStack::new(),
+            sender
         }
     }
 
@@ -146,7 +152,14 @@ impl Interpreter {
                     )?;
                     let func = resolver.function_at(fh_idx);
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, vec![])?;
+                        self.call_native(
+                            &resolver,
+                            data_store,
+                            cost_strategy,
+                            func,
+                            vec![],
+                            current_frame.function.module_id()
+                        )?;
                         continue;
                     }
                     // TODO: when a native function is executed, the current frame has not yet
@@ -169,7 +182,14 @@ impl Interpreter {
                     let func = loader.function_at(func_inst.handle());
                     let ty_args = func_inst.materialize(current_frame.ty_args())?;
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, ty_args)?;
+                        self.call_native(
+                            &resolver,
+                            data_store,
+                            cost_strategy,
+                            func,
+                            ty_args,
+                            current_frame.function.module_id()
+                        )?;
                         continue;
                     }
                     // TODO: when a native function is executed, the current frame has not yet
@@ -209,13 +229,22 @@ impl Interpreter {
         cost_strategy: &mut CostStrategy,
         function: Arc<Function>,
         ty_args: Vec<Type>,
+        caller: Option<&ModuleId>
     ) -> VMResult<()> {
         let mut arguments = VecDeque::new();
         let expected_args = function.arg_count();
         for _ in 0..expected_args {
             arguments.push_front(self.operand_stack.pop()?);
         }
-        let mut native_context = FunctionContext::new(self, data_store, cost_strategy, resolver);
+
+        let mut native_context = FunctionContext::new(
+            self,
+            data_store,
+            cost_strategy,
+            resolver,
+            caller,
+            self.sender,
+        );
         let native_function = function.get_native()?;
         let result = native_function.dispatch(&mut native_context, ty_args, arguments)?;
         cost_strategy.deduct_gas(result.cost)?;
@@ -592,7 +621,7 @@ impl Stack {
 
 /// A call stack.
 #[derive(Debug)]
-struct CallStack(Vec<Frame>);
+struct CallStack(pub Vec<Frame>);
 
 impl CallStack {
     /// Create a new empty call stack.
