@@ -11,6 +11,7 @@ use proptest::prelude::*;
 use proptest_derive::Arbitrary;
 use serde::{de, ser, Deserialize, Serialize};
 use std::{convert::TryFrom, fmt};
+use enum_iterator::IntoEnumIterator;
 
 /// The minimum status code for validation statuses
 pub static VALIDATION_STATUS_MIN_CODE: u64 = 0;
@@ -452,8 +453,8 @@ macro_rules! derive_status_try_from_repr {
 derive_status_try_from_repr! {
 #[repr(u64)]
 #[allow(non_camel_case_types)]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-/// We don't derive Arbitrary on thispub enum because it is too large and breaks proptest. It is
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, IntoEnumIterator)]
+/// We don't derive Arbitrary on this enum because it is too large and breaks proptest. It is
 /// written for a subset of these in proptest_types. We test conversion between this and protobuf
 /// with a hand-written test.
 pub enum StatusCode {
