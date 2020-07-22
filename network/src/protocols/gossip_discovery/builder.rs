@@ -19,7 +19,7 @@ use tokio::{
 };
 
 /// Configuration object which describes the production Discovery component.
-struct GossipDiscoveryBuilderConfig {
+pub struct GossipDiscoveryBuilderConfig {
     network_context: Arc<NetworkContext>,
     self_addrs: Vec<NetworkAddress>,
     discovery_interval_ms: u64,
@@ -51,7 +51,7 @@ impl GossipDiscoveryBuilderConfig {
 type GossipDiscoveryService = GossipDiscovery<Fuse<Interval>>;
 
 #[derive(Debug, PartialOrd, PartialEq)]
-enum State {
+pub enum State {
     CREATED,
     BUILT,
     STARTED,

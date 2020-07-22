@@ -8,7 +8,7 @@ use crate::protocols::wire::handshake::v1::{MessagingProtocolVersion, ProtocolId
 use serde::{Deserialize, Serialize};
 
 #[cfg(test)]
-mod test;
+pub mod test;
 
 /// Message variants that are sent on the wire.
 /// New variants cannot be added without bumping up the MessagingProtocolVersion.

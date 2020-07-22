@@ -125,7 +125,7 @@ impl Default for Logger {
 }
 
 /// Provies the log::Log for Libra's synchronous logger
-struct SyncLogger<W> {
+pub struct SyncLogger<W> {
     filter: filter::Filter,
     writer: W,
 }
@@ -160,21 +160,21 @@ impl<W: Writer> Log for SyncLogger<W> {
 }
 
 /// Operations between the AsyncLogClient and AsyncLogService
-enum LogOp {
+pub enum LogOp {
     /// Send a line to log to the writer.
     Log(String),
 }
 
 /// Provides the backend to the asynchronous interface for logging. This part actually writes the
 /// log to the writer.
-struct AsyncLogService<W> {
+pub struct AsyncLogService<W> {
     receiver: Receiver<LogOp>,
     writer: W,
 }
 
 impl<W: Writer> AsyncLogService<W> {
     /// Loop for handling logging
-    fn log_handler(mut self) {
+    pub fn log_handler(mut self) {
         loop {
             if let Err(e) = self.handle_recv() {
                 // TODO write an error record and then exit
@@ -184,7 +184,7 @@ impl<W: Writer> AsyncLogService<W> {
         }
     }
 
-    fn handle_recv(&mut self) -> Result<(), RecvError> {
+    pub fn handle_recv(&mut self) -> Result<(), RecvError> {
         match self.receiver.recv()? {
             LogOp::Log(line) => self.writer.write(line),
         };
@@ -193,7 +193,7 @@ impl<W: Writer> AsyncLogService<W> {
 }
 
 /// Provides the log::Log interface for Libra's asynchronous logger
-struct AsyncLogClient {
+pub struct AsyncLogClient {
     filter: filter::Filter,
     sender: SyncSender<LogOp>,
 }
@@ -236,7 +236,7 @@ impl Log for AsyncLogClient {
 /// UNIX_TIMESTAMP LOG_LEVEL FILE:LINE MESSAGE
 /// Example:
 /// 2020-03-07 05:03:03 INFO common/libra-logger/src/lib.rs:261 Hello
-fn format(record: &Record) -> Result<String, fmt::Error> {
+pub fn format(record: &Record) -> Result<String, fmt::Error> {
     let mut buffer = String::new();
 
     write!(buffer, "{} ", record.metadata().level())?;
@@ -261,8 +261,8 @@ trait Writer: Send + Sync {
     fn write(&self, log: String);
 }
 
-/// A struct for writing logs to stderr
-struct StderrWriter {}
+/// A pub struct for writing logs to stderr
+pub struct StderrWriter {}
 
 impl Writer for StderrWriter {
     /// Write log to stderr
@@ -272,12 +272,12 @@ impl Writer for StderrWriter {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use crate::{text_log::*, *};
     use std::sync::{Arc, RwLock};
 
     #[derive(Default)]
-    struct VecWriter {
+    pub struct VecWriter {
         logs: Arc<RwLock<Vec<String>>>,
     }
 

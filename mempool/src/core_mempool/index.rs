@@ -27,23 +27,23 @@ pub struct PriorityIndex {
 pub type PriorityQueueIter<'a> = Rev<Iter<'a, OrderedQueueKey>>;
 
 impl PriorityIndex {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             data: BTreeSet::new(),
         }
     }
 
     /// add transaction to index
-    pub(crate) fn insert(&mut self, txn: &MempoolTransaction) {
+    pub fn insert(&mut self, txn: &MempoolTransaction) {
         self.data.insert(self.make_key(&txn));
     }
 
     /// remove transaction from index
-    pub(crate) fn remove(&mut self, txn: &MempoolTransaction) {
+    pub fn remove(&mut self, txn: &MempoolTransaction) {
         self.data.remove(&self.make_key(&txn));
     }
 
-    pub(crate) fn contains(&self, txn: &MempoolTransaction) -> bool {
+    pub fn contains(&self, txn: &MempoolTransaction) -> bool {
         self.data.contains(&self.make_key(txn))
     }
 
@@ -58,11 +58,11 @@ impl PriorityIndex {
     }
 
     /// returns iterator over priority queue
-    pub(crate) fn iter(&self) -> PriorityQueueIter {
+    pub fn iter(&self) -> PriorityQueueIter {
         self.data.iter().rev()
     }
 
-    pub(crate) fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         self.data.len()
     }
 }
@@ -115,7 +115,7 @@ pub struct TTLIndex {
 }
 
 impl TTLIndex {
-    pub(crate) fn new<F>(get_expiration_time: Box<F>) -> Self
+    pub fn new<F>(get_expiration_time: Box<F>) -> Self
     where
         F: Fn(&MempoolTransaction) -> Duration + 'static + Send + Sync,
     {
@@ -126,17 +126,17 @@ impl TTLIndex {
     }
 
     /// add transaction to index
-    pub(crate) fn insert(&mut self, txn: &MempoolTransaction) {
+    pub fn insert(&mut self, txn: &MempoolTransaction) {
         self.data.insert(self.make_key(&txn));
     }
 
     /// remove transaction from index
-    pub(crate) fn remove(&mut self, txn: &MempoolTransaction) {
+    pub fn remove(&mut self, txn: &MempoolTransaction) {
         self.data.remove(&self.make_key(&txn));
     }
 
     /// GC all old transactions
-    pub(crate) fn gc(&mut self, now: Duration) -> Vec<TTLOrderingKey> {
+    pub fn gc(&mut self, now: Duration) -> Vec<TTLOrderingKey> {
         let ttl_key = TTLOrderingKey {
             expiration_time: now,
             address: AccountAddress::ZERO,
@@ -150,7 +150,7 @@ impl TTLIndex {
         ttl_transactions
     }
 
-    fn make_key(&self, txn: &MempoolTransaction) -> TTLOrderingKey {
+    pub fn make_key(&self, txn: &MempoolTransaction) -> TTLOrderingKey {
         TTLOrderingKey {
             expiration_time: (self.get_expiration_time)(txn),
             address: txn.get_sender(),
@@ -158,7 +158,7 @@ impl TTLIndex {
         }
     }
 
-    pub(crate) fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         self.data.len()
     }
 }
@@ -194,7 +194,7 @@ pub struct TimelineIndex {
 }
 
 impl TimelineIndex {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             timeline_id: 1,
             timeline: BTreeMap::new(),
@@ -202,12 +202,12 @@ impl TimelineIndex {
     }
 
     /// get transaction at `timeline_id`
-    pub(crate) fn get_timeline_entry(&mut self, timeline_id: u64) -> Option<(AccountAddress, u64)> {
+    pub fn get_timeline_entry(&mut self, timeline_id: u64) -> Option<(AccountAddress, u64)> {
         self.timeline.get(&timeline_id).cloned()
     }
 
     /// read all transactions from timeline since <timeline_id>
-    pub(crate) fn read_timeline(
+    pub fn read_timeline(
         &mut self,
         timeline_id: u64,
         count: usize,
@@ -226,7 +226,7 @@ impl TimelineIndex {
     }
 
     /// add transaction to index
-    pub(crate) fn insert(&mut self, txn: &mut MempoolTransaction) {
+    pub fn insert(&mut self, txn: &mut MempoolTransaction) {
         self.timeline.insert(
             self.timeline_id,
             (txn.get_sender(), txn.get_sequence_number()),
@@ -236,13 +236,13 @@ impl TimelineIndex {
     }
 
     /// remove transaction from index
-    pub(crate) fn remove(&mut self, txn: &MempoolTransaction) {
+    pub fn remove(&mut self, txn: &MempoolTransaction) {
         if let TimelineState::Ready(timeline_id) = txn.timeline_state {
             self.timeline.remove(&timeline_id);
         }
     }
 
-    pub(crate) fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         self.timeline.len()
     }
 }
@@ -256,28 +256,28 @@ pub struct ParkingLotIndex {
 }
 
 impl ParkingLotIndex {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             data: BTreeSet::new(),
         }
     }
 
     /// add transaction to index
-    pub(crate) fn insert(&mut self, txn: &MempoolTransaction) {
+    pub fn insert(&mut self, txn: &MempoolTransaction) {
         self.data.insert(TxnPointer::from(txn));
     }
 
     /// remove transaction from index
-    pub(crate) fn remove(&mut self, txn: &MempoolTransaction) {
+    pub fn remove(&mut self, txn: &MempoolTransaction) {
         self.data.remove(&TxnPointer::from(txn));
     }
 
     /// returns random "non-ready" transaction (with highest sequence number for that account)
-    pub(crate) fn pop(&mut self) -> Option<TxnPointer> {
+    pub fn pop(&mut self) -> Option<TxnPointer> {
         self.data.iter().rev().next().cloned()
     }
 
-    pub(crate) fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         self.data.len()
     }
 }

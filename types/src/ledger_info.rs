@@ -249,7 +249,7 @@ impl LedgerInfoWithV0 {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use crate::validator_signer::ValidatorSigner;
 

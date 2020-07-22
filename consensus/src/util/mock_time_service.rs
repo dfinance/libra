@@ -20,7 +20,7 @@ pub struct SimulatedTimeService {
     inner: Arc<Mutex<SimulatedTimeServiceInner>>,
 }
 
-struct SimulatedTimeServiceInner {
+pub struct SimulatedTimeServiceInner {
     now: Duration,
     pending: Vec<(Duration, Box<dyn ScheduledTask>)>,
     time_limit: Duration,

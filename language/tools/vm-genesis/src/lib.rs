@@ -1,10 +1,10 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod genesis_context;
-mod genesis_gas_schedule;
+
+pub mod genesis_context;
+pub mod genesis_gas_schedule;
 
 use crate::{genesis_context::GenesisStateView, genesis_gas_schedule::INITIAL_GAS_SCHEDULE};
 use compiled_stdlib::{stdlib_modules, transaction_scripts::StdlibScript, StdLibOptions};
@@ -84,7 +84,7 @@ pub fn encode_genesis_transaction(
     )
 }
 
-fn merge_txn_effects(
+pub fn merge_txn_effects(
     mut effects_1: TransactionEffects,
     effects_2: TransactionEffects,
 ) -> TransactionEffects {
@@ -167,7 +167,7 @@ pub fn encode_genesis_change_set(
 }
 
 /// Convert the transaction arguments into move values.
-fn convert_txn_args(args: &[TransactionArgument]) -> Vec<Value> {
+pub fn convert_txn_args(args: &[TransactionArgument]) -> Vec<Value> {
     args.iter()
         .map(|arg| match arg {
             TransactionArgument::U8(i) => Value::u8(*i),
@@ -180,7 +180,7 @@ fn convert_txn_args(args: &[TransactionArgument]) -> Vec<Value> {
         .collect()
 }
 
-fn exec_function(
+pub fn exec_function(
     session: &mut Session<StateViewCache>,
     sender: AccountAddress,
     module_name: &str,
@@ -203,7 +203,7 @@ fn exec_function(
         .unwrap_or_else(|e| panic!("Error calling {}.{}: {}", module_name, function_name, e))
 }
 
-fn exec_script(session: &mut Session<StateViewCache>, sender: AccountAddress, script: &Script) {
+pub fn exec_script(session: &mut Session<StateViewCache>, sender: AccountAddress, script: &Script) {
     session
         .execute_script(
             script.code().to_vec(),
@@ -216,7 +216,7 @@ fn exec_script(session: &mut Session<StateViewCache>, sender: AccountAddress, sc
 }
 
 /// Create and initialize Association and Core Code accounts.
-fn create_and_initialize_main_accounts(
+pub fn create_and_initialize_main_accounts(
     session: &mut Session<StateViewCache>,
     public_key: &Ed25519PublicKey,
     publishing_option: VMPublishingOption,
@@ -269,7 +269,7 @@ fn create_and_initialize_main_accounts(
     );
 }
 
-fn create_and_initialize_testnet_minting(
+pub fn create_and_initialize_testnet_minting(
     session: &mut Session<StateViewCache>,
     public_key: &Ed25519PublicKey,
 ) {
@@ -376,7 +376,7 @@ fn create_and_initialize_testnet_minting(
 /// Creates and initializes each validator owner and validator operator. This method creates all
 /// the required accounts, sets the validator operators for each validator owner, and sets the
 /// validator config on-chain.
-fn create_and_initialize_owners_operators(
+pub fn create_and_initialize_owners_operators(
     session: &mut Session<StateViewCache>,
     operator_assignments: &[OperatorAssignment],
     operator_registrations: &[OperatorRegistration],
@@ -435,14 +435,14 @@ fn create_and_initialize_owners_operators(
     }
 }
 
-fn remove_genesis(stdlib_modules: &[CompiledModule]) -> impl Iterator<Item = &CompiledModule> {
+pub fn remove_genesis(stdlib_modules: &[CompiledModule]) -> impl Iterator<Item = &CompiledModule> {
     stdlib_modules
         .iter()
         .filter(|module| module.self_id().name().as_str() != GENESIS_MODULE_NAME)
 }
 
 /// Publish the standard library.
-fn publish_stdlib(session: &mut Session<StateViewCache>, stdlib: &[CompiledModule]) {
+pub fn publish_stdlib(session: &mut Session<StateViewCache>, stdlib: &[CompiledModule]) {
     for module in remove_genesis(stdlib) {
         assert!(module.self_id().name().as_str() != GENESIS_MODULE_NAME);
         let mut module_vec = vec![];
@@ -460,7 +460,7 @@ fn publish_stdlib(session: &mut Session<StateViewCache>, stdlib: &[CompiledModul
 }
 
 /// Trigger a reconfiguration. This emits an event that will be passed along to the storage layer.
-fn reconfigure(session: &mut Session<StateViewCache>) {
+pub fn reconfigure(session: &mut Session<StateViewCache>) {
     exec_function(
         session,
         account_config::libra_root_address(),
@@ -472,7 +472,7 @@ fn reconfigure(session: &mut Session<StateViewCache>) {
 }
 
 /// Verify the consistency of the genesis `WriteSet`
-fn verify_genesis_write_set(events: &[ContractEvent]) {
+pub fn verify_genesis_write_set(events: &[ContractEvent]) {
     // Sanity checks on emitted events:
     // (1) The genesis tx should emit 1 event: a NewEpochEvent.
     assert_eq!(

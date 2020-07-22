@@ -16,7 +16,7 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Datatest-harness for running data-driven tests")]
-struct TestOpts {
+pub struct TestOpts {
     /// The FILTER string is tested against the name of all tests, and only those tests whose names
     /// contain the filter are run.
     filter: Option<String>,
@@ -101,12 +101,12 @@ pub fn runner(reqs: &[Requirements]) {
     }
 }
 
-struct Test {
-    testfn: Box<dyn Fn() -> Result<()> + Send>,
-    name: String,
+pub struct Test {
+    pub testfn: Box<dyn Fn() -> Result<()> + Send>,
+    pub name: String,
 }
 
-enum TestResult {
+pub enum TestResult {
     Ok,
     Failed,
     FailedWithMsg(String),
@@ -178,7 +178,7 @@ fn run_test(test: Test, channel: Sender<(String, TestResult)>) {
     .unwrap();
 }
 
-struct TestSummary {
+pub struct TestSummary {
     stdout: StandardStream,
     total: usize,
     filtered_out: usize,

@@ -59,7 +59,7 @@ impl MockTreeStore {
         Ok(())
     }
 
-    fn put_stale_node_index(&self, index: StaleNodeIndex) -> Result<()> {
+    pub fn put_stale_node_index(&self, index: StaleNodeIndex) -> Result<()> {
         let is_new_entry = self.0.write().unwrap().1.insert(index);
         ensure!(is_new_entry, "Duplicated retire log.");
         Ok(())

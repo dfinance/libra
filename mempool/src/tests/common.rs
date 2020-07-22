@@ -16,7 +16,7 @@ use once_cell::sync::Lazy;
 use rand::{rngs::StdRng, SeedableRng};
 use std::{collections::HashSet, iter::FromIterator};
 
-pub(crate) fn setup_mempool() -> (CoreMempool, ConsensusMock) {
+pub fn setup_mempool() -> (CoreMempool, ConsensusMock) {
     (
         CoreMempool::new(&NodeConfig::random()),
         ConsensusMock::new(),
@@ -34,14 +34,14 @@ static ACCOUNTS: Lazy<Vec<AccountAddress>> = Lazy::new(|| {
 
 #[derive(Clone)]
 pub struct TestTransaction {
-    pub(crate) address: usize,
-    pub(crate) sequence_number: u64,
-    pub(crate) gas_price: u64,
-    pub(crate) is_governance_txn: bool,
+    pub address: usize,
+    pub sequence_number: u64,
+    pub gas_price: u64,
+    pub is_governance_txn: bool,
 }
 
 impl TestTransaction {
-    pub(crate) fn new(address: usize, sequence_number: u64, gas_price: u64) -> Self {
+    pub fn new(address: usize, sequence_number: u64, gas_price: u64) -> Self {
         Self {
             address,
             sequence_number,
@@ -50,21 +50,21 @@ impl TestTransaction {
         }
     }
 
-    pub(crate) fn make_signed_transaction_with_expiration_time(
+    pub fn make_signed_transaction_with_expiration_time(
         &self,
         exp_timestamp_secs: u64,
     ) -> SignedTransaction {
         self.make_signed_transaction_impl(100, exp_timestamp_secs)
     }
 
-    pub(crate) fn make_signed_transaction_with_max_gas_amount(
+    pub fn make_signed_transaction_with_max_gas_amount(
         &self,
         max_gas_amount: u64,
     ) -> SignedTransaction {
         self.make_signed_transaction_impl(max_gas_amount, u64::max_value())
     }
 
-    pub(crate) fn make_signed_transaction(&self) -> SignedTransaction {
+    pub fn make_signed_transaction(&self) -> SignedTransaction {
         self.make_signed_transaction_impl(100, u64::max_value())
     }
 
@@ -93,13 +93,13 @@ impl TestTransaction {
             .into_inner()
     }
 
-    pub(crate) fn get_address(address: usize) -> AccountAddress {
+    pub fn get_address(address: usize) -> AccountAddress {
         ACCOUNTS[address]
     }
 }
 
 // adds transactions to mempool
-pub(crate) fn add_txns_to_mempool(
+pub fn add_txns_to_mempool(
     pool: &mut CoreMempool,
     txns: Vec<TestTransaction>,
 ) -> Vec<SignedTransaction> {
@@ -119,11 +119,11 @@ pub(crate) fn add_txns_to_mempool(
     transactions
 }
 
-pub(crate) fn add_txn(pool: &mut CoreMempool, transaction: TestTransaction) -> Result<()> {
+pub fn add_txn(pool: &mut CoreMempool, transaction: TestTransaction) -> Result<()> {
     add_signed_txn(pool, transaction.make_signed_transaction())
 }
 
-pub(crate) fn add_signed_txn(pool: &mut CoreMempool, transaction: SignedTransaction) -> Result<()> {
+pub fn add_signed_txn(pool: &mut CoreMempool, transaction: SignedTransaction) -> Result<()> {
     match pool
         .add_txn(
             transaction.clone(),
@@ -140,7 +140,7 @@ pub(crate) fn add_signed_txn(pool: &mut CoreMempool, transaction: SignedTransact
     }
 }
 
-pub(crate) fn batch_add_signed_txn(
+pub fn batch_add_signed_txn(
     pool: &mut CoreMempool,
     transactions: Vec<SignedTransaction>,
 ) -> Result<()> {
@@ -152,15 +152,15 @@ pub(crate) fn batch_add_signed_txn(
     Ok(())
 }
 
-// helper struct that keeps state between `.get_block` calls. Imitates work of Consensus
+// helper pub struct that keeps state between `.get_block` calls. Imitates work of Consensus
 pub struct ConsensusMock(HashSet<TxnPointer>);
 
 impl ConsensusMock {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self(HashSet::new())
     }
 
-    pub(crate) fn get_block(
+    pub fn get_block(
         &mut self,
         mempool: &mut CoreMempool,
         block_size: u64,
@@ -177,7 +177,7 @@ impl ConsensusMock {
     }
 }
 
-pub(crate) fn exist_in_metrics_cache(mempool: &CoreMempool, txn: &SignedTransaction) -> bool {
+pub fn exist_in_metrics_cache(mempool: &CoreMempool, txn: &SignedTransaction) -> bool {
     mempool
         .metrics_cache
         .get(&(txn.sender(), txn.sequence_number()))

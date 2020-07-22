@@ -5,14 +5,14 @@ use crate::{errors::*, parser::syntax::make_loc};
 use move_ir_types::location::*;
 
 #[derive(Default)]
-struct Context {
+pub struct Context {
     filename: &'static str,
     start_offset: usize,
     errors: Errors,
 }
 
 impl Context {
-    fn new(filename: &'static str, start_offset: usize) -> Self {
+    pub fn new(filename: &'static str, start_offset: usize) -> Self {
         Self {
             filename,
             start_offset,
@@ -20,7 +20,7 @@ impl Context {
         }
     }
 
-    fn error(&mut self, start: usize, end: usize, err_text: String) {
+    pub fn error(&mut self, start: usize, end: usize, err_text: String) {
         self.errors.push(vec![(
             make_loc(
                 self.filename,
@@ -31,11 +31,11 @@ impl Context {
         )])
     }
 
-    fn has_errors(&self) -> bool {
+    pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
 
-    fn get_errors(self) -> Errors {
+    pub fn get_errors(self) -> Errors {
         self.errors
     }
 }
@@ -54,7 +54,7 @@ pub fn decode(loc: Loc, text: &str) -> Result<Vec<u8>, Errors> {
     }
 }
 
-fn decode_(context: &mut Context, buffer: &mut Vec<u8>, chars: Vec<char>) {
+pub fn decode_(context: &mut Context, buffer: &mut Vec<u8>, chars: Vec<char>) {
     let len = chars.len();
     let mut i = 0;
     macro_rules! next_char {
@@ -133,7 +133,7 @@ fn decode_(context: &mut Context, buffer: &mut Vec<u8>, chars: Vec<char>) {
     }
 }
 
-fn push(buffer: &mut Vec<u8>, ch: char) {
+pub fn push(buffer: &mut Vec<u8>, ch: char) {
     assert!(ch.is_ascii(), "ICE ascii-only support is gated at parsing");
     buffer.extend(vec![ch as u8]);
 }

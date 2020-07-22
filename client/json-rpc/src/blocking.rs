@@ -63,7 +63,7 @@ impl JsonRpcClient {
         response
     }
 
-    fn send(&self, request: &serde_json::Value) -> Result<reqwest::blocking::Response> {
+    pub fn send(&self, request: &serde_json::Value) -> Result<reqwest::blocking::Response> {
         self.client
             .post(self.url.clone())
             .json(request)

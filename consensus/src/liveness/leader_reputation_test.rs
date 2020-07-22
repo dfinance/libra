@@ -13,13 +13,13 @@ use consensus_types::{
 };
 use libra_types::{block_metadata::NewBlockEvent, validator_signer::ValidatorSigner};
 
-struct MockHistory {
+pub struct MockHistory {
     window_size: usize,
     data: Vec<NewBlockEvent>,
 }
 
 impl MockHistory {
-    fn new(window_size: usize, data: Vec<NewBlockEvent>) -> Self {
+    pub fn new(window_size: usize, data: Vec<NewBlockEvent>) -> Self {
         Self { window_size, data }
     }
 }
@@ -35,7 +35,7 @@ impl MetadataBackend for MockHistory {
     }
 }
 
-fn create_block(proposer: Author, voters: Vec<&ValidatorSigner>) -> NewBlockEvent {
+pub fn create_block(proposer: Author, voters: Vec<&ValidatorSigner>) -> NewBlockEvent {
     NewBlockEvent::new(0, proposer, voters.iter().map(|v| v.author()).collect(), 0)
 }
 

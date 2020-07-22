@@ -1,20 +1,20 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use consensus_types::block::Block;
 use libra_crypto::HashValue;
 use libra_types::transaction::Transaction;
 
-mod execution_correctness;
-mod execution_correctness_manager;
-mod local;
-mod process;
-mod remote_service;
-mod serializer;
-mod spawned_process;
-mod thread;
+pub mod execution_correctness;
+pub mod execution_correctness_manager;
+pub mod local;
+pub mod process;
+pub mod remote_service;
+pub mod serializer;
+pub mod spawned_process;
+pub mod thread;
 
 pub use crate::{
     execution_correctness::ExecutionCorrectness,
@@ -26,9 +26,9 @@ pub use crate::{
 pub mod process_client_wrapper;
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
-fn id_and_transactions_from_block(block: &Block) -> (HashValue, Vec<Transaction>) {
+pub fn id_and_transactions_from_block(block: &Block) -> (HashValue, Vec<Transaction>) {
     let id = block.id();
     let mut transactions = vec![Transaction::BlockMetadata(block.into())];
     transactions.extend(

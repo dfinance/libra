@@ -23,12 +23,12 @@ use vm::{
 };
 
 /// An instantiation of the MoveVM.
-pub(crate) struct VMRuntime {
+pub struct VMRuntime {
     loader: Loader,
 }
 
 impl VMRuntime {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         VMRuntime {
             loader: Loader::new(),
         }
@@ -41,7 +41,7 @@ impl VMRuntime {
         }
     }
 
-    pub(crate) fn publish_module(
+    pub fn publish_module(
         &self,
         module: Vec<u8>,
         sender: AccountAddress,
@@ -85,7 +85,7 @@ impl VMRuntime {
         data_store.publish_module(&module_id, module)
     }
 
-    pub(crate) fn execute_script(
+    pub fn execute_script(
         &self,
         script: Vec<u8>,
         ty_args: Vec<TypeTag>,
@@ -124,7 +124,7 @@ impl VMRuntime {
         )
     }
 
-    pub(crate) fn execute_function(
+    pub fn execute_function(
         &self,
         module: &ModuleId,
         function_name: &IdentStr,
@@ -157,7 +157,7 @@ impl VMRuntime {
 // Check that the transaction arguments are acceptable by the VM.
 // Constants and a reference to a `Signer` are the only arguments allowed.
 // This check is more of a rough filter to remove obvious bad arguments.
-fn check_args(args: &[Value]) -> PartialVMResult<()> {
+pub fn check_args(args: &[Value]) -> PartialVMResult<()> {
     for val in args {
         if !val.is_constant_or_signer_ref() {
             return Err(PartialVMError::new(StatusCode::TYPE_MISMATCH)

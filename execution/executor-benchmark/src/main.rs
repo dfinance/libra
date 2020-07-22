@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-struct Opt {
+pub struct Opt {
     #[structopt(long, default_value = "1000000")]
     num_accounts: usize,
 

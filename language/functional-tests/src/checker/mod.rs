@@ -5,7 +5,7 @@ pub mod directives;
 pub mod matcher;
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 pub use crate::checker::{
     directives::Directive,

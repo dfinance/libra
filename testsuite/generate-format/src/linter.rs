@@ -37,7 +37,7 @@ pub fn lint_lcs_format(format: &ContainerFormat) -> Result<()> {
     })
 }
 
-fn is_empty(format: &Format) -> bool {
+pub fn is_empty(format: &Format) -> bool {
     use Format::*;
     match format {
         Unit => true,
@@ -47,7 +47,7 @@ fn is_empty(format: &Format) -> bool {
     }
 }
 
-fn is_empty_container(format: &ContainerFormat) -> bool {
+pub fn is_empty_container(format: &ContainerFormat) -> bool {
     use ContainerFormat::*;
     match format {
         UnitStruct => true,

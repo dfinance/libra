@@ -79,7 +79,7 @@ pub fn run(args: Args, xctx: XContext) -> crate::Result<()> {
     Ok(())
 }
 
-fn write_summary(
+pub fn write_summary(
     name: &str,
     feature_query: FeatureQuery<'_>,
     cargo_opts: &CargoOptions<'_>,

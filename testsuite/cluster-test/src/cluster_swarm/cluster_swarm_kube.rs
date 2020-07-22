@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use std::{collections::HashMap, sync::Arc};
 
@@ -74,7 +74,7 @@ impl ClusterSwarmKube {
         })
     }
 
-    fn service_spec(&self, peer_id: String) -> Service {
+    pub fn service_spec(&self, peer_id: String) -> Service {
         let service_yaml = format!(
             include_str!("libra_node_service_template.yaml"),
             peer_id = &peer_id
@@ -86,7 +86,7 @@ impl ClusterSwarmKube {
             .unwrap()
     }
 
-    fn lsr_spec(
+    pub fn lsr_spec(
         &self,
         validator_index: u32,
         pod_name: &str,
@@ -120,7 +120,7 @@ impl ClusterSwarmKube {
         Ok((pod_spec, service_spec))
     }
 
-    fn vault_spec(&self, validator_index: u32, node_name: &str) -> Result<(Pod, Service)> {
+    pub fn vault_spec(&self, validator_index: u32, node_name: &str) -> Result<(Pod, Service)> {
         let pod_yaml = format!(
             include_str!("vault_spec_template.yaml"),
             validator_index = validator_index,
@@ -141,7 +141,7 @@ impl ClusterSwarmKube {
         Ok((pod_spec, service_spec))
     }
 
-    fn validator_spec(
+    pub fn validator_spec(
         &self,
         index: u32,
         pod_name: &str,
@@ -180,7 +180,7 @@ impl ClusterSwarmKube {
             .map_err(|e| format_err!("serde_json::from_value failed: {}", e))
     }
 
-    fn fullnode_spec(
+    pub fn fullnode_spec(
         &self,
         fullnode_index: u32,
         num_fullnodes: u32,

@@ -112,7 +112,7 @@ impl EpochEndingRestoreController {
 }
 
 impl EpochEndingRestoreController {
-    async fn read_chunk(&self, file_handle: FileHandle) -> Result<Vec<LedgerInfoWithSignatures>> {
+    pub async fn read_chunk(&self, file_handle: FileHandle) -> Result<Vec<LedgerInfoWithSignatures>> {
         let mut file = self.storage.open_for_read(&file_handle).await?;
         let mut chunk = vec![];
 

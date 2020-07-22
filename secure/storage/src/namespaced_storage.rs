@@ -40,7 +40,7 @@ impl NamespacedStorage {
         }
     }
 
-    fn ns_name(&self, key: &str) -> String {
+    pub fn ns_name(&self, key: &str) -> String {
         format!("{}/{}", self.namespace, key)
     }
 }
@@ -48,7 +48,7 @@ impl NamespacedStorage {
 impl CryptoKVStorage for NamespacedStorage {}
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::OnDiskStorage;
     use libra_temppath::TempPath;

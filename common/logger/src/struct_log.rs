@@ -172,11 +172,11 @@ impl StructuredLogEntry {
 ///
 /// Example:
 ///
-/// mod logging {
+/// pub mod logging {
 ///    pub const MY_FIELD:LoggingField<u64> = LoggingField::new("my_field");
 /// }
 ///
-/// mod my_code {
+/// pub mod my_code {
 ///    fn my_fn() {
 ///        send_struct_log!(StructuredLogEntry::new(...).field(&logging::MY_FIELD, 0))
 ///    }
@@ -223,7 +223,7 @@ pub fn struct_logger_set() -> bool {
     STRUCT_LOGGER_STATE.load(Ordering::SeqCst) == INITIALIZED
 }
 
-/// Initializes struct logger from STRUCT_LOG_FILE env var.
+/// Initializes pub struct logger from STRUCT_LOG_FILE env var.
 /// If STRUCT_LOG_FILE is set, STRUCT_LOG_UDP_ADDR will be ignored.
 /// Can only be called once
 pub fn init_struct_log_from_env() -> Result<(), InitLoggerError> {
@@ -236,7 +236,7 @@ pub fn init_struct_log_from_env() -> Result<(), InitLoggerError> {
     }
 }
 
-/// Initializes struct logger sink that writes to specified file.
+/// Initializes pub struct logger sink that writes to specified file.
 /// Can only be called once
 pub fn init_file_struct_log(file_path: String) -> Result<(), InitLoggerError> {
     let logger = FileStructLog::start_new(file_path).map_err(InitLoggerError::IoError)?;
@@ -244,7 +244,7 @@ pub fn init_file_struct_log(file_path: String) -> Result<(), InitLoggerError> {
     set_struct_logger(logger).map_err(|_| InitLoggerError::StructLoggerAlreadySet)
 }
 
-/// Initializes struct logger sink that stream logs through UDP protocol.
+/// Initializes pub struct logger sink that stream logs through UDP protocol.
 /// Can only be called once
 pub fn init_udp_struct_log(udp_address: String) -> Result<(), InitLoggerError> {
     let logger = UDPStructLog::start_new(udp_address).map_err(InitLoggerError::IoError)?;
@@ -252,7 +252,7 @@ pub fn init_udp_struct_log(udp_address: String) -> Result<(), InitLoggerError> {
     set_struct_logger(logger).map_err(|_| InitLoggerError::StructLoggerAlreadySet)
 }
 
-/// Initialize struct logger sink that prints all structured logs to stdout
+/// Initialize pub struct logger sink that prints all structured logs to stdout
 /// Can only be called once
 pub fn init_println_struct_log() -> Result<(), ()> {
     let logger = PrintStructLog {};
@@ -267,7 +267,7 @@ pub enum InitLoggerError {
 }
 
 // This is exact copy of similar function in log crate
-fn struct_logger() -> &'static dyn StructLogSink {
+pub fn struct_logger() -> &'static dyn StructLogSink {
     unsafe {
         if STRUCT_LOGGER_STATE.load(Ordering::SeqCst) != INITIALIZED {
             &NOP
@@ -277,13 +277,13 @@ fn struct_logger() -> &'static dyn StructLogSink {
     }
 }
 
-struct NopStructLog {}
+pub struct NopStructLog {}
 
 impl StructLogSink for NopStructLog {
     fn send(&self, _entry: StructuredLogEntry) {}
 }
 
-struct PrintStructLog {}
+pub struct PrintStructLog {}
 
 impl StructLogSink for PrintStructLog {
     fn send(&self, entry: StructuredLogEntry) {
@@ -292,7 +292,7 @@ impl StructLogSink for PrintStructLog {
 }
 
 /// Sink that prints all structured logs to specified file
-struct FileStructLog {
+pub struct FileStructLog {
     sender: SyncSender<StructuredLogEntry>,
 }
 
@@ -320,7 +320,7 @@ impl StructLogSink for FileStructLog {
     }
 }
 
-struct FileStructLogThread {
+pub struct FileStructLogThread {
     receiver: Receiver<StructuredLogEntry>,
     file: File,
 }
@@ -330,20 +330,20 @@ impl FileStructLogThread {
         for entry in self.receiver {
             let json = match serde_json::to_value(entry) {
                 Err(e) => {
-                    log::error!("Failed to serialize struct log entry: {}", e);
+                    log::error!("Failed to serialize pub struct log entry: {}", e);
                     continue;
                 }
                 Ok(json) => json,
             };
             if let Err(e) = writeln!(&mut self.file, "{}", json) {
-                log::error!("Failed to write struct log entry: {}", e);
+                log::error!("Failed to write pub struct log entry: {}", e);
             }
         }
     }
 }
 
 /// Sink that streams all structured logs to an address through UDP protocol
-struct UDPStructLog {
+pub struct UDPStructLog {
     sender: SyncSender<StructuredLogEntry>,
 }
 
@@ -372,7 +372,7 @@ impl StructLogSink for UDPStructLog {
     }
 }
 
-struct UDPStructLogThread {
+pub struct UDPStructLogThread {
     receiver: Receiver<StructuredLogEntry>,
     socket: UdpSocket,
     udp_address: String,
@@ -383,7 +383,7 @@ impl UDPStructLogThread {
         for entry in self.receiver {
             let json = match serde_json::to_value(entry) {
                 Err(e) => {
-                    log::error!("[Logging] Failed to serialize struct log entry: {}", e);
+                    log::error!("[Logging] Failed to serialize pub struct log entry: {}", e);
                     continue;
                 }
                 Ok(json) => json,

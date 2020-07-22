@@ -35,7 +35,7 @@ pub struct AccountDataCache {
 }
 
 impl AccountDataCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             data_map: BTreeMap::new(),
             module_map: BTreeMap::new(),
@@ -56,7 +56,7 @@ impl AccountDataCache {
 /// The Move VM takes a `DataStore` in input and this is the default and correct implementation
 /// for a data store related to a transaction. Clients should create an instance of this type
 /// and pass it to the Move VM.
-pub(crate) struct TransactionDataCache<'r, 'l, R> {
+pub struct TransactionDataCache<'r, 'l, R> {
     remote: &'r R,
     loader: &'l Loader,
     account_map: BTreeMap<AccountAddress, AccountDataCache>,
@@ -75,7 +75,7 @@ pub struct TransactionEffects {
 impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
     /// Create a `TransactionDataCache` with a `RemoteCache` that provides access to data
     /// not updated in the transaction.
-    pub(crate) fn new(remote: &'r R, loader: &'l Loader) -> Self {
+    pub fn new(remote: &'r R, loader: &'l Loader) -> Self {
         TransactionDataCache {
             remote,
             loader,
@@ -88,7 +88,7 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
     /// published modules.
     ///
     /// Gives all proper guarantees on lifetime of global data as well.
-    pub(crate) fn into_effects(self) -> PartialVMResult<TransactionEffects> {
+    pub fn into_effects(self) -> PartialVMResult<TransactionEffects> {
         let mut modules = vec![];
         let mut resources = vec![];
         for (addr, account_cache) in self.account_map {
@@ -134,11 +134,11 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
         })
     }
 
-    pub(crate) fn num_mutated_accounts(&self) -> u64 {
+    pub fn num_mutated_accounts(&self) -> u64 {
         self.account_map.keys().len() as u64
     }
 
-    fn get_mut_or_insert_with<'a, K, V, F>(map: &'a mut BTreeMap<K, V>, k: &K, gen: F) -> &'a mut V
+    pub fn get_mut_or_insert_with<'a, K, V, F>(map: &'a mut BTreeMap<K, V>, k: &K, gen: F) -> &'a mut V
     where
         F: FnOnce() -> (K, V),
         K: Ord,
@@ -153,7 +153,7 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
     // Retrieve data from the local cache or loads it from the remote cache into the local cache.
     // All operations on the global data are based on this API and they all load the data
     // into the cache.
-    fn load_data(
+    pub fn load_data(
         &mut self,
         addr: AccountAddress,
         ty: &Type,

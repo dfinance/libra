@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 #[macro_use(sp)]
 extern crate move_ir_types;
@@ -17,7 +17,7 @@ pub mod naming;
 pub mod parser;
 pub mod shared;
 pub mod test_utils;
-mod to_bytecode;
+pub mod to_bytecode;
 pub mod typing;
 
 use anyhow::anyhow;
@@ -201,7 +201,7 @@ pub fn output_compiled_units(
 // Translations
 //**************************************************************************************************
 
-fn check_program(
+pub fn check_program(
     prog: Result<parser::ast::Program, Errors>,
     sender_opt: Option<Address>,
 ) -> Result<cfgir::ast::Program, Errors> {
@@ -215,7 +215,7 @@ fn check_program(
     Ok(cprog)
 }
 
-fn compile_program(
+pub fn compile_program(
     prog: Result<parser::ast::Program, Errors>,
     sender_opt: Option<Address>,
 ) -> Result<Vec<CompiledUnit>, Errors> {
@@ -227,7 +227,7 @@ fn compile_program(
 // Parsing
 //**************************************************************************************************
 
-fn parse_program(
+pub fn parse_program(
     targets: &[String],
     deps: &[String],
 ) -> anyhow::Result<(
@@ -312,11 +312,11 @@ pub fn find_move_filenames(files: &[String]) -> anyhow::Result<Vec<String>> {
 }
 
 // TODO replace with some sort of intern table
-fn leak_str(s: &str) -> &'static str {
+pub fn leak_str(s: &str) -> &'static str {
     Box::leak(Box::new(s.to_owned()))
 }
 
-fn parse_file(
+pub fn parse_file(
     files: &mut FilesSourceText,
     fname: &'static str,
 ) -> anyhow::Result<(Vec<parser::ast::Definition>, MatchedFileCommentMap, Errors)> {
@@ -376,7 +376,7 @@ pub fn is_permitted_char(c: char) -> bool {
     is_permitted_printable_char(c) || is_permitted_newline_char(c)
 }
 
-fn verify_string(fname: &'static str, string: &str) -> Result<(), Errors> {
+pub fn verify_string(fname: &'static str, string: &str) -> Result<(), Errors> {
     match string
         .chars()
         .enumerate()
@@ -411,14 +411,14 @@ pub type FileCommentMap = BTreeMap<Span, String>;
 /// (`/// .. <newline>` and `/** .. */`) will be not included in extracted comment string. The
 /// span in the returned map, however, covers the whole region of the comment, including the
 /// delimiters.
-fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileCommentMap), Errors> {
+pub fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileCommentMap), Errors> {
     const SLASH: char = '/';
     const SPACE: char = ' ';
     const STAR: char = '*';
     const QUOTE: char = '"';
     const BACKSLASH: char = '\\';
 
-    enum State {
+   pub enum State {
         Source,
         String,
         LineComment,
@@ -573,7 +573,7 @@ fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileComme
 
 // We restrict strings to only ascii visual characters (0x20 <= c <= 0x7E) or a permitted newline
 // character--\n--or a tab--\t.
-fn strip_comments_and_verify(
+pub fn strip_comments_and_verify(
     fname: &'static str,
     string: &str,
 ) -> Result<(String, FileCommentMap), Errors> {

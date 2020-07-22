@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use std::{
     sync::{
@@ -79,7 +79,7 @@ impl TimeService for MockTimeService {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
 
     #[test]
@@ -112,7 +112,7 @@ mod tests {
         verify_sleep(&service, sleep_time);
     }
 
-    fn verify_sleep<T: TimeService>(service: &T, sleep_time: u64) {
+    pub fn verify_sleep<T: TimeService>(service: &T, sleep_time: u64) {
         let current_time = service.now();
         service.sleep(sleep_time);
 

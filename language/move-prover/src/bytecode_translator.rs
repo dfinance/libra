@@ -59,10 +59,10 @@ pub struct ModuleTranslator<'env> {
     in_toplevel_verify: RefCell<bool>,
 }
 
-/// A struct encapsulating information which is threaded through translating the bytecodes of
+/// A pub struct encapsulating information which is threaded through translating the bytecodes of
 /// a single function. This holds information which is relevant across multiple bytecode
 /// instructions, like borrowing information and label offsets.
-struct BytecodeContext {
+pub struct BytecodeContext {
     /// Set of mutable references, represented by local index. Used for debug tracking. Currently,
     /// after each mutation (either by an instruction or by call to a function with mutable
     /// parameters), we dump tracking info for all the variables in this set. This is a vast
@@ -73,7 +73,7 @@ struct BytecodeContext {
 }
 
 impl BytecodeContext {
-    fn new(func_target: &FunctionTarget<'_>) -> Self {
+    pub fn new(func_target: &FunctionTarget<'_>) -> Self {
         let mutable_refs = Self::collect_mutable_refs(func_target);
         let loop_targets = Self::collect_loop_targets(func_target);
         BytecodeContext {
@@ -82,7 +82,7 @@ impl BytecodeContext {
         }
     }
 
-    fn collect_mutable_refs(func_target: &FunctionTarget<'_>) -> BTreeSet<usize> {
+    pub fn collect_mutable_refs(func_target: &FunctionTarget<'_>) -> BTreeSet<usize> {
         let code = func_target.get_bytecode();
         let mut mutable_refs = BTreeSet::new();
         // Walk over the bytecode and collect various context information.
@@ -114,7 +114,7 @@ impl BytecodeContext {
         mutable_refs
     }
 
-    fn collect_loop_targets(func_target: &FunctionTarget<'_>) -> BTreeMap<Label, BTreeSet<usize>> {
+    pub fn collect_loop_targets(func_target: &FunctionTarget<'_>) -> BTreeMap<Label, BTreeSet<usize>> {
         let code = func_target.get_bytecode();
         let cfg = StacklessControlFlowGraph::new_forward(code);
         let entry = cfg.entry_blocks()[0];
@@ -172,7 +172,7 @@ impl BytecodeContext {
         loop_targets
     }
 
-    fn targets(bytecode: &Bytecode) -> Vec<usize> {
+    pub fn targets(bytecode: &Bytecode) -> Vec<usize> {
         use BorrowNode::*;
         match bytecode {
             Assign(_, dest, _, _) => vec![*dest],
@@ -212,7 +212,7 @@ impl<'env> BoogieTranslator<'env> {
 impl<'env> ModuleTranslator<'env> {
     /// Creates a new module translator. Calls the stackless bytecode generator and wraps
     /// result into the translator.
-    fn new(parent: &'env BoogieTranslator, module: ModuleEnv<'env>) -> Self {
+    pub fn new(parent: &'env BoogieTranslator, module: ModuleEnv<'env>) -> Self {
         Self {
             writer: parent.writer,
             options: parent.options,
@@ -222,11 +222,11 @@ impl<'env> ModuleTranslator<'env> {
         }
     }
 
-    fn new_spec_translator_for_module(&self) -> SpecTranslator<'_> {
+    pub fn new_spec_translator_for_module(&self) -> SpecTranslator<'_> {
         self.new_spec_translator(self.module_env.clone(), false)
     }
 
-    fn new_spec_translator<E>(&self, env: E, supports_native_old: bool) -> SpecTranslator<'_>
+    pub fn new_spec_translator<E>(&self, env: E, supports_native_old: bool) -> SpecTranslator<'_>
     where
         E: Into<SpecEnv<'env>>,
     {
@@ -239,16 +239,16 @@ impl<'env> ModuleTranslator<'env> {
         )
     }
 
-    fn set_top_level_verify(&self, value: bool) {
+    pub fn set_top_level_verify(&self, value: bool) {
         *self.in_toplevel_verify.borrow_mut() = value;
     }
 
-    fn in_top_level_verify(&self) -> bool {
+    pub fn in_top_level_verify(&self) -> bool {
         *self.in_toplevel_verify.borrow()
     }
 
     /// Translates this module.
-    fn translate(&mut self) {
+    pub fn translate(&mut self) {
         log!(
             if self.module_env.is_dependency() {
                 Level::Debug
@@ -270,7 +270,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Translates all structs in the module.
-    fn translate_structs(&self) {
+    pub fn translate_structs(&self) {
         emitln!(
             self.writer,
             "\n\n// ** structs of module {}\n",
@@ -291,7 +291,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Translates the given struct.
-    fn translate_struct_type(&self, struct_env: &StructEnv<'_>) {
+    pub fn translate_struct_type(&self, struct_env: &StructEnv<'_>) {
         // Emit TypeName
         let struct_name = boogie_struct_name(&struct_env);
         emitln!(self.writer, "const unique {}: $TypeName;", struct_name);
@@ -346,8 +346,8 @@ impl<'env> ModuleTranslator<'env> {
         spec_translator.translate_invariant_functions();
     }
 
-    /// Translates struct accessors (pack/unpack).
-    fn translate_struct_accessors(&self, struct_env: &StructEnv<'_>) {
+    /// Translates pub struct accessors (pack/unpack).
+    pub fn translate_struct_accessors(&self, struct_env: &StructEnv<'_>) {
         // Pack function
         let type_args_str = struct_env
             .get_type_parameters()
@@ -389,7 +389,7 @@ impl<'env> ModuleTranslator<'env> {
                 // TODO: Remove the use of $ExtendValueArray; it is deprecated
                 ctor_expr = format!("$ExtendValueArray({},{})", ctor_expr, field_param);
             }
-            emitln!(self.writer, "$struct := $Vector({});", ctor_expr);
+            emitln!(self.writer, "$pub struct := $Vector({});", ctor_expr);
         } else {
             // Using integer maps as the internal representation
             let mut ctor_expr = "$MapConstValue($DefaultValue())".to_owned();
@@ -412,7 +412,7 @@ impl<'env> ModuleTranslator<'env> {
             }
             emitln!(
                 self.writer,
-                "$struct := $Vector($ValueArray({}, {}));",
+                "$pub struct := $Vector($ValueArray({}, {}));",
                 ctor_expr,
                 struct_env.get_field_count()
             );
@@ -467,7 +467,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Translates all functions in the module.
-    fn translate_functions(&self) {
+    pub fn translate_functions(&self) {
         emitln!(
             self.writer,
             "\n\n// ** functions of module {}\n",
@@ -503,7 +503,7 @@ impl<'env> ModuleTranslator<'env> {
 
 impl<'env> ModuleTranslator<'env> {
     /// Translates the given function.
-    fn translate_function(&self, func_target: &FunctionTarget<'_>) {
+    pub fn translate_function(&self, func_target: &FunctionTarget<'_>) {
         use FunctionEntryPoint::*;
         if func_target.is_native() {
             if self.options.prover.native_stubs {
@@ -586,7 +586,7 @@ impl<'env> ModuleTranslator<'env> {
 
     /// Return a string for a boogie procedure header. Use inline attribute and name
     /// suffix as indicated by `entry_point`.
-    fn generate_function_sig(
+    pub fn generate_function_sig(
         &self,
         func_target: &FunctionTarget<'_>,
         entry_point: FunctionEntryPoint,
@@ -614,7 +614,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Generate boogie representation of function args and return args.
-    fn generate_function_args_and_returns(
+    pub fn generate_function_args_and_returns(
         &self,
         func_target: &FunctionTarget<'_>,
     ) -> (String, String) {
@@ -644,7 +644,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Generate preconditions to make sure procedure parameters are well formed
-    fn generate_function_args_well_formed(&self, func_target: &FunctionTarget<'_>) {
+    pub fn generate_function_args_well_formed(&self, func_target: &FunctionTarget<'_>) {
         let num_args = func_target.get_parameter_count();
         let mode = if func_target.is_public() {
             // For public functions, we always include invariants in type assumptions for parameters,
@@ -671,7 +671,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Emit code for the function specification.
-    fn generate_function_spec(
+    pub fn generate_function_spec(
         &self,
         func_target: &FunctionTarget<'_>,
         entry_point: FunctionEntryPoint,
@@ -681,7 +681,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Emit code for spec inside function implementation.
-    fn generate_function_spec_inside_impl(
+    pub fn generate_function_spec_inside_impl(
         &self,
         func_target: &FunctionTarget<'_>,
         block_id: SpecBlockId,
@@ -692,7 +692,7 @@ impl<'env> ModuleTranslator<'env> {
 
     /// Generate function stub depending on entry point type. This forwards to the
     /// inlined function definition.
-    fn generate_function_stub(
+    pub fn generate_function_stub(
         &self,
         func_target: &FunctionTarget<'_>,
         entry_point: FunctionEntryPoint,
@@ -754,8 +754,8 @@ impl<'env> ModuleTranslator<'env> {
     /// This generates boogie code for everything after the function signature
     /// The function body is only generated for the `FunctionEntryPoint::Definition`
     /// version of the function.
-    fn generate_inline_function_body(&self, func_target: &FunctionTarget<'_>) {
-        // Construct context for bytecode translation.
+    pub fn generate_inline_function_body(&self, func_target: &FunctionTarget<'_>) {
+        // Conpub struct context for bytecode translation.
         let context = BytecodeContext::new(func_target);
 
         // Be sure to set back location to the whole function definition as a default, otherwise
@@ -822,7 +822,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Translates one bytecode instruction.
-    fn translate_bytecode(
+    pub fn translate_bytecode(
         &'env self,
         func_target: &FunctionTarget<'_>,
         ctx: &BytecodeContext,
@@ -1717,7 +1717,7 @@ impl<'env> ModuleTranslator<'env> {
     // TODO: the stackless bytecode should optimize away unnecessary copy/moves, so we
     // don't need this. The below transformation is only correct for stackless code
     // of certain shape
-    fn compute_effective_dest(
+    pub fn compute_effective_dest(
         &self,
         func_target: &FunctionTarget<'_>,
         offset: CodeOffset,
@@ -1737,7 +1737,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// If ty is a mutable reference to a struct, return its environment.
-    fn get_referred_struct(&self, ty: &Type) -> Option<(StructEnv<'_>, Vec<Type>)> {
+    pub fn get_referred_struct(&self, ty: &Type) -> Option<(StructEnv<'_>, Vec<Type>)> {
         if let Type::Reference(true, bt) = &ty {
             if let Type::Struct(module_idx, struct_idx, type_args) = bt.as_ref() {
                 return Some((
@@ -1754,7 +1754,7 @@ impl<'env> ModuleTranslator<'env> {
 
     /// Enforce the invariant of an updated value before mutation starts. Does nothing if there
     /// is no before-update invariant.
-    fn enforce_before_update_invariant(&self, func_target: &FunctionTarget<'_>, idx: usize) {
+    pub fn enforce_before_update_invariant(&self, func_target: &FunctionTarget<'_>, idx: usize) {
         if let Some((struct_env, type_args)) =
             self.get_referred_struct(func_target.get_local_type(idx))
         {
@@ -1779,7 +1779,7 @@ impl<'env> ModuleTranslator<'env> {
 
     /// Enforce the invariant of an updated value after mutation ended. Does nothing if there is
     /// no after-update invariant.
-    fn enforce_after_update_invariant(&self, func_target: &FunctionTarget<'_>, idx: usize) {
+    pub fn enforce_after_update_invariant(&self, func_target: &FunctionTarget<'_>, idx: usize) {
         if let Some((struct_env, type_args)) =
             self.get_referred_struct(func_target.get_local_type(idx))
         {
@@ -1803,7 +1803,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Updates a local, injecting debug information if available.
-    fn update_and_track_local(
+    pub fn update_and_track_local(
         &self,
         func_target: &FunctionTarget<'_>,
         loc: Loc,
@@ -1823,7 +1823,7 @@ impl<'env> ModuleTranslator<'env> {
     }
 
     /// Generates an update of the model debug variable at given location.
-    fn track_local(
+    pub fn track_local(
         &self,
         func_target: &FunctionTarget<'_>,
         loc: Loc,
@@ -1860,6 +1860,6 @@ impl<'env> ModuleTranslator<'env> {
 }
 
 /// Separates elements in vector, dropping empty ones.
-fn separate(elems: Vec<String>, sep: &str) -> String {
+pub fn separate(elems: Vec<String>, sep: &str) -> String {
     elems.iter().filter(|s| !s.is_empty()).join(sep)
 }

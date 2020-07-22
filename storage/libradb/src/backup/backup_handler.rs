@@ -28,7 +28,7 @@ pub struct BackupHandler {
 }
 
 impl BackupHandler {
-    pub(crate) fn new(
+    pub fn new(
         ledger_store: Arc<LedgerStore>,
         transaction_store: Arc<TransactionStore>,
         state_store: Arc<StateStore>,

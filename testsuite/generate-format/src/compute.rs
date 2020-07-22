@@ -10,7 +10,7 @@ use structopt::StructOpt;
     name = "Libra format generator",
     about = "Trace serde (de)serialization to generate format descriptions for Libra types"
 )]
-struct Options {
+pub struct Options {
     #[structopt(long, possible_values = &Corpus::variants(), default_value = "Libra", case_insensitive = true)]
     corpus: Corpus,
 

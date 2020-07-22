@@ -33,7 +33,7 @@ impl OnDiskStorageInternal<RealTimeService> {
 }
 
 impl<T: TimeService> OnDiskStorageInternal<T> {
-    fn new_with_time_service(file_path: PathBuf, time_service: T) -> Self {
+    pub fn new_with_time_service(file_path: PathBuf, time_service: T) -> Self {
         if !file_path.exists() {
             File::create(&file_path).expect("Unable to create storage");
         }
@@ -51,7 +51,7 @@ impl<T: TimeService> OnDiskStorageInternal<T> {
         }
     }
 
-    fn read(&self) -> Result<HashMap<String, GetResponse>, Error> {
+    pub fn read(&self) -> Result<HashMap<String, GetResponse>, Error> {
         let mut file = File::open(&self.file_path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
@@ -62,7 +62,7 @@ impl<T: TimeService> OnDiskStorageInternal<T> {
         Ok(data)
     }
 
-    fn write(&self, data: &HashMap<String, GetResponse>) -> Result<(), Error> {
+    pub fn write(&self, data: &HashMap<String, GetResponse>) -> Result<(), Error> {
         let contents = serde_json::to_vec(data)?;
         let mut file = File::create(self.temp_path.path())?;
         file.write_all(&contents)?;

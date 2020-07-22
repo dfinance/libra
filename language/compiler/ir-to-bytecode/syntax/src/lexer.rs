@@ -192,7 +192,7 @@ impl<'input> Lexer<'input> {
     }
 
     // Find the next token and its length without changing the state of the lexer.
-    fn find_token(
+    pub fn find_token(
         &self,
         text: &str,
         start_offset: usize,
@@ -354,7 +354,7 @@ impl<'input> Lexer<'input> {
 }
 
 // Return the length of the substring matching [a-zA-Z$_][a-zA-Z0-9$_]
-fn get_name_len(text: &str) -> usize {
+pub fn get_name_len(text: &str) -> usize {
     // If the first character is 0..=9 or EOF, then return a length of 0.
     let first_char = text.chars().next().unwrap_or('0');
     if ('0'..='9').contains(&first_char) {
@@ -368,7 +368,7 @@ fn get_name_len(text: &str) -> usize {
         .unwrap_or_else(|| text.len())
 }
 
-fn get_decimal_number(text: &str) -> (Tok, usize) {
+pub fn get_decimal_number(text: &str) -> (Tok, usize) {
     let len = text
         .chars()
         .position(|c| match c {
@@ -389,7 +389,7 @@ fn get_decimal_number(text: &str) -> (Tok, usize) {
 }
 
 // Return the length of the substring containing characters in [0-9a-fA-F].
-fn get_hex_digits_len(text: &str) -> usize {
+pub fn get_hex_digits_len(text: &str) -> usize {
     text.chars()
         .position(|c| match c {
             'a'..='f' | 'A'..='F' | '0'..='9' => false,
@@ -401,7 +401,7 @@ fn get_hex_digits_len(text: &str) -> usize {
 // Check for an optional sequence of hex digits following by a double quote, and return
 // the length of that string if found. This is used to lex ByteArrayValue tokens after
 // seeing the 'h"' prefix.
-fn get_byte_array_value_len(text: &str) -> usize {
+pub fn get_byte_array_value_len(text: &str) -> usize {
     let hex_len = get_hex_digits_len(text);
     match &text[hex_len..].chars().next() {
         Some('"') => hex_len + 1,
@@ -409,7 +409,7 @@ fn get_byte_array_value_len(text: &str) -> usize {
     }
 }
 
-fn get_name_token(name: &str) -> Tok {
+pub fn get_name_token(name: &str) -> Tok {
     match name {
         "_" => Tok::Underscore,
         "abort" => Tok::Abort,

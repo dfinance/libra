@@ -25,7 +25,7 @@ use std::{
 // Context
 //**************************************************************************************************
 
-struct Context {
+pub struct Context {
     errors: Errors,
     start: Option<Label>,
     loop_begin: Option<Label>,
@@ -61,13 +61,13 @@ impl Context {
         self.errors
     }
 
-    fn new_label(&mut self) -> Label {
+    pub fn new_label(&mut self) -> Label {
         let count = self.label_count;
         self.label_count += 1;
         Label(count)
     }
 
-    fn insert_block(&mut self, lbl: Label, basic_block: BasicBlock) {
+    pub fn insert_block(&mut self, lbl: Label, basic_block: BasicBlock) {
         assert!(self.block_ordering.insert(lbl, self.blocks.len()).is_none());
         assert!(self.blocks.insert(lbl, basic_block).is_none());
     }
@@ -109,7 +109,7 @@ pub fn program(errors: Errors, prog: H::Program) -> (G::Program, Errors) {
     (G::Program { modules, scripts }, context.get_errors())
 }
 
-fn modules(
+pub fn modules(
     context: &mut Context,
     hmodules: UniqueMap<ModuleIdent, H::ModuleDefinition>,
 ) -> UniqueMap<ModuleIdent, G::ModuleDefinition> {
@@ -119,7 +119,7 @@ fn modules(
     UniqueMap::maybe_from_iter(modules).unwrap()
 }
 
-fn module(
+pub fn module(
     context: &mut Context,
     module_ident: ModuleIdent,
     mdef: H::ModuleDefinition,
@@ -141,7 +141,7 @@ fn module(
     )
 }
 
-fn scripts(
+pub fn scripts(
     context: &mut Context,
     hscripts: BTreeMap<String, H::Script>,
 ) -> BTreeMap<String, G::Script> {
@@ -151,7 +151,7 @@ fn scripts(
         .collect()
 }
 
-fn script(context: &mut Context, hscript: H::Script) -> G::Script {
+pub fn script(context: &mut Context, hscript: H::Script) -> G::Script {
     let H::Script {
         loc,
         constants: hconstants,
@@ -172,7 +172,7 @@ fn script(context: &mut Context, hscript: H::Script) -> G::Script {
 // Functions
 //**************************************************************************************************
 
-fn constant(context: &mut Context, _name: ConstantName, c: H::Constant) -> G::Constant {
+pub fn constant(context: &mut Context, _name: ConstantName, c: H::Constant) -> G::Constant {
     let H::Constant {
         loc,
         signature,
@@ -192,7 +192,7 @@ fn constant(context: &mut Context, _name: ConstantName, c: H::Constant) -> G::Co
 const CANNOT_FOLD: &str =
     "Invalid expression in 'const'. This expression could not be evaluated to a value";
 
-fn constant_(
+pub fn constant_(
     context: &mut Context,
     full_loc: Loc,
     signature: H::BaseType,
@@ -253,7 +253,7 @@ fn constant_(
     Some(result)
 }
 
-fn check_constant_value(context: &mut Context, e: &H::Exp) {
+pub fn check_constant_value(context: &mut Context, e: &H::Exp) {
     use H::UnannotatedExp_ as E;
     match &e.exp.value {
         E::Value(_) => (),
@@ -261,7 +261,7 @@ fn check_constant_value(context: &mut Context, e: &H::Exp) {
     }
 }
 
-fn move_value_from_exp(e: H::Exp) -> Option<MoveValue> {
+pub fn move_value_from_exp(e: H::Exp) -> Option<MoveValue> {
     use H::UnannotatedExp_ as E;
     match e.exp.value {
         E::Value(v) => Some(move_value_from_value(v)),
@@ -269,7 +269,7 @@ fn move_value_from_exp(e: H::Exp) -> Option<MoveValue> {
     }
 }
 
-fn move_value_from_value(sp!(_, v_): Value) -> MoveValue {
+pub fn move_value_from_value(sp!(_, v_): Value) -> MoveValue {
     use MoveValue as MV;
     use Value_ as V;
     match v_ {
@@ -286,7 +286,7 @@ fn move_value_from_value(sp!(_, v_): Value) -> MoveValue {
 // Functions
 //**************************************************************************************************
 
-fn function(context: &mut Context, _name: FunctionName, f: H::Function) -> G::Function {
+pub fn function(context: &mut Context, _name: FunctionName, f: H::Function) -> G::Function {
     let visibility = f.visibility;
     let signature = f.signature;
     let acquires = f.acquires;
@@ -299,7 +299,7 @@ fn function(context: &mut Context, _name: FunctionName, f: H::Function) -> G::Fu
     }
 }
 
-fn function_body(
+pub fn function_body(
     context: &mut Context,
     signature: &H::FunctionSignature,
     acquires: &BTreeMap<StructName, Loc>,
@@ -351,13 +351,13 @@ fn function_body(
 // Statements
 //**************************************************************************************************
 
-fn initial_block(context: &mut Context, blocks: H::Block) {
+pub fn initial_block(context: &mut Context, blocks: H::Block) {
     let start = context.new_label();
     context.start = Some(start);
     block(context, start, blocks)
 }
 
-fn block(context: &mut Context, mut cur_label: Label, blocks: H::Block) {
+pub fn block(context: &mut Context, mut cur_label: Label, blocks: H::Block) {
     use H::Command_ as C;
 
     assert!(!blocks.is_empty());
@@ -378,7 +378,7 @@ fn block(context: &mut Context, mut cur_label: Label, blocks: H::Block) {
     context.insert_block(cur_label, basic_block);
 }
 
-fn block_(context: &mut Context, cur_label: &mut Label, blocks: H::Block) -> BasicBlock {
+pub fn block_(context: &mut Context, cur_label: &mut Label, blocks: H::Block) -> BasicBlock {
     use H::{Command_ as C, Statement_ as S};
 
     assert!(!blocks.is_empty());
@@ -495,7 +495,7 @@ fn block_(context: &mut Context, cur_label: &mut Label, blocks: H::Block) -> Bas
     basic_block
 }
 
-fn command(context: &Context, sp!(_, hc_): &mut H::Command) {
+pub fn command(context: &Context, sp!(_, hc_): &mut H::Command) {
     use H::Command_ as C;
     match hc_ {
         C::Assign(_, _) | C::Mutate(_, _) | C::Abort(_) | C::Return(_) | C::IgnoreAndPop { .. } => {

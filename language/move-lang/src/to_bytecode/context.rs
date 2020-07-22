@@ -41,7 +41,7 @@ impl<'a> Context<'a> {
         self.current_module
     }
 
-    fn is_current_module(&self, m: &ModuleIdent) -> bool {
+    pub fn is_current_module(&self, m: &ModuleIdent) -> bool {
         self.current_module.map(|cur| cur == m).unwrap_or(false)
     }
 
@@ -102,7 +102,7 @@ impl<'a> Context<'a> {
         (imports, dependencies)
     }
 
-    fn insert_struct_dependency(
+    pub fn insert_struct_dependency(
         module_dependencies: &mut BTreeMap<
             ModuleIdent,
             (Vec<IR::StructDependency>, Vec<IR::FunctionDependency>),
@@ -117,7 +117,7 @@ impl<'a> Context<'a> {
             .push(struct_dep);
     }
 
-    fn insert_function_dependency(
+    pub fn insert_function_dependency(
         module_dependencies: &mut BTreeMap<
             ModuleIdent,
             (Vec<IR::StructDependency>, Vec<IR::FunctionDependency>),
@@ -132,7 +132,7 @@ impl<'a> Context<'a> {
             .push(function_dep);
     }
 
-    fn struct_dependencies(
+    pub fn struct_dependencies(
         struct_declarations: &HashMap<
             (ModuleIdent, StructName),
             (bool, Vec<(IR::TypeVar, IR::Kind)>),
@@ -149,7 +149,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn struct_dependency(
+    pub fn struct_dependency(
         struct_declarations: &HashMap<
             (ModuleIdent, StructName),
             (bool, Vec<(IR::TypeVar, IR::Kind)>),
@@ -167,7 +167,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn function_dependencies(
+    pub fn function_dependencies(
         struct_declarations: &HashMap<
             (ModuleIdent, StructName),
             (bool, Vec<(IR::TypeVar, IR::Kind)>),
@@ -190,7 +190,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn function_dependency(
+    pub fn function_dependency(
         function_declarations: &HashMap<
             (ModuleIdent, FunctionName),
             (BTreeSet<(ModuleIdent, StructName)>, IR::FunctionSignature),
@@ -208,12 +208,12 @@ impl<'a> Context<'a> {
     // Name translation
     //**********************************************************************************************
 
-    fn ir_module_alias(ident: &ModuleIdent) -> IR::ModuleName {
+    pub fn ir_module_alias(ident: &ModuleIdent) -> IR::ModuleName {
         let ModuleIdent_ { address, name } = &ident.0.value;
         IR::ModuleName::new(format!("{}::{}", address, name))
     }
 
-    fn translate_module_ident(ident: ModuleIdent) -> IR::ModuleIdent {
+    pub fn translate_module_ident(ident: ModuleIdent) -> IR::ModuleIdent {
         let ModuleIdent_ { address, name } = ident.0.value;
         let name = Self::translate_module_name(name);
         IR::ModuleIdent::Qualified(IR::QualifiedModuleIdent::new(
@@ -222,19 +222,19 @@ impl<'a> Context<'a> {
         ))
     }
 
-    fn translate_module_name(n: ModuleName) -> IR::ModuleName {
+    pub fn translate_module_name(n: ModuleName) -> IR::ModuleName {
         IR::ModuleName::new(n.0.value)
     }
 
-    fn translate_struct_name(n: StructName) -> IR::StructName {
+    pub fn translate_struct_name(n: StructName) -> IR::StructName {
         IR::StructName::new(n.0.value)
     }
 
-    fn translate_constant_name(n: ConstantName) -> IR::ConstantName {
+    pub fn translate_constant_name(n: ConstantName) -> IR::ConstantName {
         IR::ConstantName::new(n.0.value)
     }
 
-    fn translate_function_name(n: FunctionName) -> IR::FunctionName {
+    pub fn translate_function_name(n: FunctionName) -> IR::FunctionName {
         IR::FunctionName::new(n.0.value)
     }
 
@@ -245,7 +245,7 @@ impl<'a> Context<'a> {
     pub fn struct_definition_name(&self, m: &ModuleIdent, s: StructName) -> IR::StructName {
         assert!(
             self.is_current_module(m),
-            "ICE invalid struct definition lookup"
+            "ICE invalid pub struct definition lookup"
         );
         Self::translate_struct_name(s)
     }

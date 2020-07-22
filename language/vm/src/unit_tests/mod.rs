@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod binary_tests;
-mod deserializer_tests;
-mod number_tests;
-mod signature_token_tests;
+pub mod binary_tests;
+pub mod deserializer_tests;
+pub mod number_tests;
+pub mod signature_token_tests;

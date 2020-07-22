@@ -28,7 +28,7 @@ use mirai_annotations::*;
 use std::fmt;
 
 #[cfg(test)]
-mod position_test;
+pub mod position_test;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct Position(u64);
@@ -47,14 +47,14 @@ impl Position {
         (!self.0).trailing_zeros()
     }
 
-    fn is_leaf(self) -> bool {
+    pub fn is_leaf(self) -> bool {
         self.0 & 1 == 0
     }
 
     /// What position is the node within the level? i.e. how many nodes
     /// are to the left of this node at the same level
     #[cfg(test)]
-    fn pos_counting_from_left(self) -> u64 {
+    pub fn pos_counting_from_left(self) -> u64 {
         self.0 >> (self.level() + 1)
     }
 
@@ -104,7 +104,7 @@ impl Position {
         Self::child(self, NodeDirection::Right)
     }
 
-    fn child(self, dir: NodeDirection) -> Self {
+    pub fn child(self, dir: NodeDirection) -> Self {
         checked_precondition!(!self.is_leaf());
         assume!(self.0 < u64::max_value() - 1); // invariant
 
@@ -189,7 +189,7 @@ impl Position {
 // Some helper functions to perform general bit manipulation
 
 /// Smearing all the bits starting from MSB with ones
-fn smear_ones_for_u64(v: u64) -> u64 {
+pub fn smear_ones_for_u64(v: u64) -> u64 {
     let mut n = v;
     n |= n >> 1;
     n |= n >> 2;
@@ -209,7 +209,7 @@ fn smear_ones_for_u64(v: u64) -> u64 {
 ///     00010010100 n=1
 ///     00010010000 n=3
 /// ```
-fn turn_off_right_most_n_bits(v: u64, n: u32) -> u64 {
+pub fn turn_off_right_most_n_bits(v: u64, n: u32) -> u64 {
     precondition!(n < 64);
     (v >> n) << n
 }
@@ -226,7 +226,7 @@ fn turn_off_right_most_n_bits(v: u64, n: u32) -> u64 {
 ///     00001000
 /// ```
 /// http://www.catonmat.net/blog/low-level-bit-hacks-you-absolutely-must-know/
-fn isolate_rightmost_zero_bit(v: u64) -> u64 {
+pub fn isolate_rightmost_zero_bit(v: u64) -> u64 {
     !v & (v + 1)
 }
 
@@ -456,13 +456,13 @@ impl Iterator for FrozenSubtreeSiblingIterator {
     }
 }
 
-fn children_of_node(node: u64) -> u64 {
+pub fn children_of_node(node: u64) -> u64 {
     (isolate_rightmost_zero_bit(node) << 1) - 2
 }
 
 /// In a post-order tree traversal, how many nodes are traversed before `node`
 /// not including nodes that are children of `node`.
-fn nodes_to_left_of(node: u64) -> u64 {
+pub fn nodes_to_left_of(node: u64) -> u64 {
     // If node = 0b0100111, ones_up_to_level = 0b111
     let ones_up_to_level = isolate_rightmost_zero_bit(node) - 1;
     // Unset all the 1s due to the level

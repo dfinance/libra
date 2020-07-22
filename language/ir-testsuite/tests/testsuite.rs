@@ -16,7 +16,7 @@ use move_ir_types::ast;
 use std::path::Path;
 use vm::CompiledModule;
 
-struct IRCompiler {
+pub struct IRCompiler {
     deps: Vec<CompiledModule>,
 }
 

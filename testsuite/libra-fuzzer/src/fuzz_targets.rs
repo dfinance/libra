@@ -17,17 +17,17 @@ macro_rules! module_name {
 }
 
 // List fuzz target modules here.
-mod compiled_module;
-mod consensus_proposal;
-mod inbound_rpc_protocol;
-mod inner_signed_transaction;
-mod json_rpc_service;
-mod language_transaction_execution;
-mod network_noise_initiator;
-mod network_noise_responder;
-//mod storage_save_blocks;
-mod storage_schema_decode;
-mod vm_value;
+pub mod compiled_module;
+pub mod consensus_proposal;
+pub mod inbound_rpc_protocol;
+pub mod inner_signed_transaction;
+pub mod json_rpc_service;
+pub mod language_transaction_execution;
+pub mod network_noise_initiator;
+pub mod network_noise_responder;
+//pub mod storage_save_blocks;
+pub mod storage_schema_decode;
+pub mod vm_value;
 
 static ALL_TARGETS: Lazy<BTreeMap<&'static str, Box<dyn FuzzTargetImpl>>> = Lazy::new(|| {
     let targets: Vec<Box<dyn FuzzTargetImpl>> = vec![
@@ -51,7 +51,7 @@ static ALL_TARGETS: Lazy<BTreeMap<&'static str, Box<dyn FuzzTargetImpl>>> = Lazy
 
 impl FuzzTarget {
     /// The environment variable used for passing fuzz targets to child processes.
-    pub(crate) const ENV_VAR: &'static str = "FUZZ_TARGET";
+    pub const ENV_VAR: &'static str = "FUZZ_TARGET";
 
     /// Get the current fuzz target from the environment.
     pub fn from_env() -> Result<Self> {

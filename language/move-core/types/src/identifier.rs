@@ -37,7 +37,7 @@ use std::{borrow::Borrow, fmt, ops::Deref};
 ///
 /// For now this is deliberately restrictive -- we would like to evolve this in the future.
 // TODO: "<SELF>" is coded as an exception. It should be removed once CompiledScript goes away.
-fn is_valid(s: &str) -> bool {
+pub fn is_valid(s: &str) -> bool {
     fn is_underscore_alpha_or_digit(c: char) -> bool {
         matches!(c, '_' | 'a'..='z' | 'A'..='Z' | '0'..='9')
     }
@@ -58,10 +58,10 @@ fn is_valid(s: &str) -> bool {
 // TODO: "<SELF>" is coded as an exception. It should be removed once CompiledScript goes away.
 #[cfg(any(test, feature = "fuzzing"))]
 #[allow(dead_code)]
-pub(crate) static ALLOWED_IDENTIFIERS: &str =
+pub static ALLOWED_IDENTIFIERS: &str =
     r"(?:[a-zA-Z][a-zA-Z0-9_]*)|(?:_[a-zA-Z0-9_]+)|(?:<SELF>)";
 #[cfg(any(test, feature = "fuzzing"))]
-pub(crate) static ALLOWED_NO_SELF_IDENTIFIERS: &str =
+pub static ALLOWED_NO_SELF_IDENTIFIERS: &str =
     r"(?:[a-zA-Z][a-zA-Z0-9_]*)|(?:_[a-zA-Z0-9_]+)";
 
 /// An owned identifier.

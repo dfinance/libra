@@ -4,9 +4,9 @@
 pub mod values_impl;
 
 #[cfg(test)]
-mod value_tests;
+pub mod value_tests;
 
 #[cfg(all(test, feature = "fuzzing"))]
-mod value_prop_tests;
+pub mod value_prop_tests;
 
 pub use values_impl::*;

@@ -23,7 +23,7 @@ impl<'a> UnusedEntryChecker<'a> {
         }
     }
 
-    fn traverse_function_defs(&mut self) {
+    pub fn traverse_function_defs(&mut self) {
         use Bytecode::*;
 
         for func_def in self.module.function_defs() {
@@ -58,7 +58,7 @@ impl<'a> UnusedEntryChecker<'a> {
         }
     }
 
-    fn collect_errors<'b, F>(pool: &'b [bool], f: F) -> impl Iterator<Item = PartialVMError> + 'b
+    pub fn collect_errors<'b, F>(pool: &'b [bool], f: F) -> impl Iterator<Item = PartialVMError> + 'b
     where
         F: Fn(usize) -> PartialVMError + 'b,
     {

@@ -43,7 +43,7 @@ use vm_validator::{
 
 const TXN_EXPIRATION_SECS: u64 = 100;
 
-struct Node<T: LibraInterface> {
+pub struct Node<T: LibraInterface> {
     executor: Executor<LibraVM>,
     libra: LibraInterfaceTestHarness<T>,
     key_manager: KeyManager<
@@ -139,11 +139,11 @@ impl<T: LibraInterface> Node<T> {
     }
 }
 
-/// The struct below is a LibraInterface wrapper that exposes several additional methods to better
+/// The pub struct below is a LibraInterface wrapper that exposes several additional methods to better
 /// test the internal state of a LibraInterface implementation (e.g., during end-to-end and
 /// integration tests).
 #[derive(Clone)]
-struct LibraInterfaceTestHarness<T: LibraInterface> {
+pub struct LibraInterfaceTestHarness<T: LibraInterface> {
     libra: T,
     submitted_transactions: Arc<RefCell<Vec<Transaction>>>,
 }
@@ -217,7 +217,7 @@ impl<T: LibraInterface> LibraInterface for LibraInterfaceTestHarness<T> {
 /// A mock libra interface implementation that stores a pointer to the LibraDB from which to
 /// process API requests.
 #[derive(Clone)]
-struct MockLibraInterface {
+pub struct MockLibraInterface {
     storage: Arc<LibraDB>,
 }
 

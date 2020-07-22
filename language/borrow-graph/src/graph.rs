@@ -136,7 +136,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
         self.add_path(parent_id, loc, false, vec![field], child_id)
     }
 
-    fn add_edge(&mut self, parent_id: RefID, edge: BorrowEdge<Loc, Lbl>, child_id: RefID) {
+    pub fn add_edge(&mut self, parent_id: RefID, edge: BorrowEdge<Loc, Lbl>, child_id: RefID) {
         assert!(parent_id != child_id);
         let parent = self.0.get_mut(&parent_id).unwrap();
         parent
@@ -149,7 +149,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
         child.borrows_from.insert(parent_id);
     }
 
-    fn add_path(
+    pub fn add_path(
         &mut self,
         parent_id: RefID,
         loc: Loc,
@@ -161,7 +161,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
         self.add_edge(parent_id, edge, child_id)
     }
 
-    fn factor(&mut self, parent_id: RefID, loc: Loc, path: Path<Lbl>, intermediate_id: RefID) {
+    pub fn factor(&mut self, parent_id: RefID, loc: Loc, path: Path<Lbl>, intermediate_id: RefID) {
         debug_checked_precondition!(self.check_invariant());
         let parent = self.0.get_mut(&parent_id).unwrap();
         let mut needs_factored = vec![];
@@ -250,7 +250,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
         debug_checked_postcondition!(self.check_invariant());
     }
 
-    fn splice_out_intermediate(
+    pub fn splice_out_intermediate(
         &mut self,
         parent_id: RefID,
         parent_to_intermediate: &BorrowEdge<Loc, Lbl>,
@@ -282,7 +282,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
         self.unmatched_edges(other).is_empty()
     }
 
-    fn unmatched_edges(&self, other: &Self) -> BTreeMap<RefID, BorrowEdges<Loc, Lbl>> {
+    pub fn unmatched_edges(&self, other: &Self) -> BTreeMap<RefID, BorrowEdges<Loc, Lbl>> {
         let mut unmatched_edges = BTreeMap::new();
         for (parent_id, other_ref) in &other.0 {
             let self_ref = &self.0[parent_id];
@@ -361,13 +361,13 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
     // Consistency/Invariants
     //**********************************************************************************************
 
-    fn check_invariant(&self) -> bool {
+    pub fn check_invariant(&self) -> bool {
         self.id_consistency() && self.edge_consistency() && self.no_self_loops()
     }
 
     /// Checks at all ids in edges are contained in the borrow map itself, i.e. that each id
     /// corresponds to a reference
-    fn id_consistency(&self) -> bool {
+    pub fn id_consistency(&self) -> bool {
         let contains_id = |id| self.0.contains_key(id);
         self.0.values().all(|r| {
             r.borrowed_by.0.keys().all(contains_id) && r.borrows_from.iter().all(contains_id)
@@ -377,7 +377,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
     /// Checks that for every edge in borrowed_by there is a flipped edge in borrows_from
     /// And vice versa
     //// i.e. verifies the "back edges" in the borrow graph
-    fn edge_consistency(&self) -> bool {
+    pub fn edge_consistency(&self) -> bool {
         let parent_to_child_consistency =
             |cur_parent, child| self.0[child].borrows_from.contains(cur_parent);
         let child_to_parent_consistency =
@@ -394,7 +394,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
     }
 
     /// Checks that no reference borrows from itself
-    fn no_self_loops(&self) -> bool {
+    pub fn no_self_loops(&self) -> bool {
         self.0.iter().all(|(id, r)| {
             r.borrowed_by.0.keys().all(|to_id| id != to_id)
                 && r.borrows_from.iter().all(|from_id| id != from_id)
@@ -421,7 +421,7 @@ impl<Loc: Copy, Lbl: Clone + Ord> BorrowGraph<Loc, Lbl> {
     where
         Lbl: std::fmt::Display,
     {
-        fn path_to_string<Lbl: std::fmt::Display>(p: &PathSlice<Lbl>) -> String {
+        pub fn path_to_string<Lbl: std::fmt::Display>(p: &PathSlice<Lbl>) -> String {
             p.iter()
                 .map(|l| l.to_string())
                 .collect::<Vec<_>>()

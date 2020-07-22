@@ -47,7 +47,7 @@ impl FuzzTargetImpl for ValueTarget {
     }
 }
 
-fn is_valid_layout(layout: &MoveTypeLayout) -> bool {
+pub fn is_valid_layout(layout: &MoveTypeLayout) -> bool {
     use MoveTypeLayout as L;
 
     match layout {
@@ -64,7 +64,7 @@ fn is_valid_layout(layout: &MoveTypeLayout) -> bool {
     }
 }
 
-fn is_valid_kinfo(kinfo: &MoveKindInfo) -> bool {
+pub fn is_valid_kinfo(kinfo: &MoveKindInfo) -> bool {
     use MoveKindInfo as K;
 
     match kinfo {
@@ -74,7 +74,7 @@ fn is_valid_kinfo(kinfo: &MoveKindInfo) -> bool {
     }
 }
 
-fn deserialize(data: &[u8]) -> Result<()> {
+pub fn deserialize(data: &[u8]) -> Result<()> {
     let mut data = Cursor::new(data);
     // Read the length of the layout blob.
     let layout_len = data.read_u64::<BigEndian>()? as usize;

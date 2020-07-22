@@ -5,8 +5,8 @@
 //! and is only enabled when compiled with feature "enable-inject-error" in the caller crate
 //! and **not** in cargo test.
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
+
+
 
 extern crate proc_macro;
 

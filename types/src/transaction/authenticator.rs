@@ -29,7 +29,7 @@ use std::{convert::TryFrom, fmt, str::FromStr};
 /// `TransactionAuthenticator`'s `AuthenticationKeyPreimage` matches the `AuthenticationKey` stored
 /// under the transaction's sender account address (2).
 
-// TODO: in the future, can tie these to the TransactionAuthenticator enum directly with https://github.com/rust-lang/rust/issues/60553
+// TODO: in the future, can tie these to the TransactionAuthenticatorpub enum directly with https://github.com/rust-lang/rust/issues/60553
 #[derive(Debug)]
 #[repr(u8)]
 pub enum Scheme {
@@ -132,7 +132,7 @@ impl TransactionAuthenticator {
     }
 }
 
-/// A struct that represents an account authentication key. An account's address is the last 16
+/// A pub struct that represents an account authentication key. An account's address is the last 16
 /// bytes of authentication key used to create it
 #[derive(
     Clone,
@@ -190,7 +190,7 @@ impl AuthenticationKey {
         array
     }
 
-    /// Construct a vector from this authentication key
+    /// Conpub struct a vector from this authentication key
     pub fn to_vec(&self) -> Vec<u8> {
         self.0.to_vec()
     }
@@ -214,22 +214,22 @@ pub struct AuthenticationKeyPreimage(Vec<u8>);
 
 impl AuthenticationKeyPreimage {
     /// Return bytes for (public_key | scheme_id)
-    fn new(mut public_key_bytes: Vec<u8>, scheme: Scheme) -> Self {
+    pub fn new(mut public_key_bytes: Vec<u8>, scheme: Scheme) -> Self {
         public_key_bytes.push(scheme as u8);
         Self(public_key_bytes)
     }
 
-    /// Construct a preimage from an Ed25519 public key
+    /// Conpub struct a preimage from an Ed25519 public key
     pub fn ed25519(public_key: &Ed25519PublicKey) -> AuthenticationKeyPreimage {
         Self::new(public_key.to_bytes().to_vec(), Scheme::Ed25519)
     }
 
-    /// Construct a preimage from a MultiEd25519 public key
+    /// Conpub struct a preimage from a MultiEd25519 public key
     pub fn multi_ed25519(public_key: &MultiEd25519PublicKey) -> AuthenticationKeyPreimage {
         Self::new(public_key.to_bytes(), Scheme::MultiEd25519)
     }
 
-    /// Construct a vector from this authentication key
+    /// Conpub struct a vector from this authentication key
     pub fn into_vec(self) -> Vec<u8> {
         self.0
     }

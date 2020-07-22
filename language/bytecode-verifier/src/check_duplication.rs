@@ -5,9 +5,9 @@
 //! distinct values. Successful verification implies that an index in vector can be used to
 //! uniquely name the entry at that index. Additionally, the checker also verifies the
 //! following:
-//! - struct and field definitions are consistent
-//! - the handles in struct and function definitions point to the self module index
-//! - all struct and function handles pointing to the self module index have a definition
+//! - pub struct and field definitions are consistent
+//! - the handles in pub struct and function definitions point to the self module index
+//! - all pub struct and function handles pointing to the self module index have a definition
 use libra_types::vm_status::StatusCode;
 use move_core_types::{account_address::AccountAddress, identifier::Identifier};
 use std::{collections::HashSet, hash::Hash};
@@ -31,7 +31,7 @@ impl<'a> DuplicationChecker<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         Self::check_identifiers(module.identifiers())?;
         Self::check_address_identifiers(module.address_identifiers())?;
         Self::check_constants(module.constant_pool())?;
@@ -53,7 +53,7 @@ impl<'a> DuplicationChecker<'a> {
         Self::verify_script_impl(module).map_err(|e| e.finish(Location::Script))
     }
 
-    fn verify_script_impl(script: &'a CompiledScript) -> PartialVMResult<()> {
+    pub fn verify_script_impl(script: &'a CompiledScript) -> PartialVMResult<()> {
         Self::check_identifiers(script.identifiers())?;
         Self::check_address_identifiers(script.address_identifiers())?;
         Self::check_constants(script.constant_pool())?;
@@ -64,7 +64,7 @@ impl<'a> DuplicationChecker<'a> {
         Self::check_function_instantiations(script.function_instantiations())
     }
 
-    fn check_identifiers(identifiers: &[Identifier]) -> PartialVMResult<()> {
+    pub fn check_identifiers(identifiers: &[Identifier]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(identifiers) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -75,7 +75,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_address_identifiers(address_identifiers: &[AccountAddress]) -> PartialVMResult<()> {
+    pub fn check_address_identifiers(address_identifiers: &[AccountAddress]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(address_identifiers) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -86,7 +86,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_constants(constant_pool: &[Constant]) -> PartialVMResult<()> {
+    pub fn check_constants(constant_pool: &[Constant]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(constant_pool) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -97,7 +97,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_signatures(signatures: &[Signature]) -> PartialVMResult<()> {
+    pub fn check_signatures(signatures: &[Signature]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(signatures) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -108,7 +108,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_module_handles(module_handles: &[ModuleHandle]) -> PartialVMResult<()> {
+    pub fn check_module_handles(module_handles: &[ModuleHandle]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(module_handles) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -120,7 +120,7 @@ impl<'a> DuplicationChecker<'a> {
     }
 
     // StructHandles - module and name define uniqueness
-    fn check_struct_handles(struct_handles: &[StructHandle]) -> PartialVMResult<()> {
+    pub fn check_struct_handles(struct_handles: &[StructHandle]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(struct_handles.iter().map(|x| (x.module, x.name))) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -131,7 +131,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_function_instantiations(
+    pub fn check_function_instantiations(
         function_instantiations: &[FunctionInstantiation],
     ) -> PartialVMResult<()> {
         match Self::first_duplicate_element(function_instantiations) {
@@ -145,7 +145,7 @@ impl<'a> DuplicationChecker<'a> {
     }
 
     // FunctionHandles - module and name define uniqueness
-    fn check_function_handles(function_handles: &[FunctionHandle]) -> PartialVMResult<()> {
+    pub fn check_function_handles(function_handles: &[FunctionHandle]) -> PartialVMResult<()> {
         match Self::first_duplicate_element(function_handles.iter().map(|x| (x.module, x.name))) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -160,7 +160,7 @@ impl<'a> DuplicationChecker<'a> {
     // Module only code
     //
 
-    fn check_field_handles(&self) -> PartialVMResult<()> {
+    pub fn check_field_handles(&self) -> PartialVMResult<()> {
         match Self::first_duplicate_element(self.module.field_handles()) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -171,7 +171,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_struct_instantiations(&self) -> PartialVMResult<()> {
+    pub fn check_struct_instantiations(&self) -> PartialVMResult<()> {
         match Self::first_duplicate_element(self.module.struct_instantiations()) {
             Some(idx) => Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -182,7 +182,7 @@ impl<'a> DuplicationChecker<'a> {
         }
     }
 
-    fn check_field_instantiations(&self) -> PartialVMResult<()> {
+    pub fn check_field_instantiations(&self) -> PartialVMResult<()> {
         if let Some(idx) = Self::first_duplicate_element(self.module.field_instantiations()) {
             return Err(verification_error(
                 StatusCode::DUPLICATE_ELEMENT,
@@ -193,7 +193,7 @@ impl<'a> DuplicationChecker<'a> {
         Ok(())
     }
 
-    fn check_struct_definitions(&self) -> PartialVMResult<()> {
+    pub fn check_struct_definitions(&self) -> PartialVMResult<()> {
         // StructDefinition - contained StructHandle defines uniqueness
         if let Some(idx) =
             Self::first_duplicate_element(self.module.struct_defs().iter().map(|x| x.struct_handle))
@@ -225,7 +225,7 @@ impl<'a> DuplicationChecker<'a> {
                 ));
             }
         }
-        // Check that each struct definition is pointing to the self module
+        // Check that each pub struct definition is pointing to the self module
         if let Some(idx) = self.module.struct_defs().iter().position(|x| {
             self.module.struct_handle_at(x.struct_handle).module != self.module.self_handle_idx()
         }) {
@@ -235,7 +235,7 @@ impl<'a> DuplicationChecker<'a> {
                 idx as TableIndex,
             ));
         }
-        // Check that each struct handle in self module is implemented (has a declaration)
+        // Check that each pub struct handle in self module is implemented (has a declaration)
         let implemented_struct_handles: HashSet<StructHandleIndex> = self
             .module
             .struct_defs()
@@ -256,7 +256,7 @@ impl<'a> DuplicationChecker<'a> {
         Ok(())
     }
 
-    fn check_function_defintions(&self) -> PartialVMResult<()> {
+    pub fn check_function_defintions(&self) -> PartialVMResult<()> {
         // FunctionDefinition - contained FunctionHandle defines uniqueness
         if let Some(idx) =
             Self::first_duplicate_element(self.module.function_defs().iter().map(|x| x.function))
@@ -267,7 +267,7 @@ impl<'a> DuplicationChecker<'a> {
                 idx,
             ));
         }
-        // Acquires in function declarations contain unique struct definitions
+        // Acquires in function declarations contain unique pub struct definitions
         for (idx, function_def) in self.module.function_defs().iter().enumerate() {
             let acquires = function_def.acquires_global_resources.iter();
             if Self::first_duplicate_element(acquires).is_some() {
@@ -309,7 +309,7 @@ impl<'a> DuplicationChecker<'a> {
         Ok(())
     }
 
-    fn first_duplicate_element<T>(iter: T) -> Option<TableIndex>
+    pub fn first_duplicate_element<T>(iter: T) -> Option<TableIndex>
     where
         T: IntoIterator,
         T::Item: Eq + Hash,

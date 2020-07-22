@@ -138,7 +138,7 @@ impl PeerManager {
     // Updates the information used to select a peer to send a chunk request to:
     // * eligible_peers
     // * weighted_index: the chance that a peer is selected from `eligible_peers` is weighted by its score
-    fn update_peer_selection_data(&mut self) {
+    pub fn update_peer_selection_data(&mut self) {
         let active_peers = self.get_active_upstream_peers();
         counters::ACTIVE_UPSTREAM_PEERS.set(active_peers.len() as i64);
 
@@ -173,7 +173,7 @@ impl PeerManager {
         None
     }
 
-    fn get_active_upstream_peers(&self) -> Vec<(&PeerNetworkId, &PeerInfo)> {
+    pub fn get_active_upstream_peers(&self) -> Vec<(&PeerNetworkId, &PeerInfo)> {
         if self.upstream_config.networks.len() > 1 {
             // failover mode is enabled only if there are multiple upstream networks
             // in failover mode, we select the network of the highest preference (defined by UpstreamConfig)
@@ -246,7 +246,7 @@ impl PeerManager {
         self.update_score(&peer_to_penalize, PeerScoreUpdateType::TimeOut);
     }
 
-    fn is_upstream_peer(&self, peer: &PeerNetworkId, origin: ConnectionOrigin) -> bool {
+    pub fn is_upstream_peer(&self, peer: &PeerNetworkId, origin: ConnectionOrigin) -> bool {
         let is_network_upstream = self
             .upstream_config
             .get_upstream_preference(peer.raw_network_id())

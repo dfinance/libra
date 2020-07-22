@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::ledger_info::{LedgerInfo, LedgerInfoWithSignatures};
 use anyhow::{ensure, format_err, Result};
@@ -131,7 +131,7 @@ impl Arbitrary for EpochChangeProof {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use crate::{block_info::BlockInfo, epoch_state::EpochState, waypoint::Waypoint};
 

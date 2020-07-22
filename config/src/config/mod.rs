@@ -13,37 +13,37 @@ use std::{
 };
 use thiserror::Error;
 
-mod consensus_config;
+pub mod consensus_config;
 pub use consensus_config::*;
-mod debug_interface_config;
+pub mod debug_interface_config;
 pub use debug_interface_config::*;
-mod error;
+pub mod error;
 pub use error::*;
-mod execution_config;
+pub mod execution_config;
 pub use execution_config::*;
-mod key_manager_config;
+pub mod key_manager_config;
 pub use key_manager_config::*;
-mod logger_config;
+pub mod logger_config;
 pub use logger_config::*;
-mod metrics_config;
+pub mod metrics_config;
 pub use metrics_config::*;
-mod mempool_config;
+pub mod mempool_config;
 pub use mempool_config::*;
-mod network_config;
+pub mod network_config;
 pub use network_config::*;
-mod rpc_config;
+pub mod rpc_config;
 pub use rpc_config::*;
-mod secure_backend_config;
+pub mod secure_backend_config;
 pub use secure_backend_config::*;
-mod state_sync_config;
+pub mod state_sync_config;
 pub use state_sync_config::*;
-mod storage_config;
+pub mod storage_config;
 pub use storage_config::*;
-mod safety_rules_config;
+pub mod safety_rules_config;
 pub use safety_rules_config::*;
-mod upstream_config;
+pub mod upstream_config;
 pub use upstream_config::*;
-mod test_config;
+pub mod test_config;
 use crate::network_id::NetworkId;
 use libra_secure_storage::{KVStorage, Storage};
 use libra_types::{
@@ -285,7 +285,7 @@ impl NodeConfig {
         config
     }
 
-    fn random_internal(&mut self, rng: &mut StdRng) {
+    pub fn random_internal(&mut self, rng: &mut StdRng) {
         let mut test = TestConfig::new_with_temp_dir();
 
         if self.base.role == RoleType::Validator {
@@ -405,7 +405,7 @@ impl RootPath {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

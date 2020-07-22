@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! Verifies bytecode sanity.
 
@@ -29,10 +29,10 @@ pub use signature::SignatureChecker;
 pub use struct_defs::RecursiveStructDefChecker;
 pub use verifier::{verify_main_signature, verify_module, verify_script};
 
-mod absint;
-mod acquires_list_verifier;
-mod binary_views;
-mod locals_safety;
-mod reference_safety;
-mod stack_usage_verifier;
-mod type_safety;
+pub mod absint;
+pub mod acquires_list_verifier;
+pub mod binary_views;
+pub mod locals_safety;
+pub mod reference_safety;
+pub mod stack_usage_verifier;
+pub mod type_safety;

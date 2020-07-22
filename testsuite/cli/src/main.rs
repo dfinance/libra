@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use chrono::{
     prelude::{SecondsFormat, Utc},
@@ -25,7 +25,7 @@ use structopt::StructOpt;
     author = "The Libra Association",
     about = "Libra client to connect to a specific validator"
 )]
-struct Args {
+pub struct Args {
     /// Chain ID of the network this client is connecting to
     #[structopt(
         short = "c",
@@ -121,7 +121,7 @@ fn main() {
         mnemonic_file,
         waypoint,
     )
-    .expect("Failed to construct client.");
+    .expect("Failed to conpub struct client.");
 
     // Test connection to validator
     let block_metadata = client_proxy

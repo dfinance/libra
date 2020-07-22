@@ -76,11 +76,11 @@ impl AbstractValue {
         AbstractValue { token, kind }
     }
 
-    /// Create a new struct `AbstractValue` given its type and kind
+    /// Create a new pub struct `AbstractValue` given its type and kind
     pub fn new_struct(token: SignatureToken, kind: Kind) -> AbstractValue {
         checked_precondition!(
             matches!(token, SignatureToken::Struct(_)),
-            "AbstractValue::new_struct must be applied with a struct type"
+            "AbstractValue::new_pub struct must be applied with a pub struct type"
         );
         AbstractValue { token, kind }
     }
@@ -95,7 +95,7 @@ impl AbstractValue {
         Self::is_generic_token(&self.token)
     }
 
-    fn is_generic_token(token: &SignatureToken) -> bool {
+    pub fn is_generic_token(token: &SignatureToken) -> bool {
         match token {
             SignatureToken::TypeParameter(_) => true,
             SignatureToken::StructInstantiation(_, _) => true,
@@ -343,7 +343,7 @@ impl InstantiableModule {
         }
     }
 
-    /// Returns the struct instantiation at `index`. Errors if the instantiation does not exist.
+    /// Returns the pub struct instantiation at `index`. Errors if the instantiation does not exist.
     pub fn struct_instantiantiation_at(
         &self,
         index: StructDefInstantiationIndex,
@@ -356,7 +356,7 @@ impl InstantiableModule {
         }
     }
 
-    /// Returns the struct instantiation at `index`. Errors if the instantiation does not exist.
+    /// Returns the pub struct instantiation at `index`. Errors if the instantiation does not exist.
     pub fn function_instantiantiation_at(
         &self,
         index: FunctionInstantiationIndex,
@@ -369,7 +369,7 @@ impl InstantiableModule {
         }
     }
 
-    /// Returns the struct instantiation at `index`. Errors if the instantiation does not exist.
+    /// Returns the pub struct instantiation at `index`. Errors if the instantiation does not exist.
     pub fn field_instantiantiation_at(
         &self,
         index: FieldInstantiationIndex,

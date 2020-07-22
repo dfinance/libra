@@ -95,7 +95,7 @@ impl RotateValidatorNetworkKey {
     }
 }
 
-fn decode_validator_address(
+pub fn decode_validator_address(
     address: RawEncNetworkAddress,
     account: &AccountAddress,
     key: &Key,
@@ -116,7 +116,7 @@ fn decode_validator_address(
     decode_address(raw_addr)
 }
 
-fn decode_address(raw_address: RawNetworkAddress) -> Result<NetworkAddress, Error> {
+pub fn decode_address(raw_address: RawNetworkAddress) -> Result<NetworkAddress, Error> {
     let network_address = NetworkAddress::try_from(&raw_address).map_err(|e| {
         Error::UnexpectedError(format!(
             "Failed to decode network address {}",

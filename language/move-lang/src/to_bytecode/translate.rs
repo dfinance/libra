@@ -103,7 +103,7 @@ pub fn program(prog: G::Program) -> Result<Vec<CompiledUnit>, Errors> {
     Ok(units)
 }
 
-fn module(
+pub fn module(
     ident: ModuleIdent,
     mdef: G::ModuleDefinition,
     dependency_orderings: &HashMap<ModuleIdent, usize>,
@@ -164,7 +164,7 @@ fn module(
     })
 }
 
-fn script(
+pub fn script(
     key: String,
     constants: UniqueMap<ConstantName, G::Constant>,
     name: FunctionName,
@@ -210,7 +210,7 @@ fn script(
     })
 }
 
-fn module_function_infos(
+pub fn module_function_infos(
     compile_module: &F::CompiledModule,
     source_map: &SourceMap<Loc>,
     collected_function_infos: &CollectedInfos,
@@ -222,7 +222,7 @@ fn module_function_infos(
     .unwrap()
 }
 
-fn function_info_map(
+pub fn function_info_map(
     compile_module: &F::CompiledModule,
     source_map: &SourceMap<Loc>,
     collected_function_infos: &CollectedInfos,
@@ -264,7 +264,7 @@ fn function_info_map(
     (function_name, function_info)
 }
 
-fn main_function_info(source_map: &SourceMap<Loc>, (params, specs): CollectedInfo) -> FunctionInfo {
+pub fn main_function_info(source_map: &SourceMap<Loc>, (params, specs): CollectedInfo) -> FunctionInfo {
     let idx = F::FunctionDefinitionIndex(0);
     let function_source_map = source_map.get_function_source_map(idx).unwrap();
     let local_map = function_source_map.make_local_name_to_index_map();
@@ -290,7 +290,7 @@ fn main_function_info(source_map: &SourceMap<Loc>, (params, specs): CollectedInf
     }
 }
 
-fn used_local_info(
+pub fn used_local_info(
     local_map: &BTreeMap<&String, F::LocalIndex>,
     used_local_types: &BTreeMap<Var, H::SingleType>,
 ) -> UniqueMap<Var, VarInfo> {
@@ -306,7 +306,7 @@ fn used_local_info(
     .unwrap()
 }
 
-fn var_info(
+pub fn var_info(
     local_map: &BTreeMap<&String, F::LocalIndex>,
     v: Var,
     type_: H::SingleType,
@@ -319,7 +319,7 @@ fn var_info(
 // Structs
 //**************************************************************************************************
 
-fn struct_def(
+pub fn struct_def(
     context: &mut Context,
     m: &ModuleIdent,
     s: StructName,
@@ -347,7 +347,7 @@ fn struct_def(
     )
 }
 
-fn struct_fields(
+pub fn struct_fields(
     context: &mut Context,
     loc: Loc,
     gfields: H::StructFields,
@@ -378,7 +378,7 @@ fn struct_fields(
 // Structs
 //**************************************************************************************************
 
-fn constant(
+pub fn constant(
     context: &mut Context,
     m: Option<&ModuleIdent>,
     n: ConstantName,
@@ -398,7 +398,7 @@ fn constant(
 // Functions
 //**************************************************************************************************
 
-fn function(
+pub fn function(
     context: &mut Context,
     m: Option<&ModuleIdent>,
     f: FunctionName,
@@ -443,14 +443,14 @@ fn function(
     )
 }
 
-fn visibility(v: FunctionVisibility) -> IR::FunctionVisibility {
+pub fn visibility(v: FunctionVisibility) -> IR::FunctionVisibility {
     match v {
         FunctionVisibility::Public(_) => IR::FunctionVisibility::Public,
         FunctionVisibility::Internal => IR::FunctionVisibility::Internal,
     }
 }
 
-fn function_signature(context: &mut Context, sig: H::FunctionSignature) -> IR::FunctionSignature {
+pub fn function_signature(context: &mut Context, sig: H::FunctionSignature) -> IR::FunctionSignature {
     let return_type = types(context, sig.return_type);
     let formals = sig
         .parameters
@@ -474,7 +474,7 @@ fn seen_structs(sig: &H::FunctionSignature) -> BTreeSet<(ModuleIdent, StructName
     seen
 }
 
-fn seen_structs_type(seen: &mut BTreeSet<(ModuleIdent, StructName)>, sp!(_, t_): &H::Type) {
+pub fn seen_structs_type(seen: &mut BTreeSet<(ModuleIdent, StructName)>, sp!(_, t_): &H::Type) {
     use H::Type_ as T;
     match t_ {
         T::Unit => (),
@@ -483,7 +483,7 @@ fn seen_structs_type(seen: &mut BTreeSet<(ModuleIdent, StructName)>, sp!(_, t_):
     }
 }
 
-fn seen_structs_single_type(
+pub fn seen_structs_single_type(
     seen: &mut BTreeSet<(ModuleIdent, StructName)>,
     sp!(_, st_): &H::SingleType,
 ) {
@@ -493,7 +493,7 @@ fn seen_structs_single_type(
     }
 }
 
-fn seen_structs_base_type(
+pub fn seen_structs_base_type(
     seen: &mut BTreeSet<(ModuleIdent, StructName)>,
     sp!(_, bt_): &H::BaseType,
 ) {
@@ -512,7 +512,7 @@ fn seen_structs_base_type(
     }
 }
 
-fn function_body(
+pub fn function_body(
     context: &mut Context,
     parameters: Vec<(Var, H::SingleType)>,
     mut locals_map: UniqueMap<Var, H::SingleType>,
@@ -551,19 +551,19 @@ fn function_body(
 // Names
 //**************************************************************************************************
 
-fn type_var(sp!(loc, n): Name) -> IR::TypeVar {
+pub fn type_var(sp!(loc, n): Name) -> IR::TypeVar {
     sp(loc, IR::TypeVar_::new(n))
 }
 
-fn var(v: Var) -> IR::Var {
+pub fn var(v: Var) -> IR::Var {
     sp(v.0.loc, IR::Var_::new(v.0.value))
 }
 
-fn field(f: Field) -> IR::Field {
+pub fn field(f: Field) -> IR::Field {
     sp(f.0.loc, IR::Field_::new(f.0.value))
 }
 
-fn struct_definition_name(
+pub fn struct_definition_name(
     context: &mut Context,
     sp!(_, t_): H::Type,
 ) -> (IR::StructName, Vec<IR::Type>) {
@@ -573,7 +573,7 @@ fn struct_definition_name(
     }
 }
 
-fn struct_definition_name_single(
+pub fn struct_definition_name_single(
     context: &mut Context,
     sp!(_, st_): H::SingleType,
 ) -> (IR::StructName, Vec<IR::Type>) {
@@ -584,7 +584,7 @@ fn struct_definition_name_single(
     }
 }
 
-fn struct_definition_name_base(
+pub fn struct_definition_name_base(
     context: &mut Context,
     sp!(_, bt_): H::BaseType,
 ) -> (IR::StructName, Vec<IR::Type>) {
@@ -594,7 +594,7 @@ fn struct_definition_name_base(
             context.struct_definition_name(&m, s),
             base_types(context, tys),
         ),
-        _ => panic!("ICE expected module struct type"),
+        _ => panic!("ICE expected module pub struct type"),
     }
 }
 
@@ -602,7 +602,7 @@ fn struct_definition_name_base(
 // Types
 //**************************************************************************************************
 
-fn kind(sp!(_, k_): &Kind) -> IR::Kind {
+pub fn kind(sp!(_, k_): &Kind) -> IR::Kind {
     use Kind_ as GK;
     use IR::Kind as IRK;
     match k_ {
@@ -612,17 +612,17 @@ fn kind(sp!(_, k_): &Kind) -> IR::Kind {
     }
 }
 
-fn type_parameters(tps: Vec<TParam>) -> Vec<(IR::TypeVar, IR::Kind)> {
+pub fn type_parameters(tps: Vec<TParam>) -> Vec<(IR::TypeVar, IR::Kind)> {
     tps.into_iter()
         .map(|tp| (type_var(tp.user_specified_name), kind(&tp.kind)))
         .collect()
 }
 
-fn base_types(context: &mut Context, bs: Vec<H::BaseType>) -> Vec<IR::Type> {
+pub fn base_types(context: &mut Context, bs: Vec<H::BaseType>) -> Vec<IR::Type> {
     bs.into_iter().map(|b| base_type(context, b)).collect()
 }
 
-fn base_type(context: &mut Context, sp!(_, bt_): H::BaseType) -> IR::Type {
+pub fn base_type(context: &mut Context, sp!(_, bt_): H::BaseType) -> IR::Type {
     use BuiltinTypeName_ as BT;
     use H::{BaseType_ as B, TypeName_ as TN};
     use IR::Type as IRT;
@@ -656,7 +656,7 @@ fn base_type(context: &mut Context, sp!(_, bt_): H::BaseType) -> IR::Type {
     }
 }
 
-fn single_type(context: &mut Context, sp!(_, st_): H::SingleType) -> IR::Type {
+pub fn single_type(context: &mut Context, sp!(_, st_): H::SingleType) -> IR::Type {
     use H::SingleType_ as S;
     use IR::Type as IRT;
     match st_ {
@@ -665,7 +665,7 @@ fn single_type(context: &mut Context, sp!(_, st_): H::SingleType) -> IR::Type {
     }
 }
 
-fn types(context: &mut Context, sp!(_, t_): H::Type) -> Vec<IR::Type> {
+pub fn types(context: &mut Context, sp!(_, t_): H::Type) -> Vec<IR::Type> {
     use H::Type_ as T;
     match t_ {
         T::Unit => vec![],
@@ -678,11 +678,11 @@ fn types(context: &mut Context, sp!(_, t_): H::Type) -> Vec<IR::Type> {
 // Commands
 //**************************************************************************************************
 
-fn label(lbl: H::Label) -> IR::BlockLabel {
+pub fn label(lbl: H::Label) -> IR::BlockLabel {
     IR::BlockLabel(format!("{}", lbl))
 }
 
-fn command(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, cmd_): H::Command) {
+pub fn command(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, cmd_): H::Command) {
     use H::Command_ as C;
     use IR::Bytecode_ as B;
     match cmd_ {
@@ -723,11 +723,11 @@ fn command(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, cmd_): 
     }
 }
 
-fn lvalues(context: &mut Context, code: &mut IR::BytecodeBlock, ls: Vec<H::LValue>) {
+pub fn lvalues(context: &mut Context, code: &mut IR::BytecodeBlock, ls: Vec<H::LValue>) {
     lvalues_(context, code, ls.into_iter())
 }
 
-fn lvalues_(
+pub fn lvalues_(
     context: &mut Context,
     code: &mut IR::BytecodeBlock,
     ls: impl std::iter::DoubleEndedIterator<Item = H::LValue>,
@@ -737,7 +737,7 @@ fn lvalues_(
     }
 }
 
-fn lvalue(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, l_): H::LValue) {
+pub fn lvalue(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, l_): H::LValue) {
     use H::LValue_ as L;
     use IR::Bytecode_ as B;
     match l_ {
@@ -767,11 +767,11 @@ fn lvalue(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, l_): H::
 // Expressions
 //**************************************************************************************************
 
-fn exp(context: &mut Context, code: &mut IR::BytecodeBlock, e: Box<H::Exp>) {
+pub fn exp(context: &mut Context, code: &mut IR::BytecodeBlock, e: Box<H::Exp>) {
     exp_(context, code, *e)
 }
 
-fn exp_(context: &mut Context, code: &mut IR::BytecodeBlock, e: H::Exp) {
+pub fn exp_(context: &mut Context, code: &mut IR::BytecodeBlock, e: H::Exp) {
     use Value_ as V;
     use H::UnannotatedExp_ as E;
     use IR::Bytecode_ as B;
@@ -907,7 +907,7 @@ fn exp_(context: &mut Context, code: &mut IR::BytecodeBlock, e: H::Exp) {
     }
 }
 
-fn module_call(
+pub fn module_call(
     context: &mut Context,
     code: &mut IR::BytecodeBlock,
     mident: ModuleIdent,
@@ -920,7 +920,7 @@ fn module_call(
     code.push(sp(loc, B::Call(m, n, base_types(context, tys))))
 }
 
-fn builtin(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, b_): H::BuiltinFunction) {
+pub fn builtin(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, b_): H::BuiltinFunction) {
     use H::BuiltinFunction_ as HB;
     use IR::Bytecode_ as B;
     code.push(sp(
@@ -950,7 +950,7 @@ fn builtin(context: &mut Context, code: &mut IR::BytecodeBlock, sp!(loc, b_): H:
     ))
 }
 
-fn unary_op(code: &mut IR::BytecodeBlock, sp!(loc, op_): UnaryOp) {
+pub fn unary_op(code: &mut IR::BytecodeBlock, sp!(loc, op_): UnaryOp) {
     use UnaryOp_ as O;
     use IR::Bytecode_ as B;
     code.push(sp(
@@ -961,7 +961,7 @@ fn unary_op(code: &mut IR::BytecodeBlock, sp!(loc, op_): UnaryOp) {
     ));
 }
 
-fn binary_op(code: &mut IR::BytecodeBlock, sp!(loc, op_): BinOp) {
+pub fn binary_op(code: &mut IR::BytecodeBlock, sp!(loc, op_): BinOp) {
     use BinOp_ as O;
     use IR::Bytecode_ as B;
     code.push(sp(

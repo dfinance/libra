@@ -91,7 +91,7 @@ impl<'a> DependencyChecker<'a> {
         checker.verify_imported_functions(script.function_handles(), None)
     }
 
-    fn build_deps_entry_point(&mut self) {
+    pub fn build_deps_entry_point(&mut self) {
         for (module_id, module) in &self.dependency_map {
             // Module::StructName -> def handle idx
             for struct_def in module.struct_defs() {
@@ -115,7 +115,7 @@ impl<'a> DependencyChecker<'a> {
         }
     }
 
-    fn verify_imported_modules(
+    pub fn verify_imported_modules(
         &self,
         module_handles: &[ModuleHandle],
         self_module: Option<ModuleHandleIndex>,
@@ -135,7 +135,7 @@ impl<'a> DependencyChecker<'a> {
         Ok(())
     }
 
-    fn verify_imported_structs(
+    pub fn verify_imported_structs(
         &self,
         struct_handles: &[StructHandle],
         self_module: Option<ModuleHandleIndex>,
@@ -178,7 +178,7 @@ impl<'a> DependencyChecker<'a> {
         Ok(())
     }
 
-    fn verify_imported_functions(
+    pub fn verify_imported_functions(
         &self,
         function_handles: &[FunctionHandle],
         self_module: Option<ModuleHandleIndex>,
@@ -272,7 +272,7 @@ impl<'a> DependencyChecker<'a> {
         Ok(())
     }
 
-    fn compare_types(
+    pub fn compare_types(
         &self,
         handle_type: &SignatureToken,
         def_type: &SignatureToken,
@@ -313,19 +313,19 @@ impl<'a> DependencyChecker<'a> {
         }
     }
 
-    fn compare_structs(
+    pub fn compare_structs(
         &self,
         idx1: StructHandleIndex,
         idx2: StructHandleIndex,
         def_module: &CompiledModule,
     ) -> PartialVMResult<()> {
-        // grab ModuleId and struct name for the module being verified
+        // grab ModuleId and pub struct name for the module being verified
         let struct_handle = self.resolver.struct_handle_at(idx1);
         let module_handle = self.resolver.module_handle_at(struct_handle.module);
         let module_id = self.resolver.module_id_for_handle(module_handle);
         let struct_name = self.resolver.identifier_at(struct_handle.name);
 
-        // grab ModuleId and struct name for the definition
+        // grab ModuleId and pub struct name for the definition
         let def_struct_handle = def_module.struct_handle_at(idx2);
         let def_module_handle = def_module.module_handle_at(def_struct_handle.module);
         let def_module_id = def_module.module_id_for_handle(def_module_handle);

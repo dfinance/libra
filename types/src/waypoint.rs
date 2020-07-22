@@ -124,7 +124,7 @@ impl FromStr for Waypoint {
 /// Note that not all the fields of LedgerInfo are included: some consensus-related fields
 /// might not be the same for all the participants.
 #[derive(Deserialize, Serialize, CryptoHasher, LCSCryptoHash)]
-struct Ledger2WaypointConverter {
+pub struct Ledger2WaypointConverter {
     epoch: u64,
     root_hash: HashValue,
     version: Version,
@@ -158,7 +158,7 @@ impl<'de> Deserialize<'de> for Waypoint {
             // as the original type.
             #[derive(::serde::Deserialize)]
             #[serde(rename = "Waypoint")]
-            struct Value(Version, HashValue);
+            pub struct Value(Version, HashValue);
 
             let value = Value::deserialize(deserializer)?;
             Ok(Waypoint {
@@ -184,7 +184,7 @@ impl Serialize for Waypoint {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::block_info::BlockInfo;
     use std::str::FromStr;

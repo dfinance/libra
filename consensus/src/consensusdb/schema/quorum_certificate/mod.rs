@@ -41,4 +41,4 @@ impl ValueCodec<QCSchema> for QuorumCert {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

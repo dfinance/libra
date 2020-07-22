@@ -43,14 +43,14 @@ macro_rules! get_or_add_item_macro {
 }
 
 pub const TABLE_MAX_SIZE: usize = u16::max_value() as usize;
-fn get_or_add_item_ref<K: Clone + Eq + Hash>(
+pub fn get_or_add_item_ref<K: Clone + Eq + Hash>(
     m: &mut HashMap<K, TableIndex>,
     k: &K,
 ) -> Result<TableIndex> {
     get_or_add_item_macro!(m, k, k.clone())
 }
 
-fn get_or_add_item<K: Eq + Hash>(m: &mut HashMap<K, TableIndex>, k: K) -> Result<TableIndex> {
+pub fn get_or_add_item<K: Eq + Hash>(m: &mut HashMap<K, TableIndex>, k: K) -> Result<TableIndex> {
     get_or_add_item_macro!(m, &k, k)
 }
 
@@ -58,7 +58,7 @@ pub fn ident_str(s: &str) -> Result<&IdentStr> {
     IdentStr::new(s)
 }
 
-struct CompiledDependency<'a> {
+pub struct CompiledDependency<'a> {
     structs: HashMap<(&'a IdentStr, &'a IdentStr), TableIndex>,
     functions: HashMap<&'a IdentStr, TableIndex>,
 
@@ -71,7 +71,7 @@ struct CompiledDependency<'a> {
 }
 
 impl<'a> CompiledDependency<'a> {
-    fn new<T: 'a + ModuleAccess>(dep: &'a T) -> Result<Self> {
+    pub fn new<T: 'a + ModuleAccess>(dep: &'a T) -> Result<Self> {
         let mut structs = HashMap::new();
         let mut functions = HashMap::new();
 
@@ -79,7 +79,7 @@ impl<'a> CompiledDependency<'a> {
             let mhandle = dep.module_handle_at(shandle.module);
             let mname = dep.identifier_at(mhandle.name);
             let sname = dep.identifier_at(shandle.name);
-            // get_or_add_item gets the proper struct handle index, as `dep.struct_handles()` is
+            // get_or_add_item gets the proper pub struct handle index, as `dep.struct_handles()` is
             // properly ordered
             get_or_add_item(&mut structs, (mname, sname))?;
         }
@@ -108,7 +108,7 @@ impl<'a> CompiledDependency<'a> {
         })
     }
 
-    fn source_struct_info(
+    pub fn source_struct_info(
         &self,
         idx: StructHandleIndex,
     ) -> Option<(QualifiedModuleIdent, StructName)> {
@@ -131,7 +131,7 @@ impl<'a> CompiledDependency<'a> {
         Some((ident, name))
     }
 
-    fn struct_handle(&self, name: &QualifiedStructIdent) -> Option<&'a StructHandle> {
+    pub fn struct_handle(&self, name: &QualifiedStructIdent) -> Option<&'a StructHandle> {
         self.structs
             .get(&(
                 ident_str(name.module.as_inner()).ok()?,
@@ -140,7 +140,7 @@ impl<'a> CompiledDependency<'a> {
             .and_then(|idx| self.struct_pool.get(*idx as usize))
     }
 
-    fn function_signature(&self, name: &FunctionName) -> Option<FunctionSignature> {
+    pub fn function_signature(&self, name: &FunctionName) -> Option<FunctionSignature> {
         self.functions
             .get(ident_str(name.as_inner()).ok()?)
             .and_then(|idx| {
@@ -268,7 +268,7 @@ impl<'a> Context<'a> {
         Ok(context)
     }
 
-    fn materialize_pool<T: Clone>(
+    pub fn materialize_pool<T: Clone>(
         size: usize,
         items: impl IntoIterator<Item = (T, TableIndex)>,
     ) -> Vec<T> {
@@ -280,7 +280,7 @@ impl<'a> Context<'a> {
         options.into_iter().map(|opt| opt.unwrap()).collect()
     }
 
-    fn materialize_map<T: Clone>(m: HashMap<T, TableIndex>) -> Vec<T> {
+    pub fn materialize_map<T: Clone>(m: HashMap<T, TableIndex>) -> Vec<T> {
         Self::materialize_pool(m.len(), m.into_iter())
     }
 
@@ -326,14 +326,14 @@ impl<'a> Context<'a> {
     //**********************************************************************************************
 
     /// Get the alias for the identifier, fails if it is not bound.
-    fn module_alias(&self, ident: &QualifiedModuleIdent) -> Result<&ModuleName> {
+    pub fn module_alias(&self, ident: &QualifiedModuleIdent) -> Result<&ModuleName> {
         self.aliases
             .get(ident)
             .ok_or_else(|| format_err!("Missing import for module {}", ident))
     }
 
     /// Get the handle for the alias, fails if it is not bound.
-    fn module_handle(&self, module_name: &ModuleName) -> Result<&ModuleHandle> {
+    pub fn module_handle(&self, module_name: &ModuleName) -> Result<&ModuleHandle> {
         match self.modules.get(module_name) {
             None => bail!("Unbound module alias {}", module_name),
             Some((_, mh)) => Ok(mh),
@@ -341,7 +341,7 @@ impl<'a> Context<'a> {
     }
 
     /// Get the identifier for the alias, fails if it is not bound.
-    fn module_ident(&self, module_name: &ModuleName) -> Result<&QualifiedModuleIdent> {
+    pub fn module_ident(&self, module_name: &ModuleName) -> Result<&QualifiedModuleIdent> {
         match self.modules.get(module_name) {
             None => bail!("Unbound module alias {}", module_name),
             Some((id, _)) => Ok(id),
@@ -349,7 +349,7 @@ impl<'a> Context<'a> {
     }
 
     /// Get the module handle index for the alias, fails if it is not bound.
-    fn module_handle_index(&self, module_name: &ModuleName) -> Result<ModuleHandleIndex> {
+    pub fn module_handle_index(&self, module_name: &ModuleName) -> Result<ModuleHandleIndex> {
         Ok(ModuleHandleIndex(
             *self
                 .module_handles
@@ -371,7 +371,7 @@ impl<'a> Context<'a> {
         )?))
     }
 
-    /// Get the struct instantiation index for the alias, adds it if missing.
+    /// Get the pub struct instantiation index for the alias, adds it if missing.
     pub fn struct_instantiation_index(
         &mut self,
         def: StructDefinitionIndex,
@@ -468,10 +468,10 @@ impl<'a> Context<'a> {
         }
     }
 
-    /// Get the struct definition index, fails if it is not bound.
+    /// Get the pub struct definition index, fails if it is not bound.
     pub fn struct_definition_index(&self, s: &StructName) -> Result<StructDefinitionIndex> {
         match self.struct_defs.get(&s) {
-            None => bail!("Missing struct definition for {}", s),
+            None => bail!("Missing pub struct definition for {}", s),
             Some(idx) => Ok(StructDefinitionIndex(*idx)),
         }
     }
@@ -516,7 +516,7 @@ impl<'a> Context<'a> {
         )?))
     }
 
-    /// Given an identifier and basic "signature" information, creates a struct handle
+    /// Given an identifier and basic "signature" information, creates a pub struct handle
     /// and adds it to the pool.
     pub fn declare_struct_handle_index(
         &mut self,
@@ -541,16 +541,16 @@ impl<'a> Context<'a> {
         )?))
     }
 
-    /// Given an identifier, declare the struct definition index.
+    /// Given an identifier, declare the pub struct definition index.
     pub fn declare_struct_definition_index(
         &mut self,
         s: StructName,
     ) -> Result<StructDefinitionIndex> {
         let idx = self.struct_defs.len();
         if idx > TABLE_MAX_SIZE {
-            bail!("too many struct definitions {}", s)
+            bail!("too many pub struct definitions {}", s)
         }
-        // TODO: Add the decl of the struct definition name here
+        // TODO: Add the decl of the pub struct definition name here
         // need to handle duplicates
         Ok(StructDefinitionIndex(
             *self.struct_defs.entry(s).or_insert(idx as TableIndex),
@@ -611,7 +611,7 @@ impl<'a> Context<'a> {
         Ok(())
     }
 
-    /// Given a struct handle and a field, adds it to the pool.
+    /// Given a pub struct handle and a field, adds it to the pool.
     pub fn declare_field(
         &mut self,
         s: StructHandleIndex,
@@ -630,27 +630,27 @@ impl<'a> Context<'a> {
     // Dependency Resolution
     //**********************************************************************************************
 
-    fn dependency(&self, m: &QualifiedModuleIdent) -> Result<&CompiledDependency> {
+    pub fn dependency(&self, m: &QualifiedModuleIdent) -> Result<&CompiledDependency> {
         self.dependencies
             .get(m)
             .ok_or_else(|| format_err!("Dependency not provided for {}", m))
     }
 
-    fn dep_struct_handle(&mut self, s: &QualifiedStructIdent) -> Result<(bool, Vec<Kind>)> {
+    pub fn dep_struct_handle(&mut self, s: &QualifiedStructIdent) -> Result<(bool, Vec<Kind>)> {
         if s.module.as_inner() == ModuleName::self_name() {
-            bail!("Unbound struct {}", s)
+            bail!("Unbound pub struct {}", s)
         }
         let mident = self.module_ident(&s.module)?.clone();
         let dep = self.dependency(&mident)?;
         match dep.struct_handle(s) {
-            None => bail!("Unbound struct {}", s),
+            None => bail!("Unbound pub struct {}", s),
             Some(shandle) => Ok((shandle.is_nominal_resource, shandle.type_parameters.clone())),
         }
     }
 
-    /// Given an identifier, find the struct handle index.
+    /// Given an identifier, find the pub struct handle index.
     /// Creates the handle and adds it to the pool if it it is the *first* time it looks
-    /// up the struct in a dependency.
+    /// up the pub struct in a dependency.
     pub fn struct_handle_index(&mut self, s: QualifiedStructIdent) -> Result<StructHandleIndex> {
         match self.structs.get(&s) {
             Some(sh) => Ok(StructHandleIndex(*self.struct_handles.get(sh).unwrap())),
@@ -661,7 +661,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn reindex_signature_token(
+    pub fn reindex_signature_token(
         &mut self,
         dep: &QualifiedModuleIdent,
         orig: SignatureToken,
@@ -719,7 +719,7 @@ impl<'a> Context<'a> {
         })
     }
 
-    fn reindex_function_signature(
+    pub fn reindex_function_signature(
         &mut self,
         dep: &QualifiedModuleIdent,
         orig: FunctionSignature,
@@ -742,7 +742,7 @@ impl<'a> Context<'a> {
         })
     }
 
-    fn dep_function_signature(
+    pub fn dep_function_signature(
         &mut self,
         m: &ModuleName,
         f: &FunctionName,
@@ -758,7 +758,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn ensure_function_declared(&mut self, m: ModuleName, f: FunctionName) -> Result<()> {
+    pub fn ensure_function_declared(&mut self, m: ModuleName, f: FunctionName) -> Result<()> {
         let m_f = (m.clone(), f.clone());
         if !self.function_handles.contains_key(&m_f) {
             assert!(!self.function_signatures.contains_key(&m_f));

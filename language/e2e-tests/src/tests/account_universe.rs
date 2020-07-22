@@ -1,10 +1,10 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod bad_transaction;
-mod create_account;
-mod peer_to_peer;
-mod rotate_key;
+pub mod bad_transaction;
+pub mod create_account;
+pub mod peer_to_peer;
+pub mod rotate_key;
 
 use crate::{
     account_universe::{

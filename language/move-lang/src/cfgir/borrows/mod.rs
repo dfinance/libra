@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod state;
+pub mod state;
 
 use super::absint::*;
 use crate::{
@@ -18,12 +18,12 @@ use std::collections::BTreeMap;
 // Entry and trait bindings
 //**************************************************************************************************
 
-struct BorrowSafety {
+pub struct BorrowSafety {
     local_numbers: UniqueMap<Var, usize>,
 }
 
 impl BorrowSafety {
-    fn new<T>(local_types: &UniqueMap<Var, T>) -> Self {
+    pub fn new<T>(local_types: &UniqueMap<Var, T>) -> Self {
         let mut local_numbers = UniqueMap::new();
         for (idx, (v, _)) in local_types.iter().enumerate() {
             local_numbers.add(v, idx).unwrap();
@@ -32,14 +32,14 @@ impl BorrowSafety {
     }
 }
 
-struct Context<'a, 'b> {
+pub struct Context<'a, 'b> {
     local_numbers: &'a UniqueMap<Var, usize>,
     borrow_state: &'b mut BorrowState,
     errors: Errors,
 }
 
 impl<'a, 'b> Context<'a, 'b> {
-    fn new(safety: &'a BorrowSafety, borrow_state: &'b mut BorrowState) -> Self {
+    pub fn new(safety: &'a BorrowSafety, borrow_state: &'b mut BorrowState) -> Self {
         let local_numbers = &safety.local_numbers;
         Self {
             local_numbers,
@@ -48,11 +48,11 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    fn get_errors(self) -> Errors {
+    pub fn get_errors(self) -> Errors {
         self.errors
     }
 
-    fn add_errors(&mut self, mut additional: Errors) {
+    pub fn add_errors(&mut self, mut additional: Errors) {
         self.errors.append(&mut additional);
     }
 }
@@ -98,7 +98,7 @@ pub fn verify(
 // Command
 //**************************************************************************************************
 
-fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
+pub fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
     use Command_ as C;
     match cmd_ {
         C::Assign(ls, e) => {
@@ -136,14 +136,14 @@ fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
     }
 }
 
-fn lvalues(context: &mut Context, ls: &[LValue], values: Values) {
+pub fn lvalues(context: &mut Context, ls: &[LValue], values: Values) {
     assert!(ls.len() == values.len());
     ls.iter()
         .zip(values)
         .for_each(|(l, value)| lvalue(context, l, value))
 }
 
-fn lvalue(context: &mut Context, sp!(loc, l_): &LValue, value: Value) {
+pub fn lvalue(context: &mut Context, sp!(loc, l_): &LValue, value: Value) {
     use LValue_ as L;
     match l_ {
         L::Ignore => {
@@ -162,7 +162,7 @@ fn lvalue(context: &mut Context, sp!(loc, l_): &LValue, value: Value) {
     }
 }
 
-fn exp(context: &mut Context, parent_e: &Exp) -> Values {
+pub fn exp(context: &mut Context, parent_e: &Exp) -> Values {
     use UnannotatedExp_ as E;
     let eloc = &parent_e.exp.loc;
     let svalue = || vec![Value::NonRef];
@@ -287,7 +287,7 @@ fn exp(context: &mut Context, parent_e: &Exp) -> Values {
     }
 }
 
-fn exp_list_item(context: &mut Context, item: &ExpListItem) -> Values {
+pub fn exp_list_item(context: &mut Context, item: &ExpListItem) -> Values {
     match item {
         ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(context, e),
     }

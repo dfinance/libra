@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use move_coverage::{
     coverage_map::CoverageMap,
@@ -20,7 +20,7 @@ use vm::file_format::CompiledModule;
     name = "Move VM Coverage Summary",
     about = "Creates a coverage summary from the trace data collected from the Move VM"
 )]
-struct Args {
+pub struct Args {
     /// The path to the coverage map or trace file
     #[structopt(long = "input-trace-path", short = "t")]
     pub input_trace_path: String,
@@ -44,7 +44,7 @@ struct Args {
     pub csv_output: bool,
 }
 
-fn get_modules(args: &Args) -> Vec<CompiledModule> {
+pub fn get_modules(args: &Args) -> Vec<CompiledModule> {
     let mut modules = Vec::new();
     if let Some(stdlib_path) = &args.stdlib_path {
         let stdlib_bytes = fs::read(stdlib_path).expect("Unable to read bytecode file");
@@ -71,7 +71,7 @@ fn get_modules(args: &Args) -> Vec<CompiledModule> {
     modules
 }
 
-fn format_human_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
+pub fn format_human_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
     writeln!(summary_writer, "+-------------------------+").unwrap();
     writeln!(summary_writer, "| Move Coverage Summary   |").unwrap();
     writeln!(summary_writer, "+-------------------------+").unwrap();
@@ -99,7 +99,7 @@ fn format_human_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summa
     writeln!(summary_writer, "+-------------------------+").unwrap();
 }
 
-fn format_csv_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
+pub fn format_csv_summary<W: Write>(args: &Args, coverage_map: &CoverageMap, summary_writer: &mut W) {
     writeln!(summary_writer, "ModuleName,FunctionName,Covered,Uncovered").unwrap();
 
     for module in get_modules(&args).iter() {

@@ -14,7 +14,7 @@ use tokio::{
 };
 
 /// Configuration for a HealthCheckerBuilder.
-struct HealthCheckerBuilderConfig {
+pub struct HealthCheckerBuilderConfig {
     network_context: Arc<NetworkContext>,
     ping_interval_ms: u64,
     ping_timeout_ms: u64,
@@ -24,7 +24,7 @@ struct HealthCheckerBuilderConfig {
 }
 
 impl HealthCheckerBuilderConfig {
-    fn new(
+    pub fn new(
         network_context: Arc<NetworkContext>,
         ping_interval_ms: u64,
         ping_timeout_ms: u64,
@@ -53,7 +53,7 @@ pub struct HealthCheckerBuilder {
 }
 
 impl HealthCheckerBuilder {
-    fn new(config: HealthCheckerBuilderConfig) -> Self {
+    pub fn new(config: HealthCheckerBuilderConfig) -> Self {
         Self {
             config: Some(config),
             service: None,

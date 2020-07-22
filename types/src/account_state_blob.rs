@@ -213,7 +213,7 @@ impl AccountStateWithProof {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use lcs::test_helpers::assert_canonical_encode_decode;
     use proptest::collection::vec;

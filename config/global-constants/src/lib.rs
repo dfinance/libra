@@ -6,7 +6,7 @@
 //! Libra often require access to global constant definitions (e.g., Libra Safety Rules,
 //! the Key Manager, and Secure Storage). To avoid duplicating these definitions across crates
 //! (and better allow these constants to be updated in a single location), we define them here.
-#![forbid(unsafe_code)]
+
 
 /// Definitions of global cryptographic keys (e.g., as held in secure storage)
 pub const CONSENSUS_KEY: &str = "consensus";

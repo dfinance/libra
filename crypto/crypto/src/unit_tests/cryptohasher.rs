@@ -93,7 +93,7 @@ fn prefixed_sha3(input: &[u8]) -> [u8; 32] {
 
 #[test]
 fn test_cryptohasher_salt_access() {
-    // the salt for this simple struct is expected to be its name
+    // the salt for this simple pub struct is expected to be its name
     assert_eq!(FooHasher::seed(), &prefixed_sha3(b"Foo"));
     assert_eq!(<Foo as CryptoHash>::Hasher::seed(), &prefixed_sha3(b"Foo"));
     assert_eq!(

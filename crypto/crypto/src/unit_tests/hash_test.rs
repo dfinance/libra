@@ -10,7 +10,7 @@ use serde::Serialize;
 use std::str::FromStr;
 
 #[derive(Serialize)]
-struct Foo(u32);
+pub struct Foo(u32);
 
 #[test]
 fn test_default_hasher() {

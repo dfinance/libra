@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! This crate implements the storage service.
 //!
@@ -35,7 +35,7 @@ pub struct StorageService {
 }
 
 impl StorageService {
-    fn handle_message(&self, input_message: Vec<u8>) -> Result<Vec<u8>, Error> {
+    pub fn handle_message(&self, input_message: Vec<u8>) -> Result<Vec<u8>, Error> {
         let input = lcs::from_bytes(&input_message)?;
         let output = match input {
             storage_interface::StorageRequest::GetAccountStateWithProofByVersionRequest(req) => {
@@ -51,7 +51,7 @@ impl StorageService {
         Ok(output?)
     }
 
-    fn get_account_state_with_proof_by_version(
+    pub fn get_account_state_with_proof_by_version(
         &self,
         req: &storage_interface::GetAccountStateWithProofByVersionRequest,
     ) -> Result<(Option<AccountStateBlob>, SparseMerkleProof), Error> {
@@ -60,11 +60,11 @@ impl StorageService {
             .get_account_state_with_proof_by_version(req.address, req.version)?)
     }
 
-    fn get_startup_info(&self) -> Result<Option<StartupInfo>, Error> {
+    pub fn get_startup_info(&self) -> Result<Option<StartupInfo>, Error> {
         Ok(self.db.get_startup_info()?)
     }
 
-    fn save_transactions(
+    pub fn save_transactions(
         &self,
         req: &storage_interface::SaveTransactionsRequest,
     ) -> Result<(), Error> {
@@ -75,7 +75,7 @@ impl StorageService {
         )?)
     }
 
-    fn run(self, config: &NodeConfig) -> JoinHandle<()> {
+    pub fn run(self, config: &NodeConfig) -> JoinHandle<()> {
         let mut network_server =
             NetworkServer::new(config.storage.address, config.storage.timeout_ms);
         thread::spawn(move || loop {
@@ -85,7 +85,7 @@ impl StorageService {
         })
     }
 
-    fn process_one_message(&self, network_server: &mut NetworkServer) -> Result<(), Error> {
+    pub fn process_one_message(&self, network_server: &mut NetworkServer) -> Result<(), Error> {
         let request = network_server.read()?;
         let response = self.handle_message(request)?;
         network_server.write(&response)?;
@@ -94,4 +94,4 @@ impl StorageService {
 }
 
 #[cfg(test)]
-mod storage_service_test;
+pub mod storage_service_test;

@@ -43,7 +43,7 @@ pub fn is_permitted_char(c: char) -> bool {
     is_permitted_printable_char(c) || is_permitted_newline_char(c)
 }
 
-fn verify_string(string: &str) -> Result<()> {
+pub fn verify_string(string: &str) -> Result<()> {
     string
         .chars()
         .find(|c| !is_permitted_char(*c))
@@ -56,7 +56,7 @@ fn verify_string(string: &str) -> Result<()> {
         })
 }
 
-fn strip_comments(source: &str) -> String {
+pub fn strip_comments(source: &str) -> String {
     const SLASH: char = '/';
     const SPACE: char = ' ';
 
@@ -77,7 +77,7 @@ fn strip_comments(source: &str) -> String {
 
 // We restrict strings to only ascii visual characters (0x20 <= c <= 0x7E) or a permitted newline
 // character--\n--or a tab--\t.
-fn strip_comments_and_verify(string: &str) -> Result<String> {
+pub fn strip_comments_and_verify(string: &str) -> Result<String> {
     verify_string(string)?;
     Ok(strip_comments(string))
 }
@@ -118,7 +118,7 @@ pub fn parse_cmd_(
         .or_else(|e| handle_error(e, stripped_string))
 }
 
-fn handle_error<T>(e: syntax::ParseError<Loc, anyhow::Error>, code_str: &str) -> Result<T> {
+pub fn handle_error<T>(e: syntax::ParseError<Loc, anyhow::Error>, code_str: &str) -> Result<T> {
     let msg = match &e {
         ParseError::InvalidToken { location } => {
             let mut files = Files::new();
@@ -138,7 +138,7 @@ fn handle_error<T>(e: syntax::ParseError<Loc, anyhow::Error>, code_str: &str) ->
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     #[test]
     fn verify_character_allowlist() {
         let mut good_chars = (0x20..=0x7E).collect::<Vec<u8>>();
@@ -152,7 +152,7 @@ mod tests {
         // Test to make sure that all the characters that are in the allowlist pass.
         {
             let s = std::str::from_utf8(&good_chars)
-                .expect("Failed to construct string containing an invalid character. This shouldn't happen.");
+                .expect("Failed to conpub struct string containing an invalid character. This shouldn't happen.");
             assert!(super::verify_string(s).is_ok());
         }
 
@@ -160,7 +160,7 @@ mod tests {
         for bad_char in bad_chars {
             good_chars.push(bad_char);
             let s = std::str::from_utf8(&good_chars)
-                .expect("Failed to construct string containing an invalid character. This shouldn't happen.");
+                .expect("Failed to conpub struct string containing an invalid character. This shouldn't happen.");
             assert!(super::verify_string(s).is_err());
             good_chars.pop();
         }
@@ -196,7 +196,7 @@ mod tests {
         ];
 
         let bad_chars = std::str::from_utf8(&bad_chars).expect(
-            "Failed to construct string containing an invalid character. This shouldn't happen.",
+            "Failed to conpub struct string containing an invalid character. This shouldn't happen.",
         );
         for bad_char in bad_chars.chars() {
             good_chars.push(bad_char);

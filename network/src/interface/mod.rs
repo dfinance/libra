@@ -223,7 +223,7 @@ where
         (requests_tx, notifs_rx)
     }
 
-    async fn handle_network_request(
+    pub async fn handle_network_request(
         peer_id: PeerId,
         req: NetworkRequest,
         mut rpc_reqs_tx: channel::Sender<OutboundRpcRequest>,
@@ -257,7 +257,7 @@ where
         }
     }
 
-    fn handle_rpc_notification(
+    pub fn handle_rpc_notification(
         peer_id: PeerId,
         notif: RpcNotification,
         mut notifs_tx: libra_channel::Sender<ProtocolId, NetworkNotification>,
@@ -272,7 +272,7 @@ where
         }
     }
 
-    fn handle_ds_notification(
+    pub fn handle_ds_notification(
         peer_id: PeerId,
         notif: DirectSendNotification,
         mut notifs_tx: libra_channel::Sender<ProtocolId, NetworkNotification>,
@@ -288,7 +288,7 @@ where
         }
     }
 
-    async fn handle_peer_notification(
+    pub async fn handle_peer_notification(
         notif: PeerNotification,
         mut connection_notifs_tx: channel::Sender<TransportNotification<TSocket>>,
     ) {

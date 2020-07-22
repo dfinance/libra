@@ -34,7 +34,7 @@ impl LibraDBBackend {
         }
     }
 
-    fn refresh_window(&self, target_round: Round) -> anyhow::Result<()> {
+    pub fn refresh_window(&self, target_round: Round) -> anyhow::Result<()> {
         // assumes target round is not too far from latest commit
         let buffer = 10;
         let events = self.libra_db.get_events(

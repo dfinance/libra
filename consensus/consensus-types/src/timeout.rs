@@ -8,7 +8,7 @@ use libra_types::validator_signer::ValidatorSigner;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
-/// This structure contains all the information necessary to construct a signature
+/// This structure contains all the information necessary to conpub struct a signature
 /// on the equivalent of a timeout message
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, CryptoHasher, LCSCryptoHash)]
 pub struct Timeout {

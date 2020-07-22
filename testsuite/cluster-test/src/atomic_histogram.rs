@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use std::{
     fmt::Debug,
@@ -115,7 +115,7 @@ impl AtomicHistogramSnapshot {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::tx_emitter::*;
     // other use:: for test only

@@ -7,7 +7,7 @@
 //! on the tree.
 
 #[cfg(test)]
-mod iterator_test;
+pub mod iterator_test;
 
 use crate::{
     nibble_path::NibblePath,
@@ -23,7 +23,7 @@ use std::sync::Arc;
 /// `NodeVisitInfo` keeps track of the status of an internal node during the iteration process. It
 /// indicates which ones of its children have been visited.
 #[derive(Debug)]
-struct NodeVisitInfo {
+pub struct NodeVisitInfo {
     /// The key to this node.
     node_key: NodeKey,
 
@@ -43,7 +43,7 @@ struct NodeVisitInfo {
 impl NodeVisitInfo {
     /// Constructs a new `NodeVisitInfo` with given node key and node. `next_child_to_visit` will
     /// be set to the leftmost child.
-    fn new(node_key: NodeKey, node: InternalNode) -> Self {
+    pub fn new(node_key: NodeKey, node: InternalNode) -> Self {
         let (children_bitmap, _) = node.generate_bitmaps();
         Self {
             node_key,
@@ -56,7 +56,7 @@ impl NodeVisitInfo {
     /// Same as `new` but points `next_child_to_visit` to a specific location. If the child
     /// corresponding to `next_child_to_visit` does not exist, set it to the next one on the
     /// right.
-    fn new_next_child_to_visit(
+    pub fn new_next_child_to_visit(
         node_key: NodeKey,
         node: InternalNode,
         next_child_to_visit: Nibble,
@@ -75,13 +75,13 @@ impl NodeVisitInfo {
     }
 
     /// Whether the next child to visit is the rightmost one.
-    fn is_rightmost(&self) -> bool {
+    pub fn is_rightmost(&self) -> bool {
         assert!(self.next_child_to_visit.leading_zeros() >= self.children_bitmap.leading_zeros());
         self.next_child_to_visit.leading_zeros() == self.children_bitmap.leading_zeros()
     }
 
     /// Advances `next_child_to_visit` to the next child on the right.
-    fn advance(&mut self) {
+    pub fn advance(&mut self) {
         assert!(!self.is_rightmost(), "Advancing past rightmost child.");
         self.next_child_to_visit <<= 1;
         while self.next_child_to_visit & self.children_bitmap == 0 {
@@ -181,7 +181,7 @@ where
         })
     }
 
-    fn cleanup_stack(parent_stack: &mut Vec<NodeVisitInfo>) {
+    pub fn cleanup_stack(parent_stack: &mut Vec<NodeVisitInfo>) {
         while let Some(info) = parent_stack.last_mut() {
             if info.is_rightmost() {
                 parent_stack.pop();

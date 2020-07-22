@@ -31,7 +31,7 @@ pub struct LibraNode {
 }
 
 impl Drop for LibraNode {
-    // When the LibraNode struct goes out of scope we need to kill the child process
+    // When the LibraNode pub struct goes out of scope we need to kill the child process
     fn drop(&mut self) {
         // check if the process has already been terminated
         match self.node.try_wait() {
@@ -123,7 +123,7 @@ impl LibraNode {
         Ok(contents)
     }
 
-    fn get_metric(&mut self, metric_name: &str) -> Option<i64> {
+    pub fn get_metric(&mut self, metric_name: &str) -> Option<i64> {
         match self.debug_client.get_node_metric(metric_name) {
             Err(e) => {
                 println!(
@@ -245,7 +245,7 @@ impl LibraSwarm {
     /// If specified persistent directory already exists,
     /// assumably due to previous launch failure, it will be removed.
     /// The directory for the last failed attempt won't be removed.
-    fn setup_config_dir(config_dir: &Option<String>) -> LibraSwarmDir {
+    pub fn setup_config_dir(config_dir: &Option<String>) -> LibraSwarmDir {
         if let Some(dir_str) = config_dir {
             let path_buf = PathBuf::from_str(&dir_str).expect("unable to create config dir");
             if path_buf.exists() {
@@ -356,7 +356,7 @@ impl LibraSwarm {
         Ok(())
     }
 
-    fn wait_for_connectivity(&mut self, expected_peers: i64) -> Result<(), SwarmLaunchFailure> {
+    pub fn wait_for_connectivity(&mut self, expected_peers: i64) -> Result<(), SwarmLaunchFailure> {
         // Early return if we're only launching a single node
         if self.nodes.len() == 1 {
             return Ok(());
@@ -382,7 +382,7 @@ impl LibraSwarm {
         Err(SwarmLaunchFailure::ConnectivityTimeout)
     }
 
-    fn wait_for_startup(&mut self) -> Result<(), SwarmLaunchFailure> {
+    pub fn wait_for_startup(&mut self) -> Result<(), SwarmLaunchFailure> {
         let num_attempts = 120;
         let mut done = vec![false; self.nodes.len()];
         for i in 0..num_attempts {

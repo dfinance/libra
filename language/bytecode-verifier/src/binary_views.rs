@@ -26,62 +26,62 @@ use vm::{
 // Operations that are not allowed for `CompiledScript` return an error.
 // A typical use of a `BinaryIndexedView` is while resolving indexes in bytecodes.
 #[derive(Clone, Copy)]
-pub(crate) enum BinaryIndexedView<'a> {
+pub enum BinaryIndexedView<'a> {
     Module(&'a CompiledModule),
     Script(&'a CompiledScript),
 }
 
 impl<'a> BinaryIndexedView<'a> {
-    pub(crate) fn identifier_at(&self, idx: IdentifierIndex) -> &IdentStr {
+    pub fn identifier_at(&self, idx: IdentifierIndex) -> &IdentStr {
         match self {
             BinaryIndexedView::Module(module) => module.identifier_at(idx),
             BinaryIndexedView::Script(script) => script.identifier_at(idx),
         }
     }
 
-    pub(crate) fn address_identifier_at(&self, idx: AddressIdentifierIndex) -> &AccountAddress {
+    pub fn address_identifier_at(&self, idx: AddressIdentifierIndex) -> &AccountAddress {
         match self {
             BinaryIndexedView::Module(module) => module.address_identifier_at(idx),
             BinaryIndexedView::Script(script) => script.address_identifier_at(idx),
         }
     }
 
-    pub(crate) fn constant_at(&self, idx: ConstantPoolIndex) -> &Constant {
+    pub fn constant_at(&self, idx: ConstantPoolIndex) -> &Constant {
         match self {
             BinaryIndexedView::Module(module) => module.constant_at(idx),
             BinaryIndexedView::Script(script) => script.constant_at(idx),
         }
     }
 
-    pub(crate) fn signature_at(&self, idx: SignatureIndex) -> &Signature {
+    pub fn signature_at(&self, idx: SignatureIndex) -> &Signature {
         match self {
             BinaryIndexedView::Module(module) => module.signature_at(idx),
             BinaryIndexedView::Script(script) => script.signature_at(idx),
         }
     }
 
-    pub(crate) fn module_handle_at(&self, idx: ModuleHandleIndex) -> &ModuleHandle {
+    pub fn module_handle_at(&self, idx: ModuleHandleIndex) -> &ModuleHandle {
         match self {
             BinaryIndexedView::Module(module) => module.module_handle_at(idx),
             BinaryIndexedView::Script(script) => script.module_handle_at(idx),
         }
     }
 
-    pub(crate) fn struct_handle_at(&self, idx: StructHandleIndex) -> &StructHandle {
+    pub fn struct_handle_at(&self, idx: StructHandleIndex) -> &StructHandle {
         match self {
             BinaryIndexedView::Module(module) => module.struct_handle_at(idx),
             BinaryIndexedView::Script(script) => script.struct_handle_at(idx),
         }
     }
 
-    pub(crate) fn function_handle_at(&self, idx: FunctionHandleIndex) -> &FunctionHandle {
+    pub fn function_handle_at(&self, idx: FunctionHandleIndex) -> &FunctionHandle {
         match self {
             BinaryIndexedView::Module(module) => module.function_handle_at(idx),
             BinaryIndexedView::Script(script) => script.function_handle_at(idx),
         }
     }
 
-    pub(crate) fn function_instantiation_at(
+    pub fn function_instantiation_at(
         &self,
         idx: FunctionInstantiationIndex,
     ) -> &FunctionInstantiation {
@@ -91,7 +91,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub(crate) fn field_handle_at(&self, idx: FieldHandleIndex) -> PartialVMResult<&FieldHandle> {
+    pub fn field_handle_at(&self, idx: FieldHandleIndex) -> PartialVMResult<&FieldHandle> {
         match self {
             BinaryIndexedView::Module(module) => Ok(module.field_handle_at(idx)),
             BinaryIndexedView::Script(_) => {
@@ -100,7 +100,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub(crate) fn struct_instantiation_at(
+    pub fn struct_instantiation_at(
         &self,
         idx: StructDefInstantiationIndex,
     ) -> PartialVMResult<&StructDefInstantiation> {
@@ -112,7 +112,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub(crate) fn field_instantiation_at(
+    pub fn field_instantiation_at(
         &self,
         idx: FieldInstantiationIndex,
     ) -> PartialVMResult<&FieldInstantiation> {
@@ -124,7 +124,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub(crate) fn struct_def_at(
+    pub fn struct_def_at(
         &self,
         idx: StructDefinitionIndex,
     ) -> PartialVMResult<&StructDefinition> {
@@ -136,7 +136,7 @@ impl<'a> BinaryIndexedView<'a> {
         }
     }
 
-    pub(crate) fn function_def_at(
+    pub fn function_def_at(
         &self,
         idx: FunctionDefinitionIndex,
     ) -> PartialVMResult<&FunctionDefinition> {
@@ -152,7 +152,7 @@ impl<'a> BinaryIndexedView<'a> {
     // A `TypeParameter` used the kind of the `constraints`.
     // `StructInstantiation` have to "merge" the kinds of the instantiation with that
     // of the generic type.
-    pub(crate) fn kind(&self, ty: &SignatureToken, constraints: &[Kind]) -> Kind {
+    pub fn kind(&self, ty: &SignatureToken, constraints: &[Kind]) -> Kind {
         use SignatureToken::*;
 
         match ty {
@@ -180,19 +180,19 @@ impl<'a> BinaryIndexedView<'a> {
                     .map(|ty| self.kind(ty, constraints))
                     .collect::<Vec<_>>();
                 // Derive the kind of the struct.
-                //   - If any of the type actuals is `all`, then the struct is `all`.
+                //   - If any of the type actuals is `all`, then the pub struct is `all`.
                 //     - `all` means some part of the type can be either `resource` or
                 //       `unrestricted`.
                 //     - Therefore it is also impossible to determine the kind of the type as a
                 //       whole, and thus `all`.
-                //   - If none of the type actuals is `all`, then the struct is a resource if
+                //   - If none of the type actuals is `all`, then the pub struct is a resource if
                 //     and only if one of the type actuals is `resource`.
                 kinds.iter().cloned().fold(Kind::Copyable, Kind::join)
             }
         }
     }
 
-    pub(crate) fn module_id_for_handle(&self, module_handle: &ModuleHandle) -> ModuleId {
+    pub fn module_id_for_handle(&self, module_handle: &ModuleHandle) -> ModuleId {
         ModuleId::new(
             *self.address_identifier_at(module_handle.address),
             self.identifier_at(module_handle.name).to_owned(),
@@ -208,7 +208,7 @@ const EMPTY_SIGNATURE: &Signature = &Signature(vec![]);
 // created.
 // A `FunctionView` is created for all module functions except native functions.
 // It is also created for a script.
-pub(crate) struct FunctionView<'a> {
+pub struct FunctionView<'a> {
     index: Option<FunctionDefinitionIndex>,
     code: &'a CodeUnit,
     parameters: &'a Signature,
@@ -220,7 +220,7 @@ pub(crate) struct FunctionView<'a> {
 
 impl<'a> FunctionView<'a> {
     // Creates a `FunctionView` for a module function.
-    pub(crate) fn function(
+    pub fn function(
         module: &'a CompiledModule,
         index: FunctionDefinitionIndex,
         code: &'a CodeUnit,
@@ -238,7 +238,7 @@ impl<'a> FunctionView<'a> {
     }
 
     // Creates a `FunctionView` for a script.
-    pub(crate) fn script(script: &'a CompiledScript) -> Self {
+    pub fn script(script: &'a CompiledScript) -> Self {
         let code = &script.as_inner().code;
         let parameters = script.signature_at(script.as_inner().parameters);
         let locals = script.signature_at(code.locals);
@@ -254,31 +254,31 @@ impl<'a> FunctionView<'a> {
         }
     }
 
-    pub(crate) fn index(&self) -> Option<FunctionDefinitionIndex> {
+    pub fn index(&self) -> Option<FunctionDefinitionIndex> {
         self.index
     }
 
-    pub(crate) fn code(&self) -> &CodeUnit {
+    pub fn code(&self) -> &CodeUnit {
         self.code
     }
 
-    pub(crate) fn parameters(&self) -> &Signature {
+    pub fn parameters(&self) -> &Signature {
         self.parameters
     }
 
-    pub(crate) fn return_(&self) -> &Signature {
+    pub fn return_(&self) -> &Signature {
         self.return_
     }
 
-    pub(crate) fn locals(&self) -> &Signature {
+    pub fn locals(&self) -> &Signature {
         self.locals
     }
 
-    pub(crate) fn type_parameters(&self) -> &[Kind] {
+    pub fn type_parameters(&self) -> &[Kind] {
         self.type_parameters
     }
 
-    pub(crate) fn cfg(&self) -> &VMControlFlowGraph {
+    pub fn cfg(&self) -> &VMControlFlowGraph {
         &self.cfg
     }
 }

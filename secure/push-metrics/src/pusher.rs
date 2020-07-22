@@ -18,7 +18,7 @@ impl MetricsPusher {
         Self { metrics }
     }
 
-    fn run(self, push_metrics_endpoint: String, push_metrics_frequency_secs: u64) {
+    pub fn run(self, push_metrics_endpoint: String, push_metrics_frequency_secs: u64) {
         loop {
             let mut data = String::new();
             for metric in self.metrics.get_metrics() {

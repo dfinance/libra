@@ -63,4 +63,4 @@ impl SeekKeyCodec<EventSchema> for Version {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

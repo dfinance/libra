@@ -12,7 +12,7 @@ type Map<K, V> = BTreeMap<K, V>;
 type Set<V> = BTreeSet<V>;
 pub type BlockId = CodeOffset;
 
-struct BasicBlock {
+pub struct BasicBlock {
     lower: CodeOffset,
     upper: CodeOffset,
     successors: Vec<BlockId>,
@@ -71,7 +71,7 @@ impl StacklessControlFlowGraph {
         }
     }
 
-    fn collect_blocks(code: &[Bytecode]) -> Map<BlockId, BasicBlock> {
+    pub fn collect_blocks(code: &[Bytecode]) -> Map<BlockId, BasicBlock> {
         // First go through and collect block ids, i.e., offsets that begin basic blocks.
         // Need to do this first in order to handle backwards edges.
         let label_offsets = Bytecode::label_offsets(code);
@@ -85,7 +85,7 @@ impl StacklessControlFlowGraph {
                 &label_offsets,
             );
         }
-        // Now construct blocks
+        // Now conpub struct blocks
         let mut blocks = Map::new();
         let mut entry = 0;
         for pc in 0..code.len() {
@@ -106,11 +106,11 @@ impl StacklessControlFlowGraph {
         blocks
     }
 
-    fn is_end_of_block(pc: CodeOffset, code: &[Bytecode], block_ids: &Set<BlockId>) -> bool {
+    pub fn is_end_of_block(pc: CodeOffset, code: &[Bytecode], block_ids: &Set<BlockId>) -> bool {
         pc + 1 == (code.len() as CodeOffset) || block_ids.contains(&(pc + 1))
     }
 
-    fn record_block_ids(
+    pub fn record_block_ids(
         pc: CodeOffset,
         code: &[Bytecode],
         block_ids: &mut Set<BlockId>,

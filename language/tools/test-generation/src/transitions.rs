@@ -359,7 +359,7 @@ pub fn stack_satisfies_struct_instantiation(
     }
 }
 
-/// Determine whether the struct at the given index can be constructed from the values on
+/// Determine whether the pub struct at the given index can be constructed from the values on
 /// the stack.
 /// Note that this function is bidirectional; if there is an instantiation, we check it. Otherwise,
 /// we infer the types that are needed.
@@ -445,7 +445,7 @@ pub fn get_struct_instantiation_for_state(
     (struct_index, partial_instantiation.instantiation())
 }
 
-/// Determine if a struct (of the given signature) is at the top of the stack
+/// Determine if a pub struct (of the given signature) is at the top of the stack
 /// The `struct_index` can be `Some(index)` to check for a particular struct,
 /// or `None` to just check that there is a a struct.
 pub fn stack_has_struct(state: &AbstractState, struct_index: StructDefinitionIndex) -> bool {
@@ -472,7 +472,7 @@ pub fn stack_has_struct_inst(
     stack_has_struct(state, struct_inst.def)
 }
 
-/// Determine if a struct at the given index is a resource
+/// Determine if a pub struct at the given index is a resource
 pub fn struct_is_resource(state: &AbstractState, struct_index: StructDefinitionIndex) -> bool {
     let struct_def = state.module.module.struct_def_at(struct_index);
     StructDefinitionView::new(&state.module.module, struct_def).is_nominal_resource()
@@ -540,7 +540,7 @@ pub fn stack_struct_inst_popn(
     stack_struct_popn(state, struct_inst.def)
 }
 
-/// Pop the number of stack values required to construct the struct
+/// Pop the number of stack values required to conpub struct the struct
 /// at `struct_index`
 pub fn stack_struct_popn(
     state: &AbstractState,
@@ -564,8 +564,8 @@ pub fn create_struct_from_inst(
     create_struct(state, struct_inst.def, Some(struct_inst.type_parameters))
 }
 
-/// Construct a struct from abstract values on the stack
-/// The struct is stored in the register after creation
+/// Conpub struct a pub struct from abstract values on the stack
+/// The pub struct is stored in the register after creation
 pub fn create_struct(
     state: &AbstractState,
     struct_index: StructDefinitionIndex,
@@ -603,10 +603,10 @@ pub fn stack_unpack_struct_instantiation(
                     .filter(|(_, struct_def)| struct_def.struct_handle == handle);
                 match def_filter.next() {
                     Some((idx, _)) => (StructDefinitionIndex(idx as TableIndex), toks),
-                    None => panic!("Invalid unpack -- non-struct def value found at top of stack"),
+                    None => panic!("Invalid unpack -- non-pub struct def value found at top of stack"),
                 }
             }
-            _ => panic!("Invalid unpack -- non-struct value found at top of stack"),
+            _ => panic!("Invalid unpack -- non-pub struct value found at top of stack"),
         }
     } else {
         panic!("Invalid unpack -- precondition not satisfied");
@@ -621,7 +621,7 @@ pub fn stack_unpack_struct_inst(
     stack_unpack_struct(state, struct_inst.def, Some(struct_inst.type_parameters))
 }
 
-/// Push the fields of a struct as `AbstractValue`s to the stack
+/// Push the fields of a pub struct as `AbstractValue`s to the stack
 pub fn stack_unpack_struct(
     state: &AbstractState,
     struct_index: StructDefinitionIndex,
@@ -660,7 +660,7 @@ pub fn struct_ref_instantiation(state: &mut AbstractState) -> Result<Vec<Signatu
     }
 }
 
-/// Push the field at `field_index` of a struct as an `AbstractValue` to the stack
+/// Push the field at `field_index` of a pub struct as an `AbstractValue` to the stack
 pub fn stack_struct_borrow_field(
     state: &AbstractState,
     field_index: FieldHandleIndex,
@@ -1115,7 +1115,7 @@ macro_rules! state_stack_struct_popn {
 /// Wrapper for enclosing the arguments of `stack_pack_struct` so that only the
 /// `state` needs to be given.
 #[macro_export]
-macro_rules! state_create_struct {
+macro_rules! state_create_pub struct {
     ($e1: expr) => {
         Box::new(move |state| create_struct(state, $e1, None))
     };
@@ -1131,7 +1131,7 @@ macro_rules! state_create_struct_from_inst {
 /// Wrapper for enclosing the arguments of `stack_has_struct` so that only the
 /// `state` needs to be given.
 #[macro_export]
-macro_rules! state_stack_has_struct {
+macro_rules! state_stack_has_pub struct {
     ($e: expr) => {
         Box::new(move |state| stack_has_struct(state, $e))
     };
@@ -1147,7 +1147,7 @@ macro_rules! state_stack_has_struct_inst {
 /// Wrapper for enclosing the arguments of `stack_unpack_struct` so that only the
 /// `state` needs to be given.
 #[macro_export]
-macro_rules! state_stack_unpack_struct {
+macro_rules! state_stack_unpack_pub struct {
     ($e: expr) => {
         Box::new(move |state| stack_unpack_struct(state, $e, None))
     };
@@ -1341,7 +1341,7 @@ macro_rules! state_control_flow {
     };
 }
 
-/// Determine the proper type instantiation for struct in the current state.
+/// Determine the proper type instantiation for pub struct in the current state.
 #[macro_export]
 macro_rules! struct_instantiation_for_state {
     ($e: expr, $is_exact: expr) => {
@@ -1349,7 +1349,7 @@ macro_rules! struct_instantiation_for_state {
     };
 }
 
-/// Determine the proper type instantiation for struct in the current state.
+/// Determine the proper type instantiation for pub struct in the current state.
 #[macro_export]
 macro_rules! unpack_instantiation_for_state {
     () => {

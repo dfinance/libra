@@ -18,7 +18,7 @@ define_schema!(TestSchema1, TestField, TestField, "TestCF1");
 define_schema!(TestSchema2, TestField, TestField, "TestCF2");
 
 #[derive(Debug, Eq, PartialEq)]
-struct TestField(u32);
+pub struct TestField(u32);
 
 impl TestField {
     fn to_bytes(&self) -> Result<Vec<u8>> {
@@ -87,7 +87,7 @@ fn open_db_read_only(dir: &libra_temppath::TempPath) -> DB {
     DB::open_readonly(&dir.path(), "test", get_column_families()).expect("Failed to open DB.")
 }
 
-struct TestDB {
+pub struct TestDB {
     _tmpdir: libra_temppath::TempPath,
     db: DB,
 }

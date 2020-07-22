@@ -72,18 +72,18 @@ impl From<u32> for ConnectionId {
 }
 
 /// Generator of unique ConnectionId's.
-struct ConnectionIdGenerator {
+pub struct ConnectionIdGenerator {
     ctr: AtomicU32,
 }
 
 impl ConnectionIdGenerator {
-    const fn new() -> ConnectionIdGenerator {
+    pub const fn new() -> ConnectionIdGenerator {
         Self {
             ctr: AtomicU32::new(0),
         }
     }
 
-    fn next(&self) -> ConnectionId {
+    pub fn next(&self) -> ConnectionId {
         let next = self.ctr.fetch_add(1, Ordering::Relaxed);
         ConnectionId::from(next)
     }
@@ -136,7 +136,7 @@ impl ConnectionMetadata {
     }
 }
 
-/// The `Connection` struct consists of connection metadata and the actual socket for
+/// The `Connection` pub struct consists of connection metadata and the actual socket for
 /// communication.
 #[derive(Debug)]
 pub struct Connection<TSocket> {
@@ -188,7 +188,7 @@ pub async fn perform_handshake<T: TSocket>(
 }
 
 /// Convenience function for adding a timeout to a Future that returns an `io::Result`.
-async fn timeout_io<F, T>(duration: Duration, fut: F) -> io::Result<T>
+pub async fn timeout_io<F, T>(duration: Duration, fut: F) -> io::Result<T>
 where
     F: Future<Output = io::Result<T>>,
 {
@@ -200,7 +200,7 @@ where
 }
 
 /// Common context for performing both inbound and outbound connection upgrades.
-struct UpgradeContext {
+pub struct UpgradeContext {
     noise: NoiseUpgrader,
     handshake_version: u8,
     own_handshake: HandshakeMsg,
@@ -211,7 +211,7 @@ struct UpgradeContext {
 /// `ctxt.trusted_peers` is `Some(_)`, then we will only allow connections from
 /// peers with a pubkey in this set. Otherwise, we will allow inbound connections
 /// from any pubkey.
-async fn upgrade_inbound<T: TSocket>(
+pub async fn upgrade_inbound<T: TSocket>(
     ctxt: Arc<UpgradeContext>,
     fut_socket: impl Future<Output = io::Result<T>>,
     addr: NetworkAddress,
@@ -236,7 +236,7 @@ async fn upgrade_inbound<T: TSocket>(
 
 /// Upgrade an inbound connection. This means we run a Noise IK handshake for
 /// authentication and then negotiate common supported protocols.
-async fn upgrade_outbound<T: TSocket>(
+pub async fn upgrade_outbound<T: TSocket>(
     ctxt: Arc<UpgradeContext>,
     fut_socket: impl Future<Output = io::Result<T>>,
     addr: NetworkAddress,
@@ -315,7 +315,7 @@ where
         }
     }
 
-    fn parse_dial_addr(
+    pub fn parse_dial_addr(
         addr: &NetworkAddress,
     ) -> io::Result<(NetworkAddress, x25519::PublicKey, u8)> {
         use libra_network_address::Protocol::*;
@@ -506,7 +506,7 @@ where
 // TODO(philiphayes): move tests into separate file
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::protocols::wire::handshake::v1::{ProtocolId, SupportedProtocols};
     use bytes::{Bytes, BytesMut};
@@ -521,7 +521,7 @@ mod test {
     use rand::{rngs::StdRng, SeedableRng};
     use tokio::runtime::Runtime;
 
-    fn build_trusted_peers(
+    pub fn build_trusted_peers(
         id1: PeerId,
         key1: &x25519::PrivateKey,
         id2: PeerId,
@@ -536,12 +536,12 @@ mod test {
         ))
     }
 
-    enum Auth {
+   pub enum Auth {
         Mutual,
         ServerOnly,
     }
 
-    fn setup<TTransport>(
+    pub fn setup<TTransport>(
         base_transport: TTransport,
         auth: Auth,
     ) -> (
@@ -620,8 +620,7 @@ mod test {
             supported_protocols,
         )
     }
-
-    async fn write_read_msg(socket: &mut impl TSocket, msg: &[u8]) -> Bytes {
+    pub async fn write_read_msg(socket: &mut impl TSocket, msg: &[u8]) -> Bytes {
         write_u16frame(socket, msg).await.unwrap();
         socket.flush().await.unwrap();
 
@@ -632,7 +631,7 @@ mod test {
 
     /// Check that the network address matches the format
     /// `"/memory/<port>/ln-noise-ik/<pubkey>/ln-handshake/<version>"`
-    fn expect_memory_noise_addr(addr: &NetworkAddress) {
+    pub fn expect_memory_noise_addr(addr: &NetworkAddress) {
         assert!(
             matches!(addr.as_slice(), [Memory(_), NoiseIK(_), Handshake(_)]),
             "addr: '{}'",
@@ -642,7 +641,7 @@ mod test {
 
     /// Check that the network address matches the format
     /// `"/ip4/<ipaddr>/tcp/<port>/ln-noise-ik/<pubkey>/ln-handshake/<version>"`
-    fn expect_ip4_tcp_noise_addr(addr: &NetworkAddress) {
+    pub fn expect_ip4_tcp_noise_addr(addr: &NetworkAddress) {
         assert!(
             matches!(addr.as_slice(), [Ip4(_), Tcp(_), NoiseIK(_), Handshake(_)]),
             "addr: '{}'",

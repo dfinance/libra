@@ -17,27 +17,27 @@ use petgraph::{
 use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Edge {
+pub enum Edge {
     Identity,
     Nested,
 }
 
 #[derive(Clone, Debug)]
-struct EdgeInfo {
+pub struct EdgeInfo {
     name: FunctionName,
     type_argument: Type,
     loc: Loc,
     edge: Edge,
 }
 
-struct Context<'a> {
+pub struct Context<'a> {
     tparams: &'a BTreeMap<ModuleIdent, BTreeMap<FunctionName, &'a Vec<TParam>>>,
     tparam_type_arguments: BTreeMap<TParam, BTreeMap<TParam, EdgeInfo>>,
     current_module: ModuleIdent,
 }
 
 impl<'a> Context<'a> {
-    fn new(
+    pub fn new(
         tparams: &'a BTreeMap<ModuleIdent, BTreeMap<FunctionName, &'a Vec<TParam>>>,
         current_module: ModuleIdent,
     ) -> Self {
@@ -48,7 +48,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn add_usage(&mut self, loc: Loc, module: &ModuleIdent, fname: &FunctionName, targs: &[Type]) {
+    pub fn add_usage(&mut self, loc: Loc, module: &ModuleIdent, fname: &FunctionName, targs: &[Type]) {
         if &self.current_module != module {
             return;
         }
@@ -66,7 +66,7 @@ impl<'a> Context<'a> {
             })
     }
 
-    fn add_tparam_edges(
+    pub fn add_tparam_edges(
         acc: &mut BTreeMap<TParam, BTreeMap<TParam, EdgeInfo>>,
         tparam: &TParam,
         info: EdgeInfo,
@@ -109,7 +109,7 @@ impl<'a> Context<'a> {
         }
     }
 
-    fn instantiation_graph(&self) -> DiGraphMap<&TParam, Edge> {
+    pub fn instantiation_graph(&self) -> DiGraphMap<&TParam, Edge> {
         let edges = self
             .tparam_type_arguments
             .iter()
@@ -154,7 +154,7 @@ macro_rules! scc_edges {
     }};
 }
 
-fn module<'a>(
+pub fn module<'a>(
     errors: &mut Errors,
     tparams: &'a BTreeMap<ModuleIdent, BTreeMap<FunctionName, &'a Vec<TParam>>>,
     mname: ModuleIdent,
@@ -179,7 +179,7 @@ fn module<'a>(
 // Functions
 //**************************************************************************************************
 
-fn function_body(context: &mut Context, sp!(_, b_): &T::FunctionBody) {
+pub fn function_body(context: &mut Context, sp!(_, b_): &T::FunctionBody) {
     match b_ {
         T::FunctionBody_::Native => (),
         T::FunctionBody_::Defined(es) => sequence(context, es),
@@ -190,11 +190,11 @@ fn function_body(context: &mut Context, sp!(_, b_): &T::FunctionBody) {
 // Expressions
 //**************************************************************************************************
 
-fn sequence(context: &mut Context, seq: &T::Sequence) {
+pub fn sequence(context: &mut Context, seq: &T::Sequence) {
     seq.iter().for_each(|item| sequence_item(context, item))
 }
 
-fn sequence_item(context: &mut Context, item: &T::SequenceItem) {
+pub fn sequence_item(context: &mut Context, item: &T::SequenceItem) {
     use T::SequenceItem_ as S;
     match &item.value {
         S::Bind(_, _, te) | S::Seq(te) => exp(context, te),
@@ -202,7 +202,7 @@ fn sequence_item(context: &mut Context, item: &T::SequenceItem) {
     }
 }
 
-fn exp(context: &mut Context, e: &T::Exp) {
+pub fn exp(context: &mut Context, e: &T::Exp) {
     use T::UnannotatedExp_ as E;
     match &e.exp.value {
         E::InferredNum(_) | E::Use(_) => panic!("ICE should have been expanded"),
@@ -259,11 +259,11 @@ fn exp(context: &mut Context, e: &T::Exp) {
     }
 }
 
-fn exp_list(context: &mut Context, items: &[T::ExpListItem]) {
+pub fn exp_list(context: &mut Context, items: &[T::ExpListItem]) {
     items.iter().for_each(|item| exp_list_item(context, item))
 }
 
-fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
+pub fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
     use T::ExpListItem as I;
     match item {
         I::Single(e, _) | I::Splat(_, e, _) => {
@@ -276,7 +276,7 @@ fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
 // Errors
 //**************************************************************************************************
 
-fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&TParam>) -> Error {
+pub fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&TParam>) -> Error {
     let critical_edge = scc_edges!(graph, &scc).find(|(_, e, _)| e == &Edge::Nested);
     // tail -> head
     let (critical_tail, _, critical_head) = critical_edge.unwrap();
@@ -368,7 +368,7 @@ fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&T
     error
 }
 
-fn make_subst(
+pub fn make_subst(
     context: &Context,
     state: &EdgeInfo,
     tparam: &TParam,
@@ -387,7 +387,7 @@ fn make_subst(
         .collect::<TParamSubst>()
 }
 
-fn make_call_string(
+pub fn make_call_string(
     context: &Context,
     cur: &EdgeInfo,
     tparam: &TParam,

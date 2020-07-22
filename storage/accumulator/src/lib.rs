@@ -1,14 +1,14 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! This module provides algorithms for accessing and updating a Merkle Accumulator structure
 //! persisted in a key-value store. Note that this doesn't write to the storage directly, rather,
 //! it reads from it via the `HashReader` trait and yields writes via an in memory `HashMap`.
 //!
 //! # Merkle Accumulator
-//! Given an ever growing (append only) series of "leaf" hashes, we construct an evolving Merkle
+//! Given an ever growing (append only) series of "leaf" hashes, we conpub struct an evolving Merkle
 //! Tree for which proofs of inclusion/exclusion of a leaf hash at a leaf index in a snapshot
 //! of the tree (represented by root hash) can be given.
 //!
@@ -214,7 +214,7 @@ where
 
 /// Actual implementation of Merkle Accumulator algorithms, which carries the `reader` and
 /// `num_leaves` on an instance for convenience
-struct MerkleAccumulatorView<'a, R, H> {
+pub struct MerkleAccumulatorView<'a, R, H> {
     reader: &'a R,
     num_leaves: LeafCount,
     hasher: PhantomData<H>,
@@ -225,7 +225,7 @@ where
     R: HashReader,
     H: CryptoHasher,
 {
-    fn new(reader: &'a R, num_leaves: LeafCount) -> Self {
+    pub fn new(reader: &'a R, num_leaves: LeafCount) -> Self {
         Self {
             reader,
             num_leaves,
@@ -234,7 +234,7 @@ where
     }
 
     /// implementation for pub interface `MerkleAccumulator::append`
-    fn append(&self, new_leaves: &[HashValue]) -> Result<(HashValue, Vec<Node>)> {
+    pub fn append(&self, new_leaves: &[HashValue]) -> Result<(HashValue, Vec<Node>)> {
         // Deal with the case where new_leaves is empty
         if new_leaves.is_empty() {
             if self.num_leaves == 0 {
@@ -280,7 +280,7 @@ where
             left_siblings.push((pos, hash));
         }
 
-        // Now reconstruct the final root hash by walking up to root level and adding
+        // Now reconpub struct the final root hash by walking up to root level and adding
         // placeholder hash nodes as needed on the right, and left siblings that have either
         // been newly created or read from storage.
         let (mut pos, mut hash) = left_siblings.pop().expect("Must have at least one node");
@@ -309,22 +309,22 @@ where
     ///         num_new_leaves * 2 - 1 < num_new_leaves * 2
     ///     and the full route from root of that subtree to the accumulator root turns frozen
     ///         height - (log2(num_new_leaves) + 1) < height - 1 = root_level
-    fn max_to_freeze(num_new_leaves: usize, root_level: u32) -> usize {
+    pub fn max_to_freeze(num_new_leaves: usize, root_level: u32) -> usize {
         precondition!(root_level as usize <= MAX_ACCUMULATOR_PROOF_DEPTH);
         precondition!(num_new_leaves < (usize::max_value() / 2));
         precondition!(num_new_leaves * 2 <= usize::max_value() - root_level as usize);
         num_new_leaves * 2 + root_level as usize
     }
 
-    fn hash_internal_node(left: HashValue, right: HashValue) -> HashValue {
+    pub fn hash_internal_node(left: HashValue, right: HashValue) -> HashValue {
         MerkleTreeInternalNode::<H>::new(left, right).hash()
     }
 
-    fn rightmost_leaf_index(&self) -> u64 {
+    pub fn rightmost_leaf_index(&self) -> u64 {
         (self.num_leaves - 1) as u64
     }
 
-    fn get_hash(&self, position: Position) -> Result<HashValue> {
+    pub fn get_hash(&self, position: Position) -> Result<HashValue> {
         let idx = self.rightmost_leaf_index();
         if position.is_placeholder(idx) {
             Ok(*ACCUMULATOR_PLACEHOLDER_HASH)
@@ -339,12 +339,12 @@ where
         }
     }
 
-    fn get_hashes(&self, positions: &[Position]) -> Result<Vec<HashValue>> {
+    pub fn get_hashes(&self, positions: &[Position]) -> Result<Vec<HashValue>> {
         positions.iter().map(|p| self.get_hash(*p)).collect()
     }
 
     /// implementation for pub interface `MerkleAccumulator::get_proof`
-    fn get_proof(&self, leaf_index: u64) -> Result<AccumulatorProof<H>> {
+    pub fn get_proof(&self, leaf_index: u64) -> Result<AccumulatorProof<H>> {
         ensure!(
             leaf_index < self.num_leaves as u64,
             "invalid leaf_index {}, num_leaves {}",
@@ -357,7 +357,7 @@ where
     }
 
     /// Implementation for public interface `MerkleAccumulator::get_consistency_proof`.
-    fn get_consistency_proof(
+    pub fn get_consistency_proof(
         &self,
         sub_acc_leaves: LeafCount,
     ) -> Result<AccumulatorConsistencyProof> {
@@ -377,7 +377,7 @@ where
     }
 
     /// Implementation for public interface `MerkleAccumulator::get_range_proof`.
-    fn get_range_proof(
+    pub fn get_range_proof(
         &self,
         first_leaf_index: Option<u64>,
         num_leaves: LeafCount,
@@ -390,7 +390,7 @@ where
         ))
     }
 
-    fn get_range_proof_positions(
+    pub fn get_range_proof_positions(
         &self,
         first_leaf_index: Option<u64>,
         num_leaves: LeafCount,
@@ -423,7 +423,7 @@ where
         Ok((left_siblings, right_siblings))
     }
 
-    fn get_siblings(
+    pub fn get_siblings(
         &self,
         leaf_index: u64,
         filter: impl Fn(Position) -> bool,
@@ -433,7 +433,7 @@ where
 
     /// Helper function to get siblings on the path from the given leaf to the root. An additional
     /// filter function can be applied to filter out certain siblings.
-    fn get_sibling_positions(
+    pub fn get_sibling_positions(
         &self,
         leaf_index: u64,
         filter: impl Fn(Position) -> bool,
@@ -447,7 +447,7 @@ where
     }
 
     /// Implementation for public interface `MerkleAccumulator::get_frozen_subtree_hashes`.
-    fn get_frozen_subtree_hashes(&self) -> Result<Vec<HashValue>> {
+    pub fn get_frozen_subtree_hashes(&self) -> Result<Vec<HashValue>> {
         FrozenSubTreeIterator::new(self.num_leaves)
             .map(|p| self.reader.get(p))
             .collect::<Result<Vec<_>>>()
@@ -455,4 +455,4 @@ where
 }
 
 #[cfg(test)]
-mod tests;
+pub mod tests;

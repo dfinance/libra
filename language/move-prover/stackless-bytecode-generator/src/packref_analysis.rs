@@ -22,26 +22,26 @@ use vm::file_format::CodeOffset;
 
 /// Copy analysis
 #[derive(Debug, Clone, PartialEq)]
-struct CopyState {
+pub struct CopyState {
     copies: BTreeSet<TempIndex>,
 }
 
 impl CopyState {}
 
-struct CopyAnalysis<'a> {
+pub struct CopyAnalysis<'a> {
     func_target: &'a FunctionTarget<'a>,
     borrow_annotation: &'a BorrowAnnotation,
 }
 
 impl<'a> CopyAnalysis<'a> {
-    fn new(func_target: &'a FunctionTarget<'a>, borrow_annotation: &'a BorrowAnnotation) -> Self {
+    pub fn new(func_target: &'a FunctionTarget<'a>, borrow_annotation: &'a BorrowAnnotation) -> Self {
         Self {
             func_target,
             borrow_annotation,
         }
     }
 
-    fn analyze(
+    pub fn analyze(
         &mut self,
         copies: BTreeSet<TempIndex>,
         instrs: &[Bytecode],
@@ -52,7 +52,7 @@ impl<'a> CopyAnalysis<'a> {
         self.post_process(&cfg, instrs, state_map)
     }
 
-    fn post_process(
+    pub fn post_process(
         &mut self,
         cfg: &StacklessControlFlowGraph,
         instrs: &[Bytecode],
@@ -70,7 +70,7 @@ impl<'a> CopyAnalysis<'a> {
         result
     }
 
-    fn execute(
+    pub fn execute(
         &mut self,
         pre: CopyState,
         instr: &Bytecode,
@@ -193,7 +193,7 @@ pub struct PackrefInstrumentation {
 }
 
 impl PackrefInstrumentation {
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.before.is_empty() && self.after.is_empty()
     }
 }
@@ -217,7 +217,7 @@ pub struct PackrefAnalysis<'a> {
 }
 
 impl<'a> PackrefAnalysis<'a> {
-    fn new(
+    pub fn new(
         func_target: &'a FunctionTarget<'a>,
         borrow_annotation: &'a BorrowAnnotation,
         copy_annotation: &'a BTreeMap<CodeOffset, CopyState>,
@@ -231,7 +231,7 @@ impl<'a> PackrefAnalysis<'a> {
         }
     }
 
-    fn compute_instrumentation(
+    pub fn compute_instrumentation(
         &mut self,
         code_offset: CodeOffset,
         bytecode: &Bytecode,
@@ -247,7 +247,7 @@ impl<'a> PackrefAnalysis<'a> {
         PackrefInstrumentation { before, after }
     }
 
-    fn entry_exit_instrumentation(
+    pub fn entry_exit_instrumentation(
         &mut self,
         code_offset: CodeOffset,
         at_entry: bool,
@@ -270,7 +270,7 @@ impl<'a> PackrefAnalysis<'a> {
         }
     }
 
-    fn public_function_instrumentation(
+    pub fn public_function_instrumentation(
         &mut self,
         code_offset: CodeOffset,
         bytecode: &Bytecode,
@@ -314,13 +314,13 @@ impl<'a> PackrefAnalysis<'a> {
         (before, after)
     }
 
-    fn new_attr_id(&mut self) -> AttrId {
+    pub fn new_attr_id(&mut self) -> AttrId {
         let attr_id = AttrId::new(self.next_attr_id);
         self.next_attr_id += 1;
         attr_id
     }
 
-    fn ref_create_destroy_instrumentation(
+    pub fn ref_create_destroy_instrumentation(
         &mut self,
         code_offset: CodeOffset,
         bytecode: &Bytecode,

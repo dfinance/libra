@@ -55,7 +55,7 @@ where
         I: IntoIterator<Item = (Ix, T)>,
     {
         let mut items: Vec<_> = iter.into_iter().collect();
-        // Sorting is required to construct a subset correctly.
+        // Sorting is required to conpub struct a subset correctly.
         items.sort_by(|x, y| x.0.cmp(&y.0));
         Self {
             items,

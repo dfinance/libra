@@ -34,14 +34,14 @@ pub fn program(prog: N::Program, errors: Errors) -> (T::Program, Errors) {
     (T::Program { modules, scripts }, errors)
 }
 
-fn modules(
+pub fn modules(
     context: &mut Context,
     modules: UniqueMap<ModuleIdent, N::ModuleDefinition>,
 ) -> UniqueMap<ModuleIdent, T::ModuleDefinition> {
     modules.map(|ident, mdef| module(context, ident, mdef))
 }
 
-fn module(
+pub fn module(
     context: &mut Context,
     ident: ModuleIdent,
     mdef: N::ModuleDefinition,
@@ -70,7 +70,7 @@ fn module(
     }
 }
 
-fn scripts(
+pub fn scripts(
     context: &mut Context,
     nscripts: BTreeMap<String, N::Script>,
 ) -> BTreeMap<String, T::Script> {
@@ -80,7 +80,7 @@ fn scripts(
         .collect()
 }
 
-fn script(context: &mut Context, nscript: N::Script) -> T::Script {
+pub fn script(context: &mut Context, nscript: N::Script) -> T::Script {
     assert!(context.current_script_constants.is_none());
     context.current_module = None;
     let N::Script {
@@ -101,7 +101,7 @@ fn script(context: &mut Context, nscript: N::Script) -> T::Script {
     }
 }
 
-fn check_primitive_script_arg(context: &mut Context, mloc: Loc, idx: usize, ty: &Type) {
+pub fn check_primitive_script_arg(context: &mut Context, mloc: Loc, idx: usize, ty: &Type) {
     let loc = ty.loc;
 
     let signer_ref = sp(loc, Type_::Ref(false, Box::new(Type_::signer(loc))));
@@ -152,7 +152,7 @@ fn check_primitive_script_arg(context: &mut Context, mloc: Loc, idx: usize, ty: 
 // Functions
 //**************************************************************************************************
 
-fn function(
+pub fn function(
     context: &mut Context,
     name: FunctionName,
     f: N::Function,
@@ -194,7 +194,7 @@ fn function(
     }
 }
 
-fn function_signature(context: &mut Context, sig: &N::FunctionSignature) {
+pub fn function_signature(context: &mut Context, sig: &N::FunctionSignature) {
     assert!(context.constraints.is_empty());
 
     let mut declared = UniqueMap::new();
@@ -220,7 +220,7 @@ fn function_signature(context: &mut Context, sig: &N::FunctionSignature) {
     core::solve_constraints(context);
 }
 
-fn function_body(
+pub fn function_body(
     context: &mut Context,
     acquires: &BTreeMap<StructName, Loc>,
     sp!(loc, nb_): N::FunctionBody,
@@ -254,7 +254,7 @@ fn function_body(
 // Constants
 //**************************************************************************************************
 
-fn constant(context: &mut Context, _name: ConstantName, nconstant: N::Constant) -> T::Constant {
+pub fn constant(context: &mut Context, _name: ConstantName, nconstant: N::Constant) -> T::Constant {
     assert!(context.constraints.is_empty());
     context.reset_for_module_item();
 
@@ -292,7 +292,7 @@ fn constant(context: &mut Context, _name: ConstantName, nconstant: N::Constant) 
     }
 }
 
-mod check_valid_constant {
+pub mod check_valid_constant {
     use super::subtype_no_report;
     use crate::{
         naming::ast::{Type, Type_},
@@ -353,7 +353,7 @@ mod check_valid_constant {
         exp_(context, &e.exp)
     }
 
-    fn exp_(context: &mut Context, sp!(loc, e_): &T::UnannotatedExp) {
+    pub fn exp_(context: &mut Context, sp!(loc, e_): &T::UnannotatedExp) {
         use T::UnannotatedExp_ as E;
         const REFERENCE_CASE: &str = "References (and reference operations) are";
         let s;
@@ -453,13 +453,13 @@ mod check_valid_constant {
         )])
     }
 
-    fn exp_list(context: &mut Context, items: &[T::ExpListItem]) {
+    pub fn exp_list(context: &mut Context, items: &[T::ExpListItem]) {
         for item in items {
             exp_list_item(context, item)
         }
     }
 
-    fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
+    pub fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
         use T::ExpListItem as I;
         match item {
             I::Single(e, _st) => {
@@ -471,13 +471,13 @@ mod check_valid_constant {
         }
     }
 
-    fn sequence(context: &mut Context, seq: &T::Sequence) {
+    pub fn sequence(context: &mut Context, seq: &T::Sequence) {
         for item in seq {
             sequence_item(context, item)
         }
     }
 
-    fn sequence_item(context: &mut Context, sp!(loc, item_): &T::SequenceItem) {
+    pub fn sequence_item(context: &mut Context, sp!(loc, item_): &T::SequenceItem) {
         use T::SequenceItem_ as S;
         let error_case = match &item_ {
             S::Seq(te) => {
@@ -502,7 +502,7 @@ mod check_valid_constant {
 // Structs
 //**************************************************************************************************
 
-fn struct_def(context: &mut Context, _name: StructName, s: &mut N::StructDefinition) {
+pub fn struct_def(context: &mut Context, _name: StructName, s: &mut N::StructDefinition) {
     assert!(context.constraints.is_empty());
     context.reset_for_module_item();
 
@@ -526,7 +526,7 @@ fn struct_def(context: &mut Context, _name: StructName, s: &mut N::StructDefinit
 // Types
 //**************************************************************************************************
 
-fn typing_error<T: Into<String>, F: FnOnce() -> T>(
+pub fn typing_error<T: Into<String>, F: FnOnce() -> T>(
     context: &mut Context,
     loc: Loc,
     msg: F,
@@ -575,7 +575,7 @@ fn typing_error<T: Into<String>, F: FnOnce() -> T>(
     context.error(error);
 }
 
-fn subtype_no_report(
+pub fn subtype_no_report(
     context: &mut Context,
     pre_lhs: Type,
     pre_rhs: Type,
@@ -589,7 +589,7 @@ fn subtype_no_report(
     })
 }
 
-fn subtype<T: Into<String>, F: FnOnce() -> T>(
+pub fn subtype<T: Into<String>, F: FnOnce() -> T>(
     context: &mut Context,
     loc: Loc,
     msg: F,
@@ -612,7 +612,7 @@ fn subtype<T: Into<String>, F: FnOnce() -> T>(
     }
 }
 
-fn join_opt<T: Into<String>, F: FnOnce() -> T>(
+pub fn join_opt<T: Into<String>, F: FnOnce() -> T>(
     context: &mut Context,
     loc: Loc,
     msg: F,
@@ -635,7 +635,7 @@ fn join_opt<T: Into<String>, F: FnOnce() -> T>(
     }
 }
 
-fn join<T: Into<String>, F: FnOnce() -> T>(
+pub fn join<T: Into<String>, F: FnOnce() -> T>(
     context: &mut Context,
     loc: Loc,
     msg: F,
@@ -652,7 +652,7 @@ fn join<T: Into<String>, F: FnOnce() -> T>(
 // Expressions
 //**************************************************************************************************
 
-enum SeqCase {
+pub enum SeqCase {
     Seq(Loc, Box<T::Exp>),
     Declare {
         old_locals: UniqueMap<Var, Type>,
@@ -669,7 +669,7 @@ enum SeqCase {
     },
 }
 
-fn sequence(context: &mut Context, seq: N::Sequence) -> T::Sequence {
+pub fn sequence(context: &mut Context, seq: N::Sequence) -> T::Sequence {
     use N::SequenceItem_ as NS;
     use T::SequenceItem_ as TS;
 
@@ -746,7 +746,7 @@ fn sequence(context: &mut Context, seq: N::Sequence) -> T::Sequence {
     resulting_sequence
 }
 
-fn sequence_type(seq: &T::Sequence) -> &Type {
+pub fn sequence_type(seq: &T::Sequence) -> &Type {
     use T::SequenceItem_ as TS;
     match seq.back().unwrap() {
         sp!(_, TS::Bind(_, _, _)) | sp!(_, TS::Declare(_)) => {
@@ -756,18 +756,18 @@ fn sequence_type(seq: &T::Sequence) -> &Type {
     }
 }
 
-fn exp_vec(context: &mut Context, es: Vec<N::Exp>) -> Vec<T::Exp> {
+pub fn exp_vec(context: &mut Context, es: Vec<N::Exp>) -> Vec<T::Exp> {
     es.into_iter().map(|e| exp_(context, e)).collect()
 }
 
-fn exp(context: &mut Context, ne: Box<N::Exp>) -> Box<T::Exp> {
+pub fn exp(context: &mut Context, ne: Box<N::Exp>) -> Box<T::Exp> {
     Box::new(exp_(context, *ne))
 }
 
-fn exp_(context: &mut Context, initial_ne: N::Exp) -> T::Exp {
+pub fn exp_(context: &mut Context, initial_ne: N::Exp) -> T::Exp {
     use N::Exp_ as NE;
     use T::UnannotatedExp_ as TE;
-    struct Stack<'a> {
+    pub struct Stack<'a> {
         frames: Vec<Box<dyn FnOnce(&mut Self)>>,
         operands: Vec<T::Exp>,
         context: &'a mut Context,
@@ -777,7 +777,7 @@ fn exp_(context: &mut Context, initial_ne: N::Exp) -> T::Exp {
             move |s: &mut Stack| exp_loop(s, $e)
         }};
     }
-    fn exp_loop(stack: &mut Stack, sp!(loc, cur_): N::Exp) {
+    pub fn exp_loop(stack: &mut Stack, sp!(loc, cur_): N::Exp) {
         match cur_ {
             NE::BinopExp(nlhs, bop, nrhs) => {
                 let f_lhs = inner!(*nlhs);
@@ -908,7 +908,7 @@ fn exp_(context: &mut Context, initial_ne: N::Exp) -> T::Exp {
     e_res
 }
 
-fn exp_inner(context: &mut Context, sp!(eloc, ne_): N::Exp) -> T::Exp {
+pub fn exp_inner(context: &mut Context, sp!(eloc, ne_): N::Exp) -> T::Exp {
     use N::Exp_ as NE;
     use T::UnannotatedExp_ as TE;
     let (ty, e_) = match ne_ {
@@ -1208,7 +1208,7 @@ fn exp_inner(context: &mut Context, sp!(eloc, ne_): N::Exp) -> T::Exp {
     T::exp(ty, sp(eloc, e_))
 }
 
-fn loop_body(
+pub fn loop_body(
     context: &mut Context,
     eloc: Loc,
     is_loop: bool,
@@ -1241,7 +1241,7 @@ fn loop_body(
 // Locals and LValues
 //**************************************************************************************************
 
-fn lvalues_expected_types(
+pub fn lvalues_expected_types(
     context: &mut Context,
     sp!(_loc, bs_): &T::LValueList,
 ) -> Vec<Option<N::Type>> {
@@ -1250,7 +1250,7 @@ fn lvalues_expected_types(
         .collect()
 }
 
-fn lvalue_expected_types(_context: &mut Context, sp!(loc, b_): &T::LValue) -> Option<N::Type> {
+pub fn lvalue_expected_types(_context: &mut Context, sp!(loc, b_): &T::LValue) -> Option<N::Type> {
     use N::Type_::*;
     use T::LValue_ as L;
     let loc = *loc;
@@ -1272,12 +1272,12 @@ fn lvalue_expected_types(_context: &mut Context, sp!(loc, b_): &T::LValue) -> Op
 }
 
 #[derive(Clone, Copy)]
-enum LValueCase {
+pub enum LValueCase {
     Bind,
     Assign,
 }
 
-fn bind_list(
+pub fn bind_list(
     context: &mut Context,
     ls: N::LValueList,
     ty_opt: Option<Type>,
@@ -1285,11 +1285,11 @@ fn bind_list(
     lvalue_list(context, LValueCase::Bind, ls, ty_opt)
 }
 
-fn assign_list(context: &mut Context, ls: N::LValueList, rvalue_ty: Type) -> T::LValueList {
+pub fn assign_list(context: &mut Context, ls: N::LValueList, rvalue_ty: Type) -> T::LValueList {
     lvalue_list(context, LValueCase::Assign, ls, Some(rvalue_ty)).1
 }
 
-fn lvalue_list(
+pub fn lvalue_list(
     context: &mut Context,
     case: LValueCase,
     sp!(loc, nlvalues): N::LValueList,
@@ -1344,7 +1344,7 @@ fn lvalue_list(
     (seen_locals, sp(loc, tbinds))
 }
 
-fn lvalue(
+pub fn lvalue(
     context: &mut Context,
     case: LValueCase,
     seen_locals: &mut UniqueMap<Var, ()>,
@@ -1462,7 +1462,7 @@ fn lvalue(
     sp(loc, tl_)
 }
 
-fn check_mutation(context: &mut Context, loc: Loc, given_ref: Type, rvalue_ty: &Type) -> Type {
+pub fn check_mutation(context: &mut Context, loc: Loc, given_ref: Type, rvalue_ty: &Type) -> Type {
     let inner = core::make_tvar(context, loc);
     let ref_ty = sp(loc, Type_::Ref(true, Box::new(inner.clone())));
     let res_ty = subtype(
@@ -1491,7 +1491,7 @@ fn check_mutation(context: &mut Context, loc: Loc, given_ref: Type, rvalue_ty: &
 // Fields
 //**************************************************************************************************
 
-fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Type {
+pub fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Type {
     use TypeName_::*;
     use Type_::*;
     let msg = || format!("Unbound field '{}'", field);
@@ -1521,7 +1521,7 @@ fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Ty
                 (
                     t.loc,
                     format!(
-                        "Expected a struct type in the current module but got: {}",
+                        "Expected a pub struct type in the current module but got: {}",
                         core::error_format(&t, &context.subst)
                     ),
                 ),
@@ -1531,7 +1531,7 @@ fn resolve_field(context: &mut Context, loc: Loc, ty: Type, field: &Field) -> Ty
     }
 }
 
-fn add_field_types<T>(
+pub fn add_field_types<T>(
     context: &mut Context,
     loc: Loc,
     verb: &str,
@@ -1545,7 +1545,7 @@ fn add_field_types<T>(
         N::StructFields::Defined(m) => m,
         N::StructFields::Native(nloc) => {
             let msg = format!(
-                "Invalid {} usage for native struct '{}::{}'. Native structs cannot be directly \
+                "Invalid {} usage for native pub struct '{}::{}'. Native structs cannot be directly \
                  constructed/deconstructd, and their fields cannot be dirctly accessed",
                 verb, m, n
             );
@@ -1576,14 +1576,14 @@ fn add_field_types<T>(
     })
 }
 
-enum ExpDotted_ {
+pub enum ExpDotted_ {
     Exp(Box<T::Exp>),
     TmpBorrow(Box<T::Exp>, Box<Type>),
     Dot(Box<ExpDotted>, Field, Box<Type>),
 }
 type ExpDotted = Spanned<ExpDotted_>;
 
-fn exp_dotted(
+pub fn exp_dotted(
     context: &mut Context,
     verb: &str,
     sp!(dloc, ndot_): N::ExpDotted,
@@ -1619,7 +1619,7 @@ fn exp_dotted(
     (sp(dloc, edot_), ty)
 }
 
-fn exp_dotted_to_borrow(
+pub fn exp_dotted_to_borrow(
     context: &mut Context,
     loc: Loc,
     mut_: bool,
@@ -1671,7 +1671,7 @@ fn exp_dotted_to_borrow(
     }
 }
 
-fn exp_dotted_to_owned_value(
+pub fn exp_dotted_to_owned_value(
     context: &mut Context,
     eloc: Loc,
     edot: ExpDotted,
@@ -1721,7 +1721,7 @@ impl crate::shared::ast_debug::AstDebug for ExpDotted_ {
 // Calls
 //**************************************************************************************************
 
-fn module_call(
+pub fn module_call(
     context: &mut Context,
     loc: Loc,
     m: ModuleIdent,
@@ -1762,7 +1762,7 @@ fn module_call(
     (ret_ty, T::UnannotatedExp_::ModuleCall(Box::new(call)))
 }
 
-fn builtin_call(
+pub fn builtin_call(
     context: &mut Context,
     loc: Loc,
     sp!(bloc, nb_): N::BuiltinFunction,
@@ -1836,7 +1836,7 @@ fn builtin_call(
     (ret_ty, call)
 }
 
-fn call_args<S: std::fmt::Display, F: Fn() -> S>(
+pub fn call_args<S: std::fmt::Display, F: Fn() -> S>(
     context: &mut Context,
     loc: Loc,
     msg: F,
@@ -1862,7 +1862,7 @@ fn call_args<S: std::fmt::Display, F: Fn() -> S>(
     (Box::new(arg), tys)
 }
 
-fn make_arg_types<S: std::fmt::Display, F: Fn() -> S>(
+pub fn make_arg_types<S: std::fmt::Display, F: Fn() -> S>(
     context: &mut Context,
     loc: Loc,
     msg: F,

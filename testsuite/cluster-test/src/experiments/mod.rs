@@ -1,17 +1,17 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod compatibility_test;
-mod cpu_flamegraph;
-mod packet_loss_random_validators;
-mod performance_benchmark;
-mod performance_benchmark_three_region_simulation;
-mod reboot_random_validators;
-mod recovery_time;
-mod twin_validator;
-mod versioning_test;
+
+pub mod compatibility_test;
+pub mod cpu_flamegraph;
+pub mod packet_loss_random_validators;
+pub mod performance_benchmark;
+pub mod performance_benchmark_three_region_simulation;
+pub mod reboot_random_validators;
+pub mod recovery_time;
+pub mod twin_validator;
+pub mod versioning_test;
 
 use std::{
     collections::{HashMap, HashSet},

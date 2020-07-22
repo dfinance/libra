@@ -1,9 +1,9 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod blocking;
-mod client;
-mod response;
+pub mod blocking;
+pub mod client;
+pub mod response;
 
 pub use blocking::JsonRpcClient;
 pub use client::{

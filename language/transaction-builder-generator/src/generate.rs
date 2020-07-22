@@ -15,7 +15,7 @@ use transaction_builder_generator as buildgen;
 
 arg_enum! {
 #[derive(Debug, StructOpt)]
-enum Language {
+pub enum Language {
     Python3,
     Rust,
     Cpp,
@@ -28,7 +28,7 @@ enum Language {
     name = "Transaction builder generator",
     about = "Generate code for Move script builders"
 )]
-struct Options {
+pub struct Options {
     /// Path to the directory containing ABI files in LCS encoding.
     abi_directory: PathBuf,
 

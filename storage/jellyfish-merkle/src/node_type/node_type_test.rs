@@ -686,7 +686,7 @@ fn test_internal_hash_and_proof() {
     }
 }
 
-enum BinaryTreeNode {
+pub enum BinaryTreeNode {
     Internal(BinaryTreeInternalNode),
     Child(BinaryTreeChildNode),
     Null,
@@ -742,7 +742,7 @@ impl BinaryTreeNode {
 ///    * [B]   ...
 ///   / \    / \
 ///  0   1  2   3    ... 15
-struct BinaryTreeInternalNode {
+pub struct BinaryTreeInternalNode {
     begin: u8,
     width: u8,
     left: Rc<BinaryTreeNode>,
@@ -765,14 +765,14 @@ impl BinaryTreeInternalNode {
 /// N.B. when `is_leaf` is true, in the binary tree represented by a `NaiveInternalNode`, the child
 /// node will be brought up to the root of the highest subtree that has only that leaf.
 #[derive(Clone, Copy)]
-struct BinaryTreeChildNode {
+pub struct BinaryTreeChildNode {
     version: Version,
     index: u8,
     hash: HashValue,
     is_leaf: bool,
 }
 
-struct NaiveInternalNode {
+pub struct NaiveInternalNode {
     root: Rc<BinaryTreeNode>,
 }
 

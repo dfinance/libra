@@ -39,7 +39,7 @@ use vm_validator::vm_validator::{get_account_sequence_number, TransactionValidat
 // ============================== //
 
 /// attempts broadcast to `peer` and schedules the next broadcast
-pub(crate) fn execute_broadcast<V>(
+pub fn execute_broadcast<V>(
     peer: PeerNetworkId,
     backoff: bool,
     smp: &mut SharedMempool<V>,
@@ -66,7 +66,7 @@ pub(crate) fn execute_broadcast<V>(
 
 /// broadcasts txns to `peer` if alive
 /// Returns whether the next broadcast scheduled for this peer should be in backpressure mode or not
-fn broadcast_single_peer<V>(peer: PeerNetworkId, backoff: bool, smp: &mut SharedMempool<V>) -> bool
+pub fn broadcast_single_peer<V>(peer: PeerNetworkId, backoff: bool, smp: &mut SharedMempool<V>) -> bool
 where
     V: TransactionValidation,
 {
@@ -191,7 +191,7 @@ where
     next_backoff
 }
 
-fn send_mempool_sync_msg(
+pub fn send_mempool_sync_msg(
     msg: MempoolSyncMsg,
     recipient: PeerId,
     network_sender: &mut MempoolNetworkSender,
@@ -211,7 +211,7 @@ fn send_mempool_sync_msg(
 // =============================== //
 
 /// processes transactions directly submitted by client
-pub(crate) async fn process_client_transaction_submission<V>(
+pub async fn process_client_transaction_submission<V>(
     smp: SharedMempool<V>,
     transaction: SignedTransaction,
     callback: oneshot::Sender<Result<SubmissionStatus>>,
@@ -241,7 +241,7 @@ pub(crate) async fn process_client_transaction_submission<V>(
 }
 
 /// processes transactions from other nodes
-pub(crate) async fn process_transaction_broadcast<V>(
+pub async fn process_transaction_broadcast<V>(
     mut smp: SharedMempool<V>,
     transactions: Vec<SignedTransaction>,
     request_id: String,
@@ -291,7 +291,7 @@ pub(crate) async fn process_transaction_broadcast<V>(
     notify_subscribers(SharedMempoolNotification::ACK, &smp.subscribers);
 }
 
-fn gen_ack_response(request_id: String, results: Vec<SubmissionStatus>) -> MempoolSyncMsg {
+pub fn gen_ack_response(request_id: String, results: Vec<SubmissionStatus>) -> MempoolSyncMsg {
     let mut backoff = false;
     let retry_txns = results
         .into_iter()
@@ -314,7 +314,7 @@ fn gen_ack_response(request_id: String, results: Vec<SubmissionStatus>) -> Mempo
     }
 }
 
-fn is_txn_retryable(result: SubmissionStatus) -> bool {
+pub fn is_txn_retryable(result: SubmissionStatus) -> bool {
     let mempool_status = result.0.code;
     mempool_status == MempoolStatusCode::TooManyTransactions
         || mempool_status == MempoolStatusCode::MempoolIsFull
@@ -322,7 +322,7 @@ fn is_txn_retryable(result: SubmissionStatus) -> bool {
 
 /// submits a list of SignedTransaction to the local mempool
 /// and returns a vector containing AdmissionControlStatus
-async fn process_incoming_transactions<V>(
+pub async fn process_incoming_transactions<V>(
     smp: &SharedMempool<V>,
     transactions: Vec<SignedTransaction>,
     timeline_state: TimelineState,
@@ -420,7 +420,7 @@ where
 }
 
 // TODO update counters to ID peers using PeerNetworkId
-fn log_txn_process_results(results: &[SubmissionStatus], sender: Option<PeerId>) {
+pub fn log_txn_process_results(results: &[SubmissionStatus], sender: Option<PeerId>) {
     let sender = match sender {
         Some(peer) => peer.to_string(),
         None => "client".to_string(),
@@ -451,7 +451,7 @@ fn log_txn_process_results(results: &[SubmissionStatus], sender: Option<PeerId>)
 // ================================= //
 // intra-node communication handlers //
 // ================================= //
-pub(crate) async fn process_state_sync_request(
+pub async fn process_state_sync_request(
     mempool: Arc<Mutex<CoreMempool>>,
     req: CommitNotification,
 ) {
@@ -483,7 +483,7 @@ pub(crate) async fn process_state_sync_request(
         .observe(latency.as_secs_f64());
 }
 
-pub(crate) async fn process_consensus_request(mempool: &Mutex<CoreMempool>, req: ConsensusRequest) {
+pub async fn process_consensus_request(mempool: &Mutex<CoreMempool>, req: ConsensusRequest) {
     //start latency timer
     let start_time = Instant::now();
 
@@ -548,7 +548,7 @@ pub(crate) async fn process_consensus_request(mempool: &Mutex<CoreMempool>, req:
         .observe(latency.as_secs_f64());
 }
 
-async fn commit_txns(
+pub async fn commit_txns(
     mempool: &Mutex<CoreMempool>,
     transactions: Vec<CommittedTransaction>,
     block_timestamp_usecs: u64,
@@ -572,7 +572,7 @@ async fn commit_txns(
 }
 
 /// processes on-chain reconfiguration notification
-pub(crate) async fn process_config_update<V>(
+pub async fn process_config_update<V>(
     config_update: OnChainConfigPayload,
     validator: Arc<RwLock<V>>,
 ) where
@@ -589,6 +589,6 @@ pub(crate) async fn process_config_update<V>(
 /// creates uniques request id for the batch in the format "{start_id}_{end_id}"
 /// where start is an id in timeline index  that is lower than the first txn in a batch
 /// and end equals to timeline ID of last transaction in a batch
-fn create_request_id(start_timeline_id: u64, end_timeline_id: u64) -> String {
+pub fn create_request_id(start_timeline_id: u64, end_timeline_id: u64) -> String {
     format!("{}_{}", start_timeline_id, end_timeline_id)
 }

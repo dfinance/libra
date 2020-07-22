@@ -106,7 +106,7 @@ macro_rules! impl_array_newtype_encodable {
             {
                 use $crate::std::fmt::{self, Formatter};
 
-                struct Visitor;
+                pub struct Visitor;
                 impl<'de> $crate::serde::de::Visitor<'de> for Visitor {
                     type Value = $thing;
 

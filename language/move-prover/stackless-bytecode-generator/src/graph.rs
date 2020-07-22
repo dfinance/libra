@@ -82,7 +82,7 @@ impl<T: Ord + Copy + Debug> Graph<T> {
         }
     }
 
-    fn is_acyclic(&self) -> bool {
+    pub fn is_acyclic(&self) -> bool {
         let mut visited = BTreeMap::new();
         let mut stack = vec![];
         visited.insert(self.entry, false);
@@ -113,7 +113,7 @@ impl<T: Ord + Copy + Debug> Graph<T> {
         true
     }
 
-    fn natural_loop(&self, back_edge: (T, T)) -> BTreeSet<T> {
+    pub fn natural_loop(&self, back_edge: (T, T)) -> BTreeSet<T> {
         let n = back_edge.0;
         let d = back_edge.1;
         let mut stack = vec![];
@@ -136,7 +136,7 @@ impl<T: Ord + Copy + Debug> Graph<T> {
     }
 }
 
-struct DomRelation<T: Ord + Copy + Debug> {
+pub struct DomRelation<T: Ord + Copy + Debug> {
     node_to_postorder_num: BTreeMap<T, usize>,
     postorder_num_to_node: Vec<T>,
     idom_tree: BTreeMap<usize, usize>,
@@ -177,15 +177,15 @@ impl<T: Ord + Copy + Debug> DomRelation<T> {
         }
     }
 
-    fn entry_num(&self) -> usize {
+    pub fn entry_num(&self) -> usize {
         self.num_nodes() - 1
     }
 
-    fn num_nodes(&self) -> usize {
+    pub fn num_nodes(&self) -> usize {
         self.node_to_postorder_num.len()
     }
 
-    fn postorder_visit(&mut self, graph: &Graph<T>) {
+    pub fn postorder_visit(&mut self, graph: &Graph<T>) {
         let mut stack = vec![];
         let mut visited = BTreeSet::new();
         let mut grey = BTreeSet::new();
@@ -210,7 +210,7 @@ impl<T: Ord + Copy + Debug> DomRelation<T> {
         }
     }
 
-    fn compute_dominators(&mut self, graph: &Graph<T>) {
+    pub fn compute_dominators(&mut self, graph: &Graph<T>) {
         let entry_num = self.entry_num();
         self.idom_tree.insert(entry_num, entry_num);
         let mut changed = true;
@@ -248,7 +248,7 @@ impl<T: Ord + Copy + Debug> DomRelation<T> {
         }
     }
 
-    fn intersect(&self, x: usize, y: usize) -> usize {
+    pub fn intersect(&self, x: usize, y: usize) -> usize {
         let mut finger1 = x;
         let mut finger2 = y;
         while finger1 != finger2 {

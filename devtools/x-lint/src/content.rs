@@ -36,7 +36,7 @@ impl<'l> ContentContext<'l> {
     /// The value is [the same as Git's](https://stackoverflow.com/a/6134127).
     pub const BINARY_FILE_CUTOFF: usize = 8000;
 
-    pub(super) fn new(file_ctx: FileContext<'l>, content: Vec<u8>) -> Self {
+    pub fn new(file_ctx: FileContext<'l>, content: Vec<u8>) -> Self {
         Self {
             file_ctx,
             content: Content::new(content),
@@ -83,13 +83,13 @@ impl<'l> LintContext<'l> for ContentContext<'l> {
 }
 
 #[derive(Debug)]
-enum Content {
+pub enum Content {
     Utf8(Box<str>),
     NonUtf8(Box<[u8]>),
 }
 
 impl Content {
-    fn new(bytes: Vec<u8>) -> Self {
+    pub fn new(bytes: Vec<u8>) -> Self {
         match String::from_utf8(bytes) {
             Ok(s) => Content::Utf8(s.into()),
             Err(err) => Content::NonUtf8(err.into_bytes().into()),
@@ -97,7 +97,7 @@ impl Content {
     }
 
     #[allow(dead_code)]
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         match self {
             Content::Utf8(text) => text.len(),
             Content::NonUtf8(bin) => bin.len(),

@@ -71,7 +71,7 @@ impl Value {
         }
     }
 
-    fn remap_refs(&mut self, id_map: &BTreeMap<RefID, RefID>) {
+    pub fn remap_refs(&mut self, id_map: &BTreeMap<RefID, RefID>) {
         match self {
             Value::Ref(id) if id_map.contains_key(id) => *id = id_map[id],
             _ => (),
@@ -163,14 +163,14 @@ impl BorrowState {
     // Core API
     //**********************************************************************************************
 
-    fn single_type_value(&mut self, s: &SingleType) -> Value {
+    pub fn single_type_value(&mut self, s: &SingleType) -> Value {
         match &s.value {
             SingleType_::Base(_) => Value::NonRef,
             SingleType_::Ref(mut_, _) => Value::Ref(self.declare_new_ref(*mut_)),
         }
     }
 
-    fn declare_new_ref(&mut self, mut_: bool) -> RefID {
+    pub fn declare_new_ref(&mut self, mut_: bool) -> RefID {
         fn new_id(next: &mut usize) -> RefID {
             *next += 1;
             RefID::new(*next)
@@ -181,25 +181,25 @@ impl BorrowState {
         id
     }
 
-    fn add_copy(&mut self, loc: Loc, parent: RefID, child: RefID) {
+    pub fn add_copy(&mut self, loc: Loc, parent: RefID, child: RefID) {
         self.borrows.add_strong_borrow(loc, parent, child)
     }
 
-    fn add_borrow(&mut self, loc: Loc, parent: RefID, child: RefID) {
+    pub fn add_borrow(&mut self, loc: Loc, parent: RefID, child: RefID) {
         self.borrows.add_weak_borrow(loc, parent, child)
     }
 
-    fn add_field_borrow(&mut self, loc: Loc, parent: RefID, field: Field, child: RefID) {
+    pub fn add_field_borrow(&mut self, loc: Loc, parent: RefID, field: Field, child: RefID) {
         self.borrows
             .add_strong_field_borrow(loc, parent, Self::field_label(&field), child)
     }
 
-    fn add_local_borrow(&mut self, loc: Loc, local: &Var, id: RefID) {
+    pub fn add_local_borrow(&mut self, loc: Loc, local: &Var, id: RefID) {
         self.borrows
             .add_strong_field_borrow(loc, Self::LOCAL_ROOT, Self::local_label(local), id)
     }
 
-    fn add_resource_borrow(&mut self, loc: Loc, resource: &StructName, id: RefID) {
+    pub fn add_resource_borrow(&mut self, loc: Loc, resource: &StructName, id: RefID) {
         self.borrows.add_weak_field_borrow(
             loc,
             Self::LOCAL_ROOT,
@@ -208,13 +208,13 @@ impl BorrowState {
         )
     }
 
-    fn writable<F: Fn() -> String>(&self, loc: Loc, msg: F, id: RefID) -> Errors {
+    pub fn writable<F: Fn() -> String>(&self, loc: Loc, msg: F, id: RefID) -> Errors {
         assert!(self.borrows.is_mutable(id), "ICE type checking failed");
         let (full_borrows, field_borrows) = self.borrows.borrowed_by(id);
         Self::borrow_error(&self.borrows, loc, &full_borrows, &field_borrows, msg)
     }
 
-    fn freezable<F: Fn() -> String>(
+    pub fn freezable<F: Fn() -> String>(
         &self,
         loc: Loc,
         msg: F,
@@ -257,7 +257,7 @@ impl BorrowState {
         )
     }
 
-    fn readable<F: Fn() -> String>(
+    pub fn readable<F: Fn() -> String>(
         &self,
         loc: Loc,
         msg: F,
@@ -273,11 +273,11 @@ impl BorrowState {
         }
     }
 
-    fn release(&mut self, ref_id: RefID) {
+    pub fn release(&mut self, ref_id: RefID) {
         self.borrows.release(ref_id)
     }
 
-    fn divergent_control_flow(&mut self) {
+    pub fn divergent_control_flow(&mut self) {
         *self = Self::initial(
             &self.locals,
             self.acquired_resources.clone(),
@@ -285,7 +285,7 @@ impl BorrowState {
         );
     }
 
-    fn local_borrowed_by(&self, local: &Var) -> BTreeMap<RefID, Loc> {
+    pub fn local_borrowed_by(&self, local: &Var) -> BTreeMap<RefID, Loc> {
         let (full_borrows, mut field_borrows) = self.borrows.borrowed_by(Self::LOCAL_ROOT);
         assert!(full_borrows.is_empty());
         field_borrows
@@ -293,7 +293,7 @@ impl BorrowState {
             .unwrap_or_else(BTreeMap::new)
     }
 
-    fn resource_borrowed_by(&self, resource: &StructName) -> BTreeMap<RefID, Loc> {
+    pub fn resource_borrowed_by(&self, resource: &StructName) -> BTreeMap<RefID, Loc> {
         let (full_borrows, mut field_borrows) = self.borrows.borrowed_by(Self::LOCAL_ROOT);
         assert!(full_borrows.is_empty());
         field_borrows
@@ -722,7 +722,7 @@ impl BorrowState {
         }
     }
 
-    fn leq(&self, other: &Self) -> bool {
+    pub fn leq(&self, other: &Self) -> bool {
         let BorrowState {
             locals: self_locals,
             borrows: self_borrows,

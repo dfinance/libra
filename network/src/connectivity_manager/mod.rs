@@ -58,7 +58,7 @@ use tokio::time;
 
 pub mod builder;
 #[cfg(test)]
-mod test;
+pub mod test;
 
 /// The ConnectivityManager actor.
 pub struct ConnectivityManager<TTicker, TBackoff> {
@@ -123,23 +123,23 @@ pub enum ConnectivityRequest {
 
 /// The set of `NetworkAddress`'s for all peers.
 #[derive(Serialize)]
-struct PeerAddresses(HashMap<PeerId, Addresses>);
+pub struct PeerAddresses(HashMap<PeerId, Addresses>);
 
 /// A set of `NetworkAddress`'s for a single peer, bucketed by DiscoverySource in
 /// priority order.
 #[derive(Clone, Default, Serialize)]
-struct Addresses([Vec<NetworkAddress>; DiscoverySource::NUM_VARIANTS]);
+pub struct Addresses([Vec<NetworkAddress>; DiscoverySource::NUM_VARIANTS]);
 
 /// The sets of `x25519::PublicKey`s for all peers.
-struct PeerPublicKeys(HashMap<PeerId, PublicKeys>);
+pub struct PeerPublicKeys(HashMap<PeerId, PublicKeys>);
 
 /// Sets of `x25519::PublicKey`s for a single peer, bucketed by DiscoverySource
 /// in priority order.
 #[derive(Default)]
-struct PublicKeys([HashSet<x25519::PublicKey>; DiscoverySource::NUM_VARIANTS]);
+pub struct PublicKeys([HashSet<x25519::PublicKey>; DiscoverySource::NUM_VARIANTS]);
 
 #[derive(Debug)]
-enum DialResult {
+pub enum DialResult {
     Success,
     Cancelled,
     Failed(PeerManagerError),
@@ -148,7 +148,7 @@ enum DialResult {
 /// The state needed to compute the next dial delay and dial addr for a given
 /// peer.
 #[derive(Debug, Clone)]
-struct DialState<TBackoff> {
+pub struct DialState<TBackoff> {
     /// The current state of this peer's backoff delay.
     backoff: TBackoff,
     /// The index of the next address to dial. Index of an address in the peer's
@@ -281,7 +281,7 @@ where
     /// For instance, a validator might leave the validator set after a
     /// reconfiguration. If we are currently connected to this validator, calling
     /// this function will close our connection to it.
-    async fn close_stale_connections(&mut self) {
+    pub async fn close_stale_connections(&mut self) {
         let eligible = self.eligible.read().unwrap().clone();
         let stale_connections: Vec<_> = self
             .connected
@@ -312,7 +312,7 @@ where
     /// For instance, a validator might leave the validator set after a
     /// reconfiguration. If there is a pending dial to this validator, calling
     /// this function will remove it from the dial queue.
-    async fn cancel_stale_dials(&mut self) {
+    pub async fn cancel_stale_dials(&mut self) {
         let eligible = self.eligible.read().unwrap().clone();
         let stale_dials: Vec<_> = self
             .dial_queue
@@ -325,7 +325,7 @@ where
         }
     }
 
-    async fn dial_eligible_peers<'a>(
+    pub async fn dial_eligible_peers<'a>(
         &'a mut self,
         pending_dials: &'a mut FuturesUnordered<BoxFuture<'static, PeerId>>,
     ) {
@@ -428,7 +428,7 @@ where
     // Note: We do not check that the connections to older incarnations of a node are broken, and
     // instead rely on the node moving to a new epoch to break connections made from older
     // incarnations.
-    async fn check_connectivity<'a>(
+    pub async fn check_connectivity<'a>(
         &'a mut self,
         pending_dials: &'a mut FuturesUnordered<BoxFuture<'static, PeerId>>,
     ) {
@@ -441,13 +441,13 @@ where
         self.dial_eligible_peers(pending_dials).await;
     }
 
-    fn reset_dial_state(&mut self, peer_id: &PeerId) {
+    pub fn reset_dial_state(&mut self, peer_id: &PeerId) {
         if let Some(dial_state) = self.dial_states.get_mut(peer_id) {
             *dial_state = DialState::new(self.backoff_strategy.clone());
         }
     }
 
-    fn handle_request(&mut self, req: ConnectivityRequest) {
+    pub fn handle_request(&mut self, req: ConnectivityRequest) {
         match req {
             ConnectivityRequest::UpdateAddresses(src, new_peer_addrs) => {
                 trace!(
@@ -471,7 +471,7 @@ where
         }
     }
 
-    fn handle_update_addresses(
+    pub fn handle_update_addresses(
         &mut self,
         src: DiscoverySource,
         new_peer_addrs: HashMap<PeerId, Vec<NetworkAddress>>,
@@ -524,7 +524,7 @@ where
         }
     }
 
-    fn handle_update_eligible_peers(
+    pub fn handle_update_eligible_peers(
         &mut self,
         src: DiscoverySource,
         new_peer_pubkeys: HashMap<PeerId, HashSet<x25519::PublicKey>>,
@@ -586,7 +586,7 @@ where
         // possibly `cancel_stale_connections` in here?
     }
 
-    fn handle_control_notification(&mut self, notif: peer_manager::ConnectionNotification) {
+    pub fn handle_control_notification(&mut self, notif: peer_manager::ConnectionNotification) {
         match notif {
             peer_manager::ConnectionNotification::NewPeer(peer_id, addr, _origin, _context) => {
                 // TODO(gnazario): Keep track of inbound and outbound separately?  Somehow handle limits between both
@@ -616,7 +616,7 @@ where
     }
 }
 
-fn log_dial_result(
+pub fn log_dial_result(
     network_context: Arc<NetworkContext>,
     peer_id: PeerId,
     addr: NetworkAddress,
@@ -665,7 +665,7 @@ fn log_dial_result(
 /////////////////////
 
 impl DiscoverySource {
-    fn as_usize(self) -> usize {
+    pub fn as_usize(self) -> usize {
         self as u8 as usize
     }
 }
@@ -675,7 +675,7 @@ impl DiscoverySource {
 ///////////////////
 
 impl PeerAddresses {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self(HashMap::new())
     }
 }
@@ -705,17 +705,17 @@ impl fmt::Debug for PeerAddresses {
 ///////////////
 
 impl Addresses {
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.0.iter().map(Vec::len).sum()
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
     /// Update the addresses for the `DiscoverySource` bucket. Return `true` if
     /// the addresses have actually changed.
-    fn update(&mut self, src: DiscoverySource, addrs: Vec<NetworkAddress>) -> bool {
+    pub fn update(&mut self, src: DiscoverySource, addrs: Vec<NetworkAddress>) -> bool {
         let src_idx = src.as_usize();
         if self.0[src_idx] != addrs {
             self.0[src_idx] = addrs;
@@ -725,7 +725,7 @@ impl Addresses {
         }
     }
 
-    fn get(&self, idx: usize) -> Option<&NetworkAddress> {
+    pub fn get(&self, idx: usize) -> Option<&NetworkAddress> {
         self.0.iter().flatten().nth(idx)
     }
 }
@@ -749,13 +749,13 @@ impl fmt::Debug for Addresses {
 ////////////////////
 
 impl PeerPublicKeys {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self(HashMap::new())
     }
 
     /// Remove all empty `PublicKeys`. Returns `true` if any `PublicKeys`
     /// were actually removed.
-    fn remove_empty(&mut self) -> bool {
+    pub fn remove_empty(&mut self) -> bool {
         let pre_retain_len = self.0.len();
         self.0.retain(|_, pubkeys| !pubkeys.is_empty());
         assert!(
@@ -768,7 +768,7 @@ impl PeerPublicKeys {
         num_removed > 0
     }
 
-    fn union_all(&self) -> HashMap<PeerId, HashSet<x25519::PublicKey>> {
+    pub fn union_all(&self) -> HashMap<PeerId, HashSet<x25519::PublicKey>> {
         self.0
             .iter()
             .map(|(peer_id, pubkeys)| (*peer_id, pubkeys.union()))
@@ -801,15 +801,15 @@ impl fmt::Debug for PeerPublicKeys {
 ////////////////
 
 impl PublicKeys {
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.0.iter().map(HashSet::len).sum()
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
-    fn update(&mut self, src: DiscoverySource, pubkeys: HashSet<x25519::PublicKey>) -> bool {
+    pub fn update(&mut self, src: DiscoverySource, pubkeys: HashSet<x25519::PublicKey>) -> bool {
         let src_idx = src.as_usize();
         if self.0[src_idx] != pubkeys {
             self.0[src_idx] = pubkeys;
@@ -819,7 +819,7 @@ impl PublicKeys {
         }
     }
 
-    fn union(&self) -> HashSet<x25519::PublicKey> {
+    pub fn union(&self) -> HashSet<x25519::PublicKey> {
         self.0.iter().flatten().copied().collect()
     }
 }
@@ -846,14 +846,14 @@ impl<TBackoff> DialState<TBackoff>
 where
     TBackoff: Iterator<Item = Duration> + Clone,
 {
-    fn new(backoff: TBackoff) -> Self {
+    pub fn new(backoff: TBackoff) -> Self {
         Self {
             backoff,
             addr_idx: 0,
         }
     }
 
-    fn next_addr<'a>(&mut self, addrs: &'a Addresses) -> &'a NetworkAddress {
+    pub fn next_addr<'a>(&mut self, addrs: &'a Addresses) -> &'a NetworkAddress {
         assert!(!addrs.is_empty());
 
         let addr_idx = self.addr_idx;
@@ -862,7 +862,7 @@ where
         addrs.get(addr_idx % addrs.len()).unwrap()
     }
 
-    fn next_backoff_delay(&mut self, max_delay: Duration) -> Duration {
+    pub fn next_backoff_delay(&mut self, max_delay: Duration) -> Duration {
         min(max_delay, self.backoff.next().unwrap_or(max_delay))
     }
 }

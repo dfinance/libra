@@ -164,7 +164,7 @@ const DEAD_ERR_EXP: &str = "Invalid use of a divergent expression. The code foll
                             evaluation of this expression will be dead and should be removed. In \
                             some cases, this is necessary to prevent unused resource values.";
 
-fn dead_code_error(block: &BasicBlock) -> Error {
+pub fn dead_code_error(block: &BasicBlock) -> Error {
     let first_command = block.front().unwrap();
     match unreachable_loc(first_command) {
         None => vec![(first_command.loc, DEAD_ERR_CMD.into())],
@@ -172,7 +172,7 @@ fn dead_code_error(block: &BasicBlock) -> Error {
     }
 }
 
-fn unreachable_loc(sp!(_, cmd_): &Command) -> Option<Loc> {
+pub fn unreachable_loc(sp!(_, cmd_): &Command) -> Option<Loc> {
     use Command_ as C;
     match cmd_ {
         C::Assign(_, e) => unreachable_loc_exp(e),
@@ -185,7 +185,7 @@ fn unreachable_loc(sp!(_, cmd_): &Command) -> Option<Loc> {
     }
 }
 
-fn unreachable_loc_exp(parent_e: &Exp) -> Option<Loc> {
+pub fn unreachable_loc_exp(parent_e: &Exp) -> Option<Loc> {
     use UnannotatedExp_ as E;
     match &parent_e.exp.value {
         E::Unreachable => Some(parent_e.exp.loc),
@@ -213,7 +213,7 @@ fn unreachable_loc_exp(parent_e: &Exp) -> Option<Loc> {
     }
 }
 
-fn unreachable_loc_item(item: &ExpListItem) -> Option<Loc> {
+pub fn unreachable_loc_item(item: &ExpListItem) -> Option<Loc> {
     match item {
         ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => unreachable_loc_exp(e),
     }

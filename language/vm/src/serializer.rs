@@ -226,7 +226,7 @@ impl CompiledModuleMut {
 /// `CommonSerializer` keeps track of the tables common to `CompiledScript` and
 /// `CompiledModule`.
 #[derive(Debug)]
-struct CommonSerializer {
+pub struct CommonSerializer {
     major_version: u32,
     table_count: u8,
     module_handles: (u32, u32),
@@ -241,7 +241,7 @@ struct CommonSerializer {
 
 /// Holds data to compute the header of a module binary.
 #[derive(Debug)]
-struct ModuleSerializer {
+pub struct ModuleSerializer {
     common: CommonSerializer,
     struct_defs: (u32, u32),
     struct_def_instantiations: (u32, u32),
@@ -252,7 +252,7 @@ struct ModuleSerializer {
 
 /// Holds data to compute the header of a transaction script binary.
 #[derive(Debug)]
-struct ScriptSerializer {
+pub struct ScriptSerializer {
     common: CommonSerializer,
 }
 

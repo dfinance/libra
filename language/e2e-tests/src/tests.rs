@@ -9,21 +9,21 @@
 //! separate binary. The linker ends up repeating a lot of work for each binary to not much
 //! benefit.
 
-mod account_universe;
-mod admin_script;
-mod create_account;
-mod data_store;
-mod execution_strategies;
-mod failed_transaction_tests;
-mod genesis;
-mod mint;
-mod module_publishing;
-mod on_chain_configs;
-mod peer_to_peer;
-mod rotate_key;
-mod scripts;
-mod transaction_builder;
-mod transaction_fees;
-mod validator_set_management;
-mod verify_txn;
-mod write_set;
+pub mod account_universe;
+pub mod admin_script;
+pub mod create_account;
+pub mod data_store;
+pub mod execution_strategies;
+pub mod failed_transaction_tests;
+pub mod genesis;
+pub mod mint;
+pub mod module_publishing;
+pub mod on_chain_configs;
+pub mod peer_to_peer;
+pub mod rotate_key;
+pub mod scripts;
+pub mod transaction_builder;
+pub mod transaction_fees;
+pub mod validator_set_management;
+pub mod verify_txn;
+pub mod write_set;

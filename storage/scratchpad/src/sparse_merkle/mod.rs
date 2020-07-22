@@ -62,10 +62,10 @@
 // See https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=795cd4f459f1d4a0005a99650726834b
 #![allow(clippy::while_let_loop)]
 
-mod node;
+pub mod node;
 
 #[cfg(test)]
-mod sparse_merkle_test;
+pub mod sparse_merkle_test;
 
 use self::node::{LeafNode, LeafValue, Node, SparseMerkleNode};
 use libra_crypto::{
@@ -132,7 +132,7 @@ impl SparseMerkleTree {
         Ok(SparseMerkleTree { root })
     }
 
-    fn update_one(
+    pub fn update_one(
         root: Arc<SparseMerkleNode>,
         key: HashValue,
         new_blob: AccountStateBlob,
@@ -166,11 +166,11 @@ impl SparseMerkleTree {
         }
 
         // Now we are at the bottom of the tree and current_node can be either a leaf, a subtree or
-        // empty. We construct a new subtree like we are inserting the key here.
+        // empty. We conpub struct a new subtree like we are inserting the key here.
         let new_node =
             Self::construct_subtree_at_bottom(current_node, key, new_blob, bits, proof_reader)?;
 
-        // Use the new node and all previous siblings on the path to construct the final tree.
+        // Use the new node and all previous siblings on the path to conpub struct the final tree.
         Ok(Self::construct_subtree(
             bits_on_path.into_iter().rev(),
             siblings_on_path.into_iter().rev(),
@@ -181,9 +181,9 @@ impl SparseMerkleTree {
     /// This function is called when we are trying to write (key, new_value) to the tree and have
     /// traversed the existing tree using some prefix of the key. We should have reached the bottom
     /// of the existing tree, so current_node cannot be an internal node. This function will
-    /// construct a subtree using current_node, the new key-value pair and potentially the
+    /// conpub struct a subtree using current_node, the new key-value pair and potentially the
     /// key-value pair in the proof.
-    fn construct_subtree_at_bottom(
+    pub fn construct_subtree_at_bottom(
         current_node: Arc<SparseMerkleNode>,
         key: HashValue,
         new_blob: AccountStateBlob,
@@ -266,7 +266,7 @@ impl SparseMerkleTree {
     ///   o   existing_leaf    o   new_leaf
     ///  ```
     ///
-    /// 2. Otherwise, we need to construct an "extension" for the common prefix, and at the end of
+    /// 2. Otherwise, we need to conpub struct an "extension" for the common prefix, and at the end of
     ///    the extension a subtree for both keys. For example, in the following case we assume the
     ///    existing leaf's key starts with 010010 and key starts with 010011, and this function
     ///    will return `x`.
@@ -285,7 +285,7 @@ impl SparseMerkleTree {
     ///                                    / \
     ///                       existing_leaf   new_leaf
     /// ```
-    fn construct_subtree_with_new_leaf(
+    pub fn construct_subtree_with_new_leaf(
         key: HashValue,
         new_blob: AccountStateBlob,
         existing_leaf: &LeafNode,
@@ -334,7 +334,7 @@ impl SparseMerkleTree {
     ///     leaf   a
     /// ```
     /// and this function will return `x`. Both `bits` and `siblings` start from the bottom.
-    fn construct_subtree(
+    pub fn construct_subtree(
         bits: impl Iterator<Item = bool>,
         siblings: impl Iterator<Item = Arc<SparseMerkleNode>>,
         leaf: Arc<SparseMerkleNode>,
@@ -415,7 +415,7 @@ impl SparseMerkleTree {
         Self::prune_node(root);
     }
 
-    fn prune_node(node: Arc<SparseMerkleNode>) {
+    pub fn prune_node(node: Arc<SparseMerkleNode>) {
         let mut writable_node = node.write_lock();
         let node_hash = writable_node.hash();
 

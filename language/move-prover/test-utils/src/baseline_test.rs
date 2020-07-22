@@ -41,7 +41,7 @@ pub fn verify_or_update_baseline(baseline_file_name: &Path, text: &str) -> anyho
 /// Clean a content to be usable as a baseline file. Currently, we ensure there are no
 /// trailing whitespaces and no empty last line, because this is required by git-checks.sh.
 /// We also try to detect and remove unstable file names.
-fn clean_for_baseline(content: &str) -> String {
+pub fn clean_for_baseline(content: &str) -> String {
     // Regexp for matching unstable filenames in output. This is heuristic and may need refinement
     // on a case-by-case basis.
     let rex = Regex::new(r"(/var|/tmp)(/[^/]*)*/(?P<basename>[^.]*\.)").expect("regexp ok");
@@ -58,7 +58,7 @@ fn clean_for_baseline(content: &str) -> String {
 }
 
 /// Diffs old and new content.
-fn diff(old_content: &str, new_content: &str) -> anyhow::Result<()> {
+pub fn diff(old_content: &str, new_content: &str) -> anyhow::Result<()> {
     if old_content.trim() == new_content.trim() {
         return Ok(());
     }

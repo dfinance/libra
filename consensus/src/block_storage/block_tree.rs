@@ -16,7 +16,7 @@ use std::{
 
 /// This structure is a wrapper of [`ExecutedBlock`](crate::consensus_types::block::ExecutedBlock)
 /// that adds `children` field to know the parent-child relationship between blocks.
-struct LinkableBlock {
+pub struct LinkableBlock {
     /// Executed block that has raw block data and execution output.
     executed_block: Arc<ExecutedBlock>,
     /// The set of children for cascading pruning. Note: a block may have multiple children.
@@ -80,7 +80,7 @@ pub struct BlockTree {
 }
 
 impl BlockTree {
-    pub(super) fn new(
+    pub fn new(
         root: ExecutedBlock,
         root_quorum_cert: QuorumCert,
         root_ledger_info: QuorumCert,
@@ -121,70 +121,70 @@ impl BlockTree {
     }
 
     // This method will only be used in this module.
-    fn get_linkable_block(&self, block_id: &HashValue) -> Option<&LinkableBlock> {
+    pub fn get_linkable_block(&self, block_id: &HashValue) -> Option<&LinkableBlock> {
         self.id_to_block.get(block_id)
     }
 
     // This method will only be used in this module.
-    fn get_linkable_block_mut(&mut self, block_id: &HashValue) -> Option<&mut LinkableBlock> {
+    pub fn get_linkable_block_mut(&mut self, block_id: &HashValue) -> Option<&mut LinkableBlock> {
         self.id_to_block.get_mut(block_id)
     }
 
     // This method will only be used in this module.
-    fn linkable_root(&self) -> &LinkableBlock {
+    pub fn linkable_root(&self) -> &LinkableBlock {
         self.get_linkable_block(&self.root_id)
             .expect("Root must exist")
     }
 
-    fn remove_block(&mut self, block_id: HashValue) {
+    pub fn remove_block(&mut self, block_id: HashValue) {
         // Remove the block from the store
         self.id_to_block.remove(&block_id);
         self.id_to_quorum_cert.remove(&block_id);
     }
 
-    pub(super) fn block_exists(&self, block_id: &HashValue) -> bool {
+    pub fn block_exists(&self, block_id: &HashValue) -> bool {
         self.id_to_block.contains_key(block_id)
     }
 
-    pub(super) fn get_block(&self, block_id: &HashValue) -> Option<Arc<ExecutedBlock>> {
+    pub fn get_block(&self, block_id: &HashValue) -> Option<Arc<ExecutedBlock>> {
         self.get_linkable_block(block_id)
             .map(|lb| Arc::clone(lb.executed_block()))
     }
 
-    pub(super) fn root(&self) -> Arc<ExecutedBlock> {
+    pub fn root(&self) -> Arc<ExecutedBlock> {
         self.get_block(&self.root_id).expect("Root must exist")
     }
 
-    pub(super) fn highest_certified_block(&self) -> Arc<ExecutedBlock> {
+    pub fn highest_certified_block(&self) -> Arc<ExecutedBlock> {
         self.get_block(&self.highest_certified_block_id)
             .expect("Highest cerfified block must exist")
     }
 
-    pub(super) fn highest_quorum_cert(&self) -> Arc<QuorumCert> {
+    pub fn highest_quorum_cert(&self) -> Arc<QuorumCert> {
         Arc::clone(&self.highest_quorum_cert)
     }
 
-    pub(super) fn highest_timeout_cert(&self) -> Option<Arc<TimeoutCertificate>> {
+    pub fn highest_timeout_cert(&self) -> Option<Arc<TimeoutCertificate>> {
         self.highest_timeout_cert.clone()
     }
 
     /// Replace highest timeout cert with the given value.
-    pub(super) fn replace_timeout_cert(&mut self, tc: Arc<TimeoutCertificate>) {
+    pub fn replace_timeout_cert(&mut self, tc: Arc<TimeoutCertificate>) {
         self.highest_timeout_cert.replace(tc);
     }
 
-    pub(super) fn highest_commit_cert(&self) -> Arc<QuorumCert> {
+    pub fn highest_commit_cert(&self) -> Arc<QuorumCert> {
         Arc::clone(&self.highest_commit_cert)
     }
 
-    pub(super) fn get_quorum_cert_for_block(
+    pub fn get_quorum_cert_for_block(
         &self,
         block_id: &HashValue,
     ) -> Option<Arc<QuorumCert>> {
         self.id_to_quorum_cert.get(block_id).cloned()
     }
 
-    pub(super) fn insert_block(
+    pub fn insert_block(
         &mut self,
         block: ExecutedBlock,
     ) -> anyhow::Result<Arc<ExecutedBlock>> {
@@ -209,7 +209,7 @@ impl BlockTree {
         }
     }
 
-    pub(super) fn insert_quorum_cert(&mut self, qc: QuorumCert) -> anyhow::Result<()> {
+    pub fn insert_quorum_cert(&mut self, qc: QuorumCert) -> anyhow::Result<()> {
         let block_id = qc.certified_block().id();
         let qc = Arc::new(qc);
 
@@ -258,7 +258,7 @@ impl BlockTree {
     /// B3--> B4, root = B3
     ///
     /// Note this function is read-only, use with process_pruned_blocks to do the actual prune.
-    pub(super) fn find_blocks_to_prune(&self, next_root_id: HashValue) -> VecDeque<HashValue> {
+    pub fn find_blocks_to_prune(&self, next_root_id: HashValue) -> VecDeque<HashValue> {
         // Nothing to do if this is the root
         if next_root_id == self.root_id {
             return VecDeque::new();
@@ -290,7 +290,7 @@ impl BlockTree {
     /// Note that we do not necessarily remove the pruned blocks: they're kept in a separate buffer
     /// for some time in order to enable other peers to retrieve the blocks even after they've
     /// been committed.
-    pub(super) fn process_pruned_blocks(
+    pub fn process_pruned_blocks(
         &mut self,
         root_id: HashValue,
         mut newly_pruned_blocks: VecDeque<HashValue>,
@@ -320,7 +320,7 @@ impl BlockTree {
     /// a race, in which the root of the tree is propagated forward between retrieving the block
     /// and getting its path from root (e.g., at proposal generator). Hence, we don't want to panic
     /// and prefer to return None instead.
-    pub(super) fn path_from_root(&self, block_id: HashValue) -> Option<Vec<Arc<ExecutedBlock>>> {
+    pub fn path_from_root(&self, block_id: HashValue) -> Option<Vec<Arc<ExecutedBlock>>> {
         let mut res = vec![];
         let mut cur_block_id = block_id;
         loop {
@@ -344,11 +344,11 @@ impl BlockTree {
         Some(res)
     }
 
-    pub(super) fn max_pruned_blocks_in_mem(&self) -> usize {
+    pub fn max_pruned_blocks_in_mem(&self) -> usize {
         self.max_pruned_blocks_in_mem
     }
 
-    pub(super) fn get_all_block_id(&self) -> Vec<HashValue> {
+    pub fn get_all_block_id(&self) -> Vec<HashValue> {
         self.id_to_block.keys().cloned().collect()
     }
 }
@@ -356,7 +356,7 @@ impl BlockTree {
 #[cfg(any(test, feature = "fuzzing"))]
 impl BlockTree {
     /// Returns the number of blocks in the tree
-    pub(super) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         // BFS over the tree to find the number of blocks in the tree.
         let mut res = 0;
         let mut to_visit = Vec::new();
@@ -374,12 +374,12 @@ impl BlockTree {
     }
 
     /// Returns the number of child links in the tree
-    pub(super) fn child_links(&self) -> usize {
+    pub fn child_links(&self) -> usize {
         self.len() - 1
     }
 
     /// The number of pruned blocks that are still available in memory
-    pub(super) fn pruned_blocks_in_mem(&self) -> usize {
+    pub fn pruned_blocks_in_mem(&self) -> usize {
         self.pruned_block_ids.len()
     }
 }

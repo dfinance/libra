@@ -10,7 +10,7 @@ pub mod content;
 pub mod file;
 pub mod package;
 pub mod project;
-mod runner;
+pub mod runner;
 
 pub use runner::*;
 
@@ -144,7 +144,7 @@ pub struct LintSource<'l> {
 }
 
 impl<'l> LintSource<'l> {
-    fn new(name: &'static str, kind: LintKind<'l>) -> Self {
+    pub fn new(name: &'static str, kind: LintKind<'l>) -> Self {
         Self { name, kind }
     }
 

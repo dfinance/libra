@@ -856,7 +856,7 @@ impl GlobalEnv {
         None
     }
 
-    /// Returns the struct enclosing this location.
+    /// Returns the pub struct enclosing this location.
     pub fn get_enclosing_struct(&self, loc: Loc) -> Option<StructEnv<'_>> {
         let module_env = self.get_enclosing_module(loc.clone())?;
         for struct_env in module_env.into_structs() {
@@ -1003,7 +1003,7 @@ pub struct ModuleData {
     /// Struct data.
     pub struct_data: BTreeMap<StructId, StructData>,
 
-    /// Mapping from struct definition index to id in above map.
+    /// Mapping from pub struct definition index to id in above map.
     pub struct_idx_to_id: BTreeMap<StructDefinitionIndex, StructId>,
 
     /// Function data.
@@ -1167,13 +1167,13 @@ impl<'env> ModuleEnv<'env> {
         })
     }
 
-    /// Gets the struct id from a definition index which must be valid for this environment.
+    /// Gets the pub struct id from a definition index which must be valid for this environment.
     pub fn get_struct_id(&self, idx: StructDefinitionIndex) -> StructId {
         *self
             .data
             .struct_idx_to_id
             .get(&idx)
-            .expect("undefined struct definition index")
+            .expect("undefined pub struct definition index")
     }
 
     /// Gets a StructEnv by id.
@@ -1421,10 +1421,10 @@ pub struct StructData {
     /// The location of this struct.
     loc: Loc,
 
-    /// The definition index of this struct in its module.
+    /// The definition index of this pub struct in its module.
     def_idx: StructDefinitionIndex,
 
-    /// The handle index of this struct in its module.
+    /// The handle index of this pub struct in its module.
     handle_idx: StructHandleIndex,
 
     /// Field definitions.
@@ -1439,7 +1439,7 @@ pub struct StructEnv<'env> {
     /// Reference to enclosing module.
     pub module_env: ModuleEnv<'env>,
 
-    /// Reference to the struct data.
+    /// Reference to the pub struct data.
     data: &'env StructData,
 }
 
@@ -1479,13 +1479,13 @@ impl<'env> StructEnv<'env> {
         self.module_env.get_id().qualified(self.get_id())
     }
 
-    /// Determines whether this struct is native.
+    /// Determines whether this pub struct is native.
     pub fn is_native(&self) -> bool {
         let def = self.module_env.data.module.struct_def_at(self.data.def_idx);
         def.field_information == StructFieldInformation::Native
     }
 
-    /// Determines whether this struct is the well-known vector type.
+    /// Determines whether this pub struct is the well-known vector type.
     pub fn is_vector(&self) -> bool {
         let name = self
             .module_env
@@ -1496,7 +1496,7 @@ impl<'env> StructEnv<'env> {
         name.as_ref() == "Vector" && addr == &BigUint::from(0 as u64)
     }
 
-    /// Determines whether this struct is a resource type.
+    /// Determines whether this pub struct is a resource type.
     pub fn is_resource(&self) -> bool {
         let def = self.module_env.data.module.struct_def_at(self.data.def_idx);
         let handle = self
@@ -1601,7 +1601,7 @@ impl<'env> StructEnv<'env> {
             .collect_vec()
     }
 
-    /// Returns true if this struct has specifcation conditions.
+    /// Returns true if this pub struct has specifcation conditions.
     pub fn has_conditions(&self) -> bool {
         !self.data.spec.conditions.is_empty()
     }
@@ -1620,7 +1620,7 @@ pub struct FieldData {
     /// The name of this field.
     name: Symbol,
 
-    /// The struct definition index of this field in its module.
+    /// The pub struct definition index of this field in its module.
     def_idx: StructDefinitionIndex,
 
     /// The offset of this field.

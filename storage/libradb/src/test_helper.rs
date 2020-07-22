@@ -13,7 +13,7 @@ use libra_types::{
 };
 use proptest::{collection::vec, prelude::*};
 
-fn to_blocks_to_commit(
+pub fn to_blocks_to_commit(
     partial_blocks: Vec<(Vec<TransactionToCommit>, LedgerInfoWithSignatures)>,
 ) -> Result<Vec<(Vec<TransactionToCommit>, LedgerInfoWithSignatures)>> {
     // Use temporary LibraDB and STORE LEVEL APIs to calculate hashes on a per transaction basis.

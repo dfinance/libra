@@ -24,25 +24,25 @@ const TRACE_EDGE: &str = "trace_edge";
 const PAGING_SIZE: usize = 10000;
 
 #[derive(Deserialize)]
-struct Response {
+pub struct Response {
     #[serde(rename = "_scroll_id")]
     scroll_id: String,
     hits: Hits,
 }
 
 #[derive(Deserialize)]
-struct Hits {
+pub struct Hits {
     hits: Vec<Hit>,
 }
 
 #[derive(Deserialize)]
-struct Hit {
+pub struct Hit {
     #[serde(rename = "_source")]
     source: Source,
 }
 
 #[derive(Deserialize)]
-struct Source {
+pub struct Source {
     data: serde_json::Value,
     #[serde(rename = "kubernetes.pod_name")]
     pod_name: String,
@@ -120,7 +120,7 @@ impl LibraTraceClient {
     }
 }
 
-fn parse_response(v: &mut Vec<(String, JsonLogEntry)>, response: Response) -> Result<()> {
+pub fn parse_response(v: &mut Vec<(String, JsonLogEntry)>, response: Response) -> Result<()> {
     for item in response.hits.hits {
         let peer = item.source.pod_name;
         let item = item.source.data;

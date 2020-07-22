@@ -17,13 +17,13 @@ use libra_crypto_derive::{
 use proptest::prelude::*;
 use serde::{Deserialize, Serialize};
 
-// Here we aim to make a point about how we can build an enum generically
-// on top of a few choice signing scheme types. This enum implements the
+// Here we aim to make a point about how we can build anpub enum generically
+// on top of a few choice signing scheme types. Thispub enum implements the
 // VerifyingKey, SigningKey for precisely the types selected for that enum
 // (here, Ed25519(PublicKey|PrivateKey|Signature) and MultiEd25519(...)).
 //
 // Note that we do not break type safety (see towards the end), and that
-// this enum can safely be put into the usual collection (Vec, HashMap).
+// thispub enum can safely be put into the usual collection (Vec, HashMap).
 //
 
 #[derive(
@@ -40,7 +40,7 @@ use serde::{Deserialize, Serialize};
 )]
 #[PrivateKeyType = "PrivateK"]
 #[SignatureType = "Sig"]
-enum PublicK {
+pub enum PublicK {
     Ed(Ed25519PublicKey),
     MultiEd(MultiEd25519PublicKey),
 }
@@ -48,7 +48,7 @@ enum PublicK {
 #[derive(Serialize, Deserialize, SilentDebug, ValidCryptoMaterial, PrivateKey, SigningKey)]
 #[PublicKeyType = "PublicK"]
 #[SignatureType = "Sig"]
-enum PrivateK {
+pub enum PrivateK {
     Ed(Ed25519PrivateKey),
     MultiEd(MultiEd25519PrivateKey),
 }
@@ -57,7 +57,7 @@ enum PrivateK {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Signature)]
 #[PublicKeyType = "PublicK"]
 #[PrivateKeyType = "PrivateK"]
-enum Sig {
+pub enum Sig {
     Ed(Ed25519Signature),
     MultiEd(MultiEd25519Signature),
 }
@@ -88,7 +88,7 @@ proptest! {
         prop_assert!(signature.verify(&message, &ed_keypair1.public_key).is_ok());
 
         // This is impossible to write, and generates:
-        // expected struct `ed25519::Ed25519PublicKey`, found struct `med12381::MultiEd25519PublicKey`
+        // expected pub struct `ed25519::Ed25519PublicKey`, found pub struct `med12381::MultiEd25519PublicKey`
         // prop_assert!(signature.verify(&message, &med_keypair.public_key).is_ok());
 
         let mut l2: Vec<PrivateK> = vec![];

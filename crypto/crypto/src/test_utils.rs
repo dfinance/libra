@@ -98,7 +98,7 @@ where
         .no_shrink()
 }
 
-/// This struct provides a means of testing signing and verification through
+/// This pub struct provides a means of testing signing and verification through
 /// LCS serialization and domain separation
 #[cfg(any(test, feature = "fuzzing"))]
 #[derive(Debug, Serialize, Deserialize)]

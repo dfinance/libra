@@ -39,7 +39,7 @@ pub fn impl_enum_tryfrom(name: &Ident, variants: &DataEnum) -> proc_macro2::Toke
         .fields
         .iter()
         .next()
-        .expect("Unrecognized enum for key types")
+        .expect("Unrecognizedpub enum for key types")
         .ty;
 
     let mut try_chain = quote! {
@@ -51,7 +51,7 @@ pub fn impl_enum_tryfrom(name: &Ident, variants: &DataEnum) -> proc_macro2::Toke
             .fields
             .iter()
             .next()
-            .expect("Unrecognized enum for key types")
+            .expect("Unrecognizedpub enum for key types")
             .ty;
         try_chain.extend(quote!{
             .or_else(|_err| #variant_arg::try_from(bytes).and_then(|key| Ok(#name::#variant_ident(key))))
@@ -68,7 +68,7 @@ pub fn impl_enum_tryfrom(name: &Ident, variants: &DataEnum) -> proc_macro2::Toke
     }
 }
 
-fn match_enum_to_bytes(name: &Ident, variants: &DataEnum) -> proc_macro2::TokenStream {
+pub fn match_enum_to_bytes(name: &Ident, variants: &DataEnum) -> proc_macro2::TokenStream {
     // the ValidCryptoMaterial dispatch proper
     let mut match_arms = quote! {};
     for variant in variants.variants.iter() {

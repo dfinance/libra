@@ -18,7 +18,7 @@ pub fn project_root() -> &'static Path {
 
 pub fn locate_project(xctx: &XContext) -> Result<PathBuf> {
     #[derive(Deserialize)]
-    struct LocateProject {
+    pub struct LocateProject {
         root: PathBuf,
     };
 

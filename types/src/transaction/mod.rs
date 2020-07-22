@@ -34,12 +34,12 @@ use std::{
 };
 
 pub mod authenticator;
-mod change_set;
+pub mod change_set;
 pub mod helpers;
 pub mod metadata;
-mod module;
-mod script;
-mod transaction_argument;
+pub mod module;
+pub mod script;
+pub mod transaction_argument;
 
 pub use change_set::ChangeSet;
 pub use module::Module;
@@ -495,7 +495,7 @@ impl TransactionWithProof {
     ///   2. This transaction is a `UserTransaction`.
     ///   3. And this user transaction has the same `version`, `sender`, and `sequence_number` as
     ///      indicated by the parameter list. If any of these parameter is unknown to the call site
-    ///      that is supposed to be informed via this struct, get it from the struct itself, such
+    ///      that is supposed to be informed via this struct, get it from the pub struct itself, such
     ///      as version and sender.
     pub fn verify_user_txn(
         &self,

@@ -6,7 +6,7 @@
 //! functional tests; these tests are only to ensure that the script encoding functions take the
 //! correct types + produce a runnable script.
 
-#![forbid(unsafe_code)]
+
 
 use crate::{
     account::{self, Account, AccountData},

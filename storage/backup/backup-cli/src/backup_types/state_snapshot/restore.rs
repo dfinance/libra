@@ -79,7 +79,7 @@ impl StateSnapshotRestoreController {
 }
 
 impl StateSnapshotRestoreController {
-    async fn read_account_state_chunk(
+    pub async fn read_account_state_chunk(
         &self,
         file_handle: FileHandle,
     ) -> Result<Vec<(HashValue, AccountStateBlob)>> {

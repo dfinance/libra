@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{
     cluster::Cluster,
@@ -105,7 +105,7 @@ impl DebugPortLogWorker {
         }
     }
 
-    fn parse_event(&self, event: DebugInterfaceEvent) -> Option<ValidatorEvent> {
+    pub fn parse_event(&self, event: DebugInterfaceEvent) -> Option<ValidatorEvent> {
         let e = if event.name == "committed" {
             Self::parse_commit(&event.json)
         } else {
@@ -123,7 +123,7 @@ impl DebugPortLogWorker {
         })
     }
 
-    fn parse_commit(json: &json::Value) -> Event {
+    pub fn parse_commit(json: &json::Value) -> Event {
         Event::Commit(Commit {
             commit: json
                 .get("block_id")

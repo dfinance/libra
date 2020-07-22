@@ -53,7 +53,7 @@ fn process_one_message(
     Ok(())
 }
 
-struct RemoteClient {
+pub struct RemoteClient {
     network_client: NetworkClient,
 }
 
@@ -62,7 +62,7 @@ impl RemoteClient {
         Self { network_client }
     }
 
-    fn process_one_message(&mut self, input: &[u8]) -> Result<Vec<u8>, Error> {
+    pub fn process_one_message(&mut self, input: &[u8]) -> Result<Vec<u8>, Error> {
         self.network_client.write(&input)?;
         self.network_client.read().map_err(|e| e.into())
     }

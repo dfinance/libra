@@ -1,18 +1,18 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod absint;
+pub mod absint;
 pub mod ast;
-mod borrows;
-pub(crate) mod cfg;
-mod constant_fold;
-mod eliminate_locals;
-mod inline_blocks;
-mod liveness;
-mod locals;
-mod remove_no_ops;
-mod simplify_jumps;
-pub(crate) mod translate;
+pub mod borrows;
+pub mod cfg;
+pub mod constant_fold;
+pub mod eliminate_locals;
+pub mod inline_blocks;
+pub mod liveness;
+pub mod locals;
+pub mod remove_no_ops;
+pub mod simplify_jumps;
+pub mod translate;
 
 use crate::{
     errors::Errors,

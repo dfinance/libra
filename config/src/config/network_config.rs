@@ -136,7 +136,7 @@ impl NetworkConfig {
         .expect("peer id should be present")
     }
 
-    fn prepare_identity(&mut self) {
+    pub fn prepare_identity(&mut self) {
         match &mut self.identity {
             Identity::FromStorage(_) => (),
             Identity::None => {

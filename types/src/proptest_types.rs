@@ -61,7 +61,7 @@ impl Arbitrary for WriteOp {
 }
 
 impl WriteSet {
-    fn genesis_strategy() -> impl Strategy<Value = Self> {
+    pub fn genesis_strategy() -> impl Strategy<Value = Self> {
         vec((any::<AccessPath>(), WriteOp::value_strategy()), 0..64).prop_map(|write_set| {
             let write_set_mut = WriteSetMut::new(write_set);
             write_set_mut
@@ -101,7 +101,7 @@ impl Arbitrary for ChangeSet {
 }
 
 #[derive(Debug)]
-struct AccountInfo {
+pub struct AccountInfo {
     address: AccountAddress,
     private_key: Ed25519PrivateKey,
     public_key: Ed25519PublicKey,
@@ -133,7 +133,7 @@ pub struct AccountInfoUniverse {
 }
 
 impl AccountInfoUniverse {
-    fn new(
+    pub fn new(
         keypairs: Vec<(Ed25519PrivateKey, Ed25519PublicKey)>,
         epoch: u64,
         round: Round,
@@ -152,30 +152,30 @@ impl AccountInfoUniverse {
         }
     }
 
-    fn get_account_info(&self, account_index: Index) -> &AccountInfo {
+    pub fn get_account_info(&self, account_index: Index) -> &AccountInfo {
         account_index.get(&self.accounts)
     }
 
-    fn get_account_info_mut(&mut self, account_index: Index) -> &mut AccountInfo {
+    pub fn get_account_info_mut(&mut self, account_index: Index) -> &mut AccountInfo {
         account_index.get_mut(self.accounts.as_mut_slice())
     }
 
-    fn get_and_bump_round(&mut self) -> Round {
+    pub fn get_and_bump_round(&mut self) -> Round {
         let round = self.round;
         self.round += 1;
         round
     }
 
-    fn bump_and_get_version(&mut self, block_size: usize) -> Version {
+    pub fn bump_and_get_version(&mut self, block_size: usize) -> Version {
         self.next_version += block_size as u64;
         self.next_version - 1
     }
 
-    fn get_epoch(&self) -> u64 {
+    pub fn get_epoch(&self) -> u64 {
         self.epoch
     }
 
-    fn get_and_bump_epoch(&mut self) -> u64 {
+    pub fn get_and_bump_epoch(&mut self) -> u64 {
         let epoch = self.epoch;
         self.epoch += 1;
         epoch
@@ -616,7 +616,7 @@ impl ContractEventGen {
 }
 
 #[derive(Arbitrary, Debug)]
-struct AccountResourceGen {
+pub struct AccountResourceGen {
     withdrawal_capability: Option<WithdrawCapabilityResource>,
     key_rotation_capability: Option<KeyRotationCapabilityResource>,
 }
@@ -641,7 +641,7 @@ impl AccountResourceGen {
 }
 
 #[derive(Arbitrary, Debug)]
-struct BalanceResourceGen {
+pub struct BalanceResourceGen {
     coin: u64,
 }
 
@@ -652,7 +652,7 @@ impl BalanceResourceGen {
 }
 
 #[derive(Arbitrary, Debug)]
-struct AccountStateBlobGen {
+pub struct AccountStateBlobGen {
     account_resource_gen: AccountResourceGen,
     balance_resource_gen: BalanceResourceGen,
 }
@@ -905,7 +905,7 @@ impl Arbitrary for BlockMetadata {
 }
 
 #[derive(Debug)]
-struct BlockInfoGen {
+pub struct BlockInfoGen {
     id: HashValue,
     executed_state_id: HashValue,
     timestamp_usecs: u64,
@@ -965,7 +965,7 @@ impl Arbitrary for BlockInfoGen {
 }
 
 #[derive(Arbitrary, Debug)]
-struct LedgerInfoGen {
+pub struct LedgerInfoGen {
     commit_info_gen: BlockInfoGen,
     consensus_data_hash: HashValue,
 }

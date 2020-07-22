@@ -76,4 +76,4 @@ impl SeekKeyCodec<StaleNodeIndexSchema> for Version {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

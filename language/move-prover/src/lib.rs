@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{
     boogie_wrapper::BoogieWrapper,
@@ -42,12 +42,12 @@ use std::{
     time::Instant,
 };
 
-mod boogie_helpers;
-mod boogie_wrapper;
-mod bytecode_translator;
+pub mod boogie_helpers;
+pub mod boogie_wrapper;
+pub mod bytecode_translator;
 pub mod cli;
-mod prelude_template_helpers;
-mod spec_translator;
+pub mod prelude_template_helpers;
+pub mod spec_translator;
 
 // =================================================================================================
 // Entry Point
@@ -142,7 +142,7 @@ pub fn run_move_prover_errors_to_stderr(options: Options) -> anyhow::Result<()> 
     run_move_prover(&mut error_writer, options)
 }
 
-fn run_docgen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Result<()> {
+pub fn run_docgen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Result<()> {
     let mut generator = Docgen::new(env, &options.docgen);
     let checking_elapsed = now.elapsed();
     info!("generating documentation");
@@ -161,7 +161,7 @@ fn run_docgen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Resul
     Ok(())
 }
 
-fn run_abigen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Result<()> {
+pub fn run_abigen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Result<()> {
     let mut generator = Abigen::new(env, &options.abigen);
     let checking_elapsed = now.elapsed();
     info!("generating ABI files");
@@ -181,7 +181,7 @@ fn run_abigen(env: &GlobalEnv, options: &Options, now: Instant) -> anyhow::Resul
 }
 
 /// Adds the prelude to the generated output.
-fn add_prelude(options: &Options, writer: &CodeWriter) -> anyhow::Result<()> {
+pub fn add_prelude(options: &Options, writer: &CodeWriter) -> anyhow::Result<()> {
     emit!(writer, "\n// ** prelude from {}\n\n", &options.prelude_path);
     let content = if options.prelude_path == INLINE_PRELUDE {
         debug!("using inline prelude");
@@ -203,7 +203,7 @@ fn add_prelude(options: &Options, writer: &CodeWriter) -> anyhow::Result<()> {
 }
 
 /// Create bytecode and process it.
-fn create_and_process_bytecode(options: &Options, env: &GlobalEnv) -> FunctionTargetsHolder {
+pub fn create_and_process_bytecode(options: &Options, env: &GlobalEnv) -> FunctionTargetsHolder {
     let mut targets = FunctionTargetsHolder::default();
 
     // Add function targets for all functions in the environment.
@@ -221,7 +221,7 @@ fn create_and_process_bytecode(options: &Options, env: &GlobalEnv) -> FunctionTa
 }
 
 /// Function to create the transformation pipeline.
-fn create_bytecode_processing_pipeline(options: &Options) -> FunctionTargetPipeline {
+pub fn create_bytecode_processing_pipeline(options: &Options) -> FunctionTargetPipeline {
     let mut res = FunctionTargetPipeline::default();
 
     // Add processors in order they are executed.
@@ -239,7 +239,7 @@ fn create_bytecode_processing_pipeline(options: &Options) -> FunctionTargetPipel
 }
 
 /// Calculates transitive dependencies of the given move sources.
-fn calculate_deps(sources: &[String], input_deps: &[String]) -> anyhow::Result<Vec<String>> {
+pub fn calculate_deps(sources: &[String], input_deps: &[String]) -> anyhow::Result<Vec<String>> {
     let file_map = calculate_file_map(input_deps)?;
     let mut deps = vec![];
     let mut visited = BTreeSet::new();
@@ -260,7 +260,7 @@ fn calculate_deps(sources: &[String], input_deps: &[String]) -> anyhow::Result<V
     Ok(deps)
 }
 
-fn canonicalize(s: &str) -> String {
+pub fn canonicalize(s: &str) -> String {
     match fs::canonicalize(s) {
         Ok(p) => p.to_string_lossy().to_string(),
         Err(_) => s.to_string(),
@@ -268,7 +268,7 @@ fn canonicalize(s: &str) -> String {
 }
 
 /// Recursively calculate dependencies.
-fn calculate_deps_recursively(
+pub fn calculate_deps_recursively(
     path: &Path,
     file_map: &BTreeMap<String, PathBuf>,
     visited: &mut BTreeSet<String>,
@@ -293,7 +293,7 @@ fn calculate_deps_recursively(
 }
 
 /// Calculate a map of module names to files which define those modules.
-fn calculate_file_map(deps: &[String]) -> anyhow::Result<BTreeMap<String, PathBuf>> {
+pub fn calculate_file_map(deps: &[String]) -> anyhow::Result<BTreeMap<String, PathBuf>> {
     static REX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?m)module\s+(\w+)\s*\{").unwrap());
     let mut module_to_file = BTreeMap::new();
     for dep in deps {
@@ -307,7 +307,7 @@ fn calculate_file_map(deps: &[String]) -> anyhow::Result<BTreeMap<String, PathBu
 
 /// Extracts matches out of some text file. `rex` must be a regular expression with one anonymous
 /// group.
-fn extract_matches(path: &Path, rex: &Regex) -> anyhow::Result<Vec<String>> {
+pub fn extract_matches(path: &Path, rex: &Regex) -> anyhow::Result<Vec<String>> {
     let mut content = String::new();
     let mut file = File::open(path)?;
     file.read_to_string(&mut content)?;

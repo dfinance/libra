@@ -35,7 +35,7 @@ use tokio::{runtime::Handle, time::interval};
 use vm_validator::vm_validator::TransactionValidation;
 
 /// Coordinator that handles inbound network events and outbound txn broadcasts.
-pub(crate) async fn coordinator<V>(
+pub async fn coordinator<V>(
     mut smp: SharedMempool<V>,
     executor: Handle,
     network_events: Vec<(NodeNetworkId, MempoolNetworkEvents)>,
@@ -180,7 +180,7 @@ pub(crate) async fn coordinator<V>(
 }
 
 /// GC all expired transactions by SystemTTL
-pub(crate) async fn gc_coordinator(mempool: Arc<Mutex<CoreMempool>>, gc_interval_ms: u64) {
+pub async fn gc_coordinator(mempool: Arc<Mutex<CoreMempool>>, gc_interval_ms: u64) {
     let mut interval = interval(Duration::from_millis(gc_interval_ms));
     while let Some(_interval) = interval.next().await {
         mempool

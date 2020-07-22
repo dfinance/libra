@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! This library implements a schematized DB on top of [RocksDB](https://rocksdb.org/). It makes
 //! sure all data passed in and out are structured according to predefined schemas and prevents
@@ -40,7 +40,7 @@ pub type ColumnFamilyName = &'static str;
 pub const DEFAULT_CF_NAME: ColumnFamilyName = "default";
 
 #[derive(Debug)]
-enum WriteOp {
+pub enum WriteOp {
     Value(Vec<u8>),
     Deletion,
 }
@@ -99,7 +99,7 @@ impl<'a, S> SchemaIterator<'a, S>
 where
     S: Schema,
 {
-    fn new(db_iter: rocksdb::DBRawIterator<'a>, direction: ScanDirection) -> Self {
+    pub fn new(db_iter: rocksdb::DBRawIterator<'a>, direction: ScanDirection) -> Self {
         SchemaIterator {
             db_iter,
             direction,
@@ -141,7 +141,7 @@ where
         Ok(())
     }
 
-    fn next_impl(&mut self) -> Result<Option<(S::Key, S::Value)>> {
+    pub fn next_impl(&mut self) -> Result<Option<(S::Key, S::Value)>> {
         let _timer = OP_COUNTER.timer(&format!("db_iter_time_{}", S::COLUMN_FAMILY_NAME));
         if !self.db_iter.valid() {
             self.db_iter.status()?;
@@ -228,7 +228,7 @@ impl DB {
         DB::open_cf_readonly(&db_opts, path, name, column_families)
     }
 
-    fn open_cf(
+    pub fn open_cf(
         opts: &rocksdb::Options,
         path: impl AsRef<Path>,
         name: &'static str,
@@ -250,7 +250,7 @@ impl DB {
         })
     }
 
-    fn open_cf_readonly(
+    pub fn open_cf_readonly(
         opts: &rocksdb::Options,
         path: impl AsRef<Path>,
         name: &'static str,
@@ -314,7 +314,7 @@ impl DB {
         Ok(())
     }
 
-    fn iter_with_direction<S: Schema>(
+    pub fn iter_with_direction<S: Schema>(
         &self,
         opts: ReadOptions,
         direction: ScanDirection,
@@ -373,7 +373,7 @@ impl DB {
         Ok(())
     }
 
-    fn get_cf_handle(&self, cf_name: &str) -> Result<&rocksdb::ColumnFamily> {
+    pub fn get_cf_handle(&self, cf_name: &str) -> Result<&rocksdb::ColumnFamily> {
         self.inner.cf_handle(cf_name).ok_or_else(|| {
             format_err!(
                 "DB::cf_handle not found for column family name: {}",
@@ -417,7 +417,7 @@ impl DB {
 /// For now we always use synchronous writes. This makes sure that once the operation returns
 /// `Ok(())` the data is persisted even if the machine crashes. In the future we might consider
 /// selectively turning this off for some non-critical writes to improve performance.
-fn default_write_options() -> rocksdb::WriteOptions {
+pub fn default_write_options() -> rocksdb::WriteOptions {
     let mut opts = rocksdb::WriteOptions::default();
     opts.set_sync(true);
     opts

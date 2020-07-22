@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use move_lang::ir_translation::fix_syntax_and_write;
 use std::{fs, path::Path};

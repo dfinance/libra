@@ -621,7 +621,7 @@ pub unsafe extern "C" fn libra_LibraSignedTransaction_from(
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use lcs::from_bytes;
     use libra_crypto::{PrivateKey, SigningKey, Uniform};

@@ -260,7 +260,7 @@ pub fn verify_module(
 }
 
 /// A set of common parameters required to create transactions.
-struct TransactionParameters<'a> {
+pub struct TransactionParameters<'a> {
     pub sender_addr: AccountAddress,
     pub pubkey: &'a Ed25519PublicKey,
     pub privkey: &'a Ed25519PrivateKey,

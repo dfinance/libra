@@ -29,7 +29,7 @@ pub struct RestoreHandler {
 }
 
 impl RestoreHandler {
-    pub(crate) fn new(
+    pub fn new(
         db: Arc<DB>,
         libradb: Arc<LibraDB>,
         ledger_store: Arc<LedgerStore>,

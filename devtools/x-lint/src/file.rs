@@ -39,8 +39,8 @@ impl<'l> FileContext<'l> {
     ///
     /// Returns `None` if the file is missing.
     ///
-    /// `pub(super)` is to dissuade individual linters from loading file contexts.
-    pub(super) fn load(self) -> Result<Option<ContentContext<'l>>> {
+    /// `pub` is to dissuade individual linters from loading file contexts.
+    pub fn load(self) -> Result<Option<ContentContext<'l>>> {
         let full_path = self.project_ctx.full_path(self.file_path);
         let contents_opt = read_file(&full_path)
             .map_err(|err| SystemError::io(format!("loading {}", full_path.display()), err))?;
@@ -54,7 +54,7 @@ impl<'l> LintContext<'l> for FileContext<'l> {
     }
 }
 
-fn read_file(full_path: &Path) -> io::Result<Option<Vec<u8>>> {
+pub fn read_file(full_path: &Path) -> io::Result<Option<Vec<u8>>> {
     match fs::read(full_path) {
         Ok(bytes) => Ok(Some(bytes)),
         Err(err) => {

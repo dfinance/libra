@@ -38,10 +38,10 @@ pub type InstantiableEffect =
 pub type FunctionInstantiableEffect =
     dyn Fn(FunctionInstantiationIndex) -> Vec<Box<NonInstantiableEffect>>;
 
-type Instantiation = dyn Fn(&AbstractState) -> (StructDefinitionIndex, Vec<SignatureToken>);
-type FunctionInstantiation = dyn Fn(&AbstractState) -> (FunctionHandleIndex, Vec<SignatureToken>);
-type InstantiableInstruction = dyn Fn(StructDefInstantiationIndex) -> Bytecode;
-type FunctionInstantiableInstruction = dyn Fn(FunctionInstantiationIndex) -> Bytecode;
+pub type Instantiation = dyn Fn(&AbstractState) -> (StructDefinitionIndex, Vec<SignatureToken>);
+pub type FunctionInstantiation = dyn Fn(&AbstractState) -> (FunctionHandleIndex, Vec<SignatureToken>);
+pub type InstantiableInstruction = dyn Fn(StructDefInstantiationIndex) -> Bytecode;
+pub type FunctionInstantiableInstruction = dyn Fn(FunctionInstantiationIndex) -> Bytecode;
 
 pub enum Effects {
     NoTyParams(Vec<Box<NonInstantiableEffect>>),

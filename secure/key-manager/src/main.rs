@@ -3,7 +3,7 @@
 
 //! Usage: ./key-manager node.config
 
-#![forbid(unsafe_code)]
+
 
 use libra_config::config::KeyManagerConfig;
 use libra_key_manager::{

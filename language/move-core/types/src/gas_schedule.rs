@@ -145,7 +145,7 @@ pub const CONST_SIZE: AbstractMemorySize<GasCarrier> = AbstractMemorySize(16);
 /// The size in words for a reference on the stack
 pub const REFERENCE_SIZE: AbstractMemorySize<GasCarrier> = AbstractMemorySize(8);
 
-/// The size of a struct in words
+/// The size of a pub struct in words
 pub const STRUCT_SIZE: AbstractMemorySize<GasCarrier> = AbstractMemorySize(2);
 
 /// For V1 all accounts will be ~800 bytes
@@ -209,7 +209,7 @@ impl Default for GasConstants {
     }
 }
 /// The cost tables, keyed by the serialized form of the bytecode instruction.  We use the
-/// serialized form as opposed to the instruction enum itself as the key since this will be the
+/// serialized form as opposed to the instructionpub enum itself as the key since this will be the
 /// on-chain representation of bytecode instructions in the future.
 #[derive(Clone, Debug, Serialize, PartialEq, Deserialize)]
 pub struct CostTable {

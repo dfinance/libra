@@ -15,7 +15,7 @@ use std::{convert::TryFrom, fmt, str::FromStr};
 
 const SHORT_STRING_LENGTH: usize = 4;
 
-/// A struct that represents an account address.
+/// A pub struct that represents an account address.
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy, CryptoHasher)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct AccountAddress([u8; AccountAddress::LENGTH]);
@@ -220,7 +220,7 @@ impl<'de> Deserialize<'de> for AccountAddress {
             // as the original type.
             #[derive(::serde::Deserialize)]
             #[serde(rename = "AccountAddress")]
-            struct Value([u8; AccountAddress::LENGTH]);
+            pub struct Value([u8; AccountAddress::LENGTH]);
 
             let value = Value::deserialize(deserializer)?;
             Ok(AccountAddress::new(value.0))

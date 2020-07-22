@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use libra_config::config::NodeConfig;
 use libra_logger::prelude::*;
@@ -17,7 +17,7 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Libra Node")]
-struct Args {
+pub struct Args {
     #[structopt(short = "f", long, parse(from_os_str))]
     /// Path to NodeConfig
     config: PathBuf,

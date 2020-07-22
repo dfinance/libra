@@ -10,7 +10,7 @@ use vm::file_format::{
     IdentifierIndex, ModuleHandleIndex, Signature, SignatureIndex, SignatureToken,
 };
 
-mod common;
+pub mod common;
 
 fn generate_module_with_function() -> CompiledModuleMut {
     let mut module: CompiledModuleMut = empty_module();

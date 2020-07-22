@@ -3,7 +3,7 @@
 
 //! Usage: ./executor-service node.config
 
-#![forbid(unsafe_code)]
+
 
 use execution_correctness::Process;
 use libra_config::config::NodeConfig;

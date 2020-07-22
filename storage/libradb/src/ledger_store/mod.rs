@@ -35,7 +35,7 @@ use std::{ops::Deref, sync::Arc};
 use storage_interface::{StartupInfo, TreeState};
 
 #[derive(Debug)]
-pub(crate) struct LedgerStore {
+pub struct LedgerStore {
     db: Arc<DB>,
 
     /// We almost always need the latest ledger info and signatures to serve read requests, so we
@@ -132,7 +132,7 @@ impl LedgerStore {
         })
     }
 
-    fn get_epoch_state(&self, epoch: u64) -> Result<EpochState> {
+    pub fn get_epoch_state(&self, epoch: u64) -> Result<EpochState> {
         ensure!(epoch > 0, "EpochState only queryable for epoch >= 1.",);
 
         let ledger_info_with_sigs =
@@ -354,7 +354,7 @@ impl LedgerStore {
     }
 }
 
-pub(crate) type Accumulator = MerkleAccumulator<LedgerStore, TransactionAccumulatorHasher>;
+pub type Accumulator = MerkleAccumulator<LedgerStore, TransactionAccumulatorHasher>;
 
 impl HashReader for LedgerStore {
     fn get(&self, position: Position) -> Result<HashValue> {
@@ -438,6 +438,6 @@ impl<'a> Iterator for EpochEndingLedgerInfoIter<'a> {
 }
 
 #[cfg(test)]
-mod ledger_info_test;
+pub mod ledger_info_test;
 #[cfg(test)]
-mod transaction_info_test;
+pub mod transaction_info_test;

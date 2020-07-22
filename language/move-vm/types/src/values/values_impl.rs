@@ -36,7 +36,7 @@ use vm::{
 
 /// Runtime representation of a Move value.
 #[derive(Debug)]
-enum ValueImpl {
+pub enum ValueImpl {
     Invalid,
 
     U8(u8),
@@ -61,7 +61,7 @@ enum ValueImpl {
 /// Except when not owned by the VM stack, a container always lives inside an Rc<RefCell<>>,
 /// making it possible to be shared by references.
 #[derive(Debug, Clone)]
-enum Container {
+pub enum Container {
     Locals(Rc<RefCell<Vec<ValueImpl>>>),
     VecR(Rc<RefCell<Vec<ValueImpl>>>),
     VecC(Rc<RefCell<Vec<ValueImpl>>>),
@@ -78,7 +78,7 @@ enum Container {
 /// or in global storage. In the latter case, it also keeps a status flag indicating whether
 /// the container has been possibly modified.
 #[derive(Debug)]
-enum ContainerRef {
+pub enum ContainerRef {
     Local(Container),
     Global {
         status: Rc<RefCell<GlobalDataStatus>>,
@@ -90,27 +90,27 @@ enum ContainerRef {
 /// Clean - the data was only read.
 /// Dirty - the data was possibly modified.
 #[derive(Debug, Clone, Copy)]
-enum GlobalDataStatus {
+pub enum GlobalDataStatus {
     Clean,
     Dirty,
 }
 
 /// A Move reference pointing to an element in a container.
 #[derive(Debug)]
-struct IndexedRef {
+pub struct IndexedRef {
     idx: usize,
     container_ref: ContainerRef,
 }
 
-/// An umbrella enum for references. It is used to hide the internals of the public type
+/// An umbrellapub enum for references. It is used to hide the internals of the public type
 /// Reference.
 #[derive(Debug)]
-enum ReferenceImpl {
+pub enum ReferenceImpl {
     IndexedRef(IndexedRef),
     ContainerRef(ContainerRef),
 }
 
-// A reference to a signer. Clients can attempt a cast to this struct if they are
+// A reference to a signer. Clients can attempt a cast to this pub struct if they are
 // expecting a Signer on the stavk or as an argument.
 #[derive(Debug)]
 pub struct SignerRef(ContainerRef);
@@ -145,7 +145,7 @@ pub struct Vector(Container);
  *
  **************************************************************************************/
 
-/// A reference to a Move struct that allows you to take a reference to one of its fields.
+/// A reference to a Move pub struct that allows you to take a reference to one of its fields.
 #[derive(Debug)]
 pub struct StructRef(ContainerRef);
 
@@ -205,7 +205,7 @@ pub struct GlobalValue {
  **************************************************************************************/
 
 impl Container {
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         match self {
             Self::Locals(r)
             | Self::StructC(r)
@@ -220,7 +220,7 @@ impl Container {
         }
     }
 
-    fn is_resource(&self) -> PartialVMResult<bool> {
+    pub fn is_resource(&self) -> PartialVMResult<bool> {
         use Container::*;
 
         match self {
@@ -235,7 +235,7 @@ impl Container {
         }
     }
 
-    fn rc_count(&self) -> usize {
+    pub fn rc_count(&self) -> usize {
         match self {
             Self::Locals(r)
             | Self::StructC(r)
@@ -250,13 +250,13 @@ impl Container {
         }
     }
 
-    fn signer(x: AccountAddress) -> Self {
+    pub fn signer(x: AccountAddress) -> Self {
         Container::StructR(Rc::new(RefCell::new(vec![ValueImpl::Address(x)])))
     }
 }
 
 impl ValueImpl {
-    fn is_resource(&self) -> PartialVMResult<bool> {
+    pub fn is_resource(&self) -> PartialVMResult<bool> {
         use ValueImpl::*;
 
         match self {
@@ -304,7 +304,7 @@ impl Value {
 }
 
 impl ValueImpl {
-    fn check_constant(&self, sig: &SignatureToken) -> bool {
+    pub fn check_constant(&self, sig: &SignatureToken) -> bool {
         match (sig, &self) {
             (SignatureToken::U8, ValueImpl::U8(_))
             | (SignatureToken::U64, ValueImpl::U64(_))
@@ -334,7 +334,7 @@ impl ValueImpl {
         }
     }
 
-    fn is_constant(&self) -> bool {
+    pub fn is_constant(&self) -> bool {
         match self {
             ValueImpl::Bool(_)
             | ValueImpl::U8(_)
@@ -377,7 +377,7 @@ impl ValueImpl {
  *
  **************************************************************************************/
 
-fn take_unique_ownership<T: Debug>(r: Rc<RefCell<T>>) -> PartialVMResult<T> {
+pub fn take_unique_ownership<T: Debug>(r: Rc<RefCell<T>>) -> PartialVMResult<T> {
     match Rc::try_unwrap(r) {
         Ok(cell) => Ok(cell.into_inner()),
         Err(r) => Err(
@@ -388,13 +388,13 @@ fn take_unique_ownership<T: Debug>(r: Rc<RefCell<T>>) -> PartialVMResult<T> {
 }
 
 impl ContainerRef {
-    fn container(&self) -> &Container {
+    pub fn container(&self) -> &Container {
         match self {
             Self::Local(container) | Self::Global { container, .. } => container,
         }
     }
 
-    fn mark_dirty(&self) {
+    pub fn mark_dirty(&self) {
         if let Self::Global { status, .. } = self {
             *status.borrow_mut() = GlobalDataStatus::Dirty
         }
@@ -409,7 +409,7 @@ impl ContainerRef {
  *   equalities.
  *
  **************************************************************************************/
-trait VMValueRef<T> {
+pub trait VMValueRef<T> {
     fn value_ref(&self) -> PartialVMResult<&T>;
 }
 
@@ -434,7 +434,7 @@ impl_vm_value_ref!(bool, Bool);
 impl_vm_value_ref!(AccountAddress, Address);
 
 impl ValueImpl {
-    fn as_value_ref<T>(&self) -> PartialVMResult<&T>
+    pub fn as_value_ref<T>(&self) -> PartialVMResult<&T>
     where
         Self: VMValueRef<T>,
     {
@@ -452,7 +452,7 @@ impl ValueImpl {
  *
  **************************************************************************************/
 impl ValueImpl {
-    fn copy_value(&self) -> PartialVMResult<Self> {
+    pub fn copy_value(&self) -> PartialVMResult<Self> {
         use ValueImpl::*;
 
         Ok(match self {
@@ -475,7 +475,7 @@ impl ValueImpl {
 }
 
 impl Container {
-    fn copy_value(&self) -> PartialVMResult<Self> {
+    pub fn copy_value(&self) -> PartialVMResult<Self> {
         let copy_rc_ref_vec_val = |r: &Rc<RefCell<Vec<ValueImpl>>>| {
             Ok(Rc::new(RefCell::new(
                 r.borrow()
@@ -511,7 +511,7 @@ impl Container {
         })
     }
 
-    fn copy_by_ref(&self) -> Self {
+    pub fn copy_by_ref(&self) -> Self {
         match self {
             Self::VecC(r) => Self::VecC(Rc::clone(r)),
             Self::VecR(r) => Self::VecR(Rc::clone(r)),
@@ -528,7 +528,7 @@ impl Container {
 }
 
 impl IndexedRef {
-    fn copy_value(&self) -> Self {
+    pub fn copy_value(&self) -> Self {
         Self {
             idx: self.idx,
             container_ref: self.container_ref.copy_value(),
@@ -537,7 +537,7 @@ impl IndexedRef {
 }
 
 impl ContainerRef {
-    fn copy_value(&self) -> Self {
+    pub fn copy_value(&self) -> Self {
         match self {
             Self::Local(container) => Self::Local(container.copy_by_ref()),
             Self::Global { status, container } => Self::Global {
@@ -764,13 +764,13 @@ impl Value {
  **************************************************************************************/
 
 impl ContainerRef {
-    fn read_ref(self) -> PartialVMResult<Value> {
+    pub fn read_ref(self) -> PartialVMResult<Value> {
         Ok(Value(ValueImpl::Container(self.container().copy_value()?)))
     }
 }
 
 impl IndexedRef {
-    fn read_ref(self) -> PartialVMResult<Value> {
+    pub fn read_ref(self) -> PartialVMResult<Value> {
         use Container::*;
 
         let res = match &*self.container_ref.container() {
@@ -789,7 +789,7 @@ impl IndexedRef {
 }
 
 impl ReferenceImpl {
-    fn read_ref(self) -> PartialVMResult<Value> {
+    pub fn read_ref(self) -> PartialVMResult<Value> {
         match self {
             Self::ContainerRef(r) => r.read_ref(),
             Self::IndexedRef(r) => r.read_ref(),
@@ -818,7 +818,7 @@ impl Reference {
  **************************************************************************************/
 
 impl ContainerRef {
-    fn write_ref(self, v: Value) -> PartialVMResult<()> {
+    pub fn write_ref(self, v: Value) -> PartialVMResult<()> {
         match v.0 {
             ValueImpl::Container(c) => {
                 macro_rules! assign {
@@ -878,7 +878,7 @@ impl ContainerRef {
 }
 
 impl IndexedRef {
-    fn write_ref(self, x: Value) -> PartialVMResult<()> {
+    pub fn write_ref(self, x: Value) -> PartialVMResult<()> {
         match &x.0 {
             ValueImpl::IndexedRef(_)
             | ValueImpl::ContainerRef(_)
@@ -939,7 +939,7 @@ impl IndexedRef {
 }
 
 impl ReferenceImpl {
-    fn write_ref(self, x: Value) -> PartialVMResult<()> {
+    pub fn write_ref(self, x: Value) -> PartialVMResult<()> {
         match self {
             Self::ContainerRef(r) => r.write_ref(x),
             Self::IndexedRef(r) => r.write_ref(x),
@@ -963,7 +963,7 @@ impl Reference {
  **************************************************************************************/
 
 impl ContainerRef {
-    fn borrow_elem(&self, idx: usize) -> PartialVMResult<ValueImpl> {
+    pub fn borrow_elem(&self, idx: usize) -> PartialVMResult<ValueImpl> {
         let len = self.container().len();
         if idx >= len {
             return Err(
@@ -1110,7 +1110,7 @@ impl Locals {
         }
     }
 
-    fn swap_loc(&mut self, idx: usize, x: Value) -> PartialVMResult<Value> {
+    pub fn swap_loc(&mut self, idx: usize, x: Value) -> PartialVMResult<Value> {
         let mut v = self.0.borrow_mut();
         match v.get_mut(idx) {
             Some(v) => {
@@ -1779,7 +1779,7 @@ pub const INDEX_OUT_OF_BOUNDS: u64 = NFE_VECTOR_ERROR_BASE + 1;
 pub const POP_EMPTY_VEC: u64 = NFE_VECTOR_ERROR_BASE + 2;
 pub const DESTROY_NON_EMPTY_VEC: u64 = NFE_VECTOR_ERROR_BASE + 3;
 
-fn check_elem_layout(
+pub fn check_elem_layout(
     context: &impl NativeContext,
     ty: &Type,
     v: &Container,
@@ -2059,7 +2059,7 @@ impl Vector {
  **************************************************************************************/
 
 impl Container {
-    fn size(&self) -> AbstractMemorySize<GasCarrier> {
+    pub fn size(&self) -> AbstractMemorySize<GasCarrier> {
         match self {
             Self::Locals(r)
             | Self::VecC(r)
@@ -2084,19 +2084,19 @@ impl Container {
 }
 
 impl ContainerRef {
-    fn size(&self) -> AbstractMemorySize<GasCarrier> {
+    pub fn size(&self) -> AbstractMemorySize<GasCarrier> {
         words_in(REFERENCE_SIZE)
     }
 }
 
 impl IndexedRef {
-    fn size(&self) -> AbstractMemorySize<GasCarrier> {
+    pub fn size(&self) -> AbstractMemorySize<GasCarrier> {
         words_in(REFERENCE_SIZE)
     }
 }
 
 impl ValueImpl {
-    fn size(&self) -> AbstractMemorySize<GasCarrier> {
+    pub fn size(&self) -> AbstractMemorySize<GasCarrier> {
         use ValueImpl::*;
 
         match self {
@@ -2111,7 +2111,7 @@ impl ValueImpl {
 }
 
 impl Struct {
-    fn size_impl(fields: &[ValueImpl]) -> AbstractMemorySize<GasCarrier> {
+    pub fn size_impl(fields: &[ValueImpl]) -> AbstractMemorySize<GasCarrier> {
         fields
             .iter()
             .fold(STRUCT_SIZE, |acc, v| acc.map2(v.size(), Add::add))
@@ -2129,7 +2129,7 @@ impl Value {
 }
 
 impl ReferenceImpl {
-    fn size(&self) -> AbstractMemorySize<GasCarrier> {
+    pub fn size(&self) -> AbstractMemorySize<GasCarrier> {
         match self {
             Self::ContainerRef(r) => r.size(),
             Self::IndexedRef(r) => r.size(),
@@ -2339,31 +2339,31 @@ pub mod debug {
     use super::*;
     use std::fmt::Write;
 
-    fn print_invalid<B: Write>(buf: &mut B) -> PartialVMResult<()> {
+    pub fn print_invalid<B: Write>(buf: &mut B) -> PartialVMResult<()> {
         debug_write!(buf, "-")
     }
 
-    fn print_u8<B: Write>(buf: &mut B, x: &u8) -> PartialVMResult<()> {
+    pub fn print_u8<B: Write>(buf: &mut B, x: &u8) -> PartialVMResult<()> {
         debug_write!(buf, "{}", x)
     }
 
-    fn print_u64<B: Write>(buf: &mut B, x: &u64) -> PartialVMResult<()> {
+    pub fn print_u64<B: Write>(buf: &mut B, x: &u64) -> PartialVMResult<()> {
         debug_write!(buf, "{}", x)
     }
 
-    fn print_u128<B: Write>(buf: &mut B, x: &u128) -> PartialVMResult<()> {
+    pub fn print_u128<B: Write>(buf: &mut B, x: &u128) -> PartialVMResult<()> {
         debug_write!(buf, "{}", x)
     }
 
-    fn print_bool<B: Write>(buf: &mut B, x: &bool) -> PartialVMResult<()> {
+    pub fn print_bool<B: Write>(buf: &mut B, x: &bool) -> PartialVMResult<()> {
         debug_write!(buf, "{}", x)
     }
 
-    fn print_address<B: Write>(buf: &mut B, x: &AccountAddress) -> PartialVMResult<()> {
+    pub fn print_address<B: Write>(buf: &mut B, x: &AccountAddress) -> PartialVMResult<()> {
         debug_write!(buf, "{}", x)
     }
 
-    fn print_value_impl<B: Write>(buf: &mut B, val: &ValueImpl) -> PartialVMResult<()> {
+    pub fn print_value_impl<B: Write>(buf: &mut B, val: &ValueImpl) -> PartialVMResult<()> {
         match val {
             ValueImpl::Invalid => print_invalid(buf),
 
@@ -2380,7 +2380,7 @@ pub mod debug {
         }
     }
 
-    fn print_list<'a, B, I, X, F>(
+    pub fn print_list<'a, B, I, X, F>(
         buf: &mut B,
         begin: &str,
         items: I,
@@ -2406,7 +2406,7 @@ pub mod debug {
         Ok(())
     }
 
-    fn print_container<B: Write>(buf: &mut B, c: &Container) -> PartialVMResult<()> {
+    pub fn print_container<B: Write>(buf: &mut B, c: &Container) -> PartialVMResult<()> {
         match c {
             Container::VecC(r) | Container::VecR(r) => {
                 print_list(buf, "[", r.borrow().iter(), print_value_impl, "]")
@@ -2429,12 +2429,12 @@ pub mod debug {
         }
     }
 
-    fn print_container_ref<B: Write>(buf: &mut B, r: &ContainerRef) -> PartialVMResult<()> {
+    pub fn print_container_ref<B: Write>(buf: &mut B, r: &ContainerRef) -> PartialVMResult<()> {
         debug_write!(buf, "(&) ")?;
         print_container(buf, r.container())
     }
 
-    fn print_slice_elem<B, X, F>(buf: &mut B, v: &[X], idx: usize, print: F) -> PartialVMResult<()>
+    pub fn print_slice_elem<B, X, F>(buf: &mut B, v: &[X], idx: usize, print: F) -> PartialVMResult<()>
     where
         B: Write,
         F: FnOnce(&mut B, &X) -> PartialVMResult<()>,
@@ -2448,7 +2448,7 @@ pub mod debug {
         }
     }
 
-    fn print_indexed_ref<B: Write>(buf: &mut B, r: &IndexedRef) -> PartialVMResult<()> {
+    pub fn print_indexed_ref<B: Write>(buf: &mut B, r: &IndexedRef) -> PartialVMResult<()> {
         let idx = r.idx;
         match r.container_ref.container() {
             Container::Locals(r)
@@ -2495,8 +2495,8 @@ pub mod debug {
  *   enums that carry type info in the tags, we should NOT rely on them for
  *   serialization:
  *     1) Depending on the specific internal representation, it may be impossible to
- *        reconstruct the layout from a value. For example, one cannot tell if a general
- *        container is a struct or a value.
+ *        reconpub struct the layout from a value. For example, one cannot tell if a general
+ *        container is a pub struct or a value.
  *     2) Even if 1) is not a problem at a certain time, we may change to a different
  *        internal representation that breaks the 1-1 mapping. Extremely speaking, if
  *        we switch to untagged unions one day, none of the type info will be carried
@@ -2558,7 +2558,7 @@ impl Struct {
     }
 }
 
-struct AnnotatedValue<'a, 'b, T1, T2> {
+pub struct AnnotatedValue<'a, 'b, T1, T2> {
     layout: &'a T1,
     val: &'b T2,
 }
@@ -2651,7 +2651,7 @@ impl<'a, 'b> serde::Serialize for AnnotatedValue<'a, 'b, MoveStructLayout, Vec<V
         let fields = self.layout.fields();
         if fields.len() != values.len() {
             return Err(invariant_violation::<S>(format!(
-                "cannot serialize struct value {:?} as {:?} -- number of fields mismatch",
+                "cannot serialize pub struct value {:?} as {:?} -- number of fields mismatch",
                 self.val, self.layout
             )));
         }
@@ -2667,7 +2667,7 @@ impl<'a, 'b> serde::Serialize for AnnotatedValue<'a, 'b, MoveStructLayout, Vec<V
 }
 
 #[derive(Clone)]
-struct SeedWrapper<K, L> {
+pub struct SeedWrapper<K, L> {
     kind_info: K,
     layout: L,
 }
@@ -2781,7 +2781,7 @@ impl<'d> serde::de::DeserializeSeed<'d>
     }
 }
 
-struct VectorElementVisitor<'a>(SeedWrapper<&'a MoveKindInfo, &'a MoveTypeLayout>);
+pub struct VectorElementVisitor<'a>(SeedWrapper<&'a MoveKindInfo, &'a MoveTypeLayout>);
 
 impl<'d, 'a> serde::de::Visitor<'d> for VectorElementVisitor<'a> {
     type Value = Vec<ValueImpl>;
@@ -2802,7 +2802,7 @@ impl<'d, 'a> serde::de::Visitor<'d> for VectorElementVisitor<'a> {
     }
 }
 
-struct StructFieldVisitor<'a>(&'a [MoveKindInfo], &'a [MoveTypeLayout]);
+pub struct StructFieldVisitor<'a>(&'a [MoveKindInfo], &'a [MoveTypeLayout]);
 
 impl<'d, 'a> serde::de::Visitor<'d> for StructFieldVisitor<'a> {
     type Value = Vec<Value>;
@@ -2839,7 +2839,7 @@ impl<'d, 'a> serde::de::Visitor<'d> for StructFieldVisitor<'a> {
 **************************************************************************************/
 
 impl Value {
-    fn constant_sig_token_to_layout(
+    pub fn constant_sig_token_to_layout(
         constant_signature: &SignatureToken,
     ) -> Option<(MoveKindInfo, MoveTypeLayout)> {
         use MoveKindInfo as K;
@@ -3061,7 +3061,7 @@ pub mod prop {
                         .map(|v| v.as_move_value(inner_layout.as_ref()))
                         .collect(),
                     Container::StructC(_) | Container::StructR(_) => {
-                        panic!("got struct container when converting vec")
+                        panic!("got pub struct container when converting vec")
                     }
                     Container::Locals(_) => panic!("got locals container when converting vec"),
                 }),

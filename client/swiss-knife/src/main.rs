@@ -21,7 +21,7 @@ use structopt::StructOpt;
 use swiss_knife::helpers;
 
 #[derive(Debug, StructOpt)]
-enum Command {
+pub enum Command {
     /// Generates and serializes a RawTransaction and its hash. The hash of this RawTransaction needs to be signed to generate a SignedTransaction.
     /// Takes the input json payload from stdin. Writes the output json payload to stdout.
     /// Refer to README.md for examples.
@@ -55,7 +55,7 @@ enum Command {
     name = "swiss-knife",
     about = "Tool for generating, serializing (LCS), hashing and signing Libra transactions. Additionally, contains tools for testing. Please refer to README.md for examples."
 )]
-struct Opt {
+pub struct Opt {
     #[structopt(subcommand)]
     pub cmd: Command,
 }
@@ -116,7 +116,7 @@ fn main() {
 
 #[derive(Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
-struct TxnParams {
+pub struct TxnParams {
     // Sender's address
     pub sender_address: String,
     // Sequence number of this transaction corresponding to sender's account.
@@ -140,7 +140,7 @@ struct TxnParams {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-enum MoveScriptParams {
+pub enum MoveScriptParams {
     Preburn {
         coin_tag: String,
         amount: u64,
@@ -156,18 +156,18 @@ enum MoveScriptParams {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct GenerateRawTxnRequest {
+pub struct GenerateRawTxnRequest {
     pub txn_params: TxnParams,
     pub script_params: MoveScriptParams,
 }
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct GenerateRawTxnResponse {
+pub struct GenerateRawTxnResponse {
     pub raw_txn: String,
 }
 
-fn generate_raw_txn(g: GenerateRawTxnRequest) -> GenerateRawTxnResponse {
+pub fn generate_raw_txn(g: GenerateRawTxnRequest) -> GenerateRawTxnResponse {
     let script = match g.script_params {
         MoveScriptParams::Preburn { coin_tag, amount } => {
             let coin_tag = helpers::coin_tag_parser(&coin_tag);
@@ -217,7 +217,7 @@ fn generate_raw_txn(g: GenerateRawTxnRequest) -> GenerateRawTxnResponse {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct GenerateSignedTxnRequest {
+pub struct GenerateSignedTxnRequest {
     pub raw_txn: String,
     pub public_key: String,
     pub signature: String,
@@ -225,12 +225,12 @@ struct GenerateSignedTxnRequest {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct GenerateSignedTxnResponse {
+pub struct GenerateSignedTxnResponse {
     pub signed_txn: String,
     pub txn_hash: String,
 }
 
-fn generate_signed_txn(request: GenerateSignedTxnRequest) -> GenerateSignedTxnResponse {
+pub fn generate_signed_txn(request: GenerateSignedTxnRequest) -> GenerateSignedTxnResponse {
     let raw_txn: RawTransaction = lcs::from_bytes(
         &hex::decode(request.raw_txn.clone())
             .map_err(|err| {
@@ -278,14 +278,14 @@ fn generate_signed_txn(request: GenerateSignedTxnRequest) -> GenerateSignedTxnRe
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct GenerateKeypairResponse {
+pub struct GenerateKeypairResponse {
     pub private_key: String,
     pub public_key: String,
     pub libra_auth_key: String,
     pub libra_account_address: String,
 }
 
-fn generate_key_pair(seed: Option<u64>) -> GenerateKeypairResponse {
+pub fn generate_key_pair(seed: Option<u64>) -> GenerateKeypairResponse {
     let mut rng = StdRng::seed_from_u64(seed.unwrap_or_else(rand::random));
     let keypair: KeyPair<Ed25519PrivateKey, Ed25519PublicKey> =
         Ed25519PrivateKey::generate(&mut rng).into();
@@ -318,18 +318,18 @@ fn generate_key_pair(seed: Option<u64>) -> GenerateKeypairResponse {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct SignTransactionUsingEd25519Request {
+pub struct SignTransactionUsingEd25519Request {
     pub raw_txn: String,
     pub private_key: String,
 }
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct SignTransactionUsingEd25519Response {
+pub struct SignTransactionUsingEd25519Response {
     pub signature: String,
 }
 
-fn sign_transaction_using_ed25519(
+pub fn sign_transaction_using_ed25519(
     request: SignTransactionUsingEd25519Request,
 ) -> SignTransactionUsingEd25519Response {
     let raw_txn: RawTransaction = lcs::from_bytes(
@@ -368,7 +368,7 @@ fn sign_transaction_using_ed25519(
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct VerifyEd25519SignatureRequest {
+pub struct VerifyEd25519SignatureRequest {
     pub payload: String,
     pub signature: String,
     pub public_key: String,
@@ -376,11 +376,11 @@ struct VerifyEd25519SignatureRequest {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct VerifyEd25519SignatureResponse {
+pub struct VerifyEd25519SignatureResponse {
     pub valid_signature: bool,
 }
 
-fn verify_signature_using_ed25519(
+pub fn verify_signature_using_ed25519(
     request: VerifyEd25519SignatureRequest,
 ) -> VerifyEd25519SignatureResponse {
     let message = helpers::hex_decode(&request.payload);
@@ -412,7 +412,7 @@ fn verify_signature_using_ed25519(
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct VerifyTransactionEd25519SignatureRequest {
+pub struct VerifyTransactionEd25519SignatureRequest {
     pub raw_txn: String,
     pub signature: String,
     pub public_key: String,
@@ -420,11 +420,11 @@ struct VerifyTransactionEd25519SignatureRequest {
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-struct VerifyTransactionEd25519SignatureResponse {
+pub struct VerifyTransactionEd25519SignatureResponse {
     pub valid_signature: bool,
 }
 
-fn verify_transaction_signature_using_ed25519(
+pub fn verify_transaction_signature_using_ed25519(
     request: VerifyTransactionEd25519SignatureRequest,
 ) -> VerifyTransactionEd25519SignatureResponse {
     let raw_txn: RawTransaction = lcs::from_bytes(

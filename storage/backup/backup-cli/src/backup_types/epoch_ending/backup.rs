@@ -106,23 +106,23 @@ impl EpochEndingBackupController {
 }
 
 impl EpochEndingBackupController {
-    fn backup_name(&self) -> ShellSafeName {
+    pub fn backup_name(&self) -> ShellSafeName {
         format!("epoch_ending_{}-", self.start_epoch)
             .try_into()
             .unwrap()
     }
 
-    fn manifest_name() -> &'static ShellSafeName {
+    pub fn manifest_name() -> &'static ShellSafeName {
         static NAME: Lazy<ShellSafeName> =
             Lazy::new(|| ShellSafeName::from_str("epoch_ending.manifest").unwrap());
         &NAME
     }
 
-    fn chunk_name(first_epoch: u64) -> ShellSafeName {
+    pub fn chunk_name(first_epoch: u64) -> ShellSafeName {
         format!("{}-.chunk", first_epoch).try_into().unwrap()
     }
 
-    fn get_waypoint(record: &[u8], epoch: u64) -> Result<Waypoint> {
+    pub fn get_waypoint(record: &[u8], epoch: u64) -> Result<Waypoint> {
         let li: LedgerInfoWithSignatures = lcs::from_bytes(record)?;
         ensure!(
             li.ledger_info().epoch() == epoch,
@@ -133,7 +133,7 @@ impl EpochEndingBackupController {
         Waypoint::new_epoch_boundary(li.ledger_info())
     }
 
-    async fn write_chunk(
+    pub async fn write_chunk(
         &self,
         backup_handle: &BackupHandleRef,
         chunk_bytes: &[u8],
@@ -152,7 +152,7 @@ impl EpochEndingBackupController {
         })
     }
 
-    async fn write_manifest(
+    pub async fn write_manifest(
         &self,
         backup_handle: &BackupHandleRef,
         waypoints: Vec<Waypoint>,

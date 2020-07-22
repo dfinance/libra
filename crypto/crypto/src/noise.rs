@@ -128,7 +128,7 @@ const _: [(); 0 - !{ const ASSERT: bool = HashValue::LENGTH == 32; ASSERT } as u
 // ------
 //
 
-/// A NoiseError enum represents the different types of error that noise can return to users of the crate
+/// A NoiseErrorpub enum represents the different types of error that noise can return to users of the crate
 #[derive(Debug, Error)]
 pub enum NoiseError {
     /// the received message is too short to contain the expected data
@@ -173,11 +173,11 @@ pub enum NoiseError {
 // -------
 //
 
-fn hash(data: &[u8]) -> Vec<u8> {
+pub fn hash(data: &[u8]) -> Vec<u8> {
     sha2::Sha256::digest(data).to_vec()
 }
 
-fn hkdf(ck: &[u8], dh_output: Option<&[u8]>) -> Result<(Vec<u8>, Vec<u8>), NoiseError> {
+pub fn hkdf(ck: &[u8], dh_output: Option<&[u8]>) -> Result<(Vec<u8>, Vec<u8>), NoiseError> {
     let dh_output = dh_output.unwrap_or_else(|| &[]);
     let hkdf_output = Hkdf::<sha2::Sha256>::extract_then_expand(Some(ck), dh_output, None, 64);
 
@@ -186,12 +186,12 @@ fn hkdf(ck: &[u8], dh_output: Option<&[u8]>) -> Result<(Vec<u8>, Vec<u8>), Noise
     Ok((k1.to_vec(), k2.to_vec()))
 }
 
-fn mix_hash(h: &mut Vec<u8>, data: &[u8]) {
+pub fn mix_hash(h: &mut Vec<u8>, data: &[u8]) {
     h.extend_from_slice(data);
     *h = hash(h);
 }
 
-fn mix_key(ck: &mut Vec<u8>, dh_output: &[u8]) -> Result<Vec<u8>, NoiseError> {
+pub fn mix_key(ck: &mut Vec<u8>, dh_output: &[u8]) -> Result<Vec<u8>, NoiseError> {
     let (new_ck, k) = hkdf(ck, Some(dh_output))?;
     *ck = new_ck;
     Ok(k)
@@ -605,7 +605,7 @@ pub struct NoiseSession {
 }
 
 impl NoiseSession {
-    fn new(write_key: Vec<u8>, read_key: Vec<u8>, remote_public_key: x25519::PublicKey) -> Self {
+    pub fn new(write_key: Vec<u8>, read_key: Vec<u8>, remote_public_key: x25519::PublicKey) -> Self {
         Self {
             valid: true,
             remote_public_key,

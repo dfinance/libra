@@ -7,13 +7,13 @@ use std::num::NonZeroUsize;
 
 /// This represents a proposal message from a validator
 #[derive(Debug, PartialEq)]
-struct ProposalMsg {
+pub struct ProposalMsg {
     msg: String,
 }
 
 /// This represents a vote message from a validator
 #[derive(Debug, PartialEq)]
-struct VoteMsg {
+pub struct VoteMsg {
     msg: String,
 }
 

@@ -17,13 +17,13 @@ use std::collections::BTreeMap;
 //**************************************************************************************************
 
 #[derive(Debug, Clone)]
-enum ResolvedType {
+pub enum ResolvedType {
     TParam(Loc, N::TParam),
     BuiltinType,
 }
 
 impl ResolvedType {
-    fn error_msg(&self, n: &Name) -> (Loc, String) {
+    pub fn error_msg(&self, n: &Name) -> (Loc, String) {
         match self {
             ResolvedType::TParam(loc, _) => (
                 *loc,
@@ -34,7 +34,7 @@ impl ResolvedType {
     }
 }
 
-struct Context {
+pub struct Context {
     errors: Errors,
     current_module: Option<ModuleIdent>,
     scoped_types: BTreeMap<ModuleIdent, BTreeMap<String, (Loc, ModuleIdent, Option<Kind>)>>,
@@ -45,7 +45,7 @@ struct Context {
 }
 
 impl Context {
-    fn new(prog: &E::Program, errors: Errors) -> Self {
+    pub fn new(prog: &E::Program, errors: Errors) -> Self {
         use ResolvedType as RT;
         let scoped_types = prog
             .modules
@@ -101,20 +101,20 @@ impl Context {
         }
     }
 
-    fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
+    pub fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
         self.errors
             .push(e.into_iter().map(|(loc, msg)| (loc, msg.into())).collect())
     }
 
-    fn get_errors(self) -> Errors {
+    pub fn get_errors(self) -> Errors {
         self.errors
     }
 
-    fn has_errors(&self) -> bool {
+    pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
 
-    fn resolve_module_type(
+    pub fn resolve_module_type(
         &mut self,
         loc: Loc,
         m: &ModuleIdent,
@@ -132,7 +132,7 @@ impl Context {
                 self.error(vec![(
                     loc,
                     format!(
-                        "Invalid module access. Unbound struct '{}' in module '{}'",
+                        "Invalid module access. Unbound pub struct '{}' in module '{}'",
                         n, m
                     ),
                 )]);
@@ -142,7 +142,7 @@ impl Context {
         }
     }
 
-    fn resolve_module_function(
+    pub fn resolve_module_function(
         &mut self,
         loc: Loc,
         m: &ModuleIdent,
@@ -170,7 +170,7 @@ impl Context {
         }
     }
 
-    fn resolve_module_constant(
+    pub fn resolve_module_constant(
         &mut self,
         loc: Loc,
         m: &ModuleIdent,
@@ -198,7 +198,7 @@ impl Context {
         }
     }
 
-    fn resolve_unscoped_type(&mut self, n: &Name) -> Option<ResolvedType> {
+    pub fn resolve_unscoped_type(&mut self, n: &Name) -> Option<ResolvedType> {
         match self.unscoped_types.get(&n.value) {
             None => {
                 self.error(vec![(
@@ -211,7 +211,7 @@ impl Context {
         }
     }
 
-    fn resolve_struct_name(
+    pub fn resolve_struct_name(
         &mut self,
         verb: &str,
         sp!(loc, ma_): E::ModuleAccess,
@@ -225,7 +225,7 @@ impl Context {
                 }
                 Some(rt) => {
                     self.error(vec![
-                        (loc, format!("Invalid {}. Expected a struct name", verb)),
+                        (loc, format!("Invalid {}. Expected a pub struct name", verb)),
                         rt.error_msg(&n),
                     ]);
                     None
@@ -241,7 +241,7 @@ impl Context {
         }
     }
 
-    fn resolve_constant(
+    pub fn resolve_constant(
         &mut self,
         sp!(loc, ma_): E::ModuleAccess,
     ) -> Option<(Option<ModuleIdent>, ConstantName)> {
@@ -264,19 +264,19 @@ impl Context {
         }
     }
 
-    fn bind_type(&mut self, s: String, rt: ResolvedType) {
+    pub fn bind_type(&mut self, s: String, rt: ResolvedType) {
         self.unscoped_types.insert(s, rt);
     }
 
-    fn bind_constant(&mut self, s: String, loc: Loc) {
+    pub fn bind_constant(&mut self, s: String, loc: Loc) {
         self.unscoped_constants.insert(s, loc);
     }
 
-    fn save_unscoped(&self) -> (BTreeMap<String, ResolvedType>, BTreeMap<String, Loc>) {
+    pub fn save_unscoped(&self) -> (BTreeMap<String, ResolvedType>, BTreeMap<String, Loc>) {
         (self.unscoped_types.clone(), self.unscoped_constants.clone())
     }
 
-    fn restore_unscoped(
+    pub fn restore_unscoped(
         &mut self,
         (types, constants): (BTreeMap<String, ResolvedType>, BTreeMap<String, Loc>),
     ) {
@@ -297,14 +297,14 @@ pub fn program(prog: E::Program, errors: Errors) -> (N::Program, Errors) {
     (N::Program { modules, scripts }, context.get_errors())
 }
 
-fn modules(
+pub fn modules(
     context: &mut Context,
     modules: UniqueMap<ModuleIdent, E::ModuleDefinition>,
 ) -> UniqueMap<ModuleIdent, N::ModuleDefinition> {
     modules.map(|ident, mdef| module(context, ident, mdef))
 }
 
-fn module(
+pub fn module(
     context: &mut Context,
     ident: ModuleIdent,
     mdef: E::ModuleDefinition,
@@ -334,7 +334,7 @@ fn module(
     }
 }
 
-fn scripts(
+pub fn scripts(
     context: &mut Context,
     escripts: BTreeMap<String, E::Script>,
 ) -> BTreeMap<String, N::Script> {
@@ -344,7 +344,7 @@ fn scripts(
         .collect()
 }
 
-fn script(context: &mut Context, escript: E::Script) -> N::Script {
+pub fn script(context: &mut Context, escript: E::Script) -> N::Script {
     let E::Script {
         loc,
         constants: econstants,
@@ -377,7 +377,7 @@ fn script(context: &mut Context, escript: E::Script) -> N::Script {
 // Functions
 //**************************************************************************************************
 
-fn function(context: &mut Context, _name: FunctionName, f: E::Function) -> N::Function {
+pub fn function(context: &mut Context, _name: FunctionName, f: E::Function) -> N::Function {
     let visibility = f.visibility;
     let signature = function_signature(context, f.signature);
     let acquires = function_acquires(context, f.acquires);
@@ -390,7 +390,7 @@ fn function(context: &mut Context, _name: FunctionName, f: E::Function) -> N::Fu
     }
 }
 
-fn function_signature(context: &mut Context, sig: E::FunctionSignature) -> N::FunctionSignature {
+pub fn function_signature(context: &mut Context, sig: E::FunctionSignature) -> N::FunctionSignature {
     let type_parameters = type_parameters(context, sig.type_parameters);
     let parameters = sig
         .parameters
@@ -405,14 +405,14 @@ fn function_signature(context: &mut Context, sig: E::FunctionSignature) -> N::Fu
     }
 }
 
-fn function_body(context: &mut Context, sp!(loc, b_): E::FunctionBody) -> N::FunctionBody {
+pub fn function_body(context: &mut Context, sp!(loc, b_): E::FunctionBody) -> N::FunctionBody {
     match b_ {
         E::FunctionBody_::Native => sp(loc, N::FunctionBody_::Native),
         E::FunctionBody_::Defined(es) => sp(loc, N::FunctionBody_::Defined(sequence(context, es))),
     }
 }
 
-fn function_acquires(
+pub fn function_acquires(
     context: &mut Context,
     eacquires: Vec<E::ModuleAccess>,
 ) -> BTreeMap<StructName, Loc> {
@@ -433,7 +433,7 @@ fn function_acquires(
     acquires
 }
 
-fn acquires_type(context: &mut Context, sp!(loc, en_): E::ModuleAccess) -> Option<StructName> {
+pub fn acquires_type(context: &mut Context, sp!(loc, en_): E::ModuleAccess) -> Option<StructName> {
     use ResolvedType as RT;
     use E::ModuleAccess_ as EN;
     match en_ {
@@ -458,7 +458,7 @@ fn acquires_type(context: &mut Context, sp!(loc, en_): E::ModuleAccess) -> Optio
     }
 }
 
-fn acquires_type_struct(
+pub fn acquires_type_struct(
     context: &mut Context,
     loc: Loc,
     decl_loc: Loc,
@@ -472,7 +472,7 @@ fn acquires_type_struct(
     };
     if !declared_in_current {
         let tmsg = format!(
-            "The struct '{}' was not declared in the current module. Global storage access is \
+            "The pub struct '{}' was not declared in the current module. Global storage access is \
              internal to the module'",
             n
         );
@@ -483,7 +483,7 @@ fn acquires_type_struct(
     if resource_opt.is_none() {
         context.error(vec![
             (loc, "Invalid acquires item. Expected a nominal resource."),
-            (decl_loc, "Declared as a normal struct here"),
+            (decl_loc, "Declared as a normal pub struct here"),
         ]);
         return None;
     }
@@ -495,7 +495,7 @@ fn acquires_type_struct(
 // Structs
 //**************************************************************************************************
 
-fn struct_def(
+pub fn struct_def(
     context: &mut Context,
     name: StructName,
     sdef: E::StructDefinition,
@@ -518,7 +518,7 @@ fn struct_def(
     }
 }
 
-fn struct_fields(context: &mut Context, efields: E::StructFields) -> N::StructFields {
+pub fn struct_fields(context: &mut Context, efields: E::StructFields) -> N::StructFields {
     match efields {
         E::StructFields::Native(loc) => N::StructFields::Native(loc),
         E::StructFields::Defined(em) => {
@@ -527,13 +527,13 @@ fn struct_fields(context: &mut Context, efields: E::StructFields) -> N::StructFi
     }
 }
 
-fn check_no_nominal_resources(context: &mut Context, s: &StructName, field: &Field, ty: &N::Type) {
+pub fn check_no_nominal_resources(context: &mut Context, s: &StructName, field: &Field, ty: &N::Type) {
     use N::Type_ as T;
     let sp!(tloc, ty_) = ty;
     match ty_ {
         T::Apply(Some(sp!(kloc, Kind_::Resource)), _, _) => {
             let field_msg = format!(
-                "Invalid resource field '{}' for struct '{}'. Structs cannot contain resource \
+                "Invalid resource field '{}' for pub struct '{}'. Structs cannot contain resource \
                  types, except through type parameters",
                 field, s
             );
@@ -564,7 +564,7 @@ fn check_no_nominal_resources(context: &mut Context, s: &StructName, field: &Fie
 // Constants
 //**************************************************************************************************
 
-fn constant(context: &mut Context, _name: ConstantName, econstant: E::Constant) -> N::Constant {
+pub fn constant(context: &mut Context, _name: ConstantName, econstant: E::Constant) -> N::Constant {
     let E::Constant {
         loc,
         signature: esignature,
@@ -612,11 +612,11 @@ fn type_parameters(context: &mut Context, type_parameters: Vec<(Name, Kind)>) ->
         .collect()
 }
 
-fn types(context: &mut Context, tys: Vec<E::Type>) -> Vec<N::Type> {
+pub fn types(context: &mut Context, tys: Vec<E::Type>) -> Vec<N::Type> {
     tys.into_iter().map(|t| type_(context, t)).collect()
 }
 
-fn type_(context: &mut Context, sp!(loc, ety_): E::Type) -> N::Type {
+pub fn type_(context: &mut Context, sp!(loc, ety_): E::Type) -> N::Type {
     use ResolvedType as RT;
     use E::{ModuleAccess_ as EN, Type_ as ET};
     use N::{TypeName_ as NN, Type_ as NT};
@@ -673,11 +673,11 @@ fn type_(context: &mut Context, sp!(loc, ety_): E::Type) -> N::Type {
 // Exp
 //**************************************************************************************************
 
-fn sequence(context: &mut Context, seq: E::Sequence) -> N::Sequence {
+pub fn sequence(context: &mut Context, seq: E::Sequence) -> N::Sequence {
     seq.into_iter().map(|s| sequence_item(context, s)).collect()
 }
 
-fn sequence_item(context: &mut Context, sp!(loc, ns_): E::SequenceItem) -> N::SequenceItem {
+pub fn sequence_item(context: &mut Context, sp!(loc, ns_): E::SequenceItem) -> N::SequenceItem {
     use E::SequenceItem_ as ES;
     use N::SequenceItem_ as NS;
 
@@ -709,19 +709,19 @@ fn sequence_item(context: &mut Context, sp!(loc, ns_): E::SequenceItem) -> N::Se
     sp(loc, s_)
 }
 
-fn call_args(context: &mut Context, sp!(loc, es): Spanned<Vec<E::Exp>>) -> Spanned<Vec<N::Exp>> {
+pub fn call_args(context: &mut Context, sp!(loc, es): Spanned<Vec<E::Exp>>) -> Spanned<Vec<N::Exp>> {
     sp(loc, exps(context, es))
 }
 
-fn exps(context: &mut Context, es: Vec<E::Exp>) -> Vec<N::Exp> {
+pub fn exps(context: &mut Context, es: Vec<E::Exp>) -> Vec<N::Exp> {
     es.into_iter().map(|e| exp_(context, e)).collect()
 }
 
-fn exp(context: &mut Context, e: E::Exp) -> Box<N::Exp> {
+pub fn exp(context: &mut Context, e: E::Exp) -> Box<N::Exp> {
     Box::new(exp_(context, e))
 }
 
-fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
+pub fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
     use E::Exp_ as EE;
     use N::Exp_ as NE;
     let sp!(eloc, e_) = e;
@@ -874,7 +874,7 @@ fn exp_(context: &mut Context, e: E::Exp) -> N::Exp {
     sp(eloc, ne_)
 }
 
-fn access_constant(context: &mut Context, ma: E::ModuleAccess) -> N::Exp_ {
+pub fn access_constant(context: &mut Context, ma: E::ModuleAccess) -> N::Exp_ {
     match context.resolve_constant(ma) {
         None => {
             assert!(context.has_errors());
@@ -884,7 +884,7 @@ fn access_constant(context: &mut Context, ma: E::ModuleAccess) -> N::Exp_ {
     }
 }
 
-fn dotted(context: &mut Context, edot: E::ExpDotted) -> Option<N::ExpDotted> {
+pub fn dotted(context: &mut Context, edot: E::ExpDotted) -> Option<N::ExpDotted> {
     let sp!(loc, edot_) = edot;
     let nedot_ = match edot_ {
         E::ExpDotted_::Exp(e) => {
@@ -900,12 +900,12 @@ fn dotted(context: &mut Context, edot: E::ExpDotted) -> Option<N::ExpDotted> {
 }
 
 #[derive(Clone, Copy)]
-enum LValueCase {
+pub enum LValueCase {
     Bind,
     Assign,
 }
 
-fn lvalue(context: &mut Context, case: LValueCase, sp!(loc, l_): E::LValue) -> Option<N::LValue> {
+pub fn lvalue(context: &mut Context, case: LValueCase, sp!(loc, l_): E::LValue) -> Option<N::LValue> {
     use LValueCase as C;
     use E::LValue_ as EL;
     use N::LValue_ as NL;
@@ -941,15 +941,15 @@ fn lvalue(context: &mut Context, case: LValueCase, sp!(loc, l_): E::LValue) -> O
     Some(sp(loc, nl_))
 }
 
-fn bind_list(context: &mut Context, ls: E::LValueList) -> Option<N::LValueList> {
+pub fn bind_list(context: &mut Context, ls: E::LValueList) -> Option<N::LValueList> {
     lvalue_list(context, LValueCase::Bind, ls)
 }
 
-fn assign_list(context: &mut Context, ls: E::LValueList) -> Option<N::LValueList> {
+pub fn assign_list(context: &mut Context, ls: E::LValueList) -> Option<N::LValueList> {
     lvalue_list(context, LValueCase::Assign, ls)
 }
 
-fn lvalue_list(
+pub fn lvalue_list(
     context: &mut Context,
     case: LValueCase,
     sp!(loc, b_): E::LValueList,
@@ -962,7 +962,7 @@ fn lvalue_list(
     ))
 }
 
-fn resolve_builtin_function(
+pub fn resolve_builtin_function(
     context: &mut Context,
     loc: Loc,
     b: &Name,
@@ -987,7 +987,7 @@ fn resolve_builtin_function(
     })
 }
 
-fn check_builtin_ty_arg(
+pub fn check_builtin_ty_arg(
     context: &mut Context,
     loc: Loc,
     b: &Name,
@@ -1000,7 +1000,7 @@ fn check_builtin_ty_arg(
     })
 }
 
-fn check_builtin_ty_args(
+pub fn check_builtin_ty_args(
     context: &mut Context,
     loc: Loc,
     b: &Name,

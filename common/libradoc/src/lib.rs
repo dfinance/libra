@@ -57,13 +57,13 @@ where
 static BEGIN_RE: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"<!-- @begin-libradoc name=([^ ]*) -->").unwrap());
 
-fn match_begin_command(line: &str) -> Option<String> {
+pub fn match_begin_command(line: &str) -> Option<String> {
     match BEGIN_RE.captures(line) {
         Some(cap) => Some(cap[1].to_string()),
         None => None,
     }
 }
 
-fn match_end_command(line: &str) -> bool {
+pub fn match_end_command(line: &str) -> bool {
     line.contains("<!-- @end-libradoc -->")
 }

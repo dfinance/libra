@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::Executor;
 use anyhow::{ensure, format_err, Result};
@@ -140,7 +140,7 @@ pub fn calculate_genesis<V: VMExecutor>(
     Ok(committer)
 }
 
-fn get_state_timestamp(state_view: &VerifiedStateView) -> Result<u64> {
+pub fn get_state_timestamp(state_view: &VerifiedStateView) -> Result<u64> {
     let rsrc_bytes = &state_view
         .get(&AccessPath::new(
             libra_root_address(),
@@ -151,7 +151,7 @@ fn get_state_timestamp(state_view: &VerifiedStateView) -> Result<u64> {
     Ok(rsrc.libra_timestamp.microseconds)
 }
 
-fn get_state_epoch(state_view: &VerifiedStateView) -> Result<u64> {
+pub fn get_state_epoch(state_view: &VerifiedStateView) -> Result<u64> {
     let rsrc_bytes = &state_view
         .get(&AccessPath::new(
             config_address(),
@@ -162,6 +162,6 @@ fn get_state_epoch(state_view: &VerifiedStateView) -> Result<u64> {
     Ok(rsrc.epoch())
 }
 
-fn genesis_block_id() -> HashValue {
+pub fn genesis_block_id() -> HashValue {
     HashValue::zero()
 }

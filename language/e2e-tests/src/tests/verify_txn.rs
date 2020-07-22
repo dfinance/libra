@@ -623,7 +623,7 @@ fn test_dependency_fails_verification() {
     let bad_module_code = "
     module Test {
         resource R1 { b: bool }
-        struct S1 { r1: Self.R1 }
+        pub struct S1 { r1: Self.R1 }
 
         public new_S1(): Self.S1 {
             let s: Self.S1;

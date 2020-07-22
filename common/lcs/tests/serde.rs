@@ -38,7 +38,7 @@ where
     assert_eq!(bytes.len(), serialized_size(&t).unwrap());
 }
 
-// TODO deriving `Arbitrary` is currently broken for enum types
+// TODO deriving `Arbitrary` is currently broken forpub enum types
 // Once AltSysrq/proptest#163 is merged we can use `Arbitrary` again.
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 enum E {
@@ -72,7 +72,7 @@ fn test_enum() {
 }
 
 #[derive(Arbitrary, Debug, Deserialize, Serialize, PartialEq)]
-struct S {
+pub struct S {
     int: u16,
     option: Option<u8>,
     seq: Vec<String>,
@@ -272,7 +272,7 @@ fn invalid_utf8() {
 #[test]
 fn uleb_encoding_and_variant() {
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
-    enum Test {
+   pub enum Test {
         One,
         Two,
     };
@@ -429,7 +429,7 @@ fn test_char() {
 #[test]
 fn zero_copy_parse() {
     #[derive(Serialize, Deserialize, Eq, PartialEq, Debug)]
-    struct Foo<'a> {
+    pub struct Foo<'a> {
         borrowed_str: &'a str,
         borrowed_bytes: &'a [u8],
     }
@@ -456,7 +456,7 @@ fn cow() {
     large_map.insert(1, 2);
 
     #[derive(Serialize, Deserialize, Debug)]
-    enum Message<'a> {
+   pub enum Message<'a> {
         M1(Cow<'a, Vec<u32>>),
         M2(Cow<'a, BTreeMap<u32, u32>>),
     }
@@ -521,10 +521,10 @@ fn path_buf() {
 }
 
 #[derive(Arbitrary, Debug, Deserialize, Serialize, PartialEq)]
-struct Addr([u8; 32]);
+pub struct Addr([u8; 32]);
 
 #[derive(Arbitrary, Debug, Deserialize, Serialize, PartialEq)]
-struct Bar {
+pub struct Bar {
     a: u64,
     b: Vec<u8>,
     c: Addr,
@@ -532,7 +532,7 @@ struct Bar {
 }
 
 #[derive(Arbitrary, Debug, Deserialize, Serialize, PartialEq)]
-struct Foo {
+pub struct Foo {
     a: u64,
     b: Vec<u8>,
     c: Bar,
@@ -583,7 +583,7 @@ fn serde_known_vector() {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone)]
-struct List {
+pub struct List {
     next: Option<(usize, Box<List>)>,
 }
 

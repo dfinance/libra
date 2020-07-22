@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 /// Types of ledger counters.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, ToPrimitive, NumVariants)]
 #[cfg_attr(test, derive(Arbitrary))]
-pub(crate) enum LedgerCounter {
+pub enum LedgerCounter {
     EventsCreated = 101,
 
     NewStateLeaves = 201,
@@ -52,7 +52,7 @@ impl LedgerCounter {
 }
 
 #[derive(Clone, Eq, PartialEq, Debug, Serialize, Deserialize)]
-struct InnerLedgerCounters {
+pub struct InnerLedgerCounters {
     counters: BTreeMap<u16, usize>,
 }
 
@@ -63,24 +63,24 @@ impl InnerLedgerCounters {
         }
     }
 
-    fn raw_key(counter: LedgerCounter) -> u16 {
+    pub fn raw_key(counter: LedgerCounter) -> u16 {
         counter
             .to_u16()
             .expect("LedgerCounter should convert to u16.")
     }
 
-    fn get(&self, counter: LedgerCounter) -> usize {
+    pub fn get(&self, counter: LedgerCounter) -> usize {
         self.counters
             .get(&Self::raw_key(counter))
             .cloned()
             .unwrap_or(0)
     }
 
-    fn inc(&mut self, counter: LedgerCounter, by: usize) -> &mut Self {
+    pub fn inc(&mut self, counter: LedgerCounter, by: usize) -> &mut Self {
         self.raw_inc(Self::raw_key(counter), by)
     }
 
-    fn raw_inc(&mut self, key: u16, by: usize) -> &mut Self {
+    pub fn raw_inc(&mut self, key: u16, by: usize) -> &mut Self {
         let value = self.counters.entry(key).or_insert(0);
         *value += by;
 
@@ -89,7 +89,7 @@ impl InnerLedgerCounters {
 }
 
 /// Represents `LedgerCounter` bumps yielded by saving a batch of transactions.
-pub(crate) struct LedgerCounterBumps {
+pub struct LedgerCounterBumps {
     bumps: InnerLedgerCounters,
 }
 
@@ -121,7 +121,7 @@ impl LedgerCounterBumps {
 
 /// Represents ledger counter values at a certain version.
 #[derive(Clone, Eq, PartialEq, Debug, Serialize, Deserialize)]
-pub(crate) struct LedgerCounters {
+pub struct LedgerCounters {
     counters: InnerLedgerCounters,
 }
 
@@ -160,7 +160,7 @@ impl LedgerCounters {
 
 #[cfg(test)]
 prop_compose! {
-    pub(crate) fn ledger_counters_strategy()(
+    pub fn ledger_counters_strategy()(
         counters_map in hash_map(any::<LedgerCounter>(), any::<usize>(), 0..3)
     ) -> LedgerCounters {
         let mut counters = InnerLedgerCounters::new();
@@ -183,4 +183,4 @@ impl Arbitrary for LedgerCounters {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

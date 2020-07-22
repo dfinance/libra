@@ -145,7 +145,7 @@ pub struct Docgen<'env> {
 
 /// A table-of-contents entry.
 #[derive(Debug, Default, Clone)]
-struct TocEntry {
+pub struct TocEntry {
     label: String,
     title: String,
 }
@@ -198,7 +198,7 @@ impl<'env> Docgen<'env> {
 
     /// Compute the schemas declared in all modules. This information is currently not directly
     /// in the environment, but can be derived from it.
-    fn compute_declared_schemas(&mut self) {
+    pub fn compute_declared_schemas(&mut self) {
         for module_env in self.env.get_modules() {
             let mut schemas = BTreeSet::new();
             for block in module_env.get_spec_block_infos() {
@@ -212,7 +212,7 @@ impl<'env> Docgen<'env> {
 
     /// Computes file locations for all modules in the environment, so they are available
     /// to generate reference links.
-    fn compute_file_map(&mut self) {
+    pub fn compute_file_map(&mut self) {
         for module_env in self.env.get_modules() {
             let output_path = PathBuf::from(&self.options.output_directory);
             let file_name = PathBuf::from(module_env.get_source_path())
@@ -256,7 +256,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Make path relative to other path.
-    fn path_relative_to(&self, path: &PathBuf, to: &PathBuf) -> PathBuf {
+    pub fn path_relative_to(&self, path: &PathBuf, to: &PathBuf) -> PathBuf {
         if path.is_absolute() || to.is_absolute() {
             path.clone()
         } else {
@@ -269,7 +269,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates documentation for a module.
-    fn gen_module(&mut self, module_env: &ModuleEnv<'env>) {
+    pub fn gen_module(&mut self, module_env: &ModuleEnv<'env>) {
         // (Re-) initialize state for this module.
         self.writer = CodeWriter::new(self.env.unknown_loc());
         self.toc = RefCell::new(Default::default());
@@ -389,7 +389,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates documentation for a struct.
-    fn gen_struct(&self, spec_block_map: &SpecBlockMap<'_>, struct_env: &StructEnv<'_>) {
+    pub fn gen_struct(&self, spec_block_map: &SpecBlockMap<'_>, struct_env: &StructEnv<'_>) {
         let name = struct_env.get_name();
         self.section_header(
             &self.struct_title(struct_env),
@@ -435,7 +435,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates code signature for a struct.
-    fn struct_header_display(&self, struct_env: &StructEnv<'_>) -> String {
+    pub fn struct_header_display(&self, struct_env: &StructEnv<'_>) -> String {
         let name = self.name_string(struct_env.get_name());
         let kind = if struct_env.is_resource() {
             "resource struct"
@@ -450,7 +450,7 @@ impl<'env> Docgen<'env> {
         )
     }
 
-    fn gen_struct_fields(&self, struct_env: &StructEnv<'_>) {
+    pub fn gen_struct_fields(&self, struct_env: &StructEnv<'_>) {
         let tctx = self.type_display_context_for_struct(struct_env);
         self.begin_definitions();
         for field in struct_env.get_fields() {
@@ -468,7 +468,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates documentation for a function.
-    fn gen_function(&self, spec_block_map: &SpecBlockMap<'_>, func_env: &FunctionEnv<'_>) {
+    pub fn gen_function(&self, spec_block_map: &SpecBlockMap<'_>, func_env: &FunctionEnv<'_>) {
         let name = func_env.get_name();
         self.section_header(
             &format!("Function `{}`", self.name_string(name)),
@@ -498,7 +498,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates documentation for a function signature.
-    fn function_header_display(&self, func_env: &FunctionEnv<'_>) -> String {
+    pub fn function_header_display(&self, func_env: &FunctionEnv<'_>) -> String {
         let name = self.name_string(func_env.get_name());
         let visibility = if func_env.is_public() { "public " } else { "" };
         let tctx = &self.type_display_context_for_fun(&func_env);
@@ -527,7 +527,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates documentation for a series of spec blocks associated with spec block target.
-    fn gen_spec_blocks(
+    pub fn gen_spec_blocks(
         &self,
         module_env: &ModuleEnv<'_>,
         title: &str,
@@ -614,7 +614,7 @@ impl<'env> Docgen<'env> {
 
     /// Organizes spec blocks in the module such that free items like schemas and module blocks
     /// are associated with the context they appear in.
-    fn organize_spec_blocks(&self, module_env: &'env ModuleEnv<'env>) -> SpecBlockMap<'env> {
+    pub fn organize_spec_blocks(&self, module_env: &'env ModuleEnv<'env>) -> SpecBlockMap<'env> {
         let mut result = BTreeMap::new();
         let mut current_target = SpecBlockTarget::Module;
         for block in module_env.get_spec_block_infos() {
@@ -639,7 +639,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Check whether the location contains a single line of source.
-    fn is_single_liner(&self, loc: &Loc) -> bool {
+    pub fn is_single_liner(&self, loc: &Loc) -> bool {
         self.env
             .get_source(loc)
             .map(|s| !s.contains('\n'))
@@ -647,7 +647,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generates standalone spec section. This is used if `options.specs_inlined` is false.
-    fn gen_spec_section(&self, module_env: &ModuleEnv<'_>, spec_block_map: &SpecBlockMap<'_>) {
+    pub fn gen_spec_section(&self, module_env: &ModuleEnv<'_>, spec_block_map: &SpecBlockMap<'_>) {
         if spec_block_map.is_empty() || !self.options.include_specs {
             return;
         }
@@ -697,12 +697,12 @@ impl<'env> Docgen<'env> {
     // Helpers
 
     /// Returns a string for a name symbol.
-    fn name_string(&self, name: Symbol) -> Rc<String> {
+    pub fn name_string(&self, name: Symbol) -> Rc<String> {
         self.env.symbol_pool().string(name)
     }
 
     /// Creates a type display context for a function.
-    fn type_display_context_for_fun(&self, func_env: &FunctionEnv<'_>) -> TypeDisplayContext<'_> {
+    pub fn type_display_context_for_fun(&self, func_env: &FunctionEnv<'_>) -> TypeDisplayContext<'_> {
         let type_param_names = Some(
             func_env
                 .get_named_type_parameters()
@@ -717,7 +717,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Creates a type display context for a struct.
-    fn type_display_context_for_struct(
+    pub fn type_display_context_for_struct(
         &self,
         struct_env: &StructEnv<'_>,
     ) -> TypeDisplayContext<'_> {
@@ -735,17 +735,17 @@ impl<'env> Docgen<'env> {
     }
 
     /// Increments section nest.
-    fn increment_section_nest(&self) {
+    pub fn increment_section_nest(&self) {
         *self.section_nest.borrow_mut() += 1;
     }
 
     /// Decrements section nest, committing sub-sections to the table-of-contents map.
-    fn decrement_section_nest(&self) {
+    pub fn decrement_section_nest(&self) {
         *self.section_nest.borrow_mut() -= 1;
     }
 
     /// Creates a new section header and inserts a table-of-contents entry into the generator.
-    fn section_header(&self, s: &str, label: &str) {
+    pub fn section_header(&self, s: &str, label: &str) {
         let level = *self.section_nest.borrow();
         if !label.is_empty() {
             self.label(label);
@@ -765,19 +765,19 @@ impl<'env> Docgen<'env> {
     }
 
     /// Generate label.
-    fn label(&self, label: &str) {
+    pub fn label(&self, label: &str) {
         emitln!(self.writer);
         emitln!(self.writer, "<a name=\"{}\"></a>", label);
         emitln!(self.writer);
     }
 
     /// Generate label in code, without empty lines.
-    fn label_in_code(&self, label: &str) {
+    pub fn label_in_code(&self, label: &str) {
         emitln!(self.writer, "<a name=\"{}\"></a>", label);
     }
 
     /// Begins a collapsed section.
-    fn begin_collapsed(&self, summary: &str) {
+    pub fn begin_collapsed(&self, summary: &str) {
         if self.options.collapsed_sections {
             emitln!(self.writer);
             emitln!(self.writer, "<details>");
@@ -791,7 +791,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Ends a collapsed section.
-    fn end_collapsed(&self) {
+    pub fn end_collapsed(&self) {
         if self.options.collapsed_sections {
             emitln!(self.writer);
             emitln!(self.writer, "</details>");
@@ -799,7 +799,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Outputs documentation text.
-    fn doc_text(&self, module_env: &ModuleEnv<'_>, text: &str) {
+    pub fn doc_text(&self, module_env: &ModuleEnv<'_>, text: &str) {
         for line in self.decorate_text(module_env, text).lines() {
             let line = line.trim();
             if line.starts_with('#') {
@@ -826,13 +826,13 @@ impl<'env> Docgen<'env> {
     }
 
     /// Makes a label from a string.
-    fn make_label_from_str(&self, s: &str) -> String {
+    pub fn make_label_from_str(&self, s: &str) -> String {
         format!("@{}", s.replace(' ', "_"))
     }
 
     /// Decorates documentation text, identifying code fragments and decorating them
     /// as code.
-    fn decorate_text(&self, module_env: &ModuleEnv<'_>, text: &str) -> String {
+    pub fn decorate_text(&self, module_env: &ModuleEnv<'_>, text: &str) -> String {
         static REX: Lazy<Regex> = Lazy::new(|| Regex::new(r"(?m)`[^`]+`").unwrap());
         let mut r = String::new();
         let mut at = 0;
@@ -864,7 +864,7 @@ impl<'env> Docgen<'env> {
 
     /// Begins a code block. This uses html, not markdown code blocks, so we are able to
     /// insert style and links into the code.
-    fn begin_code(&self) {
+    pub fn begin_code(&self) {
         emitln!(self.writer);
         // If we newline after <pre><code>, an empty line will be created. So we don't.
         // This, however, creates some ugliness with indented code.
@@ -872,20 +872,20 @@ impl<'env> Docgen<'env> {
     }
 
     /// Ends a code block.
-    fn end_code(&self) {
+    pub fn end_code(&self) {
         emitln!(self.writer, "</code></pre>\n");
         // Always be sure to have an empty line at the end of block.
         emitln!(self.writer);
     }
 
     /// Outputs decorated code text in context of a module.
-    fn code_text(&self, module_env: &ModuleEnv<'_>, code: &str) {
+    pub fn code_text(&self, module_env: &ModuleEnv<'_>, code: &str) {
         emitln!(self.writer, &self.decorate_code(module_env, code));
     }
 
     /// Decorates a code fragment, for use in an html block. Replaces < and >, bolds keywords and
     /// tries to resolve and cross-link references.
-    fn decorate_code(&self, module_env: &ModuleEnv<'_>, code: &str) -> String {
+    pub fn decorate_code(&self, module_env: &ModuleEnv<'_>, code: &str) -> String {
         static REX: Lazy<Regex> = Lazy::new(|| {
             Regex::new(
                 r"(?P<ident>(\b\w+\b\s*::\s*)*\b\w+\b)(?P<call>\s*[(<])?|(?P<lt><)|(?P<gt>>)",
@@ -936,7 +936,7 @@ impl<'env> Docgen<'env> {
     /// the label for the declaration inside of this documentation. This uses a
     /// heuristic and may not work in all cases or produce wrong results (for instance, it
     /// ignores aliases). To improve on this, we would need best direct support by the compiler.
-    fn resolve_to_label(
+    pub fn resolve_to_label(
         &self,
         module_env: &ModuleEnv<'_>,
         s: &str,
@@ -1012,7 +1012,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Return the label for a module.
-    fn label_for_module(&self, module_env: &ModuleEnv<'_>) -> String {
+    pub fn label_for_module(&self, module_env: &ModuleEnv<'_>) -> String {
         if module_env.is_script_module() {
             "SCRIPT".to_string()
         } else {
@@ -1025,7 +1025,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Return the reference for a module.
-    fn ref_for_module(&self, module_env: &ModuleEnv<'_>) -> String {
+    pub fn ref_for_module(&self, module_env: &ModuleEnv<'_>) -> String {
         let label = self.label_for_module(module_env);
         if let Some(current) = &self.current_module {
             if current.get_id() == module_env.get_id() {
@@ -1041,17 +1041,17 @@ impl<'env> Docgen<'env> {
     }
 
     /// Return the label for an item in a module.
-    fn label_for_module_item(&self, module_env: &ModuleEnv<'_>, item: Symbol) -> String {
+    pub fn label_for_module_item(&self, module_env: &ModuleEnv<'_>, item: Symbol) -> String {
         self.label_for_module_item_str(module_env, self.name_string(item).as_str())
     }
 
     /// Return the label for an item in a module.
-    fn label_for_module_item_str(&self, module_env: &ModuleEnv<'_>, s: &str) -> String {
+    pub fn label_for_module_item_str(&self, module_env: &ModuleEnv<'_>, s: &str) -> String {
         format!("{}_{}", self.label_for_module(module_env), s)
     }
 
     /// Return the reference for an item in a module.
-    fn ref_for_module_item(&self, module_env: &ModuleEnv<'_>, item: Symbol) -> String {
+    pub fn ref_for_module_item(&self, module_env: &ModuleEnv<'_>, item: Symbol) -> String {
         format!(
             "{}_{}",
             self.ref_for_module(module_env),
@@ -1060,20 +1060,20 @@ impl<'env> Docgen<'env> {
     }
 
     /// Shortcut for code_block in a module context.
-    fn code_block(&self, module_env: &ModuleEnv<'_>, code: &str) {
+    pub fn code_block(&self, module_env: &ModuleEnv<'_>, code: &str) {
         self.begin_code();
         self.code_text(module_env, code);
         self.end_code();
     }
 
     /// Begin an itemized list.
-    fn begin_items(&self) {}
+    pub fn begin_items(&self) {}
 
     /// End an itemized list.
-    fn end_items(&self) {}
+    pub fn end_items(&self) {}
 
     /// Emit an item. With use the optional module env to do text decoration.
-    fn item_text(&self, module_env_opt: Option<&ModuleEnv<'_>>, text: &str) {
+    pub fn item_text(&self, module_env_opt: Option<&ModuleEnv<'_>>, text: &str) {
         match module_env_opt {
             Some(module_env) => emitln!(self.writer, "-  {}", self.decorate_text(module_env, text)),
             None => emitln!(self.writer, "-  {}", text),
@@ -1081,19 +1081,19 @@ impl<'env> Docgen<'env> {
     }
 
     /// Begin a definition list.
-    fn begin_definitions(&self) {
+    pub fn begin_definitions(&self) {
         emitln!(self.writer);
         emitln!(self.writer, "<dl>");
     }
 
     /// End a definition list.
-    fn end_definitions(&self) {
+    pub fn end_definitions(&self) {
         emitln!(self.writer, "</dl>");
         emitln!(self.writer);
     }
 
     /// Emit a definition.
-    fn definition_text(&self, module_env_opt: Option<&ModuleEnv<'_>>, term: &str, def: &str) {
+    pub fn definition_text(&self, module_env_opt: Option<&ModuleEnv<'_>>, term: &str, def: &str) {
         let decorate = |s| match module_env_opt {
             Some(m) => self.decorate_text(m, s),
             None => s.to_string(),
@@ -1103,7 +1103,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Display a type parameter.
-    fn type_parameter_display(&self, tp: &TypeParameter) -> String {
+    pub fn type_parameter_display(&self, tp: &TypeParameter) -> String {
         format!(
             "{}{}",
             self.name_string(tp.0),
@@ -1116,7 +1116,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Display a type parameter list.
-    fn type_parameter_list_display(&self, tps: &[TypeParameter]) -> String {
+    pub fn type_parameter_list_display(&self, tps: &[TypeParameter]) -> String {
         if tps.is_empty() {
             "".to_owned()
         } else {
@@ -1133,7 +1133,7 @@ impl<'env> Docgen<'env> {
     /// Typically code has the first line unindented because location tracking starts
     /// at the first keyword of the item (e.g. `public fun`), but subsequent lines are then
     /// indented. This uses a heuristic by guessing the indentation from the context.
-    fn get_source_with_indent(&self, loc: &Loc) -> String {
+    pub fn get_source_with_indent(&self, loc: &Loc) -> String {
         if let Ok(source) = self.env.get_source(loc) {
             // Compute the indentation of this source fragment by looking at some
             // characters preceding it.
@@ -1169,7 +1169,7 @@ impl<'env> Docgen<'env> {
     }
 
     /// Repeats a string n times.
-    fn repeat_str(&self, s: &str, n: usize) -> String {
+    pub fn repeat_str(&self, s: &str, n: usize) -> String {
         (0..n).map(|_| s).collect::<String>()
     }
 }

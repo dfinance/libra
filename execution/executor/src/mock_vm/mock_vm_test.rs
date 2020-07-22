@@ -11,7 +11,7 @@ fn gen_address(index: u8) -> AccountAddress {
     AccountAddress::new([index; AccountAddress::LENGTH])
 }
 
-struct MockStateView;
+pub struct MockStateView;
 
 impl StateView for MockStateView {
     fn get(&self, _access_path: &AccessPath) -> Result<Option<Vec<u8>>> {

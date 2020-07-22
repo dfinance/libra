@@ -259,13 +259,13 @@ impl Context {
         self.is_current_module(m) && matches!(&self.current_function, Some(curf) if curf == f)
     }
 
-    fn module_info(&self, m: &ModuleIdent) -> &ModuleInfo {
+    pub fn module_info(&self, m: &ModuleIdent) -> &ModuleInfo {
         self.modules
             .get(m)
             .expect("ICE should have failed in naming")
     }
 
-    fn struct_definition(&self, m: &ModuleIdent, n: &StructName) -> &StructDefinition {
+    pub fn struct_definition(&self, m: &ModuleIdent, n: &StructName) -> &StructDefinition {
         let minfo = self.module_info(m);
         minfo
             .structs
@@ -285,18 +285,18 @@ impl Context {
             .expect("ICE should have failed in naming")
     }
 
-    fn struct_tparams(&self, m: &ModuleIdent, n: &StructName) -> &Vec<TParam> {
+    pub fn struct_tparams(&self, m: &ModuleIdent, n: &StructName) -> &Vec<TParam> {
         &self.struct_definition(m, n).type_parameters
     }
 
-    fn function_info(&mut self, m: &ModuleIdent, n: &FunctionName) -> &FunctionInfo {
+    pub fn function_info(&mut self, m: &ModuleIdent, n: &FunctionName) -> &FunctionInfo {
         self.module_info(m)
             .functions
             .get(n)
             .expect("ICE should have failed in naming")
     }
 
-    fn constant_info(&mut self, m_opt: &Option<ModuleIdent>, n: &ConstantName) -> &ConstantInfo {
+    pub fn constant_info(&mut self, m_opt: &Option<ModuleIdent>, n: &ConstantName) -> &ConstantInfo {
         let constants = match m_opt {
             None => self.current_script_constants.as_ref().unwrap(),
             Some(m) => &self.module_info(m).constants,
@@ -387,7 +387,7 @@ pub fn error_format_nested(b: &Type, subst: &Subst) -> String {
     error_format_(b, subst, true)
 }
 
-fn error_format_(sp!(_, b_): &Type, subst: &Subst, nested: bool) -> String {
+pub fn error_format_(sp!(_, b_): &Type, subst: &Subst, nested: bool) -> String {
     use Type_::*;
     let res = match b_ {
         UnresolvedError | Anything => "_".to_string(),
@@ -478,7 +478,7 @@ pub fn infer_kind(context: &Context, subst: &Subst, ty: Type) -> Option<Kind> {
     }
 }
 
-fn most_general_kind(k1: &Kind, k2: &Kind) -> std::cmp::Ordering {
+pub fn most_general_kind(k1: &Kind, k2: &Kind) -> std::cmp::Ordering {
     use std::cmp::Ordering as O;
     use Kind_ as K;
     match (&k1.value, &k2.value) {
@@ -496,7 +496,7 @@ fn most_general_kind(k1: &Kind, k2: &Kind) -> std::cmp::Ordering {
     }
 }
 
-fn type_name_declared_loc(context: &Context, sp!(loc, n_): &TypeName) -> Loc {
+pub fn type_name_declared_loc(context: &Context, sp!(loc, n_): &TypeName) -> Loc {
     match n_ {
         TypeName_::Multiple(_) | TypeName_::Builtin(_) => *loc,
         TypeName_::ModuleType(m, n) => context.struct_declared_loc(m, n),
@@ -607,7 +607,7 @@ pub fn make_field_type(
             context.error(vec![
                 (
                     loc,
-                    format!("Unbound field '{}' for native struct '{}::{}'", field, m, n),
+                    format!("Unbound field '{}' for native pub struct '{}::{}'", field, m, n),
                 ),
                 (nloc, "Declared 'native' here".into()),
             ]);
@@ -784,7 +784,7 @@ pub fn solve_constraints(context: &mut Context) {
     }
 }
 
-fn solve_kind_constraint(context: &mut Context, loc: Loc, b: Type, k: Kind) {
+pub fn solve_kind_constraint(context: &mut Context, loc: Loc, b: Type, k: Kind) {
     use Kind_ as K;
     let b = unfold_type(&context.subst, b);
     let bloc = b.loc;
@@ -862,7 +862,7 @@ fn solve_kind_constraint(context: &mut Context, loc: Loc, b: Type, k: Kind) {
     }
 }
 
-fn solve_copyable_constraint(context: &mut Context, loc: Loc, msg: String, s: Type) {
+pub fn solve_copyable_constraint(context: &mut Context, loc: Loc, msg: String, s: Type) {
     let s = unfold_type(&context.subst, s);
     let sloc = s.loc;
     let kind = match infer_kind(&context, &context.subst, s.clone()) {
@@ -884,7 +884,7 @@ fn solve_copyable_constraint(context: &mut Context, loc: Loc, msg: String, s: Ty
     }
 }
 
-fn solve_implicitly_copyable_constraint(
+pub fn solve_implicitly_copyable_constraint(
     context: &mut Context,
     loc: Loc,
     msg: String,
@@ -923,7 +923,7 @@ fn solve_implicitly_copyable_constraint(
     }
 }
 
-fn solve_builtin_type_constraint(
+pub fn solve_builtin_type_constraint(
     context: &mut Context,
     builtin_set: BTreeSet<BuiltinTypeName_>,
     loc: Loc,
@@ -966,7 +966,7 @@ fn solve_builtin_type_constraint(
     }
 }
 
-fn solve_base_type_constraint(context: &mut Context, loc: Loc, msg: String, ty: &Type) {
+pub fn solve_base_type_constraint(context: &mut Context, loc: Loc, msg: String, ty: &Type) {
     use TypeName_::*;
     use Type_::*;
     let sp!(tyloc, unfolded_) = unfold_type(&context.subst, ty.clone());
@@ -981,7 +981,7 @@ fn solve_base_type_constraint(context: &mut Context, loc: Loc, msg: String, ty: 
     }
 }
 
-fn solve_single_type_constraint(context: &mut Context, loc: Loc, msg: String, ty: &Type) {
+pub fn solve_single_type_constraint(context: &mut Context, loc: Loc, msg: String, ty: &Type) {
     use TypeName_::*;
     use Type_::*;
     let sp!(tyloc, unfolded_) = unfold_type(&context.subst, ty.clone());
@@ -1026,7 +1026,7 @@ pub fn best_loc(subst: &Subst, sp!(loc, t_): &Type) -> Loc {
     }
 }
 
-fn make_tparam_subst(tps: &[TParam], args: Vec<Type>) -> TParamSubst {
+pub fn make_tparam_subst(tps: &[TParam], args: Vec<Type>) -> TParamSubst {
     assert!(tps.len() == args.len());
     let mut subst = TParamSubst::new();
     for (tp, arg) in tps.iter().zip(args) {
@@ -1090,7 +1090,7 @@ pub fn instantiate(context: &mut Context, sp!(loc, t_): Type) -> Type {
     sp(loc, it_)
 }
 
-fn instantiate_apply(
+pub fn instantiate_apply(
     context: &mut Context,
     loc: Loc,
     kind_opt: Option<Kind>,
@@ -1124,7 +1124,7 @@ fn instantiate_apply(
 // This might be needed for any variance case, and I THINK that it should be fine without it
 // BUT I'm adding it as a safeguard against instantiating twice. Can always remove once this
 // stabilizes
-fn instantiate_type_args(
+pub fn instantiate_type_args(
     context: &mut Context,
     loc: Loc,
     n: Option<&TypeName_>,
@@ -1164,7 +1164,7 @@ fn instantiate_type_args(
     res
 }
 
-fn check_type_argument_arity<F: FnOnce() -> String>(
+pub fn check_type_argument_arity<F: FnOnce() -> String>(
     context: &mut Context,
     loc: Loc,
     name_f: F,
@@ -1196,12 +1196,12 @@ fn check_type_argument_arity<F: FnOnce() -> String>(
     ty_args
 }
 
-enum TVarCase {
+pub enum TVarCase {
     Single(String),
     Base,
 }
 
-fn make_tparams(
+pub fn make_tparams(
     context: &mut Context,
     loc: Loc,
     case: TVarCase,
@@ -1236,7 +1236,7 @@ pub enum TypingError {
 }
 
 #[derive(Clone, Copy, Debug)]
-enum TypingCase {
+pub enum TypingCase {
     Join,
     Subtype,
 }
@@ -1249,7 +1249,7 @@ pub fn join(subst: Subst, lhs: &Type, rhs: &Type) -> Result<(Subst, Type), Typin
     join_impl(subst, TypingCase::Join, lhs, rhs)
 }
 
-fn join_impl(
+pub fn join_impl(
     mut subst: Subst,
     case: TypingCase,
     lhs: &Type,
@@ -1350,7 +1350,7 @@ fn join_impl(
     }
 }
 
-fn join_impl_types(
+pub fn join_impl_types(
     mut subst: Subst,
     case: TypingCase,
     tys1: &[Type],
@@ -1367,7 +1367,7 @@ fn join_impl_types(
     Ok((subst, tys))
 }
 
-fn join_tvar(
+pub fn join_tvar(
     mut subst: Subst,
     case: TypingCase,
     loc1: Loc,
@@ -1420,14 +1420,14 @@ fn join_tvar(
     }
 }
 
-fn forward_tvar(subst: &Subst, id: TVar) -> TVar {
+pub fn forward_tvar(subst: &Subst, id: TVar) -> TVar {
     match subst.get(id) {
         Some(sp!(_, Type_::Var(next))) => forward_tvar(subst, *next),
         Some(_) | None => id,
     }
 }
 
-fn join_bind_tvar(subst: &mut Subst, loc: Loc, tvar: TVar, ty: Type) -> Result<(), ()> {
+pub fn join_bind_tvar(subst: &mut Subst, loc: Loc, tvar: TVar, ty: Type) -> Result<(), ()> {
     // check not necessary for soundness but improves error message structure
     if !check_num_tvar(&subst, loc, tvar, &ty) {
         return Err(());
@@ -1439,11 +1439,11 @@ fn join_bind_tvar(subst: &mut Subst, loc: Loc, tvar: TVar, ty: Type) -> Result<(
     Ok(())
 }
 
-fn check_num_tvar(subst: &Subst, loc: Loc, tvar: TVar, ty: &Type) -> bool {
+pub fn check_num_tvar(subst: &Subst, loc: Loc, tvar: TVar, ty: &Type) -> bool {
     !subst.is_num_var(tvar) || check_num_tvar_(subst, loc, tvar, ty)
 }
 
-fn check_num_tvar_(subst: &Subst, loc: Loc, tvar: TVar, ty: &Type) -> bool {
+pub fn check_num_tvar_(subst: &Subst, loc: Loc, tvar: TVar, ty: &Type) -> bool {
     use Type_::*;
     match &ty.value {
         UnresolvedError | Anything => true,

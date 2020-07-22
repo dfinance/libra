@@ -19,13 +19,13 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 const NEW_NAME_DELIM: &str = "#";
 
-fn new_name(n: &str) -> String {
+pub fn new_name(n: &str) -> String {
     format!("{}{}{}", n, NEW_NAME_DELIM, Counter::next())
 }
 
 const TEMP_PREFIX: &str = "tmp%";
 
-fn new_temp_name() -> String {
+pub fn new_temp_name() -> String {
     new_name(TEMP_PREFIX)
 }
 
@@ -52,7 +52,7 @@ pub fn display_var(s: &str) -> DisplayVar {
 // Context
 //**************************************************************************************************
 
-struct Context {
+pub struct Context {
     errors: Errors,
     structs: UniqueMap<StructName, UniqueMap<Field, usize>>,
     function_locals: UniqueMap<Var, H::SingleType>,
@@ -159,7 +159,7 @@ pub fn program(prog: T::Program) -> (H::Program, Errors) {
     (H::Program { modules, scripts }, context.get_errors())
 }
 
-fn modules(
+pub fn modules(
     context: &mut Context,
     modules: UniqueMap<ModuleIdent, T::ModuleDefinition>,
 ) -> UniqueMap<ModuleIdent, H::ModuleDefinition> {
@@ -169,7 +169,7 @@ fn modules(
     UniqueMap::maybe_from_iter(hlir_modules).unwrap()
 }
 
-fn module(
+pub fn module(
     context: &mut Context,
     module_ident: ModuleIdent,
     mdef: T::ModuleDefinition,
@@ -196,7 +196,7 @@ fn module(
     )
 }
 
-fn scripts(
+pub fn scripts(
     context: &mut Context,
     tscripts: BTreeMap<String, T::Script>,
 ) -> BTreeMap<String, H::Script> {
@@ -206,7 +206,7 @@ fn scripts(
         .collect()
 }
 
-fn script(context: &mut Context, tscript: T::Script) -> H::Script {
+pub fn script(context: &mut Context, tscript: T::Script) -> H::Script {
     let T::Script {
         loc,
         constants: tconstants,
@@ -227,7 +227,7 @@ fn script(context: &mut Context, tscript: T::Script) -> H::Script {
 // Functions
 //**************************************************************************************************
 
-fn function(context: &mut Context, _name: FunctionName, f: T::Function) -> H::Function {
+pub fn function(context: &mut Context, _name: FunctionName, f: T::Function) -> H::Function {
     assert!(context.has_empty_locals());
     let visibility = f.visibility;
     let signature = function_signature(context, f.signature);
@@ -241,7 +241,7 @@ fn function(context: &mut Context, _name: FunctionName, f: T::Function) -> H::Fu
     }
 }
 
-fn function_signature(context: &mut Context, sig: N::FunctionSignature) -> H::FunctionSignature {
+pub fn function_signature(context: &mut Context, sig: N::FunctionSignature) -> H::FunctionSignature {
     let type_parameters = sig.type_parameters;
     let parameters = sig
         .parameters
@@ -260,7 +260,7 @@ fn function_signature(context: &mut Context, sig: N::FunctionSignature) -> H::Fu
     }
 }
 
-fn function_body(
+pub fn function_body(
     context: &mut Context,
     sig: &H::FunctionSignature,
     sp!(loc, tb_): T::FunctionBody,
@@ -280,7 +280,7 @@ fn function_body(
     sp(loc, b_)
 }
 
-fn function_body_defined(
+pub fn function_body_defined(
     context: &mut Context,
     signature: &H::FunctionSignature,
     loc: Loc,
@@ -312,7 +312,7 @@ fn function_body_defined(
 // Constants
 //**************************************************************************************************
 
-fn constant(context: &mut Context, _name: ConstantName, cdef: T::Constant) -> H::Constant {
+pub fn constant(context: &mut Context, _name: ConstantName, cdef: T::Constant) -> H::Constant {
     let T::Constant {
         loc,
         signature: tsignature,
@@ -342,7 +342,7 @@ fn constant(context: &mut Context, _name: ConstantName, cdef: T::Constant) -> H:
 // Structs
 //**************************************************************************************************
 
-fn struct_def(
+pub fn struct_def(
     context: &mut Context,
     _name: StructName,
     sdef: N::StructDefinition,
@@ -357,7 +357,7 @@ fn struct_def(
     }
 }
 
-fn struct_fields(context: &mut Context, tfields: N::StructFields) -> H::StructFields {
+pub fn struct_fields(context: &mut Context, tfields: N::StructFields) -> H::StructFields {
     let tfields_map = match tfields {
         N::StructFields::Native(loc) => return H::StructFields::Native(loc),
         N::StructFields::Defined(m) => m,
@@ -374,7 +374,7 @@ fn struct_fields(context: &mut Context, tfields: N::StructFields) -> H::StructFi
 // Types
 //**************************************************************************************************
 
-fn type_name(_context: &Context, sp!(loc, ntn_): N::TypeName) -> H::TypeName {
+pub fn type_name(_context: &Context, sp!(loc, ntn_): N::TypeName) -> H::TypeName {
     use H::TypeName_ as HT;
     use N::TypeName_ as NT;
     let tn_ = match ntn_ {
@@ -385,14 +385,14 @@ fn type_name(_context: &Context, sp!(loc, ntn_): N::TypeName) -> H::TypeName {
     sp(loc, tn_)
 }
 
-fn base_types<R: std::iter::FromIterator<H::BaseType>>(
+pub fn base_types<R: std::iter::FromIterator<H::BaseType>>(
     context: &Context,
     tys: impl IntoIterator<Item = N::Type>,
 ) -> R {
     tys.into_iter().map(|t| base_type(context, t)).collect()
 }
 
-fn base_type(context: &Context, sp!(loc, nb_): N::Type) -> H::BaseType {
+pub fn base_type(context: &Context, sp!(loc, nb_): N::Type) -> H::BaseType {
     use H::BaseType_ as HB;
     use N::Type_ as NT;
     let b_ = match nb_ {
@@ -412,7 +412,7 @@ fn base_type(context: &Context, sp!(loc, nb_): N::Type) -> H::BaseType {
     sp(loc, b_)
 }
 
-fn expected_types(context: &Context, loc: Loc, nss: Vec<Option<N::Type>>) -> H::Type {
+pub fn expected_types(context: &Context, loc: Loc, nss: Vec<Option<N::Type>>) -> H::Type {
     let any = || {
         sp(
             loc,
@@ -426,11 +426,11 @@ fn expected_types(context: &Context, loc: Loc, nss: Vec<Option<N::Type>>) -> H::
     H::Type_::from_vec(loc, ss)
 }
 
-fn single_types(context: &Context, ss: Vec<N::Type>) -> Vec<H::SingleType> {
+pub fn single_types(context: &Context, ss: Vec<N::Type>) -> Vec<H::SingleType> {
     ss.into_iter().map(|s| single_type(context, s)).collect()
 }
 
-fn single_type(context: &Context, sp!(loc, ty_): N::Type) -> H::SingleType {
+pub fn single_type(context: &Context, sp!(loc, ty_): N::Type) -> H::SingleType {
     use H::SingleType_ as HS;
     use N::Type_ as NT;
     let s_ = match ty_ {
@@ -440,7 +440,7 @@ fn single_type(context: &Context, sp!(loc, ty_): N::Type) -> H::SingleType {
     sp(loc, s_)
 }
 
-fn type_(context: &Context, sp!(loc, ty_): N::Type) -> H::Type {
+pub fn type_(context: &Context, sp!(loc, ty_): N::Type) -> H::Type {
     use H::Type_ as HT;
     use N::{TypeName_ as TN, Type_ as NT};
     let t_ = match ty_ {
@@ -459,7 +459,7 @@ fn type_(context: &Context, sp!(loc, ty_): N::Type) -> H::Type {
 // Statements
 //**************************************************************************************************
 
-fn block(
+pub fn block(
     context: &mut Context,
     result: &mut Block,
     loc: Loc,
@@ -496,7 +496,7 @@ fn block(
     res
 }
 
-fn statement(context: &mut Context, result: &mut Block, e: T::Exp) {
+pub fn statement(context: &mut Context, result: &mut Block, e: T::Exp) {
     use H::Statement_ as S;
     use T::UnannotatedExp_ as TE;
 
@@ -560,7 +560,7 @@ fn statement(context: &mut Context, result: &mut Block, e: T::Exp) {
     result.push_back(sp(eloc, stmt_))
 }
 
-fn statement_loop_body(context: &mut Context, body: T::Exp) -> (Block, bool) {
+pub fn statement_loop_body(context: &mut Context, body: T::Exp) -> (Block, bool) {
     let old_has_return_abort = context.has_return_abort;
     context.has_return_abort = false;
     let mut loop_block = Block::new();
@@ -575,11 +575,11 @@ fn statement_loop_body(context: &mut Context, body: T::Exp) -> (Block, bool) {
 // LValue
 //**************************************************************************************************
 
-fn declare_bind_list(context: &mut Context, sp!(_, binds): &T::LValueList) {
+pub fn declare_bind_list(context: &mut Context, sp!(_, binds): &T::LValueList) {
     binds.iter().for_each(|b| declare_bind(context, b))
 }
 
-fn declare_bind(context: &mut Context, sp!(_, bind_): &T::LValue) {
+pub fn declare_bind(context: &mut Context, sp!(_, bind_): &T::LValue) {
     use T::LValue_ as L;
     match bind_ {
         L::Ignore => (),
@@ -593,7 +593,7 @@ fn declare_bind(context: &mut Context, sp!(_, bind_): &T::LValue) {
     }
 }
 
-fn assign_command(
+pub fn assign_command(
     context: &mut Context,
     result: &mut Block,
     loc: Loc,
@@ -617,7 +617,7 @@ fn assign_command(
     result.append(&mut after);
 }
 
-fn assign(
+pub fn assign(
     context: &mut Context,
     result: &mut Block,
     sp!(loc, ta_): T::LValue,
@@ -669,7 +669,7 @@ fn assign(
     (sp(loc, l_), after)
 }
 
-fn assign_fields(
+pub fn assign_fields(
     context: &Context,
     s: &StructName,
     tfields: Fields<(N::Type, T::LValue)>,
@@ -688,7 +688,7 @@ fn assign_fields(
 // Commands
 //**************************************************************************************************
 
-fn ignore_and_pop(result: &mut Block, e: H::Exp) {
+pub fn ignore_and_pop(result: &mut Block, e: H::Exp) {
     match &e.exp.value {
         H::UnannotatedExp_::Unreachable => (),
         _ => {
@@ -708,7 +708,7 @@ fn ignore_and_pop(result: &mut Block, e: H::Exp) {
 // Expressions
 //**************************************************************************************************
 
-fn exp(
+pub fn exp(
     context: &mut Context,
     result: &mut Block,
     expected_type_opt: Option<&H::Type>,
@@ -717,7 +717,7 @@ fn exp(
     Box::new(exp_(context, result, expected_type_opt, te))
 }
 
-fn exp_(
+pub fn exp_(
     context: &mut Context,
     result: &mut Block,
     initial_expected_type_opt: Option<&H::Type>,
@@ -725,7 +725,7 @@ fn exp_(
 ) -> H::Exp {
     use std::{cell::RefCell, rc::Rc};
 
-    struct Stack<'a> {
+    pub struct Stack<'a> {
         frames: Vec<Box<dyn FnOnce(&mut Self)>>,
         operands: Vec<H::Exp>,
         context: &'a mut Context,
@@ -739,7 +739,7 @@ fn exp_(
         }};
     }
 
-    fn maybe_freeze(
+    pub fn maybe_freeze(
         context: &mut Context,
         result: &mut Block,
         expected_type_opt: Option<H::Type>,
@@ -754,7 +754,7 @@ fn exp_(
         }
     }
 
-    fn exp_loop(
+    pub fn exp_loop(
         stack: &mut Stack,
         result: Rc<RefCell<Block>>,
         cur_expected_type_opt: Option<H::Type>,
@@ -930,12 +930,12 @@ fn exp_(
     e_res
 }
 
-enum TmpItem {
+pub enum TmpItem {
     Single(Box<H::SingleType>),
     Splat(Loc, Vec<H::SingleType>),
 }
 
-fn exp_impl(
+pub fn exp_impl(
     context: &mut Context,
     result: &mut Block,
     ty: H::Type,
@@ -1204,7 +1204,7 @@ fn exp_impl(
     H::exp(ty, sp(eloc, res))
 }
 
-fn exp_evaluation_order(
+pub fn exp_evaluation_order(
     context: &mut Context,
     result: &mut Block,
     tes: Vec<(T::Exp, Option<H::Type>)>,
@@ -1236,7 +1236,7 @@ fn exp_evaluation_order(
     es
 }
 
-fn make_temps(context: &mut Context, loc: Loc, ty: H::Type) -> Vec<(Var, H::SingleType)> {
+pub fn make_temps(context: &mut Context, loc: Loc, ty: H::Type) -> Vec<(Var, H::SingleType)> {
     use H::Type_ as T;
     match ty.value {
         T::Unit => vec![],
@@ -1248,7 +1248,7 @@ fn make_temps(context: &mut Context, loc: Loc, ty: H::Type) -> Vec<(Var, H::Sing
     }
 }
 
-fn bind_exp(context: &mut Context, result: &mut Block, e: H::Exp) -> H::Exp {
+pub fn bind_exp(context: &mut Context, result: &mut Block, e: H::Exp) -> H::Exp {
     if let H::UnannotatedExp_::Unreachable = &e.exp.value {
         return e;
     }
@@ -1258,7 +1258,7 @@ fn bind_exp(context: &mut Context, result: &mut Block, e: H::Exp) -> H::Exp {
     H::exp(ty, sp(loc, bind_exp_(result, loc, tmps, e)))
 }
 
-fn bind_exp_(
+pub fn bind_exp_(
     result: &mut Block,
     loc: Loc,
     tmps: Vec<(Var, H::SingleType)>,
@@ -1300,7 +1300,7 @@ fn bind_exp_(
     }
 }
 
-fn use_tmp(var: Var) -> H::UnannotatedExp_ {
+pub fn use_tmp(var: Var) -> H::UnannotatedExp_ {
     use H::UnannotatedExp_ as E;
     E::Move {
         from_user: false,
@@ -1308,7 +1308,7 @@ fn use_tmp(var: Var) -> H::UnannotatedExp_ {
     }
 }
 
-fn builtin(
+pub fn builtin(
     context: &mut Context,
     result: &mut Block,
     _eloc: Loc,
@@ -1361,13 +1361,13 @@ fn builtin(
 //**************************************************************************************************
 
 #[derive(PartialEq, Eq)]
-enum Freeze {
+pub enum Freeze {
     NotNeeded,
     Point,
     Sub(Vec<bool>),
 }
 
-fn needs_freeze(sp!(_, actual): &H::Type, sp!(_, expected): &H::Type) -> Freeze {
+pub fn needs_freeze(sp!(_, actual): &H::Type, sp!(_, expected): &H::Type) -> Freeze {
     use H::Type_ as T;
     match (actual, expected) {
         (T::Unit, T::Unit) => Freeze::NotNeeded,
@@ -1398,12 +1398,12 @@ fn needs_freeze(sp!(_, actual): &H::Type, sp!(_, expected): &H::Type) -> Freeze 
     }
 }
 
-fn needs_freeze_single(sp!(_, actual): &H::SingleType, sp!(_, expected): &H::SingleType) -> bool {
+pub fn needs_freeze_single(sp!(_, actual): &H::SingleType, sp!(_, expected): &H::SingleType) -> bool {
     use H::SingleType_ as T;
     matches!((actual, expected), (T::Ref(true, _), T::Ref(false, _)))
 }
 
-fn freeze(context: &mut Context, result: &mut Block, expected_type: &H::Type, e: H::Exp) -> H::Exp {
+pub fn freeze(context: &mut Context, result: &mut Block, expected_type: &H::Type, e: H::Exp) -> H::Exp {
     use H::{Type_ as T, UnannotatedExp_ as E};
 
     match needs_freeze(&e.ty, expected_type) {
@@ -1462,14 +1462,14 @@ fn freeze(context: &mut Context, result: &mut Block, expected_type: &H::Type, e:
     }
 }
 
-fn freeze_point(e: H::Exp) -> H::Exp {
+pub fn freeze_point(e: H::Exp) -> H::Exp {
     let frozen_ty = freeze_ty(e.ty.clone());
     let eloc = e.exp.loc;
     let e_ = H::UnannotatedExp_::Freeze(Box::new(e));
     H::exp(frozen_ty, sp(eloc, e_))
 }
 
-fn freeze_ty(sp!(tloc, t): H::Type) -> H::Type {
+pub fn freeze_ty(sp!(tloc, t): H::Type) -> H::Type {
     use H::Type_ as T;
     match t {
         T::Single(s) => sp(tloc, T::Single(freeze_single(s))),
@@ -1477,7 +1477,7 @@ fn freeze_ty(sp!(tloc, t): H::Type) -> H::Type {
     }
 }
 
-fn freeze_single(sp!(sloc, s): H::SingleType) -> H::SingleType {
+pub fn freeze_single(sp!(sloc, s): H::SingleType) -> H::SingleType {
     use H::SingleType_ as S;
     match s {
         S::Ref(true, inner) => sp(sloc, S::Ref(false, inner)),
@@ -1485,7 +1485,7 @@ fn freeze_single(sp!(sloc, s): H::SingleType) -> H::SingleType {
     }
 }
 
-fn bind_for_short_circuit(e: &T::Exp) -> bool {
+pub fn bind_for_short_circuit(e: &T::Exp) -> bool {
     use T::UnannotatedExp_ as TE;
     match &e.exp.value {
         TE::Use(_) | TE::InferredNum(_) => panic!("ICE should have been expanded"),
@@ -1526,7 +1526,7 @@ fn bind_for_short_circuit(e: &T::Exp) -> bool {
     }
 }
 
-fn bind_for_short_circuit_sequence(seq: &T::Sequence) -> bool {
+pub fn bind_for_short_circuit_sequence(seq: &T::Sequence) -> bool {
     use T::SequenceItem_ as TItem;
     seq.len() != 1
         || match &seq[1].value {
@@ -1541,7 +1541,7 @@ fn bind_for_short_circuit_sequence(seq: &T::Sequence) -> bool {
 // Trailing semicolon
 //**************************************************************************************************
 
-fn check_trailing_unit(context: &mut Context, block: &mut Block) {
+pub fn check_trailing_unit(context: &mut Context, block: &mut Block) {
     use H::{Command_ as C, Statement_ as S, UnannotatedExp_ as E};
     macro_rules! hcmd {
         ($loc:pat, $cmd:pat) => {
@@ -1574,7 +1574,7 @@ fn check_trailing_unit(context: &mut Context, block: &mut Block) {
             )
         };
     }
-    fn divergent_block(block: &Block) -> bool {
+    pub fn divergent_block(block: &Block) -> bool {
         matches!(
             block.back(),
             Some(hcmd!(_, C::Break))
@@ -1635,7 +1635,7 @@ fn check_trailing_unit(context: &mut Context, block: &mut Block) {
     };
 }
 
-fn check_trailing_unit_statement(context: &mut Context, sp!(_, s_): &mut H::Statement) {
+pub fn check_trailing_unit_statement(context: &mut Context, sp!(_, s_): &mut H::Statement) {
     use H::Statement_ as S;
     match s_ {
         S::Command(_) => (),
@@ -1662,7 +1662,7 @@ fn check_trailing_unit_statement(context: &mut Context, sp!(_, s_): &mut H::Stat
 // Unused locals
 //**************************************************************************************************
 
-fn check_unused_locals(
+pub fn check_unused_locals(
     context: &mut Context,
     locals: &mut UniqueMap<Var, H::SingleType>,
     used: BTreeSet<Var>,
@@ -1707,13 +1707,13 @@ fn check_unused_locals(
     unused
 }
 
-fn remove_unused_bindings(unused: &BTreeSet<Var>, block: &mut Block) {
+pub fn remove_unused_bindings(unused: &BTreeSet<Var>, block: &mut Block) {
     block
         .iter_mut()
         .for_each(|s| remove_unused_bindings_statement(unused, s))
 }
 
-fn remove_unused_bindings_statement(unused: &BTreeSet<Var>, sp!(_, s_): &mut H::Statement) {
+pub fn remove_unused_bindings_statement(unused: &BTreeSet<Var>, sp!(_, s_): &mut H::Statement) {
     use H::Statement_ as S;
     match s_ {
         S::Command(c) => remove_unused_bindings_command(unused, c),
@@ -1736,7 +1736,7 @@ fn remove_unused_bindings_statement(unused: &BTreeSet<Var>, sp!(_, s_): &mut H::
     }
 }
 
-fn remove_unused_bindings_command(unused: &BTreeSet<Var>, sp!(_, c_): &mut H::Command) {
+pub fn remove_unused_bindings_command(unused: &BTreeSet<Var>, sp!(_, c_): &mut H::Command) {
     use H::Command_ as HC;
 
     if let HC::Assign(ls, _) = c_ {
@@ -1744,12 +1744,12 @@ fn remove_unused_bindings_command(unused: &BTreeSet<Var>, sp!(_, c_): &mut H::Co
     }
 }
 
-fn remove_unused_bindings_lvalues(unused: &BTreeSet<Var>, ls: &mut Vec<H::LValue>) {
+pub fn remove_unused_bindings_lvalues(unused: &BTreeSet<Var>, ls: &mut Vec<H::LValue>) {
     ls.iter_mut()
         .for_each(|l| remove_unused_bindings_lvalue(unused, l))
 }
 
-fn remove_unused_bindings_lvalue(unused: &BTreeSet<Var>, sp!(_, l_): &mut H::LValue) {
+pub fn remove_unused_bindings_lvalue(unused: &BTreeSet<Var>, sp!(_, l_): &mut H::LValue) {
     use H::LValue_ as HL;
     match l_ {
         HL::Var(v, _) if unused.contains(v) => *l_ = HL::Ignore,

@@ -222,7 +222,7 @@ pub const BINARY_SIZE_LIMIT: usize = usize::max_value();
 
 /// A wrapper for the binary vector
 #[derive(Default, Debug)]
-pub(crate) struct BinaryData {
+pub struct BinaryData {
     _binary: Vec<u8>,
 }
 
@@ -291,7 +291,7 @@ impl From<Vec<u8>> for BinaryData {
     }
 }
 
-pub(crate) fn write_u64_as_uleb128(binary: &mut BinaryData, mut val: u64) -> Result<()> {
+pub fn write_u64_as_uleb128(binary: &mut BinaryData, mut val: u64) -> Result<()> {
     loop {
         let cur = val & 0x7f;
         if cur != val {
@@ -307,22 +307,22 @@ pub(crate) fn write_u64_as_uleb128(binary: &mut BinaryData, mut val: u64) -> Res
 
 /// Write a `u16` in Little Endian format.
 #[allow(dead_code)]
-pub(crate) fn write_u16(binary: &mut BinaryData, value: u16) -> Result<()> {
+pub fn write_u16(binary: &mut BinaryData, value: u16) -> Result<()> {
     binary.extend(&value.to_le_bytes())
 }
 
 /// Write a `u32` in Little Endian format.
-pub(crate) fn write_u32(binary: &mut BinaryData, value: u32) -> Result<()> {
+pub fn write_u32(binary: &mut BinaryData, value: u32) -> Result<()> {
     binary.extend(&value.to_le_bytes())
 }
 
 /// Write a `u64` in Little Endian format.
-pub(crate) fn write_u64(binary: &mut BinaryData, value: u64) -> Result<()> {
+pub fn write_u64(binary: &mut BinaryData, value: u64) -> Result<()> {
     binary.extend(&value.to_le_bytes())
 }
 
 /// Write a `u128` in Little Endian format.
-pub(crate) fn write_u128(binary: &mut BinaryData, value: u128) -> Result<()> {
+pub fn write_u128(binary: &mut BinaryData, value: u128) -> Result<()> {
     binary.extend(&value.to_le_bytes())
 }
 

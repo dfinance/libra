@@ -22,7 +22,7 @@ use vm::errors::{PartialVMError, PartialVMResult};
 
 // Publish a resource if the resource does not exists at that location.
 // Return an error otherwise.
-pub(crate) fn move_resource_to(
+pub fn move_resource_to(
     data_store: &mut dyn DataStore,
     addr: AccountAddress,
     ty: Type,
@@ -55,7 +55,7 @@ pub(crate) fn move_resource_to(
 
 // Unpublish a resource if there are no live references to it.
 // Return an error otherwise.
-pub(crate) fn move_resource_from(
+pub fn move_resource_from(
     data_store: &mut dyn DataStore,
     addr: AccountAddress,
     ty: &Type,
@@ -79,7 +79,7 @@ pub(crate) fn move_resource_from(
 }
 
 // Return true if the resource exits already at the given location, false otherwise.
-pub(crate) fn resource_exists(
+pub fn resource_exists(
     data_store: &mut dyn DataStore,
     addr: AccountAddress,
     ty: &Type,
@@ -92,7 +92,7 @@ pub(crate) fn resource_exists(
 
 // Borrow a resource at a give location if the resource was not borrowed already.
 // Return an error otherwise.
-pub(crate) fn borrow_global<'a>(
+pub fn borrow_global<'a>(
     data_store: &'a mut dyn DataStore,
     addr: AccountAddress,
     ty: &Type,

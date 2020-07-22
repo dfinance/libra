@@ -194,7 +194,7 @@ impl ValidatorConfig {
         (libra_root_key, config_seed)
     }
 
-    fn build_safety_rules(&self, config: &mut NodeConfig) -> Result<()> {
+    pub fn build_safety_rules(&self, config: &mut NodeConfig) -> Result<()> {
         let safety_rules_config = &mut config.consensus.safety_rules;
 
         if let Some(server_address) = self.safety_rules_addr {
@@ -243,7 +243,7 @@ pub fn test_config() -> (NodeConfig, Ed25519PrivateKey) {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

@@ -1,37 +1,37 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! Consensus for the Libra Core blockchain
 //!
 //! The consensus protocol implemented is LibraBFT (based on
 //! [HotStuff](https://arxiv.org/pdf/1803.05069.pdf)).
 
-#![cfg_attr(not(feature = "fuzzing"), deny(missing_docs))]
+#![cfg_attr(not(feature = "fuzzing"),)]
 #![cfg_attr(feature = "fuzzing", allow(dead_code))]
 #![recursion_limit = "512"]
 
-mod block_storage;
-mod consensusdb;
-mod counters;
-mod epoch_manager;
-mod liveness;
-mod metrics_safety_rules;
-mod network;
+pub mod block_storage;
+pub mod consensusdb;
+pub mod counters;
+pub mod epoch_manager;
+pub mod liveness;
+pub mod metrics_safety_rules;
+pub mod network;
 #[cfg(test)]
-mod network_tests;
-mod pending_votes;
-mod persistent_liveness_storage;
-mod round_manager;
-mod state_computer;
-mod state_replication;
+pub mod network_tests;
+pub mod pending_votes;
+pub mod persistent_liveness_storage;
+pub mod round_manager;
+pub mod state_computer;
+pub mod state_replication;
 #[cfg(any(test, feature = "fuzzing"))]
-mod test_utils;
+pub mod test_utils;
 #[cfg(test)]
-mod twins_test;
-mod txn_manager;
-mod util;
+pub mod twins_test;
+pub mod txn_manager;
+pub mod util;
 
 /// LibraBFT implementation
 pub mod consensus_provider;

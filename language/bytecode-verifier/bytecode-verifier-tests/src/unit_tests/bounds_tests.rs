@@ -144,7 +144,7 @@ proptest! {
     }
 }
 
-/// Ensure that valid modules that don't have any members (e.g. function args, struct fields) pass
+/// Ensure that valid modules that don't have any members (e.g. function args, pub struct fields) pass
 /// bounds checks.
 ///
 /// There are some potentially tricky edge cases around ranges that are captured here.

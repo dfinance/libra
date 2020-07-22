@@ -6,7 +6,7 @@ use move_core_types::identifier::Identifier;
 use serde::{Deserialize, Serialize};
 use std::collections::btree_map::BTreeMap;
 
-/// A enum that captures the collection of role-specific resources stored under each account type
+/// Apub enum that captures the collection of role-specific resources stored under each account type
 #[derive(Debug, Serialize, Deserialize)]
 pub enum AccountRole {
     ParentVASP {

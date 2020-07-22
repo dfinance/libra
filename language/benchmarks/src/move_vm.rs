@@ -28,7 +28,7 @@ pub fn bench(c: &mut Criterion, fun: &str) {
 }
 
 // Compile `bench.move`
-fn compile_module(addr: &[u8; AccountAddress::LENGTH]) -> CompiledModule {
+pub fn compile_module(addr: &[u8; AccountAddress::LENGTH]) -> CompiledModule {
     // TODO: this has only been tried with `cargo bench` from `libra/src/language/benchmarks`
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push("src/bench.move");
@@ -43,7 +43,7 @@ fn compile_module(addr: &[u8; AccountAddress::LENGTH]) -> CompiledModule {
 }
 
 // execute a given function in the Bench module
-fn execute(
+pub fn execute(
     c: &mut Criterion,
     move_vm: &MoveVM,
     sender: AccountAddress,
@@ -91,7 +91,7 @@ fn execute(
 //
 
 // An empty `StateView`
-struct EmptyStateView;
+pub struct EmptyStateView;
 
 impl StateView for EmptyStateView {
     fn get(&self, _: &AccessPath) -> Result<Option<Vec<u8>>> {

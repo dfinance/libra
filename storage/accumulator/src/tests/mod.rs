@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod proof_test;
-mod write_test;
+pub mod proof_test;
+pub mod write_test;
 
 use super::*;
 use libra_crypto::hash::TestOnlyHasher;
@@ -13,7 +13,7 @@ use std::collections::HashMap;
 type InMemoryAccumulator = libra_types::proof::accumulator::InMemoryAccumulator<TestOnlyHasher>;
 type TestAccumulator = MerkleAccumulator<MockHashStore, TestOnlyHasher>;
 
-struct MockHashStore {
+pub struct MockHashStore {
     store: HashMap<Position, HashValue>,
 }
 
@@ -26,7 +26,7 @@ impl HashReader for MockHashStore {
     }
 }
 
-struct Subtree {
+pub struct Subtree {
     root_position: u64,
     max_position: u64,
     hash: HashValue,
@@ -45,7 +45,7 @@ impl MockHashStore {
         self.store.extend(writes.iter().cloned())
     }
 
-    fn verify_in_store_if_frozen(
+    pub fn verify_in_store_if_frozen(
         &self,
         position: u64,
         hash: HashValue,
@@ -69,7 +69,7 @@ impl MockHashStore {
     ///
     /// This is needed because a real Accumulator subtree with only placeholder nodes are trimmed
     /// (never generated nor accessed).
-    fn hash_internal(left: HashValue, right: HashValue) -> HashValue {
+    pub fn hash_internal(left: HashValue, right: HashValue) -> HashValue {
         if left == *ACCUMULATOR_PLACEHOLDER_HASH && right == *ACCUMULATOR_PLACEHOLDER_HASH {
             *ACCUMULATOR_PLACEHOLDER_HASH
         } else {
@@ -77,7 +77,7 @@ impl MockHashStore {
         }
     }
 
-    fn verify_subtree(&self, leaves: &[HashValue], min_position: u64) -> Result<Subtree> {
+    pub fn verify_subtree(&self, leaves: &[HashValue], min_position: u64) -> Result<Subtree> {
         assert!(leaves.len().is_power_of_two());
 
         let me = if leaves.len() == 1 {
@@ -132,7 +132,7 @@ impl MockHashStore {
     ///     c. sum up frozen nodes
     ///     d. verify frozen nodes are in store at the above mentioned "position"
     /// 4. verify number of nodes in store matches exactly number of frozen nodes.
-    fn verify(&self, leaves: &[HashValue]) -> Result<HashValue> {
+    pub fn verify(&self, leaves: &[HashValue]) -> Result<HashValue> {
         if leaves.is_empty() {
             ensure!(self.store.is_empty(), "non-empty store for empty tree.");
             Ok(*ACCUMULATOR_PLACEHOLDER_HASH)

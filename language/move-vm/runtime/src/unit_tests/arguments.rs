@@ -87,7 +87,7 @@ fn make_script_with_imports(signature: Signature) -> Vec<u8> {
     blob
 }
 
-struct RemoteStore {}
+pub struct RemoteStore {}
 
 impl RemoteCache for RemoteStore {
     fn get_module(&self, _module_id: &ModuleId) -> VMResult<Option<Vec<u8>>> {
@@ -173,7 +173,7 @@ fn check_main_signature() {
     // Bad signatures
     //
 
-    // struct in signature
+    // pub struct in signature
     let script = make_script_with_imports(Signature(vec![SignatureToken::Struct(
         StructHandleIndex(0),
     )]));
@@ -184,7 +184,7 @@ fn check_main_signature() {
             .major_status(),
         StatusCode::INVALID_MAIN_FUNCTION_SIGNATURE,
     );
-    // struct in signature
+    // pub struct in signature
     let script = make_script_with_imports(Signature(vec![
         SignatureToken::Bool,
         SignatureToken::Struct(StructHandleIndex(0)),
@@ -197,7 +197,7 @@ fn check_main_signature() {
             .major_status(),
         StatusCode::INVALID_MAIN_FUNCTION_SIGNATURE,
     );
-    // reference to struct in signature
+    // reference to pub struct in signature
     let script = make_script_with_imports(Signature(vec![
         SignatureToken::Address,
         SignatureToken::MutableReference(Box::new(SignatureToken::Struct(StructHandleIndex(0)))),
@@ -209,7 +209,7 @@ fn check_main_signature() {
             .major_status(),
         StatusCode::INVALID_MAIN_FUNCTION_SIGNATURE,
     );
-    // vector of struct in signature
+    // vector of pub struct in signature
     let script = make_script_with_imports(Signature(vec![
         SignatureToken::Bool,
         SignatureToken::Vector(Box::new(SignatureToken::Struct(StructHandleIndex(0)))),
@@ -222,7 +222,7 @@ fn check_main_signature() {
             .major_status(),
         StatusCode::INVALID_MAIN_FUNCTION_SIGNATURE,
     );
-    // vector of vector of struct in signature
+    // vector of vector of pub struct in signature
     let script = make_script_with_imports(Signature(vec![
         SignatureToken::Bool,
         SignatureToken::Vector(Box::new(SignatureToken::Vector(Box::new(

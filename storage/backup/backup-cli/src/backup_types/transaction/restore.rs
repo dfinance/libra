@@ -44,12 +44,12 @@ pub struct TransactionRestoreController {
 }
 
 #[derive(Default)]
-struct State {
+pub struct State {
     frozen_subtree_confirmed: bool,
     transaction_replayer: Option<Executor<LibraVM>>,
 }
 
-struct LoadedChunk {
+pub struct LoadedChunk {
     pub manifest: TransactionChunk,
     pub txns: Vec<Transaction>,
     pub txn_infos: Vec<TransactionInfo>,
@@ -123,7 +123,7 @@ impl TransactionRestoreController {
         }
     }
 
-    fn maybe_save_frozen_subtrees(&mut self, chunk: &LoadedChunk) -> Result<()> {
+    pub fn maybe_save_frozen_subtrees(&mut self, chunk: &LoadedChunk) -> Result<()> {
         if !self.state.frozen_subtree_confirmed {
             self.restore_handler.confirm_or_save_frozen_subtrees(
                 chunk.manifest.first_version,
@@ -134,7 +134,7 @@ impl TransactionRestoreController {
         Ok(())
     }
 
-    fn transaction_replayer(&mut self) -> Result<&mut Executor<LibraVM>> {
+    pub fn transaction_replayer(&mut self) -> Result<&mut Executor<LibraVM>> {
         if self.state.transaction_replayer.is_none() {
             let replayer = Executor::new_on_unbootstrapped_db(
                 DbReaderWriter::from_arc(Arc::clone(&self.restore_handler.libradb)),

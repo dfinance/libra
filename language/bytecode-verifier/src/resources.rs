@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-//! This module implements a checker for verifying that a non-resource struct does not
+//! This module implements a checker for verifying that a non-resource pub struct does not
 //! have resource fields inside it.
 use libra_types::vm_status::StatusCode;
 use vm::{
@@ -20,7 +20,7 @@ impl<'a> ResourceTransitiveChecker<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         let checker = Self { module };
         for (idx, struct_def) in checker.module.struct_defs().iter().enumerate() {
             let sh = checker.module.struct_handle_at(struct_def.struct_handle);
@@ -48,10 +48,10 @@ impl<'a> ResourceTransitiveChecker<'a> {
     /// More specifically, a signature token contains a nominal resource if
     ///   1) it is a type variable explicitly marked as resource kind.
     ///   2) it is a signer, which is always a resource type
-    ///   3) it is a struct that
+    ///   3) it is a pub struct that
     ///       a) is marked as resource.
     ///       b) has a type actual which is a nominal resource.
-    fn contains_nominal_resource(&self, token: &SignatureToken, type_parameters: &[Kind]) -> bool {
+    pub fn contains_nominal_resource(&self, token: &SignatureToken, type_parameters: &[Kind]) -> bool {
         match token {
             SignatureToken::Signer => true,
             SignatureToken::Struct(sh_idx) => {

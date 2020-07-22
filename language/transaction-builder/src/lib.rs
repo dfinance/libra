@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use compiled_stdlib::{transaction_scripts::StdlibScript, StdLibOptions};
 use libra_types::{
@@ -15,7 +15,7 @@ use move_core_types::language_storage::TypeTag;
 use std::convert::TryFrom;
 
 /// Generated builders.
-mod generated;
+pub mod generated;
 
 /// Re-export all generated builders unless they are shadowed by custom builders below.
 pub use generated::*;

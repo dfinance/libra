@@ -108,14 +108,14 @@ impl<'a> StacklessBytecodeGenerator<'a> {
     }
 
     /// Create a new attribute id and populate location table.
-    fn new_loc_attr(&mut self, code_offset: CodeOffset) -> AttrId {
+    pub fn new_loc_attr(&mut self, code_offset: CodeOffset) -> AttrId {
         let loc = self.func_env.get_bytecode_loc(code_offset);
         let attr = AttrId::new(self.location_table.len());
         self.location_table.insert(attr, loc);
         attr
     }
 
-    fn get_field_info(&self, field_handle_index: FieldHandleIndex) -> (StructId, usize, Type) {
+    pub fn get_field_info(&self, field_handle_index: FieldHandleIndex) -> (StructId, usize, Type) {
         let field_handle = self.module.field_handle_at(field_handle_index);
         let struct_id = self.func_env.module_env.get_struct_id(field_handle.owner);
         let struct_env = self.func_env.module_env.get_struct(struct_id);
@@ -123,7 +123,7 @@ impl<'a> StacklessBytecodeGenerator<'a> {
         (struct_id, field_handle.field as usize, field_env.get_type())
     }
 
-    fn get_type_params(&self, type_params_index: SignatureIndex) -> Vec<Type> {
+    pub fn get_type_params(&self, type_params_index: SignatureIndex) -> Vec<Type> {
         self.func_env
             .module_env
             .get_type_actuals(Some(type_params_index))
@@ -1029,7 +1029,7 @@ impl<'a> StacklessBytecodeGenerator<'a> {
         }
     }
 
-    fn translate_value(ty: &Type, value: &MoveValue) -> Constant {
+    pub fn translate_value(ty: &Type, value: &MoveValue) -> Constant {
         match (ty, &value) {
             (Type::Vector(inner), MoveValue::Vector(vs)) => {
                 let b = vs

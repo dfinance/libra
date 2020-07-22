@@ -228,7 +228,7 @@ impl fmt::Display for PendingVotes {
 //
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::{PendingVotes, VoteReceptionResult};
     use consensus_types::{vote::Vote, vote_data::VoteData};
     use libra_crypto::HashValue;
@@ -238,7 +238,7 @@ mod tests {
     };
 
     /// Creates a random ledger info for epoch 1 and round 1.
-    fn random_ledger_info() -> LedgerInfo {
+    pub fn random_ledger_info() -> LedgerInfo {
         LedgerInfo::new(
             BlockInfo::new(1, 0, HashValue::random(), HashValue::random(), 0, 0, None),
             HashValue::random(),
@@ -247,7 +247,7 @@ mod tests {
 
     /// Creates a random VoteData for epoch 1 and round 1,
     /// extending a random block at epoch1 and round 0.
-    fn random_vote_data() -> VoteData {
+    pub fn random_vote_data() -> VoteData {
         VoteData::new(BlockInfo::random(1), BlockInfo::random(0))
     }
 

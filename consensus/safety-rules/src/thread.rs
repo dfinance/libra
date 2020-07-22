@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //! This provides a execution separation between SafetyRules and Consensus without requiring the
-//! use of processes. Rust does not support fork and so the mechanics to actually construct a
+//! use of processes. Rust does not support fork and so the mechanics to actually conpub struct a
 //! SafetyRules that would run together and be started by Consensus requires a separate binary and
 //! making a call to start that via a command. This is a lightweight means of accomplishing a goal
 //! in testing correctness of the communication layer between Consensus and SafetyRules.

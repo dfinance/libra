@@ -113,38 +113,38 @@ impl StateSnapshotBackupController {
 }
 
 impl StateSnapshotBackupController {
-    fn backup_name(&self) -> ShellSafeName {
+    pub fn backup_name(&self) -> ShellSafeName {
         format!("state_ver_{}", self.version).try_into().unwrap()
     }
 
-    fn manifest_name() -> &'static ShellSafeName {
+    pub fn manifest_name() -> &'static ShellSafeName {
         static NAME: Lazy<ShellSafeName> =
             Lazy::new(|| ShellSafeName::from_str("state.manifest").unwrap());
         &NAME
     }
 
-    fn proof_name() -> &'static ShellSafeName {
+    pub fn proof_name() -> &'static ShellSafeName {
         static NAME: Lazy<ShellSafeName> =
             Lazy::new(|| ShellSafeName::from_str("state.proof").unwrap());
         &NAME
     }
 
-    fn chunk_name(first_idx: usize) -> ShellSafeName {
+    pub fn chunk_name(first_idx: usize) -> ShellSafeName {
         format!("{}-.chunk", first_idx).try_into().unwrap()
     }
 
-    fn chunk_proof_name(first_idx: usize, last_idx: usize) -> ShellSafeName {
+    pub fn chunk_proof_name(first_idx: usize, last_idx: usize) -> ShellSafeName {
         format!("{}-{}.proof", first_idx, last_idx)
             .try_into()
             .unwrap()
     }
 
-    fn parse_key(record: &Bytes) -> Result<HashValue> {
+    pub fn parse_key(record: &Bytes) -> Result<HashValue> {
         let (key, _): (HashValue, AccountStateBlob) = lcs::from_bytes(record)?;
         Ok(key)
     }
 
-    async fn write_chunk(
+    pub async fn write_chunk(
         &self,
         backup_handle: &BackupHandleRef,
         chunk_bytes: &[u8],
@@ -182,7 +182,7 @@ impl StateSnapshotBackupController {
         })
     }
 
-    async fn write_manifest(
+    pub async fn write_manifest(
         &self,
         backup_handle: &BackupHandleRef,
         chunks: Vec<StateSnapshotChunk>,

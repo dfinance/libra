@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod handlers;
+pub mod handlers;
 
 use crate::handlers::get_routes;
 use libradb::LibraDB;
@@ -36,7 +36,7 @@ pub fn start_backup_service(port: u16, db: Arc<LibraDB>) -> Runtime {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use libra_config::utils::get_available_port;
     use libra_crypto::hash::HashValue;

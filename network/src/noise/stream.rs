@@ -39,9 +39,9 @@ pub struct NoiseStream<TSocket> {
     session: noise::NoiseSession,
     /// handy buffers to write/read
     buffers: Box<NoiseBuffers>,
-    /// an enum used for progressively reading a noise payload
+    /// anpub enum used for progressively reading a noise payload
     read_state: ReadState,
-    /// an enum used for progressively writing a noise payload
+    /// anpub enum used for progressively writing a noise payload
     write_state: WriteState,
 }
 
@@ -70,7 +70,7 @@ impl<TSocket> NoiseStream<TSocket> {
 
 /// Possible read states for a [NoiseStream]
 #[derive(Debug)]
-enum ReadState {
+pub enum ReadState {
     /// Initial State
     Init,
     /// Read frame length
@@ -89,7 +89,7 @@ impl<TSocket> NoiseStream<TSocket>
 where
     TSocket: AsyncRead + Unpin,
 {
-    fn poll_read(&mut self, mut context: &mut Context, buf: &mut [u8]) -> Poll<io::Result<usize>> {
+    pub fn poll_read(&mut self, mut context: &mut Context, buf: &mut [u8]) -> Poll<io::Result<usize>> {
         loop {
             trace!("NoiseStream ReadState::{:?}", self.read_state);
             match self.read_state {
@@ -207,7 +207,7 @@ where
 
 /// Possible write states for a [NoiseStream]
 #[derive(Debug)]
-enum WriteState {
+pub enum WriteState {
     /// Initial State
     Init,
     /// Buffer provided data
@@ -431,7 +431,7 @@ const MAX_WRITE_BUFFER_LENGTH: usize = noise::decrypted_len(noise::MAX_SIZE_NOIS
 
 /// Collection of buffers used for buffering data during the various read/write states of a
 /// NoiseStream
-struct NoiseBuffers {
+pub struct NoiseBuffers {
     /// A read buffer, used for both a received ciphertext and then for its decrypted content.
     read_buffer: [u8; noise::MAX_SIZE_NOISE_MSG],
     /// A write buffer, used for both a plaintext to send, and then its encrypted version.
@@ -439,7 +439,7 @@ struct NoiseBuffers {
 }
 
 impl NoiseBuffers {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             read_buffer: [0; noise::MAX_SIZE_NOISE_MSG],
             write_buffer: [0; noise::MAX_SIZE_NOISE_MSG],
@@ -460,7 +460,7 @@ impl ::std::fmt::Debug for NoiseBuffers {
 //
 
 /// Write an offset of a buffer to a socket, only returns Ready once done.
-fn poll_write_all<TSocket>(
+pub fn poll_write_all<TSocket>(
     mut context: &mut Context,
     mut socket: Pin<&mut TSocket>,
     buf: &[u8],
@@ -490,7 +490,7 @@ where
 /// 1) Ok(None) => EOF; remote graceful shutdown
 /// 2) Err(UnexpectedEOF) => read 1 byte then hit EOF; remote died
 /// 3) Ok(Some(n)) => new frame of length n
-fn poll_read_u16frame_len<TSocket>(
+pub fn poll_read_u16frame_len<TSocket>(
     context: &mut Context,
     socket: Pin<&mut TSocket>,
     buf: &mut [u8; 2],
@@ -514,7 +514,7 @@ where
 /// continuously calls poll_read on the socket until enough data is read.
 /// It is possible that this function never completes,
 /// so a timeout needs to be set on the caller side.
-fn poll_read_exact<TSocket>(
+pub fn poll_read_exact<TSocket>(
     mut context: &mut Context,
     mut socket: Pin<&mut TSocket>,
     buf: &mut [u8],
@@ -543,7 +543,7 @@ where
 //
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::{
         noise::{AntiReplayTimestamps, HandshakeAuthMode, NoiseUpgrader},
@@ -561,7 +561,7 @@ mod test {
     use std::io;
 
     /// helper to setup two testing peers
-    fn build_peers() -> (
+    pub fn build_peers() -> (
         (NoiseUpgrader, x25519::PublicKey),
         (NoiseUpgrader, x25519::PublicKey),
     ) {
@@ -590,7 +590,7 @@ mod test {
     }
 
     /// helper to perform a noise handshake with two peers
-    fn perform_handshake(
+    pub fn perform_handshake(
         client: NoiseUpgrader,
         server_public_key: x25519::PublicKey,
         server: NoiseUpgrader,

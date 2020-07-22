@@ -16,7 +16,7 @@ fn test() {
     suite::run_test_suite(execution_correctness(false));
 }
 
-fn execution_correctness(
+pub fn execution_correctness(
     enable_signing: bool,
 ) -> (Box<dyn ExecutionCorrectness>, Option<Ed25519PublicKey>) {
     let (config, _handle, _db) = start_storage_service();

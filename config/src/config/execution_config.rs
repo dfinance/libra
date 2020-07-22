@@ -122,7 +122,7 @@ pub struct RemoteExecutionService {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use libra_temppath::TempPath;
     use libra_types::{
@@ -159,7 +159,7 @@ mod test {
         assert_eq!(config.genesis, Some(fake_genesis));
     }
 
-    fn generate_config() -> (ExecutionConfig, TempPath) {
+    pub fn generate_config() -> (ExecutionConfig, TempPath) {
         let temp_dir = TempPath::new();
         temp_dir.create_as_dir().expect("error creating tempdir");
         let execution_config = ExecutionConfig::default();

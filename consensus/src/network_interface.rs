@@ -40,12 +40,12 @@ pub enum ConsensusMsg {
     /// ProposalMsg contains the required information for the proposer election protocol to make
     /// its choice (typically depends on round and proposer info).
     ProposalMsg(Box<ProposalMsg>),
-    /// This struct describes basic synchronization metadata.
+    /// This pub struct describes basic synchronization metadata.
     SyncInfo(Box<SyncInfo>),
     /// A vector of LedgerInfo with contiguous increasing epoch numbers to prove a sequence of
     /// epoch changes from the first LedgerInfo's epoch.
     EpochChangeProof(Box<EpochChangeProof>),
-    /// VoteMsg is the struct that is ultimately sent by the voter in response for receiving a
+    /// VoteMsg is the pub struct that is ultimately sent by the voter in response for receiving a
     /// proposal.
     VoteMsg(Box<VoteMsg>),
 }

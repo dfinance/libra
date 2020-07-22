@@ -18,7 +18,7 @@ pub enum JoinResult {
 }
 
 #[derive(Clone)]
-enum BlockPostcondition {
+pub enum BlockPostcondition {
     /// Unprocessed block
     Unprocessed,
     /// Analyzing block was successful
@@ -28,7 +28,7 @@ enum BlockPostcondition {
 }
 
 #[derive(Clone)]
-struct BlockInvariant<State> {
+pub struct BlockInvariant<State> {
     /// Precondition of the block
     pre: State,
     /// Postcondition of the block---just success/error for now
@@ -38,7 +38,7 @@ struct BlockInvariant<State> {
 /// A map from block id's to the pre/post of each block after a fixed point is reached.
 type InvariantMap<State> = BTreeMap<Label, BlockInvariant<State>>;
 
-fn collect_states_and_errors<State>(map: InvariantMap<State>) -> (BTreeMap<Label, State>, Errors) {
+pub fn collect_states_and_errors<State>(map: InvariantMap<State>) -> (BTreeMap<Label, State>, Errors) {
     let mut errors = Errors::new();
     let final_states = map
         .into_iter()

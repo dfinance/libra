@@ -1,10 +1,10 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod counters;
-mod pusher;
+
+pub mod counters;
+pub mod pusher;
 
 pub use crate::{
     counters::{Counter, Gauge, Metrics, PushMetricFormat},

@@ -112,11 +112,11 @@ fn simple_handshake() {
 fn test_vectors() {
     // structures needed to deserialize test vectors
     #[derive(Serialize, Deserialize)]
-    struct TestVectors {
+    pub struct TestVectors {
         vectors: Vec<TestVector>,
     }
     #[derive(Serialize, Deserialize, Debug)]
-    struct TestVector {
+    pub struct TestVector {
         protocol_name: String,
         init_prologue: String,
         init_static: Option<String>,
@@ -128,13 +128,13 @@ fn test_vectors() {
         messages: Vec<TestMessage>,
     }
     #[derive(Serialize, Deserialize, Debug)]
-    struct TestMessage {
+    pub struct TestMessage {
         payload: String,
         ciphertext: String,
     }
 
     // EphemeralRng is used to get deterministic ephemeral keys based on test vectors
-    struct EphemeralRng {
+    pub struct EphemeralRng {
         ephemeral: Vec<u8>,
     }
     impl rand::RngCore for EphemeralRng {

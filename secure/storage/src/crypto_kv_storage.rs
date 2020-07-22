@@ -107,7 +107,7 @@ impl<T: CryptoKVStorage> CryptoStorage for T {
 }
 
 /// Private helper method to generate a new ed25519 key pair using entropy from the OS.
-fn new_ed25519_key_pair() -> Result<(Ed25519PrivateKey, Ed25519PublicKey), Error> {
+pub fn new_ed25519_key_pair() -> Result<(Ed25519PrivateKey, Ed25519PublicKey), Error> {
     let mut seed_rng = OsRng;
     let mut rng = rand::rngs::StdRng::from_seed(seed_rng.gen());
     let private_key = Ed25519PrivateKey::generate(&mut rng);
@@ -117,6 +117,6 @@ fn new_ed25519_key_pair() -> Result<(Ed25519PrivateKey, Ed25519PublicKey), Error
 
 /// Private helper method to get the name of the previous version of the given key pair, as held in
 /// secure cryptographic storage.
-fn get_previous_version_name(name: &str) -> String {
+pub fn get_previous_version_name(name: &str) -> String {
     format!("{}_previous", name)
 }

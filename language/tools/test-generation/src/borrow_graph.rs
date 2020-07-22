@@ -46,7 +46,7 @@ pub struct BorrowGraph {
 }
 
 impl BorrowGraph {
-    /// Construct a new `BorrowGraph` given the number of locals it has
+    /// Conpub struct a new `BorrowGraph` given the number of locals it has
     pub fn new(num_locals: u8) -> BorrowGraph {
         BorrowGraph {
             partitions: Vec::with_capacity(num_locals as usize),
@@ -114,7 +114,7 @@ impl BorrowGraph {
     }
 
     /// Determine whether the `path_1` is a prefix of `path_2`
-    fn path_is_prefix(&self, path_1: Path, path_2: Path) -> bool {
+    pub fn path_is_prefix(&self, path_1: Path, path_2: Path) -> bool {
         let mut prefix = true;
         for (i, field) in path_1.iter().enumerate() {
             if *field != path_2[i] {

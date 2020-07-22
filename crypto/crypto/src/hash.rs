@@ -43,7 +43,7 @@
 //! use libra_crypto_derive::{CryptoHasher, LCSCryptoHash};
 //! use serde::{Deserialize, Serialize};
 //! #[derive(Serialize, Deserialize, CryptoHasher, LCSCryptoHash)]
-//! struct MyNewStruct { /*...*/ }
+//! pub struct MyNewStruct { /*...*/ }
 //!
 //! let value = MyNewStruct { /*...*/ };
 //! value.hash();
@@ -67,7 +67,7 @@
 //! use serde::Deserialize;
 //! #[derive(Deserialize, CryptoHasher)]
 //! #[serde(rename = "OptionalCustomSerdeName")]
-//! struct MyNewStruct { /*...*/ }
+//! pub struct MyNewStruct { /*...*/ }
 //! ```
 //!
 //! The macro `CryptoHasher` will define a hasher automatically called `MyNewStructHasher`, and derive a salt
@@ -114,7 +114,7 @@ use tiny_keccak::{Hasher, Sha3};
 /// A prefix used to begin the salt of every libra hashable structure. The salt
 /// consists in this global prefix, concatenated with the specified
 /// serialization name of the struct.
-pub(crate) const LIBRA_HASH_PREFIX: &[u8] = b"LIBRA::";
+pub const LIBRA_HASH_PREFIX: &[u8] = b"LIBRA::";
 const SHORT_STRING_LENGTH: usize = 4;
 
 /// Output value of our hash function. Intentionally opaque for safety and modularity.
@@ -181,7 +181,7 @@ impl HashValue {
     /// feeding and finalization.
     ///
     /// Note this will not result in the `<T as CryptoHash>::hash()` for any
-    /// reasonable struct T, as this computes a sha3 without any ornaments.
+    /// reasonable pub struct T, as this computes a sha3 without any ornaments.
     pub fn sha3_256_of(buffer: &[u8]) -> Self {
         let mut sha3 = Sha3::v256();
         sha3.update(buffer);
@@ -200,11 +200,11 @@ impl HashValue {
         HashValue::from_keccak(sha3)
     }
 
-    fn as_ref_mut(&mut self) -> &mut [u8] {
+    pub fn as_ref_mut(&mut self) -> &mut [u8] {
         &mut self.hash[..]
     }
 
-    fn from_keccak(state: Sha3) -> Self {
+    pub fn from_keccak(state: Sha3) -> Self {
         let mut hash = Self::zero();
         state.finalize(hash.as_ref_mut());
         hash
@@ -302,7 +302,7 @@ impl<'de> de::Deserialize<'de> for HashValue {
             // See comment in serialize.
             #[derive(::serde::Deserialize)]
             #[serde(rename = "HashValue")]
-            struct Value<'a>(&'a [u8]);
+            pub struct Value<'a>(&'a [u8]);
 
             let value = Value::deserialize(deserializer)?;
             Self::from_slice(value.0).map_err(<D::Error as ::serde::de::Error>::custom)
@@ -392,7 +392,7 @@ pub struct HashValueBitIterator<'a> {
 
 impl<'a> HashValueBitIterator<'a> {
     /// Constructs a new `HashValueBitIterator` using given `HashValue`.
-    fn new(hash_value: &'a HashValue) -> Self {
+    pub fn new(hash_value: &'a HashValue) -> Self {
         HashValueBitIterator {
             hash_bytes: hash_value.as_ref(),
             pos: (0..HashValue::LENGTH_IN_BITS),
@@ -400,7 +400,7 @@ impl<'a> HashValueBitIterator<'a> {
     }
 
     /// Returns the `index`-th bit in the bytes.
-    fn get_bit(&self, index: usize) -> bool {
+    pub fn get_bit(&self, index: usize) -> bool {
         assume!(index < self.pos.end); // assumed precondition
         assume!(self.hash_bytes.len() == HashValue::LENGTH); // invariant
         assume!(self.pos.end == self.hash_bytes.len() * 8); // invariant
@@ -508,7 +508,7 @@ macro_rules! define_hasher {
         pub struct $hasher_type(DefaultHasher);
 
         impl $hasher_type {
-            fn new() -> Self {
+            pub fn new() -> Self {
                 $hasher_type(DefaultHasher::new($salt))
             }
         }

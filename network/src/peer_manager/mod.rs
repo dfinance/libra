@@ -49,9 +49,9 @@ use tokio::runtime::Handle;
 
 pub mod builder;
 pub mod conn_notifs_channel;
-mod error;
+pub mod error;
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 pub use self::error::PeerManagerError;
 
@@ -114,7 +114,7 @@ pub struct ConnectionRequestSender {
 }
 
 impl PeerManagerRequestSender {
-    /// Construct a new PeerManagerRequestSender with a raw channel::Sender
+    /// Conpub struct a new PeerManagerRequestSender with a raw channel::Sender
     pub fn new(inner: libra_channel::Sender<(PeerId, ProtocolId), PeerManagerRequest>) -> Self {
         Self { inner }
     }
@@ -192,7 +192,7 @@ impl PeerManagerRequestSender {
 }
 
 impl ConnectionRequestSender {
-    /// Construct a new ConnectionRequestSender with a raw libra_channel::Sender
+    /// Conpub struct a new ConnectionRequestSender with a raw libra_channel::Sender
     pub fn new(inner: libra_channel::Sender<PeerId, ConnectionRequest>) -> Self {
         Self { inner }
     }
@@ -273,7 +273,7 @@ where
     TTransport: Transport<Output = Connection<TSocket>> + Send + 'static,
     TSocket: transport::TSocket,
 {
-    /// Construct a new PeerManager actor
+    /// Conpub struct a new PeerManager actor
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         executor: Handle,
@@ -381,7 +381,7 @@ where
         }
     }
 
-    fn handle_connection_event(&mut self, event: TransportNotification<TSocket>) {
+    pub fn handle_connection_event(&mut self, event: TransportNotification<TSocket>) {
         trace!(
             "{} TransportNotification::{:?}",
             self.network_context,
@@ -448,7 +448,7 @@ where
         }
     }
 
-    async fn handle_connection_request(&mut self, request: ConnectionRequest) {
+    pub async fn handle_connection_request(&mut self, request: ConnectionRequest) {
         trace!("{} PeerManagerRequest::{:?}", self.network_context, request);
         match request {
             ConnectionRequest::DialPeer(requested_peer_id, addr, response_tx) => {
@@ -499,7 +499,7 @@ where
         }
     }
 
-    async fn handle_request(&mut self, request: PeerManagerRequest) {
+    pub async fn handle_request(&mut self, request: PeerManagerRequest) {
         trace!("{} PeerManagerRequest::{:?}", self.network_context, request);
         match request {
             PeerManagerRequest::SendMessage(peer_id, msg) => {
@@ -539,7 +539,7 @@ where
         }
     }
 
-    fn start_connection_listener(&mut self) {
+    pub fn start_connection_listener(&mut self) {
         let transport_handler = self
             .transport_handler
             .take()
@@ -554,7 +554,7 @@ where
     ///
     /// Returns `true` if the existing connection should be dropped and `false` if the new
     /// connection should be dropped.
-    fn simultaneous_dial_tie_breaking(
+    pub fn simultaneous_dial_tie_breaking(
         own_peer_id: PeerId,
         remote_peer_id: PeerId,
         existing_origin: ConnectionOrigin,
@@ -571,7 +571,7 @@ where
         }
     }
 
-    fn add_peer(&mut self, connection: Connection<TSocket>) {
+    pub fn add_peer(&mut self, connection: Connection<TSocket>) {
         let conn_meta = connection.metadata.clone();
         let peer_id = conn_meta.peer_id();
         assert_ne!(self.network_context.peer_id(), peer_id);
@@ -654,7 +654,7 @@ where
     }
 
     /// Sends a `ConnectionNotification` to all event handlers, warns on failures
-    fn send_conn_notification(&mut self, peer_id: PeerId, notification: ConnectionNotification) {
+    pub fn send_conn_notification(&mut self, peer_id: PeerId, notification: ConnectionNotification) {
         for handler in self.connection_event_handlers.iter_mut() {
             if let Err(e) = handler.push(peer_id, notification.clone()) {
                 warn!(
@@ -668,7 +668,7 @@ where
         }
     }
 
-    async fn dial_peer(
+    pub async fn dial_peer(
         &mut self,
         peer_id: PeerId,
         address: NetworkAddress,
@@ -678,7 +678,7 @@ where
         self.transport_reqs_tx.send(request).await.unwrap();
     }
 
-    fn spawn_peer_network_events_handler(
+    pub fn spawn_peer_network_events_handler(
         &self,
         peer_id: PeerId,
         network_events: libra_channel::Receiver<ProtocolId, NetworkNotification>,
@@ -699,7 +699,7 @@ where
         ));
     }
 
-    fn handle_inbound_event(
+    pub fn handle_inbound_event(
         network_context: Arc<NetworkContext>,
         inbound_event: NetworkNotification,
         peer_id: PeerId,
@@ -757,7 +757,7 @@ where
 }
 
 #[derive(Debug)]
-enum TransportRequest {
+pub enum TransportRequest {
     DialPeer(
         PeerId,
         NetworkAddress,
@@ -775,7 +775,7 @@ where
 }
 
 /// Responsible for listening for new incoming connections
-struct TransportHandler<TTransport, TSocket>
+pub struct TransportHandler<TTransport, TSocket>
 where
     TTransport: Transport,
     TSocket: AsyncRead + AsyncWrite,
@@ -796,7 +796,7 @@ where
     TTransport::Outbound: 'static,
     TSocket: AsyncRead + AsyncWrite + 'static,
 {
-    fn new(
+    pub fn new(
         network_context: Arc<NetworkContext>,
         transport: TTransport,
         listen_addr: NetworkAddress,
@@ -819,7 +819,7 @@ where
         )
     }
 
-    async fn listen(mut self) {
+    pub async fn listen(mut self) {
         let mut pending_inbound_connections = FuturesUnordered::new();
         let mut pending_outbound_connections = FuturesUnordered::new();
 
@@ -862,7 +862,7 @@ where
         );
     }
 
-    fn dial_peer(
+    pub fn dial_peer(
         &self,
         dial_peer_request: TransportRequest,
     ) -> Option<
@@ -902,7 +902,7 @@ where
         }
     }
 
-    async fn handle_completed_outbound_upgrade(
+    pub async fn handle_completed_outbound_upgrade(
         &mut self,
         upgrade: Result<Connection<TSocket>, TTransport::Error>,
         addr: NetworkAddress,
@@ -965,7 +965,7 @@ where
         }
     }
 
-    async fn handle_completed_inbound_upgrade(
+    pub async fn handle_completed_inbound_upgrade(
         &mut self,
         upgrade: Result<Connection<TSocket>, TTransport::Error>,
         addr: NetworkAddress,

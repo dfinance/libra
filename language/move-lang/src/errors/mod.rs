@@ -60,7 +60,7 @@ pub fn report_errors_to_color_buffer(files: FilesSourceText, errors: Errors) -> 
     writer.into_inner()
 }
 
-fn output_errors<W: WriteColor>(writer: &mut W, sources: FilesSourceText, errors: Errors) {
+pub fn output_errors<W: WriteColor>(writer: &mut W, sources: FilesSourceText, errors: Errors) {
     assert!(!errors.is_empty());
     let mut files = Files::new();
     let mut file_mapping = HashMap::new();
@@ -71,7 +71,7 @@ fn output_errors<W: WriteColor>(writer: &mut W, sources: FilesSourceText, errors
     render_errors(writer, &files, &file_mapping, errors);
 }
 
-fn hashable_error(error: &ErrorSlice) -> HashableError {
+pub fn hashable_error(error: &ErrorSlice) -> HashableError {
     error
         .iter()
         .map(|(loc, e)| {
@@ -85,7 +85,7 @@ fn hashable_error(error: &ErrorSlice) -> HashableError {
         .collect()
 }
 
-fn render_errors<W: WriteColor>(
+pub fn render_errors<W: WriteColor>(
     writer: &mut W,
     files: &Files<String>,
     file_mapping: &FileMapping,
@@ -108,7 +108,7 @@ fn render_errors<W: WriteColor>(
     }
 }
 
-fn convert_loc(files: &Files<String>, file_mapping: &FileMapping, loc: Loc) -> (FileId, Span) {
+pub fn convert_loc(files: &Files<String>, file_mapping: &FileMapping, loc: Loc) -> (FileId, Span) {
     let fname = loc.file();
     let id = *file_mapping.get(fname).unwrap();
     let offset = files.source_span(id).start().to_usize();
@@ -117,7 +117,7 @@ fn convert_loc(files: &Files<String>, file_mapping: &FileMapping, loc: Loc) -> (
     (id, Span::new(begin_index, end_index))
 }
 
-fn render_error(files: &Files<String>, file_mapping: &FileMapping, mut error: Error) -> Diagnostic {
+pub fn render_error(files: &Files<String>, file_mapping: &FileMapping, mut error: Error) -> Diagnostic {
     let mk_lbl = |err: (Loc, String)| -> Label {
         let (id, span) = convert_loc(files, file_mapping, err.0);
         Label::new(id, span, err.1)

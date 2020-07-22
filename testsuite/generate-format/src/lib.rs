@@ -9,15 +9,15 @@ use std::str::FromStr;
 use structopt::{clap::arg_enum, StructOpt};
 
 /// Consensus messages.
-mod consensus;
+pub mod consensus;
 /// Libra transactions.
-mod libra;
+pub mod libra;
 /// Analyze Serde formats to detect certain patterns.
-mod linter;
+pub mod linter;
 /// Move ABI.
-mod move_abi;
+pub mod move_abi;
 /// Network messages.
-mod network;
+pub mod network;
 
 pub use linter::lint_lcs_format;
 

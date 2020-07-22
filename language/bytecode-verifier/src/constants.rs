@@ -16,7 +16,7 @@ pub fn verify_module(module: &CompiledModule) -> VMResult<()> {
     verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
 }
 
-fn verify_module_impl(module: &CompiledModule) -> PartialVMResult<()> {
+pub fn verify_module_impl(module: &CompiledModule) -> PartialVMResult<()> {
     for (idx, constant) in module.constant_pool().iter().enumerate() {
         verify_constant(idx, constant)?
     }
@@ -27,19 +27,19 @@ pub fn verify_script(module: &CompiledScript) -> VMResult<()> {
     verify_script_impl(module).map_err(|e| e.finish(Location::Script))
 }
 
-fn verify_script_impl(script: &CompiledScript) -> PartialVMResult<()> {
+pub fn verify_script_impl(script: &CompiledScript) -> PartialVMResult<()> {
     for (idx, constant) in script.as_inner().constant_pool.iter().enumerate() {
         verify_constant(idx, constant)?
     }
     Ok(())
 }
 
-fn verify_constant(idx: usize, constant: &Constant) -> PartialVMResult<()> {
+pub fn verify_constant(idx: usize, constant: &Constant) -> PartialVMResult<()> {
     verify_constant_type(idx, &constant.type_)?;
     verify_constant_data(idx, constant)
 }
 
-fn verify_constant_type(idx: usize, type_: &SignatureToken) -> PartialVMResult<()> {
+pub fn verify_constant_type(idx: usize, type_: &SignatureToken) -> PartialVMResult<()> {
     if type_.is_constant() {
         Ok(())
     } else {
@@ -51,7 +51,7 @@ fn verify_constant_type(idx: usize, type_: &SignatureToken) -> PartialVMResult<(
     }
 }
 
-fn verify_constant_data(idx: usize, constant: &Constant) -> PartialVMResult<()> {
+pub fn verify_constant_data(idx: usize, constant: &Constant) -> PartialVMResult<()> {
     match constant.deserialize_constant() {
         Some(_) => Ok(()),
         None => Err(verification_error(

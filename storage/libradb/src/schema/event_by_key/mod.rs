@@ -72,4 +72,4 @@ impl ValueCodec<EventByKeySchema> for Value {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

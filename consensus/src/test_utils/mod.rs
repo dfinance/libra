@@ -15,10 +15,10 @@ use libra_types::{ledger_info::LedgerInfo, validator_signer::ValidatorSigner};
 use std::{future::Future, sync::Arc, time::Duration};
 use tokio::{runtime, time::timeout};
 
-mod mock_state_computer;
-mod mock_storage;
+pub mod mock_state_computer;
+pub mod mock_storage;
 #[cfg(any(test, feature = "fuzzing"))]
-mod mock_txn_manager;
+pub mod mock_txn_manager;
 
 use crate::util::mock_time_service::SimulatedTimeService;
 use consensus_types::{block::block_test_utils::gen_test_certificate, common::Payload};
@@ -169,7 +169,7 @@ pub fn placeholder_sync_info() -> SyncInfo {
     SyncInfo::new(certificate_for_genesis(), certificate_for_genesis(), None)
 }
 
-fn nocapture() -> bool {
+pub fn nocapture() -> bool {
     ::std::env::args().any(|arg| arg == "--nocapture")
 }
 

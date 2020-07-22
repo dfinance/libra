@@ -195,7 +195,7 @@ impl Command {
         }
     }
 
-    fn unexpected_command(self, expected: CommandName) -> Error {
+    pub fn unexpected_command(self, expected: CommandName) -> Error {
         Error::UnexpectedCommand(expected.to_string(), CommandName::from(&self).to_string())
     }
 }

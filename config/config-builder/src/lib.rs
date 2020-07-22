@@ -1,11 +1,11 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod error;
-mod full_node_config;
-mod key_manager_config;
-mod swarm_config;
-mod validator_config;
+pub mod error;
+pub mod full_node_config;
+pub mod key_manager_config;
+pub mod swarm_config;
+pub mod validator_config;
 
 pub use crate::{
     error::Error,

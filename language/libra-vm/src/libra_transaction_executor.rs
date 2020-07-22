@@ -74,7 +74,7 @@ impl LibraVM {
         .1
     }
 
-    fn failed_transaction_cleanup_and_keep_vm_status(
+    pub fn failed_transaction_cleanup_and_keep_vm_status(
         &self,
         error_code: VMStatus,
         gas_schedule: &CostTable,
@@ -107,7 +107,7 @@ impl LibraVM {
         }
     }
 
-    fn success_transaction_cleanup<R: RemoteCache>(
+    pub fn success_transaction_cleanup<R: RemoteCache>(
         &self,
         mut session: Session<R>,
         gas_schedule: &CostTable,
@@ -135,7 +135,7 @@ impl LibraVM {
         ))
     }
 
-    fn execute_script(
+    pub fn execute_script(
         &self,
         remote_cache: &StateViewCache<'_>,
         cost_strategy: &mut CostStrategy,
@@ -188,7 +188,7 @@ impl LibraVM {
         }
     }
 
-    fn execute_module(
+    pub fn execute_module(
         &self,
         remote_cache: &StateViewCache<'_>,
         cost_strategy: &mut CostStrategy,
@@ -236,7 +236,7 @@ impl LibraVM {
         )
     }
 
-    fn execute_user_transaction(
+    pub fn execute_user_transaction(
         &mut self,
         remote_cache: &StateViewCache<'_>,
         txn: &SignatureCheckedTransaction,
@@ -303,7 +303,7 @@ impl LibraVM {
         }
     }
 
-    fn read_writeset(
+    pub fn read_writeset(
         &self,
         remote_cache: &StateViewCache<'_>,
         write_set: &WriteSet,
@@ -318,7 +318,7 @@ impl LibraVM {
         Ok(())
     }
 
-    fn process_waypoint_change_set(
+    pub fn process_waypoint_change_set(
         &mut self,
         remote_cache: &mut StateViewCache<'_>,
         change_set: ChangeSet,
@@ -332,7 +332,7 @@ impl LibraVM {
         ))
     }
 
-    fn process_block_prologue(
+    pub fn process_block_prologue(
         &mut self,
         remote_cache: &mut StateViewCache<'_>,
         block_metadata: BlockMetadata,
@@ -377,7 +377,7 @@ impl LibraVM {
         Ok((VMStatus::Executed, output))
     }
 
-    fn process_writeset_transaction(
+    pub fn process_writeset_transaction(
         &mut self,
         remote_cache: &mut StateViewCache<'_>,
         txn: SignatureCheckedTransaction,
@@ -516,7 +516,7 @@ impl LibraVM {
         ))
     }
 
-    fn execute_block_impl(
+    pub fn execute_block_impl(
         &mut self,
         transactions: Vec<Transaction>,
         data_cache: &mut StateViewCache,
@@ -610,7 +610,7 @@ impl LibraVM {
     }
 }
 
-fn preprocess_transaction(txn: Transaction) -> Result<PreprocessedTransaction, VMStatus> {
+pub fn preprocess_transaction(txn: Transaction) -> Result<PreprocessedTransaction, VMStatus> {
     Ok(match txn {
         Transaction::BlockMetadata(b) => PreprocessedTransaction::BlockPrologue(b),
         Transaction::WaypointWriteSet(cs) => PreprocessedTransaction::WaypointWriteSet(cs),
@@ -627,7 +627,7 @@ fn preprocess_transaction(txn: Transaction) -> Result<PreprocessedTransaction, V
     })
 }
 
-fn is_reconfiguration(vm_output: &TransactionOutput) -> bool {
+pub fn is_reconfiguration(vm_output: &TransactionOutput) -> bool {
     let new_epoch_event_key = libra_types::on_chain_config::new_epoch_event_key();
     vm_output
         .events()
@@ -637,7 +637,7 @@ fn is_reconfiguration(vm_output: &TransactionOutput) -> bool {
 
 /// Transactions divided by transaction flow.
 /// Transaction flows are different across different types of transactions.
-enum PreprocessedTransaction {
+pub enum PreprocessedTransaction {
     UserTransaction(Box<SignatureCheckedTransaction>),
     WaypointWriteSet(ChangeSet),
     BlockPrologue(BlockMetadata),
@@ -663,7 +663,7 @@ impl VMExecutor for LibraVM {
     }
 }
 
-pub(crate) fn discard_error_vm_status(err: VMStatus) -> (VMStatus, TransactionOutput) {
+pub fn discard_error_vm_status(err: VMStatus) -> (VMStatus, TransactionOutput) {
     let vm_status = err.clone();
     let error_code = match err.keep_or_discard() {
         Ok(_) => {
@@ -675,7 +675,7 @@ pub(crate) fn discard_error_vm_status(err: VMStatus) -> (VMStatus, TransactionOu
     (vm_status, discard_error_output(error_code))
 }
 
-pub(crate) fn discard_error_output(err: StatusCode) -> TransactionOutput {
+pub fn discard_error_output(err: StatusCode) -> TransactionOutput {
     // Since this transaction will be discarded, no writeset will be included.
     TransactionOutput::new(
         WriteSet::default(),
@@ -686,7 +686,7 @@ pub(crate) fn discard_error_output(err: StatusCode) -> TransactionOutput {
 }
 
 /// Convert the transaction arguments into move values.
-fn convert_txn_args(args: &[TransactionArgument]) -> Vec<Value> {
+pub fn convert_txn_args(args: &[TransactionArgument]) -> Vec<Value> {
     args.iter()
         .map(|arg| match arg {
             TransactionArgument::U8(i) => Value::u8(*i),

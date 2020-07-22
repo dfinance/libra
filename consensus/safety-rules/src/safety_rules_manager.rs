@@ -52,7 +52,7 @@ pub fn storage(config: &SafetyRulesConfig) -> PersistentSafetyStorage {
     }
 }
 
-enum SafetyRulesWrapper {
+pub enum SafetyRulesWrapper {
     Local(Arc<RwLock<SafetyRules>>),
     Process(ProcessService),
     Serializer(Arc<RwLock<SerializerService>>),

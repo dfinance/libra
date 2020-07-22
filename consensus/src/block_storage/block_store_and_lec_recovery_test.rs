@@ -27,7 +27,7 @@ use std::{
 };
 use storage_interface::DbReader;
 
-fn get_initial_data_and_qc(db: &dyn DbReader) -> (RecoveryData, QuorumCert) {
+pub fn get_initial_data_and_qc(db: &dyn DbReader) -> (RecoveryData, QuorumCert) {
     // find the block corresponding to storage latest ledger info
     let startup_info = db
         .get_startup_info()
@@ -65,7 +65,7 @@ fn get_initial_data_and_qc(db: &dyn DbReader) -> (RecoveryData, QuorumCert) {
     )
 }
 
-fn build_inserter(
+pub fn build_inserter(
     config: &NodeConfig,
     initial_data: RecoveryData,
     lec_client: Box<dyn ExecutionCorrectness + Send + Sync>,

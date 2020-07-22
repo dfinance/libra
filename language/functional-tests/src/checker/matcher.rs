@@ -74,14 +74,14 @@ use aho_corasick::{AhoCorasick, AhoCorasickBuilder};
 
 /// A group consisting of 0 or more negative directives followed by an optional positive directive.
 /// An Aho-Corasick automaton is used for efficient matching.
-struct MatcherGroup<D> {
+pub struct MatcherGroup<D> {
     directives: Vec<(usize, D)>,
     automaton: AhoCorasick,
 }
 
 /// A group match consisting of the type of the match (p/n), the id of the matched directive and
 /// the start and end locations of the text matched (in bytes).
-struct GroupMatch {
+pub struct GroupMatch {
     is_positive: bool,
     directive_id: usize,
     start: usize,
@@ -144,7 +144,7 @@ where
 
 /// An iterator that steps through all matches produced by the given matcher groups
 /// against the (stringified) log.
-struct MatchIterator<'a, D, S> {
+pub struct MatchIterator<'a, D, S> {
     text: &'a [S],
     matcher_groups: &'a [MatcherGroup<D>],
     cur_entry_id: usize,

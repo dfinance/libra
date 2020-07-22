@@ -54,4 +54,4 @@ impl ValueCodec<EpochByVersionSchema> for u64 {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

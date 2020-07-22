@@ -8,7 +8,7 @@ use libra_types::validator_verifier::ValidatorVerifier;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 
-/// VoteMsg is the struct that is ultimately sent by the voter in response for
+/// VoteMsg is the pub struct that is ultimately sent by the voter in response for
 /// receiving a proposal.
 /// VoteMsg carries the `LedgerInfo` of a block that is going to be committed in case this vote
 /// is gathers QuorumCertificate (see the detailed explanation in the comments of `LedgerInfo`).

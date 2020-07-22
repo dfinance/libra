@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use bytecode_source_map::{
     mapping::SourceMapping,
@@ -20,7 +20,7 @@ use vm::file_format::{CompiledModule, CompiledScript};
     name = "Move Bytecode Disassembler",
     about = "Print a human-readable version of Move bytecode (.mv files)"
 )]
-struct Args {
+pub struct Args {
     /// Skip printing of private functions.
     #[structopt(long = "skip-private")]
     pub skip_private: bool,

@@ -64,7 +64,7 @@ impl SerializerClient {
         Self { service }
     }
 
-    fn request(&mut self, input: SafetyRulesInput) -> Result<Vec<u8>, Error> {
+    pub fn request(&mut self, input: SafetyRulesInput) -> Result<Vec<u8>, Error> {
         self.service.request(input)
     }
 }
@@ -105,7 +105,7 @@ pub trait TSerializerClient: Send + Sync {
     fn request(&mut self, input: SafetyRulesInput) -> Result<Vec<u8>, Error>;
 }
 
-struct LocalService {
+pub struct LocalService {
     pub serializer_service: Arc<RwLock<SerializerService>>,
 }
 

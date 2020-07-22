@@ -11,7 +11,7 @@ use libra_types::{
 use proptest::{collection::vec, prelude::*};
 use std::path::Path;
 
-fn arb_ledger_infos_with_sigs() -> impl Strategy<Value = Vec<LedgerInfoWithSignatures>> {
+pub fn arb_ledger_infos_with_sigs() -> impl Strategy<Value = Vec<LedgerInfoWithSignatures>> {
     (
         any_with::<AccountInfoUniverse>(3),
         vec((any::<LedgerInfoWithSignaturesGen>(), 1..10usize), 1..10),
@@ -28,7 +28,7 @@ fn arb_ledger_infos_with_sigs() -> impl Strategy<Value = Vec<LedgerInfoWithSigna
         })
 }
 
-fn get_first_epoch(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> u64 {
+pub fn get_first_epoch(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> u64 {
     ledger_infos_with_sigs
         .first()
         .unwrap()
@@ -36,11 +36,11 @@ fn get_first_epoch(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> u64 {
         .epoch()
 }
 
-fn get_last_epoch(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> u64 {
+pub fn get_last_epoch(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> u64 {
     ledger_infos_with_sigs.last().unwrap().ledger_info().epoch()
 }
 
-fn get_last_version(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> Version {
+pub fn get_last_version(ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> Version {
     ledger_infos_with_sigs
         .last()
         .unwrap()
@@ -178,7 +178,7 @@ proptest! {
     }
 }
 
-fn set_up(path: &impl AsRef<Path>, ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> LibraDB {
+pub fn set_up(path: &impl AsRef<Path>, ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) -> LibraDB {
     let db = LibraDB::new_for_test(path);
     let store = &db.ledger_store;
 
@@ -195,7 +195,7 @@ fn set_up(path: &impl AsRef<Path>, ledger_infos_with_sigs: &[LedgerInfoWithSigna
     db
 }
 
-fn put_transaction_infos(db: &LibraDB, txn_infos: &[TransactionInfo]) {
+pub fn put_transaction_infos(db: &LibraDB, txn_infos: &[TransactionInfo]) {
     let mut cs = ChangeSet::new();
     db.ledger_store
         .put_transaction_infos(0, txn_infos, &mut cs)

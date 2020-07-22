@@ -97,7 +97,7 @@ impl Stream for Listener {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use crate::transport::{memory::MemoryTransport, Transport};
     use futures::{
         executor::block_on,

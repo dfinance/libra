@@ -114,7 +114,7 @@ proptest! {
         hashes1 in vec(any::<HashValue>(), 0..100),
         hashes2 in vec(any::<HashValue>(), 0..100),
     ) {
-        // Construct an accumulator with hashes1.
+        // Conpub struct an accumulator with hashes1.
         let accumulator = InMemoryAccumulator::<TestOnlyHasher>::from_leaves(&hashes1);
 
         // Compute all the internal nodes in a bigger accumulator with combination of hashes1 and

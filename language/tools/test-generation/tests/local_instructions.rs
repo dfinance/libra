@@ -5,7 +5,7 @@ extern crate test_generation;
 use test_generation::abstract_state::{AbstractState, AbstractValue, BorrowState};
 use vm::file_format::{Bytecode, Kind, SignatureToken};
 
-mod common;
+pub mod common;
 
 #[test]
 fn bytecode_copyloc() {

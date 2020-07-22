@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use libra_config::config::PersistableConfig;
 use libra_logger::prelude::*;
@@ -20,7 +20,7 @@ pub type SeedPeersConfig = HashMap<PeerId, Vec<NetworkAddress>>;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Tool to generate configs from chain")]
-struct Args {
+pub struct Args {
     #[structopt(short = "o", long, parse(from_os_str))]
     /// The output directory
     output_dir: PathBuf,
@@ -59,14 +59,14 @@ fn main() {
 }
 
 /// Retrieve validator set from the JSON-RPC endpoint
-fn get_validator_set(endpoint: String, peer_id: PeerId) -> anyhow::Result<Option<ValidatorSet>> {
+pub fn get_validator_set(endpoint: String, peer_id: PeerId) -> anyhow::Result<Option<ValidatorSet>> {
     let json_rpc = JsonRpcClient::new(endpoint);
     let account_state = json_rpc.get_account_state(peer_id, None)?;
     Ok(account_state.get_validator_set()?)
 }
 
 /// Convert ValidatorInfo to a seed peer
-fn to_seed_peer(
+pub fn to_seed_peer(
     validator_info: &ValidatorInfo,
 ) -> Result<(PeerId, Vec<NetworkAddress>), lcs::Error> {
     let peer_id = *validator_info.account_address();

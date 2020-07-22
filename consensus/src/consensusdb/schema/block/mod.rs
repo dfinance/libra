@@ -73,4 +73,4 @@ impl ValueCodec<BlockSchema> for SchemaBlock {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

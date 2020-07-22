@@ -35,7 +35,7 @@ use std::{
 /// It creates a worker thread on construction and joins it on destruction. When destructed, it
 /// quits the worker thread eagerly without waiting for all pending work to be done.
 #[derive(Debug)]
-pub(crate) struct Pruner {
+pub struct Pruner {
     /// Other than the latest version, how many historical versions to keep being readable. For
     /// example, this being 0 means keep only the latest version.
     historical_versions_to_keep: u64,
@@ -80,7 +80,7 @@ impl Pruner {
                 .send(Command::Prune {
                     least_readable_version,
                 })
-                .expect("Receiver should not destruct prematurely.");
+                .expect("Receiver should not depub struct prematurely.");
         }
     }
 
@@ -123,12 +123,12 @@ impl Drop for Pruner {
     }
 }
 
-enum Command {
+pub enum Command {
     Quit,
     Prune { least_readable_version: Version },
 }
 
-struct Worker {
+pub struct Worker {
     db: Arc<DB>,
     command_receiver: Receiver<Command>,
     target_least_readable_version: Version,
@@ -146,7 +146,7 @@ struct Worker {
 impl Worker {
     const MAX_VERSIONS_TO_PRUNE_PER_BATCH: usize = 100;
 
-    fn new(
+    pub fn new(
         db: Arc<DB>,
         command_receiver: Receiver<Command>,
         least_readable_version: Arc<AtomicU64>,
@@ -162,7 +162,7 @@ impl Worker {
         }
     }
 
-    fn work_loop(mut self) {
+    pub fn work_loop(mut self) {
         while self.receive_commands() {
             // Process a reasonably small batch of work before trying to receive commands again,
             // in case `Command::Quit` is received (that's when we should quit.)
@@ -207,13 +207,13 @@ impl Worker {
     ///
     /// Returns `false` if `Command::Quit` is received, to break the outer loop and let
     /// `work_loop()` return.
-    fn receive_commands(&mut self) -> bool {
+    pub fn receive_commands(&mut self) -> bool {
         loop {
             let command = if self.blocking_recv {
                 // Worker has nothing to do, blocking wait for the next command.
                 self.command_receiver
                     .recv()
-                    .expect("Sender should not destruct prematurely.")
+                    .expect("Sender should not depub struct prematurely.")
             } else {
                 // Worker has pending work to do, non-blocking recv.
                 match self.command_receiver.try_recv() {
@@ -245,7 +245,7 @@ impl Worker {
     ///
     /// We issue (range) deletes on the index only periodically instead of after every pruning batch
     /// to avoid sending too many deletions to the DB, which takes disk space and slows it down.
-    fn maybe_purge_index(&mut self) -> Result<()> {
+    pub fn maybe_purge_index(&mut self) -> Result<()> {
         const MIN_INTERVAL: Duration = Duration::from_secs(60);
         const MIN_VERSIONS: u64 = 60000;
 
@@ -271,13 +271,13 @@ impl Worker {
     }
 }
 
-struct StaleNodeIndicesByVersionIterator<'a> {
+pub struct StaleNodeIndicesByVersionIterator<'a> {
     inner: Peekable<SchemaIterator<'a, StaleNodeIndexSchema>>,
     target_least_readable_version: Version,
 }
 
 impl<'a> StaleNodeIndicesByVersionIterator<'a> {
-    fn new(
+    pub fn new(
         db: &'a DB,
         least_readable_version: Version,
         target_least_readable_version: Version,
@@ -291,7 +291,7 @@ impl<'a> StaleNodeIndicesByVersionIterator<'a> {
         })
     }
 
-    fn next_result(&mut self) -> Result<Option<Vec<StaleNodeIndex>>> {
+    pub fn next_result(&mut self) -> Result<Option<Vec<StaleNodeIndex>>> {
         match self.inner.next().transpose()? {
             None => Ok(None),
             Some((index, _)) => {
@@ -358,4 +358,4 @@ pub fn prune_state(
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

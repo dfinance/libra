@@ -81,7 +81,7 @@ pub unsafe extern "C" fn libra_LibraEvent_from(
             Ok(res) => res,
             Err(e) => {
                 update_last_error(format!(
-                    "Error converting struct tag name to string: {}",
+                    "Error converting pub struct tag name to string: {}",
                     e.to_string()
                 ));
                 return LibraStatus::InvalidArgument;

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 use std::{cmp::min, env};
 
 use crate::{
@@ -19,7 +19,7 @@ pub struct ExperimentSuite {
 }
 
 impl ExperimentSuite {
-    fn new_pre_release(cluster: &Cluster) -> Self {
+    pub fn new_pre_release(cluster: &Cluster) -> Self {
         let mut experiments: Vec<Box<dyn Experiment>> = vec![];
         if env::var("RECOVERY_EXP").is_ok() {
             experiments.push(Box::new(
@@ -60,7 +60,7 @@ impl ExperimentSuite {
         Self { experiments }
     }
 
-    fn new_perf_suite(cluster: &Cluster) -> Self {
+    pub fn new_perf_suite(cluster: &Cluster) -> Self {
         let mut experiments: Vec<Box<dyn Experiment>> = vec![];
         experiments.push(Box::new(
             PerformanceBenchmarkParams::new_nodes_down(0).build(cluster),
@@ -77,7 +77,7 @@ impl ExperimentSuite {
         Self { experiments }
     }
 
-    fn new_land_blocking_suite(cluster: &Cluster) -> Self {
+    pub fn new_land_blocking_suite(cluster: &Cluster) -> Self {
         let mut experiments: Vec<Box<dyn Experiment>> = vec![];
         experiments.push(Box::new(
             PerformanceBenchmarkParams::new_nodes_down(0).build(cluster),
@@ -85,7 +85,7 @@ impl ExperimentSuite {
         Self { experiments }
     }
 
-    fn new_land_blocking_compat_suite(cluster: &Cluster) -> Result<Self> {
+    pub fn new_land_blocking_compat_suite(cluster: &Cluster) -> Result<Self> {
         let count: usize = match env::var("BATCH_SIZE") {
             Ok(val) => val
                 .parse()

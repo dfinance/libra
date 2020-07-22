@@ -78,7 +78,7 @@ fn test_round_event_generation() {
     );
 }
 
-fn make_round_state() -> (RoundState, channel::Receiver<Round>) {
+pub fn make_round_state() -> (RoundState, channel::Receiver<Round>) {
     let time_interval = Box::new(ExponentialTimeInterval::fixed(Duration::from_millis(2)));
     let simulated_time = SimulatedTimeService::auto_advance_until(Duration::from_millis(4));
     let (timeout_tx, timeout_rx) = channel::new_test(1_024);
@@ -88,19 +88,19 @@ fn make_round_state() -> (RoundState, channel::Receiver<Round>) {
     )
 }
 
-fn expect_qc(round: Round, event: Option<NewRoundEvent>) {
+pub fn expect_qc(round: Round, event: Option<NewRoundEvent>) {
     let event = event.unwrap();
     assert_eq!(round, event.round);
     assert_eq!(event.reason, NewRoundReason::QCReady);
 }
 
-fn expect_timeout(round: Round, event: Option<NewRoundEvent>) {
+pub fn expect_timeout(round: Round, event: Option<NewRoundEvent>) {
     let event = event.unwrap();
     assert_eq!(round, event.round);
     assert_eq!(event.reason, NewRoundReason::Timeout);
 }
 
-fn generate_sync_info(
+pub fn generate_sync_info(
     quorum_round: Option<Round>,
     timeout_round: Option<Round>,
     commit_round: Option<Round>,

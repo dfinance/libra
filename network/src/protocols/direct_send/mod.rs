@@ -32,7 +32,7 @@ use serde::Serialize;
 use std::fmt::Debug;
 
 #[cfg(test)]
-mod test;
+pub mod test;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DirectSendRequest {
@@ -130,7 +130,7 @@ impl DirectSend {
     }
 
     // Handle PeerNotification, which can only be NewMessage for now.
-    async fn handle_peer_notification(&mut self, notif: PeerNotification) {
+    pub async fn handle_peer_notification(&mut self, notif: PeerNotification) {
         trace!("PeerNotification::{:?}", notif);
         match notif {
             PeerNotification::NewMessage(message) => {
@@ -169,7 +169,7 @@ impl DirectSend {
 
     // Handle DirectSendRequest, which can only be SendMessage request for now.
     // Tries to synchronously send a message to the peer handle.
-    async fn handle_direct_send_request(&mut self, req: DirectSendRequest) {
+    pub async fn handle_direct_send_request(&mut self, req: DirectSendRequest) {
         trace!("DirectSendRequest::{:?}", req);
         match req {
             DirectSendRequest::SendMessage(msg) => {

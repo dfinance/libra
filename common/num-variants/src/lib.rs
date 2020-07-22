@@ -1,9 +1,9 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-//! Add an associated constant to an enum describing the number of variants it has.
+//! Add an associated constant to anpub enum describing the number of variants it has.
 
-#![forbid(unsafe_code)]
+
 #![warn(missing_docs)]
 
 extern crate proc_macro;
@@ -15,7 +15,7 @@ use syn::{
     MetaNameValue, Result,
 };
 
-/// Derives an associated constant with the number of variants this enum has.
+/// Derives an associated constant with the number of variants thispub enum has.
 ///
 /// The default constant name is `NUM_VARIANTS`. This can be customized with `#[num_variants =
 /// "FOO")]`.

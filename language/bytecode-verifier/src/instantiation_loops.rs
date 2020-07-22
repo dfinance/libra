@@ -32,10 +32,10 @@ use vm::{
 /// Data attached to each node.
 /// Each node corresponds to a type formal of a generic function in the module.
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
-struct Node(FunctionDefinitionIndex, TypeParameterIndex);
+pub struct Node(FunctionDefinitionIndex, TypeParameterIndex);
 
 /// Data attached to each edge. Indicating the type of the edge.
-enum Edge<'a> {
+pub enum Edge<'a> {
     /// This type of edge from type formal T1 to T2 means the type bound to T1 is used to
     /// instantiate T2 unmodified, thus the name `Identity`.
     ///
@@ -53,7 +53,7 @@ enum Edge<'a> {
     ///
     /// Example:
     /// ```
-    /// //    struct Baz<T> {}
+    /// //    pub struct Baz<T> {}
     /// //    foo<T>() { bar<Baz<T>>(); return; }
     /// //
     /// //    edge: foo_T --TyConApp(Baz<T>)--> bar_T
@@ -70,7 +70,7 @@ pub struct InstantiationLoopChecker<'a> {
 }
 
 impl<'a> InstantiationLoopChecker<'a> {
-    fn new(module: &'a CompiledModule) -> Self {
+    pub fn new(module: &'a CompiledModule) -> Self {
         Self {
             module,
             graph: Graph::new(),
@@ -88,7 +88,7 @@ impl<'a> InstantiationLoopChecker<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         let mut checker = Self::new(module);
         checker.build_graph();
         let mut components = checker.find_non_trivial_components();
@@ -122,7 +122,7 @@ impl<'a> InstantiationLoopChecker<'a> {
 
     /// Retrives the node corresponding to the specified type formal.
     /// If none exists in the graph yet, create one.
-    fn get_or_add_node(&mut self, node: Node) -> NodeIndex {
+    pub fn get_or_add_node(&mut self, node: Node) -> NodeIndex {
         match self.node_map.entry(node) {
             hash_map::Entry::Occupied(entry) => *entry.get(),
             hash_map::Entry::Vacant(entry) => {
@@ -135,12 +135,12 @@ impl<'a> InstantiationLoopChecker<'a> {
 
     /// Helper function that extracts type parameters from a given type.
     /// Duplicated entries are removed.
-    fn extract_type_parameters(&self, ty: &SignatureToken) -> HashSet<TypeParameterIndex> {
+    pub fn extract_type_parameters(&self, ty: &SignatureToken) -> HashSet<TypeParameterIndex> {
         use SignatureToken::*;
 
         let mut type_params = HashSet::new();
 
-        fn rec(type_params: &mut HashSet<TypeParameterIndex>, ty: &SignatureToken) {
+        pub fn rec(type_params: &mut HashSet<TypeParameterIndex>, ty: &SignatureToken) {
             match ty {
                 Bool | Address | U8 | U64 | U128 | Signer | Struct(_) => (),
                 TypeParameter(idx) => {
@@ -162,7 +162,7 @@ impl<'a> InstantiationLoopChecker<'a> {
 
     /// Helper function that creates an edge from one given node to the other.
     /// If a node does not exist, create one.
-    fn add_edge(&mut self, node_from: Node, node_to: Node, edge: Edge<'a>) {
+    pub fn add_edge(&mut self, node_from: Node, node_to: Node, edge: Edge<'a>) {
         let node_from_idx = self.get_or_add_node(node_from);
         let node_to_idx = self.get_or_add_node(node_to);
         self.graph.add_edge(node_from_idx, node_to_idx, edge);
@@ -170,7 +170,7 @@ impl<'a> InstantiationLoopChecker<'a> {
 
     /// Helper of 'fn build_graph' that inspects a function call. If type parameters of the caller
     /// appear in the type actuals to the callee, nodes and edges are added to the graph.
-    fn build_graph_call(
+    pub fn build_graph_call(
         &mut self,
         caller_idx: FunctionDefinitionIndex,
         callee_idx: FunctionDefinitionIndex,
@@ -201,7 +201,7 @@ impl<'a> InstantiationLoopChecker<'a> {
 
     /// Helper of `fn build_graph` that inspects a function definition for calls between two generic
     /// functions defined in the current module.
-    fn build_graph_function_def(
+    pub fn build_graph_function_def(
         &mut self,
         caller_idx: FunctionDefinitionIndex,
         caller_def: &FunctionDefinition,
@@ -227,7 +227,7 @@ impl<'a> InstantiationLoopChecker<'a> {
     ///   - There is an edge from type formal f_T to g_T if f_T is used to instantiate g_T in a
     ///     call.
     ///     - Each edge is labeled either `Identity` or `TyConApp`. See `Edge` for details.
-    fn build_graph(&mut self) {
+    pub fn build_graph(&mut self) {
         for (def_idx, func_def) in self
             .module
             .function_defs()
@@ -243,7 +243,7 @@ impl<'a> InstantiationLoopChecker<'a> {
     /// contain at least one `TyConApp` edge. Such components indicate there exists a loop such
     /// that an input type can get "bigger" infinitely many times along the loop, also creating
     /// infinitely many types. This is precisely the kind of constructs we want to forbid.
-    fn find_non_trivial_components(&self) -> Vec<(Vec<NodeIndex>, Vec<EdgeIndex>)> {
+    pub fn find_non_trivial_components(&self) -> Vec<(Vec<NodeIndex>, Vec<EdgeIndex>)> {
         tarjan_scc(&self.graph)
             .into_iter()
             .filter_map(move |nodes| {
@@ -276,12 +276,12 @@ impl<'a> InstantiationLoopChecker<'a> {
             .collect()
     }
 
-    fn format_node(&self, node_idx: NodeIndex) -> String {
+    pub fn format_node(&self, node_idx: NodeIndex) -> String {
         let Node(def_idx, param_idx) = self.graph.node_weight(node_idx).unwrap();
         format!("f{}#{}", def_idx, param_idx)
     }
 
-    fn format_edge(&self, edge_idx: EdgeIndex) -> String {
+    pub fn format_edge(&self, edge_idx: EdgeIndex) -> String {
         let (node_idx_1, node_idx_2) = self.graph.edge_endpoints(edge_idx).unwrap();
         let node_1 = self.format_node(node_idx_1);
         let node_2 = self.format_node(node_idx_2);

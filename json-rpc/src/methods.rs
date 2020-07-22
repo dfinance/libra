@@ -34,7 +34,7 @@ use std::{collections::HashMap, convert::TryFrom, ops::Deref, pin::Pin, str::Fro
 use storage_interface::DbReader;
 
 #[derive(Clone)]
-pub(crate) struct JsonRpcService {
+pub struct JsonRpcService {
     db: Arc<dyn DbReader>,
     mempool_sender: MempoolClientSender,
     role: RoleType,
@@ -68,9 +68,9 @@ impl JsonRpcService {
 type RpcHandler =
     Box<fn(JsonRpcService, JsonRpcRequest) -> Pin<Box<dyn Future<Output = Result<Value>> + Send>>>;
 
-pub(crate) type RpcRegistry = HashMap<String, RpcHandler>;
+pub type RpcRegistry = HashMap<String, RpcHandler>;
 
-pub(crate) struct JsonRpcRequest {
+pub struct JsonRpcRequest {
     pub params: Vec<Value>,
     pub ledger_info: LedgerInfoWithSignatures,
 }
@@ -78,26 +78,26 @@ pub(crate) struct JsonRpcRequest {
 impl JsonRpcRequest {
     /// Returns the request parameter at the given index.
     /// Returns Null if given index is out of bounds.
-    fn get_param(&self, index: usize) -> Value {
+    pub fn get_param(&self, index: usize) -> Value {
         self.get_param_with_default(index, Value::Null)
     }
 
     /// Returns the request parameter at the given index.
     /// Returns default Value if given index is out of bounds.
-    fn get_param_with_default(&self, index: usize, default: Value) -> Value {
+    pub fn get_param_with_default(&self, index: usize, default: Value) -> Value {
         if self.params.len() > index {
             return self.params[index].clone();
         }
         default
     }
 
-    fn version(&self) -> u64 {
+    pub fn version(&self) -> u64 {
         self.ledger_info.ledger_info().version()
     }
 }
 
 /// Submits transaction to full node
-async fn submit(mut service: JsonRpcService, request: JsonRpcRequest) -> Result<()> {
+pub async fn submit(mut service: JsonRpcService, request: JsonRpcRequest) -> Result<()> {
     let txn_payload: String = serde_json::from_value(request.get_param(0))?;
     let transaction: SignedTransaction = lcs::from_bytes(&hex::decode(txn_payload)?)?;
     trace_code_block!("json-rpc::submit", {"txn", transaction.sender(), transaction.sequence_number()});
@@ -119,7 +119,7 @@ async fn submit(mut service: JsonRpcService, request: JsonRpcRequest) -> Result<
 }
 
 /// Returns account state (AccountView) by given address
-async fn get_account(
+pub async fn get_account(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<Option<AccountView>> {
@@ -156,7 +156,7 @@ async fn get_account(
 /// Returns the blockchain metadata for a specified version. If no version is specified, default to
 /// returning the current blockchain metadata
 /// Can be used to verify that target Full Node is up-to-date
-async fn get_metadata(service: JsonRpcService, request: JsonRpcRequest) -> Result<BlockMetadata> {
+pub async fn get_metadata(service: JsonRpcService, request: JsonRpcRequest) -> Result<BlockMetadata> {
     match serde_json::from_value::<u64>(request.get_param(0)) {
         Ok(version) => Ok(BlockMetadata {
             version,
@@ -170,7 +170,7 @@ async fn get_metadata(service: JsonRpcService, request: JsonRpcRequest) -> Resul
 }
 
 /// Returns transactions by range
-async fn get_transactions(
+pub async fn get_transactions(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<Vec<TransactionView>> {
@@ -228,7 +228,7 @@ async fn get_transactions(
 }
 
 /// Returns account transaction by account and sequence_number
-async fn get_account_transaction(
+pub async fn get_account_transaction(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<Option<TransactionView>> {
@@ -272,7 +272,7 @@ async fn get_account_transaction(
 }
 
 /// Returns events by given access path
-async fn get_events(service: JsonRpcService, request: JsonRpcRequest) -> Result<Vec<EventView>> {
+pub async fn get_events(service: JsonRpcService, request: JsonRpcRequest) -> Result<Vec<EventView>> {
     let raw_event_key: String = serde_json::from_value(request.get_param(0))?;
     let start: u64 = serde_json::from_value(request.get_param(1))?;
     let limit: u64 = serde_json::from_value(request.get_param(2))?;
@@ -290,7 +290,7 @@ async fn get_events(service: JsonRpcService, request: JsonRpcRequest) -> Result<
 }
 
 /// Returns meta information about supported currencies
-async fn currencies_info(
+pub async fn currencies_info(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<Vec<CurrencyInfoView>> {
@@ -319,7 +319,7 @@ async fn currencies_info(
 }
 
 /// Returns proof of new state relative to version known to client
-async fn get_state_proof(
+pub async fn get_state_proof(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<StateProofView> {
@@ -333,7 +333,7 @@ async fn get_state_proof(
 /// Returns the account state to the client, alongside a proof relative to the version and
 /// ledger_version specified by the client. If version or ledger_version are not specified,
 /// the latest known versions will be used.
-async fn get_account_state_with_proof(
+pub async fn get_account_state_with_proof(
     service: JsonRpcService,
     request: JsonRpcRequest,
 ) -> Result<AccountStateWithProofView> {
@@ -356,7 +356,7 @@ async fn get_account_state_with_proof(
 }
 
 /// Returns the number of peers this node is connected to
-async fn get_network_status(service: JsonRpcService, _request: JsonRpcRequest) -> Result<u64> {
+pub async fn get_network_status(service: JsonRpcService, _request: JsonRpcRequest) -> Result<u64> {
     let blah = counters::LIBRA_NETWORK_PEERS
         .get_metric_with_label_values(&[service.role.as_str(), "connected"])?;
     Ok(blah.get() as u64)
@@ -366,7 +366,7 @@ async fn get_network_status(service: JsonRpcService, _request: JsonRpcRequest) -
 /// To register new RPC method, add it via `register_rpc_method!` macros call
 /// Note that RPC method name will equal to name of function
 #[allow(unused_comparisons)]
-pub(crate) fn build_registry() -> RpcRegistry {
+pub fn build_registry() -> RpcRegistry {
     let mut registry = RpcRegistry::new();
     register_rpc_method!(registry, "submit", submit, 1, 0);
     register_rpc_method!(registry, "get_metadata", get_metadata, 0, 1);

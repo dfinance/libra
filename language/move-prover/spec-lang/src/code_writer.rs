@@ -8,7 +8,7 @@ use codespan::{ByteIndex, ByteOffset, ColumnIndex, Files, LineIndex, RawIndex, R
 use crate::env::Loc;
 use std::cell::RefCell;
 
-struct CodeWriterData {
+pub struct CodeWriterData {
     /// The generated output string.
     output: String,
 
@@ -169,7 +169,7 @@ impl CodeWriter {
         }
     }
 
-    fn trim_trailing_whitespace(s: &mut String) {
+    pub fn trim_trailing_whitespace(s: &mut String) {
         s.truncate(s.trim_end_matches(' ').len());
     }
 
@@ -180,7 +180,7 @@ impl CodeWriter {
     }
 
     /// Helper for emitting a string for a single line.
-    fn emit_str(&self, s: &str) {
+    pub fn emit_str(&self, s: &str) {
         let mut data = self.0.borrow_mut();
         // If we are looking at the beginning of a new line, emit indent now.
         if data.indent > 0 && (data.output.is_empty() || data.output.ends_with('\n')) {

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use anyhow::Context;
 use bytecode_verifier::{verify_module, verify_script, DependencyChecker};
@@ -20,7 +20,7 @@ use vm::{errors::VMError, file_format::CompiledModule};
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "IR Compiler", about = "Move IR to bytecode compiler.")]
-struct Args {
+pub struct Args {
     /// Treat input file as a module (default is to treat file as a script)
     #[structopt(short = "m", long = "module")]
     pub module_input: bool,
@@ -47,13 +47,13 @@ struct Args {
     pub output_source_maps: bool,
 }
 
-fn print_error_and_exit(verification_error: &VMError) -> ! {
+pub fn print_error_and_exit(verification_error: &VMError) -> ! {
     println!("Verification failed:");
     println!("{:?}", verification_error);
     std::process::exit(1);
 }
 
-fn do_verify_module(module: CompiledModule, dependencies: &[CompiledModule]) -> CompiledModule {
+pub fn do_verify_module(module: CompiledModule, dependencies: &[CompiledModule]) -> CompiledModule {
     verify_module(&module).unwrap_or_else(|err| print_error_and_exit(&err));
     if let Err(err) = DependencyChecker::verify_module(&module, dependencies) {
         print_error_and_exit(&err);
@@ -61,7 +61,7 @@ fn do_verify_module(module: CompiledModule, dependencies: &[CompiledModule]) -> 
     module
 }
 
-fn write_output(path: &PathBuf, buf: &[u8]) {
+pub fn write_output(path: &PathBuf, buf: &[u8]) {
     let mut f = fs::File::create(path)
         .with_context(|| format!("Unable to open output file {:?}", path))
         .unwrap();

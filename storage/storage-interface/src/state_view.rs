@@ -50,7 +50,7 @@ pub struct VerifiedStateView<'a> {
     /// will be loaded into the cache from scratchpad or persistent storage in order as a
     /// deserialized ordered map and then be returned. If the VM queries this account again,
     /// the cached data can be read directly without bothering storage layer. The proofs in
-    /// cache are needed by ScratchPad after VM execution to construct an in-memory sparse Merkle
+    /// cache are needed by ScratchPad after VM execution to conpub struct an in-memory sparse Merkle
     /// tree.
     /// ```text
     ///                      +----------------------------+

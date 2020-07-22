@@ -163,7 +163,7 @@ fn test_unsupported_hash_functions() {
 }
 
 // Test Vectors for sha256 from https://tools.ietf.org/html/rfc5869.
-struct Test<'a> {
+pub struct Test<'a> {
     ikm: &'a str,
     salt: &'a str,
     info: &'a str,

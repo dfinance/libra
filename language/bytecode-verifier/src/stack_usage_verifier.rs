@@ -18,7 +18,7 @@ use vm::{
     file_format::{Bytecode, CodeUnit, FunctionDefinitionIndex, Signature, StructFieldInformation},
 };
 
-pub(crate) struct StackUsageVerifier<'a> {
+pub struct StackUsageVerifier<'a> {
     resolver: &'a BinaryIndexedView<'a>,
     current_function: Option<FunctionDefinitionIndex>,
     code: &'a CodeUnit,
@@ -26,7 +26,7 @@ pub(crate) struct StackUsageVerifier<'a> {
 }
 
 impl<'a> StackUsageVerifier<'a> {
-    pub(crate) fn verify(
+    pub fn verify(
         resolver: &'a BinaryIndexedView<'a>,
         function_view: &'a FunctionView,
     ) -> PartialVMResult<()> {
@@ -43,7 +43,7 @@ impl<'a> StackUsageVerifier<'a> {
         Ok(())
     }
 
-    fn verify_block(&self, block_id: BlockId, cfg: &dyn ControlFlowGraph) -> PartialVMResult<()> {
+    pub fn verify_block(&self, block_id: BlockId, cfg: &dyn ControlFlowGraph) -> PartialVMResult<()> {
         let code = &self.code.code;
         let mut stack_size_increment = 0;
         let block_start = cfg.block_start(block_id);
@@ -74,7 +74,7 @@ impl<'a> StackUsageVerifier<'a> {
     /// The effect of an instruction is a tuple where the first element
     /// is the number of pops it does, and the second element is the number
     /// of pushes it does
-    fn instruction_effect(&self, instruction: &Bytecode) -> PartialVMResult<(u32, u32)> {
+    pub fn instruction_effect(&self, instruction: &Bytecode) -> PartialVMResult<(u32, u32)> {
         Ok(match instruction {
             // Instructions that pop, but don't push
             Bytecode::Pop
@@ -206,7 +206,7 @@ impl<'a> StackUsageVerifier<'a> {
         })
     }
 
-    fn current_function(&self) -> FunctionDefinitionIndex {
+    pub fn current_function(&self) -> FunctionDefinitionIndex {
         self.current_function.unwrap_or(FunctionDefinitionIndex(0))
     }
 }

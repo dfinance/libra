@@ -1,22 +1,22 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod consensus_state;
-mod counters;
-mod error;
-mod local_client;
-mod logging;
-mod persistent_safety_storage;
-mod process;
-mod remote_service;
-mod safety_rules;
-mod safety_rules_manager;
-mod serializer;
-mod spawned_process;
-mod t_safety_rules;
-mod thread;
+
+pub mod consensus_state;
+pub mod counters;
+pub mod error;
+pub mod local_client;
+pub mod logging;
+pub mod persistent_safety_storage;
+pub mod process;
+pub mod remote_service;
+pub mod safety_rules;
+pub mod safety_rules_manager;
+pub mod serializer;
+pub mod spawned_process;
+pub mod t_safety_rules;
+pub mod thread;
 
 pub use crate::{
     consensus_state::ConsensusState, counters::COUNTERS, error::Error,
@@ -34,4 +34,4 @@ pub mod process_client_wrapper;
 pub mod test_utils;
 
 #[cfg(test)]
-mod tests;
+pub mod tests;

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! # Grammar
 //! ## Identifiers
@@ -16,8 +16,8 @@
 //! ## Types
 //! ```text
 //! k ∈ Kind ::=
-//!   | R // Linear resource struct value. Must be used, cannot be copied
-//!   | V // Non-resource struct value. Can be silently discarded, can be copied
+//!   | R // Linear resource pub struct value. Must be used, cannot be copied
+//!   | V // Non-resource pub struct value. Can be silently discarded, can be copied
 //!
 //! g ∈ GroundType ::=
 //!   | bool
@@ -33,7 +33,7 @@
 //!
 //! t ∈ BaseType ::=
 //!   | g     // ground type
-//!   | k#d.n // struct 'n' declared in the module referenced by 'd' with kind 'k'
+//!   | k#d.n // pub struct 'n' declared in the module referenced by 'd' with kind 'k'
 //!           // the kind 'k' cannot differ from the declared kind
 //!
 //! 𝛕 ∈ Type ::=
@@ -70,8 +70,8 @@
 //!   | &x        // type: 't -> &mut t'
 //!               // creates an exclusive, mutable reference to a local
 //!   | &e.f      // type: '&t_1 -> &t_2' or '&mut t_1 -> &mut t_2'
-//!               // borrows a new reference to field 'f' of the struct 't_1'. inherits exclusive or shared from parent
-//!               // 't_1' must be a struct declared in the current module, i.e. 'f' is "private"
+//!               // borrows a new reference to field 'f' of the pub struct 't_1'. inherits exclusive or shared from parent
+//!               // 't_1' must be a pub struct declared in the current module, i.e. 'f' is "private"
 //!   | *e        // type: '&t -> t' or '&mut t -> t'. Dereferencing. Not valid for resources
 //!
 //! e ∈ Exp ::=
@@ -108,14 +108,14 @@
 //! // module operators are available only inside the module that declares n.
 //! mop ∈ ModuleOp ::=
 //!   | move_from<n>(e)      // type: 'address -> Self.n'
-//!                          // removes the resource struct 'n' at the specified address
+//!                          // removes the resource pub struct 'n' at the specified address
 //!                          // fails if there is no resource present for 'Self.n'
 //!   | borrow_global<n>(e)  // type: 'address -> &mut Self.n'
-//!                          // borrows a mutable reference to the resource struct 'n' at the specified address
+//!                          // borrows a mutable reference to the resource pub struct 'n' at the specified address
 //!                          // fails if there is no resource
 //!                          // fails if it is already borrowed in this transaction's execution
 //!   | exists<n>(e)         // type: 'address -> bool', s.t. 'n' is a resource struct
-//!                          // returns 'true' if the resource struct 'n' at the specified address exists
+//!                          // returns 'true' if the resource pub struct 'n' at the specified address exists
 //!                          // returns 'false' otherwise
 //!
 //! builtin ∈ Builtin ::=
@@ -142,7 +142,7 @@
 //!   | continue                            // return to the top of a loop
 //!   | return e_1, ..., e_n                // return values from procedure
 //!   | n { f_1: x_1, ... , f_j: x_j } = e  // "de-constructor" for 'n'
-//!                                         // "unpacks" a struct value 'e: _#Self.n'
+//!                                         // "unpacks" a pub struct value 'e: _#Self.n'
 //!                                         // value for 'f_i' is bound to local 'x_i'
 //! ```
 //!
@@ -167,7 +167,7 @@
 //! ```text
 //! sdecl ∈ StructDecl ::=
 //!   | resource n { f_1: t_1, ..., f_j: t_j } // declaration of a resource struct
-//!   | struct n { f_1: t_1, ..., f_j: t_j }   // declaration of a non-resource (value) struct
+//!   | pub struct n { f_1: t_1, ..., f_j: t_j }   // declaration of a non-resource (value) struct
 //!                                            // s.t. any 't_i' is not of resource kind
 //!
 //! body ∈ ProcedureBody ::=
@@ -192,5 +192,5 @@
 //!   | idecl_1 ... idecl_i public main(x_1: g_1, ..., x_j: g_j) { s }
 //! ```
 
-mod lexer;
+pub mod lexer;
 pub mod syntax;

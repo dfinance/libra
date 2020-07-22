@@ -12,14 +12,14 @@ use move_ir_types::location::*;
 use petgraph::{algo::tarjan_scc as petgraph_scc, graphmap::DiGraphMap};
 use std::collections::BTreeMap;
 
-struct Context {
+pub struct Context {
     struct_neighbors: BTreeMap<StructName, BTreeMap<StructName, Loc>>,
     current_module: ModuleIdent,
     current_struct: Option<StructName>,
 }
 
 impl Context {
-    fn new(current_module: ModuleIdent) -> Self {
+    pub fn new(current_module: ModuleIdent) -> Self {
         Context {
             current_module,
             struct_neighbors: BTreeMap::new(),
@@ -27,7 +27,7 @@ impl Context {
         }
     }
 
-    fn add_usage(&mut self, loc: Loc, module: &ModuleIdent, sname: &StructName) {
+    pub fn add_usage(&mut self, loc: Loc, module: &ModuleIdent, sname: &StructName) {
         if &self.current_module != module {
             return;
         }
@@ -37,7 +37,7 @@ impl Context {
             .insert(sname.clone(), loc);
     }
 
-    fn struct_graph(&self) -> DiGraphMap<&StructName, ()> {
+    pub fn struct_graph(&self) -> DiGraphMap<&StructName, ()> {
         let edges = self
             .struct_neighbors
             .iter()
@@ -56,7 +56,7 @@ pub fn modules(errors: &mut Errors, modules: &UniqueMap<ModuleIdent, T::ModuleDe
         .for_each(|(mname, m)| module(errors, mname, m))
 }
 
-fn module(errors: &mut Errors, mname: ModuleIdent, module: &T::ModuleDefinition) {
+pub fn module(errors: &mut Errors, mname: ModuleIdent, module: &T::ModuleDefinition) {
     let context = &mut Context::new(mname);
     module
         .structs
@@ -72,7 +72,7 @@ fn module(errors: &mut Errors, mname: ModuleIdent, module: &T::ModuleDefinition)
         .for_each(|scc| errors.push(cycle_error(context, &graph, scc[0])))
 }
 
-fn struct_def(context: &mut Context, sname: StructName, sdef: &N::StructDefinition) {
+pub fn struct_def(context: &mut Context, sname: StructName, sdef: &N::StructDefinition) {
     assert!(context.current_struct == None, "ICE struct name not unset");
     context.current_struct = Some(sname);
     match &sdef.fields {
@@ -84,7 +84,7 @@ fn struct_def(context: &mut Context, sname: StructName, sdef: &N::StructDefiniti
     context.current_struct = None;
 }
 
-fn type_(context: &mut Context, sp!(loc, ty_): &N::Type) {
+pub fn type_(context: &mut Context, sp!(loc, ty_): &N::Type) {
     use N::Type_::*;
     match ty_ {
         Var(_) => panic!("ICE tvar in struct field type"),
@@ -99,7 +99,7 @@ fn type_(context: &mut Context, sp!(loc, ty_): &N::Type) {
     }
 }
 
-fn cycle_error(
+pub fn cycle_error(
     context: &Context,
     graph: &DiGraphMap<&StructName, ()>,
     cycle_node: &StructName,
@@ -120,7 +120,7 @@ fn cycle_error(
     vec![(used_loc, use_msg), (used_loc, cycle_msg)]
 }
 
-fn best_cycle_loc<'a>(
+pub fn best_cycle_loc<'a>(
     context: &'a Context,
     cycle: Vec<&'a StructName>,
 ) -> (Loc, &'a StructName, &'a StructName) {

@@ -90,7 +90,7 @@ impl Ed25519PrivateKey {
     }
 
     /// Deserialize an Ed25519PrivateKey without any validation checks apart from expected key size.
-    fn from_bytes_unchecked(
+    pub fn from_bytes_unchecked(
         bytes: &[u8],
     ) -> std::result::Result<Ed25519PrivateKey, CryptoMaterialError> {
         match ed25519_dalek::SecretKey::from_bytes(bytes) {
@@ -101,7 +101,7 @@ impl Ed25519PrivateKey {
 
     /// Private function aimed at minimizing code duplication between sign
     /// methods of the SigningKey implementation. This should remain private.
-    fn sign_arbitrary_message(&self, message: &[u8]) -> Ed25519Signature {
+    pub fn sign_arbitrary_message(&self, message: &[u8]) -> Ed25519Signature {
         let secret_key: &ed25519_dalek::SecretKey = &self.0;
         let public_key: Ed25519PublicKey = self.into();
         let expanded_secret_key: ed25519_dalek::ExpandedSecretKey =
@@ -118,7 +118,7 @@ impl Ed25519PublicKey {
     }
 
     /// Deserialize an Ed25519PublicKey without any validation checks apart from expected key size.
-    pub(crate) fn from_bytes_unchecked(
+    pub fn from_bytes_unchecked(
         bytes: &[u8],
     ) -> std::result::Result<Ed25519PublicKey, CryptoMaterialError> {
         match ed25519_dalek::PublicKey::from_bytes(bytes) {
@@ -142,7 +142,7 @@ impl Ed25519PublicKey {
     ///               x25519 public key, you should pass `false` for this
     ///               argument.
     #[cfg(test)]
-    pub(crate) fn from_x25519_public_bytes(
+    pub fn from_x25519_public_bytes(
         x25519_bytes: &[u8],
         negative: bool,
     ) -> Result<Self, CryptoMaterialError> {
@@ -174,7 +174,7 @@ impl Ed25519Signature {
 
     /// Deserialize an Ed25519Signature without any validation checks (malleability)
     /// apart from expected key size.
-    pub(crate) fn from_bytes_unchecked(
+    pub fn from_bytes_unchecked(
         bytes: &[u8],
     ) -> std::result::Result<Ed25519Signature, CryptoMaterialError> {
         match ed25519_dalek::Signature::from_bytes(bytes) {
@@ -369,7 +369,7 @@ impl TryFrom<&[u8]> for Ed25519PublicKey {
             return Err(CryptoMaterialError::SmallSubgroupError);
         }
 
-        // Unfortunately, tuple struct `PublicKey` is private so we cannot
+        // Unfortunately, tuple pub struct `PublicKey` is private so we cannot
         // Ok(Ed25519PublicKey(ed25519_dalek::PublicKey(compressed, point)))
         // and we have to again invoke deserialization.
         Ed25519PublicKey::from_bytes_unchecked(bytes)

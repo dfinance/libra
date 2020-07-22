@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use anyhow::Result;
 use libra_state_view::StateView;
@@ -11,18 +11,18 @@ use std::collections::HashMap;
 use vm::CompiledModule;
 
 // `StateView` has no data given we are creating the genesis
-pub(crate) struct GenesisStateView {
+pub struct GenesisStateView {
     data: HashMap<AccessPath, Vec<u8>>,
 }
 
 impl GenesisStateView {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             data: HashMap::new(),
         }
     }
 
-    pub(crate) fn add_module(&mut self, module_id: &ModuleId, module: &CompiledModule) {
+    pub fn add_module(&mut self, module_id: &ModuleId, module: &CompiledModule) {
         let access_path = AccessPath::from(module_id);
         let mut blob = vec![];
         module

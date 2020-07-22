@@ -14,7 +14,7 @@ pub mod python3;
 pub mod rust;
 
 /// Internals shared between languages.
-mod common;
+pub mod common;
 
 /// Read all ABI files in a directory.
 pub fn read_abis<P: AsRef<std::path::Path>>(dir_path: P) -> anyhow::Result<Vec<ScriptABI>> {

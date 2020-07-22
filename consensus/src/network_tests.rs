@@ -370,7 +370,7 @@ impl NetworkPlayground {
     }
 }
 
-struct AuthorToTwinIds(HashMap<Author, Vec<TwinId>>);
+pub struct AuthorToTwinIds(HashMap<Author, Vec<TwinId>>);
 
 impl AuthorToTwinIds {
     pub fn extend_author_to_twin_ids(&mut self, author: Author, twin_id: TwinId) {
@@ -384,7 +384,7 @@ impl AuthorToTwinIds {
     }
 }
 
-struct DropConfig(HashMap<TwinId, HashSet<TwinId>>);
+pub struct DropConfig(HashMap<TwinId, HashSet<TwinId>>);
 
 impl DropConfig {
     pub fn is_message_dropped(&self, src: &TwinId, dst: &TwinId) -> bool {
@@ -417,7 +417,7 @@ impl DropConfig {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use crate::network::NetworkTask;
     use consensus_types::block_retrieval::{

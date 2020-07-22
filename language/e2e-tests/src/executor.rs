@@ -43,7 +43,7 @@ use vm_genesis::GENESIS_KEYPAIR;
 
 /// Provides an environment to run a VM instance.
 ///
-/// This struct is a mock in-memory implementation of the Libra executor.
+/// This pub struct is a mock in-memory implementation of the Libra executor.
 #[derive(Debug)]
 pub struct FakeExecutor {
     data_store: FakeDataStore,

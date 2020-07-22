@@ -17,7 +17,7 @@ enum MyEnum {
 }
 
 #[derive(Deserialize)]
-struct MyStruct(u64);
+pub struct MyStruct(u64);
 
 #[test]
 fn test_doctool() {
@@ -46,7 +46,7 @@ fn test_doctool() {
 111111
 <!-- @begin-libradoc name=MyStruct -->
 ```rust
-struct MyStruct(u64);
+pub struct MyStruct(u64);
 ```
 <!-- @end-libradoc -->
 <!-- @begin-libradoc name=MyEnum -->

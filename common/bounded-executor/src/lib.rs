@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! A bounded tokio [`Handle`]. Only a bounded number of tasks can run
 //! concurrently when spawned through this executor, defined by the initial
@@ -57,7 +57,7 @@ impl BoundedExecutor {
         }
     }
 
-    fn spawn_with_permit<F>(&self, f: F, spawn_permit: Permit) -> JoinHandle<F::Output>
+    pub fn spawn_with_permit<F>(&self, f: F, spawn_permit: Permit) -> JoinHandle<F::Output>
     where
         F: Future + Send + 'static,
         F::Output: Send + 'static,
@@ -72,7 +72,7 @@ impl BoundedExecutor {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use futures::{channel::oneshot, executor::block_on, future::Future};
     use std::{
@@ -114,7 +114,7 @@ mod test {
         block_on(f2).unwrap().unwrap();
     }
 
-    fn yield_task() -> impl Future<Output = ()> {
+    pub fn yield_task() -> impl Future<Output = ()> {
         delay_for(Duration::from_millis(1)).map(|_| ())
     }
 

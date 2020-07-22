@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, convert::TryInto, fmt, iter::Iterator};
 
 #[cfg(test)]
-mod test;
+pub mod test;
 
 /// Unique identifier associated with each application protocol.
 /// New application protocols can be added without bumping up the MessagingProtocolVersion.
@@ -97,8 +97,8 @@ impl<'a, T: Iterator<Item = &'a ProtocolId>> From<T> for SupportedProtocols {
 }
 
 impl SupportedProtocols {
-    /// Returns a new SupportedProtocols struct that is an intersection.
-    fn intersection(self, other: SupportedProtocols) -> SupportedProtocols {
+    /// Returns a new SupportedProtocols pub struct that is an intersection.
+    pub fn intersection(self, other: SupportedProtocols) -> SupportedProtocols {
         SupportedProtocols(self.0 & other.0)
     }
 }

@@ -62,4 +62,4 @@ impl ValueCodec<EventAccumulatorSchema> for HashValue {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

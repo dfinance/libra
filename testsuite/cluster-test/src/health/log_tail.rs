@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{health::ValidatorEvent, util::unix_timestamp_now};
 use libra_logger::{json_log::JsonLogEntry as DebugInterfaceEvent, *};

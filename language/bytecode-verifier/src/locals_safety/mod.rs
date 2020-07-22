@@ -6,7 +6,7 @@
 //! It is concerned with the assignment state of a local variable at the time of usage, which is
 //! a control flow sensitive check
 
-mod abstract_state;
+pub mod abstract_state;
 
 use crate::{
     absint::{AbstractInterpreter, BlockInvariant, BlockPostcondition, TransferFunctions},
@@ -20,7 +20,7 @@ use vm::{
     file_format::{Bytecode, CodeOffset, Kind},
 };
 
-pub(crate) fn verify<'a>(
+pub fn verify<'a>(
     resolver: &BinaryIndexedView,
     function_view: &'a FunctionView<'a>,
 ) -> PartialVMResult<()> {
@@ -37,7 +37,7 @@ pub(crate) fn verify<'a>(
     Ok(())
 }
 
-fn execute_inner(
+pub fn execute_inner(
     state: &mut AbstractState,
     bytecode: &Bytecode,
     offset: CodeOffset,
@@ -156,7 +156,7 @@ fn execute_inner(
     Ok(())
 }
 
-struct LocalsSafetyAnalysis();
+pub struct LocalsSafetyAnalysis();
 
 impl TransferFunctions for LocalsSafetyAnalysis {
     type State = AbstractState;

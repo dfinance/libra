@@ -6,7 +6,7 @@ use std::{fmt, ops::Deref, str::FromStr};
 
 pub mod commands;
 #[cfg(test)]
-mod coverage;
+pub mod coverage;
 pub mod fuzz_targets;
 
 /// Implementation for a particular target of a fuzz operation.

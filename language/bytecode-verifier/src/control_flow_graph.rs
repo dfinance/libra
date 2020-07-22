@@ -36,7 +36,7 @@ pub trait ControlFlowGraph {
     fn entry_block_id(&self) -> BlockId;
 }
 
-struct BasicBlock {
+pub struct BasicBlock {
     entry: CodeOffset,
     exit: CodeOffset,
     successors: Vec<BlockId>,
@@ -101,11 +101,11 @@ impl VMControlFlowGraph {
         }
     }
 
-    fn is_end_of_block(pc: CodeOffset, code: &[Bytecode], block_ids: &Set<BlockId>) -> bool {
+    pub fn is_end_of_block(pc: CodeOffset, code: &[Bytecode], block_ids: &Set<BlockId>) -> bool {
         pc + 1 == (code.len() as CodeOffset) || block_ids.contains(&(pc + 1))
     }
 
-    fn record_block_ids(pc: CodeOffset, code: &[Bytecode], block_ids: &mut Set<BlockId>) {
+    pub fn record_block_ids(pc: CodeOffset, code: &[Bytecode], block_ids: &mut Set<BlockId>) {
         let bytecode = &code[pc as usize];
 
         if let Some(offset) = bytecode.offset() {
@@ -119,7 +119,7 @@ impl VMControlFlowGraph {
 
     /// A utility function that implements BFS-reachability from block_id with
     /// respect to get_targets function
-    fn traverse_by(&self, block_id: BlockId) -> Vec<BlockId> {
+    pub fn traverse_by(&self, block_id: BlockId) -> Vec<BlockId> {
         let mut ret = Vec::new();
         // We use this index to keep track of our frontier.
         let mut index = 0;

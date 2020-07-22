@@ -61,7 +61,7 @@ impl Drop for SpawnedProcess {
 }
 
 #[cfg(test)]
-mod runner {
+pub mod runner {
     const BINARY: &str = "safety-rules";
 
     pub fn run(path: &std::path::Path) -> std::process::Child {
@@ -76,7 +76,7 @@ mod runner {
 }
 
 #[cfg(not(test))]
-mod runner {
+pub mod runner {
     pub fn run(_path: &std::path::Path) -> std::process::Child {
         panic!("Not supported outside of testing");
     }

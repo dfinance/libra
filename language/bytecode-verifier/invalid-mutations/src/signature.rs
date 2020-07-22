@@ -73,7 +73,7 @@ impl<'a> FieldRefMutation<'a> {
     }
 }
 
-fn mutate_sig(sig: &Signature, token_idx: usize) -> Signature {
+pub fn mutate_sig(sig: &Signature, token_idx: usize) -> Signature {
     use SignatureToken::*;
 
     Signature(
@@ -94,6 +94,6 @@ fn mutate_sig(sig: &Signature, token_idx: usize) -> Signature {
     )
 }
 
-fn mutate_field(token: &SignatureToken) -> SignatureToken {
+pub fn mutate_field(token: &SignatureToken) -> SignatureToken {
     SignatureToken::Reference(Box::new(token.clone()))
 }

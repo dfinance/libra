@@ -415,7 +415,7 @@ macro_rules! derive_status_try_from_repr {
     (
         #[repr($repr_ty:ident)]
         $( #[$metas:meta] )*
-        $vis:vis enum $enum_name:ident {
+        pub enum $enum_name:ident {
             $(
                 $variant:ident = $value: expr
             ),*
@@ -424,7 +424,7 @@ macro_rules! derive_status_try_from_repr {
     ) => {
         #[repr($repr_ty)]
         $( #[$metas] )*
-        $vis enum $enum_name {
+        pub enum $enum_name {
             $(
                 $variant = $value
             ),*
@@ -443,7 +443,7 @@ macro_rules! derive_status_try_from_repr {
         }
 
         #[cfg(any(test, feature = "fuzzing"))]
-        const STATUS_CODE_VALUES: &'static [$repr_ty] = &[
+        pub const STATUS_CODE_VALUES: &'static [$repr_ty] = &[
             $($value),*
         ];
     };
@@ -453,7 +453,7 @@ derive_status_try_from_repr! {
 #[repr(u64)]
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-/// We don't derive Arbitrary on this enum because it is too large and breaks proptest. It is
+/// We don't derive Arbitrary on thispub enum because it is too large and breaks proptest. It is
 /// written for a subset of these in proptest_types. We test conversion between this and protobuf
 /// with a hand-written test.
 pub enum StatusCode {
@@ -600,7 +600,7 @@ pub enum StatusCode {
     LOOP_IN_INSTANTIATION_GRAPH = 1077,
     UNUSED_LOCALS_SIGNATURE = 1078,
     UNUSED_TYPE_SIGNATURE = 1079,
-    // Reported when a struct has zero fields
+    // Reported when a pub struct has zero fields
     ZERO_SIZED_STRUCT = 1080,
     LINKER_ERROR = 1081,
     INVALID_CONSTANT_TYPE = 1082,
@@ -770,7 +770,7 @@ impl<'de> de::Deserialize<'de> for StatusCode {
     where
         D: de::Deserializer<'de>,
     {
-        struct StatusCodeVisitor;
+        pub struct StatusCodeVisitor;
         impl<'de> de::Visitor<'de> for StatusCodeVisitor {
             type Value = StatusCode;
 
@@ -823,7 +823,7 @@ pub mod sub_status {
     pub const GSE_UNABLE_TO_DESERIALIZE: u64 = 2;
 }
 
-/// The `Arbitrary` impl only generates validation statuses since the full enum is too large.
+/// The `Arbitrary` impl only generates validation statuses since the fullpub enum is too large.
 #[cfg(any(test, feature = "fuzzing"))]
 impl Arbitrary for StatusCode {
     type Parameters = ();

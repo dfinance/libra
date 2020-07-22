@@ -6,7 +6,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-struct ValueInfo<V> {
+pub struct ValueInfo<V> {
     value: V,
     ttl: SystemTime,
 }

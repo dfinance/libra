@@ -17,7 +17,7 @@ pub fn output_file() -> Option<&'static str> {
 }
 
 /// Record sample values for crypto types used by network.
-fn trace_crypto_values(tracer: &mut Tracer, samples: &mut Samples) -> Result<()> {
+pub fn trace_crypto_values(tracer: &mut Tracer, samples: &mut Samples) -> Result<()> {
     let mut rng: StdRng = SeedableRng::from_seed([0; 32]);
     let private_key = PrivateKey::generate(&mut rng);
     let public_key: PublicKey = (&private_key).into();
@@ -39,7 +39,7 @@ pub fn get_registry() -> Result<Registry> {
     )?;
     tracer.trace_value(&mut samples, &address::NetworkAddress::mock())?;
 
-    // 2. Trace the main entry point(s) + every enum separately.
+    // 2. Trace the main entry point(s) + everypub enum separately.
     tracer.trace_type::<messaging::v1::NetworkMessage>(&samples)?;
     tracer.trace_type::<handshake::v1::HandshakeMsg>(&samples)?;
     tracer.trace_type::<address::NetworkAddress>(&samples)?;

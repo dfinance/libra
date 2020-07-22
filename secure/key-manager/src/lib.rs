@@ -17,7 +17,7 @@
 //! KeyManager talks to Libra via the LibraInterface that may either be a direct link into
 //! `LibraDB`/`Executor`, JSON-RPC, or some other concoction.
 //! KeyManager talks to its own storage through the `LibraSecureStorage::Storage trait.
-#![forbid(unsafe_code)]
+
 
 use crate::{
     counters::COUNTERS,
@@ -44,7 +44,7 @@ pub mod libra_interface;
 pub mod logging;
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 const GAS_UNIT_PRICE: u64 = 0;
 const MAX_GAS_AMOUNT: u64 = 400_000;
@@ -162,7 +162,7 @@ where
         }
     }
 
-    fn sleep(&self) {
+    pub fn sleep(&self) {
         self.log(
             LogEntry::Sleep,
             Some(LogEvent::Pending),
@@ -286,7 +286,7 @@ where
 
     /// Ensures that the libra_timestamp() value registered on-chain is strictly monotonically
     /// increasing.
-    fn ensure_timestamp_progress(&mut self) -> Result<(), Error> {
+    pub fn ensure_timestamp_progress(&mut self) -> Result<(), Error> {
         let current_libra_timestamp = self.libra.libra_timestamp()?;
         if current_libra_timestamp <= self.last_checked_libra_timestamp {
             return Err(Error::LivenessError(
@@ -356,7 +356,7 @@ where
         }
     }
 
-    fn get_account_from_storage(&self, account_name: &str) -> Result<AccountAddress, Error> {
+    pub fn get_account_from_storage(&self, account_name: &str) -> Result<AccountAddress, Error> {
         match self
             .storage
             .get(account_name)

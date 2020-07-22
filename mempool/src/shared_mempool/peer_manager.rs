@@ -17,19 +17,19 @@ use std::{
 };
 
 /// stores only peers that receive txns from this node
-pub(crate) type PeerInfo = HashMap<PeerNetworkId, PeerSyncState>;
+pub type PeerInfo = HashMap<PeerNetworkId, PeerSyncState>;
 
 /// state of last sync with peer
 /// `timeline_id` is position in log of ready transactions
 /// `is_alive` - is connection healthy
 #[derive(Clone)]
-pub(crate) struct PeerSyncState {
+pub struct PeerSyncState {
     pub timeline_id: u64,
     pub is_alive: bool,
     pub broadcast_info: BroadcastInfo,
 }
 
-pub(crate) struct PeerManager {
+pub struct PeerManager {
     upstream_config: UpstreamConfig,
     peer_info: Mutex<PeerInfo>,
     // the upstream peer to failover to if all peers in the primary upstream network are dead
@@ -48,7 +48,7 @@ pub struct BroadcastInfo {
 }
 
 impl BroadcastInfo {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             sent_batches: HashMap::new(),
             total_retry_txns: BTreeSet::new(),
@@ -125,7 +125,7 @@ impl PeerManager {
     }
 
     // updates the peer chosen to failover to if all peers in the primary upstream network are down
-    fn update_failover(&self) {
+    pub fn update_failover(&self) {
         // failover is enabled only if there are multiple upstream networks
         if self.upstream_config.networks.len() < 2 {
             return;
@@ -305,13 +305,13 @@ impl PeerManager {
         }
     }
 
-    fn is_primary_upstream_peer(&self, peer: &PeerNetworkId) -> bool {
+    pub fn is_primary_upstream_peer(&self, peer: &PeerNetworkId) -> bool {
         self.upstream_config
             .get_upstream_preference(peer.raw_network_id())
             == Some(0)
     }
 
-    fn is_public_downstream(network_id: NetworkId, origin: ConnectionOrigin) -> bool {
+    pub fn is_public_downstream(network_id: NetworkId, origin: ConnectionOrigin) -> bool {
         network_id == NetworkId::Public && origin == ConnectionOrigin::Inbound
     }
 

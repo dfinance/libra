@@ -160,7 +160,7 @@ impl<'d> serde::de::DeserializeSeed<'d> for &MoveTypeLayout {
     }
 }
 
-struct VectorElementVisitor<'a>(&'a MoveTypeLayout);
+pub struct VectorElementVisitor<'a>(&'a MoveTypeLayout);
 
 impl<'d, 'a> serde::de::Visitor<'d> for VectorElementVisitor<'a> {
     type Value = Vec<MoveValue>;
@@ -181,7 +181,7 @@ impl<'d, 'a> serde::de::Visitor<'d> for VectorElementVisitor<'a> {
     }
 }
 
-struct StructFieldVisitor<'a>(&'a [MoveTypeLayout]);
+pub struct StructFieldVisitor<'a>(&'a [MoveTypeLayout]);
 
 impl<'d, 'a> serde::de::Visitor<'d> for StructFieldVisitor<'a> {
     type Value = Vec<MoveValue>;

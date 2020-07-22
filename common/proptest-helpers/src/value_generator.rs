@@ -10,7 +10,7 @@ use proptest::{
 ///
 /// Proptest is designed to be built around "value trees", which represent a spectrum from complex
 /// values to simpler ones. But in some contexts, like benchmarking or generating corpuses, one just
-/// wants a single value. This is a convenience struct for that.
+/// wants a single value. This is a convenience pub struct for that.
 #[derive(Default)]
 pub struct ValueGenerator {
     runner: TestRunner,

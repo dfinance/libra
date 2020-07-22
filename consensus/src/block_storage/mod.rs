@@ -7,8 +7,8 @@ use consensus_types::{
 use libra_crypto::HashValue;
 use std::sync::Arc;
 
-mod block_store;
-mod block_tree;
+pub mod block_store;
+pub mod block_tree;
 
 pub use block_store::{sync_manager::BlockRetriever, BlockStore};
 use consensus_types::sync_info::SyncInfo;

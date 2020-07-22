@@ -3,7 +3,7 @@
 
 //! Usage: ./safety-rules node.config
 
-#![forbid(unsafe_code)]
+
 
 use libra_config::config::{PersistableConfig, SafetyRulesConfig};
 use libra_secure_push_metrics::MetricsPusher;

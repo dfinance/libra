@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! This crate provides [`LibraDB`] which represents physical storage of the core Libra data
 //! structures.
@@ -17,19 +17,19 @@ pub mod backup;
 pub mod errors;
 pub mod schema;
 
-mod change_set;
-mod event_store;
-mod ledger_counters;
-mod ledger_store;
-mod metrics;
-mod pruner;
-mod state_store;
-mod system_store;
-mod transaction_store;
+pub mod change_set;
+pub mod event_store;
+pub mod ledger_counters;
+pub mod ledger_store;
+pub mod metrics;
+pub mod pruner;
+pub mod state_store;
+pub mod system_store;
+pub mod transaction_store;
 
 #[cfg(any(test, feature = "fuzzing"))]
 #[allow(dead_code)]
-mod libradb_test;
+pub mod libradb_test;
 
 #[cfg(feature = "fuzzing")]
 pub use libradb_test::test_save_blocks_impl;
@@ -85,7 +85,7 @@ const MAX_LIMIT: u64 = 1000;
 // or guarantee that there is always a recent enough waypoint and client knows to boot from there.
 const MAX_NUM_EPOCH_ENDING_LEDGER_INFO: usize = 100;
 
-fn error_if_too_many_requested(num_requested: u64, max_allowed: u64) -> Result<()> {
+pub fn error_if_too_many_requested(num_requested: u64, max_allowed: u64) -> Result<()> {
     if num_requested > max_allowed {
         Err(LibraDbError::TooManyRequested(num_requested, max_allowed).into())
     } else {
@@ -182,7 +182,7 @@ impl LibraDB {
         )
     }
 
-    fn get_epoch_ending_ledger_infos_impl(
+    pub fn get_epoch_ending_ledger_infos_impl(
         &self,
         start_epoch: u64,
         end_epoch: u64,
@@ -266,7 +266,7 @@ impl LibraDB {
     }
 
     // ================================== Private APIs ==================================
-    fn get_events_by_event_key(
+    pub fn get_events_by_event_key(
         &self,
         event_key: &EventKey,
         start_seq_num: u64,
@@ -342,7 +342,7 @@ impl LibraDB {
     ///
     /// Specifically, counter increases are added to current counter values and converted to DB
     /// alternations.
-    fn seal_change_set(
+    pub fn seal_change_set(
         &self,
         first_version: Version,
         num_txns: Version,
@@ -363,7 +363,7 @@ impl LibraDB {
         Ok((SealedChangeSet { batch: cs.batch }, counters))
     }
 
-    fn save_transactions_impl(
+    pub fn save_transactions_impl(
         &self,
         txns_to_commit: &[TransactionToCommit],
         first_version: u64,
@@ -420,7 +420,7 @@ impl LibraDB {
     /// Write the whole schema batch including all data necessary to mutate the ledger
     /// state of some transaction by leveraging rocksdb atomicity support. Also committed are the
     /// LedgerCounters.
-    fn commit(&self, sealed_cs: SealedChangeSet) -> Result<()> {
+    pub fn commit(&self, sealed_cs: SealedChangeSet) -> Result<()> {
         self.db.write_schemas(sealed_cs.batch)?;
 
         match self.db.get_approximate_sizes_cf() {
@@ -441,7 +441,7 @@ impl LibraDB {
         Ok(())
     }
 
-    fn wake_pruner(&self, latest_version: Version) {
+    pub fn wake_pruner(&self, latest_version: Version) {
         if let Some(pruner) = self.pruner.as_ref() {
             pruner.wake(latest_version)
         }
@@ -822,7 +822,7 @@ impl DbWriter for LibraDB {
 }
 
 // Convert requested range and order to a range in ascending order.
-fn get_first_seq_num_and_limit(ascending: bool, cursor: u64, limit: u64) -> Result<(u64, u64)> {
+pub fn get_first_seq_num_and_limit(ascending: bool, cursor: u64, limit: u64) -> Result<(u64, u64)> {
     ensure!(limit > 0, "limit should > 0, got {}", limit);
 
     Ok(if ascending {

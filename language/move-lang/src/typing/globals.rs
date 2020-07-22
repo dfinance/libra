@@ -47,7 +47,7 @@ pub fn function_body_(
 // Expressions
 //**************************************************************************************************
 
-fn sequence(
+pub fn sequence(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -58,7 +58,7 @@ fn sequence(
     }
 }
 
-fn sequence_item(
+pub fn sequence_item(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -72,7 +72,7 @@ fn sequence_item(
     }
 }
 
-fn exp(
+pub fn exp(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -154,7 +154,7 @@ fn exp(
     }
 }
 
-fn exp_list(
+pub fn exp_list(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -165,7 +165,7 @@ fn exp_list(
     }
 }
 
-fn exp_list_item(
+pub fn exp_list_item(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -179,11 +179,11 @@ fn exp_list_item(
     }
 }
 
-fn is_current_function(context: &Context, call: &T::ModuleCall) -> bool {
+pub fn is_current_function(context: &Context, call: &T::ModuleCall) -> bool {
     context.is_current_function(&call.module, &call.name)
 }
 
-fn builtin_function(
+pub fn builtin_function(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     seen: &mut Seen,
@@ -214,7 +214,7 @@ fn builtin_function(
 // Checks
 //**************************************************************************************************
 
-fn check_acquire_listed<F>(
+pub fn check_acquire_listed<F>(
     context: &mut Context,
     annotated_acquires: &BTreeMap<StructName, Loc>,
     loc: Loc,
@@ -247,13 +247,13 @@ where
     check_global_access_(context, loc, msg, global_type)
 }
 
-fn valid_acquires_annot(_context: &mut Context, _loc: Loc, _global_type: &StructName) -> bool {
+pub fn valid_acquires_annot(_context: &mut Context, _loc: Loc, _global_type: &StructName) -> bool {
     // let msg = || panic!("ICE should not have recorded errors");
     // check_global_access_(context, loc, msg, global_type, false)
     true
 }
 
-fn check_global_access_<'a, F>(
+pub fn check_global_access_<'a, F>(
     context: &mut Context,
     loc: &Loc,
     msg: F,
@@ -309,7 +309,7 @@ where
         context.error(vec![
             (*loc, msg()),
             (*tloc, tmsg),
-            (def_loc, "Declared as a normal struct here".into()),
+            (def_loc, "Declared as a normal pub struct here".into()),
         ]);
         return None;
     }

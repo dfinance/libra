@@ -3,16 +3,16 @@
 
 //! Suppose we have the following data structure in a smart contract:
 //!
-//! struct B {
+//! pub struct B {
 //!   Map<String, String> mymap;
 //! }
 //!
-//! struct A {
+//! pub struct A {
 //!   B b;
 //!   int my_int;
 //! }
 //!
-//! struct C {
+//! pub struct C {
 //!   List<int> mylist;
 //! }
 //!
@@ -73,7 +73,7 @@ impl AccessPath {
         }
     }
 
-    fn code_access_path_vec(key: &ModuleId) -> Vec<u8> {
+    pub fn code_access_path_vec(key: &ModuleId) -> Vec<u8> {
         key.access_vector()
     }
 

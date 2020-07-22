@@ -17,12 +17,12 @@ pub mod peer_manager;
 pub mod protocols;
 
 pub mod counters;
-mod peer;
-mod sink;
+pub mod peer;
+pub mod sink;
 pub mod transport;
 
 #[cfg(not(any(feature = "testing", feature = "fuzzing")))]
-mod noise;
+pub mod noise;
 #[cfg(any(feature = "testing", feature = "fuzzing"))]
 pub mod noise;
 #[cfg(any(test, feature = "testing", feature = "fuzzing"))]

@@ -56,7 +56,7 @@ pub static KEYPAIRS: Lazy<(
     )
 });
 
-fn generate_first_two_messages() -> (Vec<u8>, Vec<u8>) {
+pub fn generate_first_two_messages() -> (Vec<u8>, Vec<u8>) {
     // build
     let (
         (initiator_private_key, initiator_public_key, initiator_peer_id),
@@ -119,7 +119,7 @@ pub fn generate_corpus(gen: &mut libra_proptest_helpers::ValueGenerator) -> Vec<
 //
 
 /// let's provide the same timestamp everytime, faster
-fn fake_timestamp() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE] {
+pub fn fake_timestamp() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE] {
     [0u8; AntiReplayTimestamps::TIMESTAMP_SIZE]
 }
 

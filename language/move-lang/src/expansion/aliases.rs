@@ -59,7 +59,7 @@ impl AliasMap {
         self.current_scope.is_empty()
     }
 
-    fn remove_module_alias_(&mut self, alias: &Name) -> Result<(), Loc> {
+    pub fn remove_module_alias_(&mut self, alias: &Name) -> Result<(), Loc> {
         self.current_scope.modules.remove(alias);
         let loc = self.modules.get_loc(alias).cloned();
         match self.modules.remove(alias) {
@@ -68,7 +68,7 @@ impl AliasMap {
         }
     }
 
-    fn remove_member_alias_(&mut self, alias: &Name) -> Result<(), Loc> {
+    pub fn remove_member_alias_(&mut self, alias: &Name) -> Result<(), Loc> {
         self.current_scope.members.remove(alias);
         let loc = self.members.get_loc(alias).cloned();
         match self.members.remove(alias) {

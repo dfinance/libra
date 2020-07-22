@@ -41,7 +41,7 @@ const HEALTH_POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 #[derive(StructOpt, Debug)]
 #[structopt(group = ArgGroup::with_name("action"))]
-struct Args {
+pub struct Args {
     #[structopt(short = "p", long, use_delimiter = true, requires = "swarm")]
     peers: Vec<String>,
 
@@ -245,11 +245,11 @@ fn setup_log() {
     ::libra_logger::Logger::new().is_async(true).init();
 }
 
-struct BasicSwarmUtil {
+pub struct BasicSwarmUtil {
     cluster: Cluster,
 }
 
-struct ClusterTestRunner {
+pub struct ClusterTestRunner {
     logs: LogTail,
     trace_tail: TraceTail,
     cluster: Cluster,
@@ -757,9 +757,9 @@ impl ClusterTestRunner {
     }
 }
 
-struct Bold {}
+pub struct Bold {}
 
-struct Reset {}
+pub struct Reset {}
 
 impl fmt::Debug for Bold {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {

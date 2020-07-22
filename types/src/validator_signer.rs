@@ -13,7 +13,7 @@ use serde::ser::Serialize;
 use std::convert::TryFrom;
 
 /// ValidatorSigner associates an author with public and private keys with helpers for signing and
-/// validating. This struct can be used for all signing operations including block and network
+/// validating. This pub struct can be used for all signing operations including block and network
 /// signing, respectively.
 #[derive(Debug)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Clone))]
@@ -114,7 +114,7 @@ pub mod proptests {
         ]
     }
 
-    fn select_keypair(keys: Vec<Ed25519PrivateKey>) -> impl Strategy<Value = Ed25519PrivateKey> {
+    pub fn select_keypair(keys: Vec<Ed25519PrivateKey>) -> impl Strategy<Value = Ed25519PrivateKey> {
         sample::select(keys)
     }
 

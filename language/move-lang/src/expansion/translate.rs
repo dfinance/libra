@@ -25,7 +25,7 @@ use std::{
 //**************************************************************************************************
 
 type ModuleMembers = BTreeMap<Name, ModuleMemberKind>;
-struct Context {
+pub struct Context {
     module_members: UniqueMap<ModuleIdent, ModuleMembers>,
     errors: Errors,
     address: Option<Address>,
@@ -35,7 +35,7 @@ struct Context {
     exp_specs: BTreeMap<SpecId, E::SpecBlock>,
 }
 impl Context {
-    fn new(module_members: UniqueMap<ModuleIdent, ModuleMembers>) -> Self {
+    pub fn new(module_members: UniqueMap<ModuleIdent, ModuleMembers>) -> Self {
         Self {
             module_members,
             errors: vec![],
@@ -47,20 +47,20 @@ impl Context {
         }
     }
 
-    fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
+    pub fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
         self.errors
             .push(e.into_iter().map(|(loc, msg)| (loc, msg.into())).collect())
     }
 
-    fn get_errors(self) -> Errors {
+    pub fn get_errors(self) -> Errors {
         self.errors
     }
 
-    fn has_errors(&self) -> bool {
+    pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
 
-    fn cur_address(&self) -> Address {
+    pub fn cur_address(&self) -> Address {
         self.address.unwrap()
     }
 
@@ -184,7 +184,7 @@ pub fn program(prog: P::Program, sender: Option<Address>) -> (E::Program, Errors
     (prog, context.get_errors())
 }
 
-fn module(
+pub fn module(
     context: &mut Context,
     address: Option<Address>,
     module_map: &mut UniqueMap<ModuleIdent, E::ModuleDefinition>,
@@ -203,7 +203,7 @@ fn module(
     context.address = None
 }
 
-fn set_sender_address(context: &mut Context, loc: Loc, sender: Option<Address>) {
+pub fn set_sender_address(context: &mut Context, loc: Loc, sender: Option<Address>) {
     context.address = Some(match sender {
         Some(addr) => addr,
         None => {
@@ -219,7 +219,7 @@ fn set_sender_address(context: &mut Context, loc: Loc, sender: Option<Address>) 
     })
 }
 
-fn module_(context: &mut Context, mdef: P::ModuleDefinition) -> (ModuleIdent, E::ModuleDefinition) {
+pub fn module_(context: &mut Context, mdef: P::ModuleDefinition) -> (ModuleIdent, E::ModuleDefinition) {
     let P::ModuleDefinition { loc, name, members } = mdef;
     let _ = check_restricted_self_name(context, "module", &name.0);
 
@@ -278,11 +278,11 @@ fn module_(context: &mut Context, mdef: P::ModuleDefinition) -> (ModuleIdent, E:
     (current_module, def)
 }
 
-fn script(context: &mut Context, scripts: &mut Vec<E::Script>, pscript: P::Script) {
+pub fn script(context: &mut Context, scripts: &mut Vec<E::Script>, pscript: P::Script) {
     scripts.push(script_(context, pscript))
 }
 
-fn script_(context: &mut Context, pscript: P::Script) -> E::Script {
+pub fn script_(context: &mut Context, pscript: P::Script) -> E::Script {
     assert!(context.address == None);
     assert!(context.is_source_module);
     let P::Script {
@@ -336,7 +336,7 @@ fn script_(context: &mut Context, pscript: P::Script) -> E::Script {
 // Aliases
 //**************************************************************************************************
 
-fn all_module_members(
+pub fn all_module_members(
     members: &mut UniqueMap<ModuleIdent, ModuleMembers>,
     sender: Option<Address>,
     defs: &[P::Definition],
@@ -354,7 +354,7 @@ fn all_module_members(
     }
 }
 
-fn module_members(
+pub fn module_members(
     members: &mut UniqueMap<ModuleIdent, ModuleMembers>,
     address: Address,
     m: &P::ModuleDefinition,
@@ -396,13 +396,13 @@ fn module_members(
     members.add(mident, cur_members).unwrap();
 }
 
-fn module_self_aliases(acc: &mut AliasMap, current_module: &ModuleIdent) {
+pub fn module_self_aliases(acc: &mut AliasMap, current_module: &ModuleIdent) {
     let self_name = sp(current_module.loc(), ModuleName::SELF_NAME.into());
     acc.add_implicit_module_alias(self_name, current_module.clone())
         .unwrap()
 }
 
-fn aliases_from_member(
+pub fn aliases_from_member(
     context: &mut Context,
     acc: &mut AliasMap,
     current_module: &ModuleIdent,
@@ -462,7 +462,7 @@ fn aliases_from_member(
     }
 }
 
-fn use_(context: &mut Context, acc: &mut AliasMap, u: P::Use) {
+pub fn use_(context: &mut Context, acc: &mut AliasMap, u: P::Use) {
     let unbound_module = |mident: &ModuleIdent| -> Error {
         vec![(
             mident.loc(),
@@ -543,7 +543,7 @@ fn use_(context: &mut Context, acc: &mut AliasMap, u: P::Use) {
     }
 }
 
-fn duplicate_module_alias(context: &mut Context, old_loc: Loc, alias: Name) {
+pub fn duplicate_module_alias(context: &mut Context, old_loc: Loc, alias: Name) {
     let msg = format!(
         "Duplicate module alias '{}'. Module aliases must be unique within a given namespace",
         alias
@@ -554,7 +554,7 @@ fn duplicate_module_alias(context: &mut Context, old_loc: Loc, alias: Name) {
     ])
 }
 
-fn duplicate_module_member(context: &mut Context, old_loc: Loc, alias: Name) {
+pub fn duplicate_module_member(context: &mut Context, old_loc: Loc, alias: Name) {
     let msg = format!(
         "Duplicate module member or alias '{}'. Top level names in a namespace must be unique",
         alias
@@ -565,7 +565,7 @@ fn duplicate_module_member(context: &mut Context, old_loc: Loc, alias: Name) {
     ])
 }
 
-fn unused_alias(context: &mut Context, alias: Name) {
+pub fn unused_alias(context: &mut Context, alias: Name) {
     if !context.is_source_module {
         return;
     }
@@ -580,7 +580,7 @@ fn unused_alias(context: &mut Context, alias: Name) {
 // Structs
 //**************************************************************************************************
 
-fn struct_def(
+pub fn struct_def(
     context: &mut Context,
     structs: &mut UniqueMap<StructName, E::StructDefinition>,
     pstruct: P::StructDefinition,
@@ -591,7 +591,7 @@ fn struct_def(
     }
 }
 
-fn struct_def_(
+pub fn struct_def_(
     context: &mut Context,
     pstruct: P::StructDefinition,
 ) -> (StructName, E::StructDefinition) {
@@ -615,7 +615,7 @@ fn struct_def_(
     (name, sdef)
 }
 
-fn struct_fields(
+pub fn struct_fields(
     context: &mut Context,
     sname: &StructName,
     pfields: P::StructFields,
@@ -632,7 +632,7 @@ fn struct_fields(
                 (
                     field.loc(),
                     format!(
-                        "Duplicate definition for field '{}' in struct '{}'",
+                        "Duplicate definition for field '{}' in pub struct '{}'",
                         field, sname
                     ),
                 ),
@@ -647,7 +647,7 @@ fn struct_fields(
 // Constants
 //**************************************************************************************************
 
-fn constant(
+pub fn constant(
     context: &mut Context,
     constants: &mut UniqueMap<ConstantName, E::Constant>,
     pconstant: P::Constant,
@@ -658,7 +658,7 @@ fn constant(
     }
 }
 
-fn constant_(context: &mut Context, pconstant: P::Constant) -> (ConstantName, E::Constant) {
+pub fn constant_(context: &mut Context, pconstant: P::Constant) -> (ConstantName, E::Constant) {
     assert!(context.exp_specs.is_empty());
     let P::Constant {
         loc,
@@ -681,7 +681,7 @@ fn constant_(context: &mut Context, pconstant: P::Constant) -> (ConstantName, E:
 // Functions
 //**************************************************************************************************
 
-fn function(
+pub fn function(
     context: &mut Context,
     functions: &mut UniqueMap<FunctionName, E::Function>,
     pfunction: P::Function,
@@ -692,7 +692,7 @@ fn function(
     }
 }
 
-fn function_(context: &mut Context, pfunction: P::Function) -> (FunctionName, E::Function) {
+pub fn function_(context: &mut Context, pfunction: P::Function) -> (FunctionName, E::Function) {
     let P::Function {
         loc,
         name,
@@ -723,7 +723,7 @@ fn function_(context: &mut Context, pfunction: P::Function) -> (FunctionName, E:
     (name, fdef)
 }
 
-fn function_signature(
+pub fn function_signature(
     context: &mut Context,
     psignature: P::FunctionSignature,
 ) -> E::FunctionSignature {
@@ -748,7 +748,7 @@ fn function_signature(
     }
 }
 
-fn function_body(context: &mut Context, sp!(loc, pbody_): P::FunctionBody) -> E::FunctionBody {
+pub fn function_body(context: &mut Context, sp!(loc, pbody_): P::FunctionBody) -> E::FunctionBody {
     use E::FunctionBody_ as EF;
     use P::FunctionBody_ as PF;
     let body_ = match pbody_ {
@@ -762,11 +762,11 @@ fn function_body(context: &mut Context, sp!(loc, pbody_): P::FunctionBody) -> E:
 // Specification Blocks
 //**************************************************************************************************
 
-fn specs(context: &mut Context, pspecs: Vec<P::SpecBlock>) -> Vec<E::SpecBlock> {
+pub fn specs(context: &mut Context, pspecs: Vec<P::SpecBlock>) -> Vec<E::SpecBlock> {
     pspecs.into_iter().map(|s| spec(context, s)).collect()
 }
 
-fn spec(context: &mut Context, sp!(loc, pspec): P::SpecBlock) -> E::SpecBlock {
+pub fn spec(context: &mut Context, sp!(loc, pspec): P::SpecBlock) -> E::SpecBlock {
     let P::SpecBlock_ {
         target,
         uses,
@@ -797,7 +797,7 @@ fn spec(context: &mut Context, sp!(loc, pspec): P::SpecBlock) -> E::SpecBlock {
     sp(loc, E::SpecBlock_ { target, members })
 }
 
-fn spec_member(
+pub fn spec_member(
     context: &mut Context,
     sp!(loc, pm): P::SpecBlockMember,
 ) -> Option<E::SpecBlockMember> {
@@ -879,7 +879,7 @@ fn spec_member(
     Some(sp(loc, em))
 }
 
-fn pragma_property(context: &mut Context, sp!(loc, pp_): P::PragmaProperty) -> E::PragmaProperty {
+pub fn pragma_property(context: &mut Context, sp!(loc, pp_): P::PragmaProperty) -> E::PragmaProperty {
     let P::PragmaProperty_ {
         name,
         value: pv_opt,
@@ -892,7 +892,7 @@ fn pragma_property(context: &mut Context, sp!(loc, pp_): P::PragmaProperty) -> E
 // Types
 //**************************************************************************************************
 
-fn type_parameters(context: &mut Context, pty_params: Vec<(Name, Kind)>) -> Vec<(Name, Kind)> {
+pub fn type_parameters(context: &mut Context, pty_params: Vec<(Name, Kind)>) -> Vec<(Name, Kind)> {
     assert!(
         context.aliases.current_scope_is_empty(),
         "ICE alias scope should be cleared before handling type parameters"
@@ -903,7 +903,7 @@ fn type_parameters(context: &mut Context, pty_params: Vec<(Name, Kind)>) -> Vec<
     pty_params
 }
 
-fn type_(context: &mut Context, sp!(loc, pt_): P::Type) -> E::Type {
+pub fn type_(context: &mut Context, sp!(loc, pt_): P::Type) -> E::Type {
     use E::Type_ as ET;
     use P::Type_ as PT;
     let t_ = match pt_ {
@@ -936,23 +936,23 @@ fn type_(context: &mut Context, sp!(loc, pt_): P::Type) -> E::Type {
     sp(loc, t_)
 }
 
-fn types(context: &mut Context, pts: Vec<P::Type>) -> Vec<E::Type> {
+pub fn types(context: &mut Context, pts: Vec<P::Type>) -> Vec<E::Type> {
     pts.into_iter().map(|pt| type_(context, pt)).collect()
 }
 
-fn optional_types(context: &mut Context, pts_opt: Option<Vec<P::Type>>) -> Option<Vec<E::Type>> {
+pub fn optional_types(context: &mut Context, pts_opt: Option<Vec<P::Type>>) -> Option<Vec<E::Type>> {
     pts_opt.map(|pts| pts.into_iter().map(|pt| type_(context, pt)).collect())
 }
 
 #[derive(Clone, Copy)]
-enum Access {
+pub enum Access {
     Type,
     ApplyNamed,
     ApplyPositional,
     Term,
 }
 
-fn module_access(
+pub fn module_access(
     context: &mut Context,
     access: Access,
     sp!(loc, ptn_): P::ModuleAccess,
@@ -996,7 +996,7 @@ fn module_access(
 
 // TODO Support uses inside functions. AliasMap will become an accumulator
 
-fn sequence(context: &mut Context, loc: Loc, seq: P::Sequence) -> E::Sequence {
+pub fn sequence(context: &mut Context, loc: Loc, seq: P::Sequence) -> E::Sequence {
     let (uses, pitems, maybe_last_semicolon_loc, pfinal_item) = seq;
 
     let mut new_scope = AliasMap::new();
@@ -1025,7 +1025,7 @@ fn sequence(context: &mut Context, loc: Loc, seq: P::Sequence) -> E::Sequence {
     items
 }
 
-fn sequence_item(context: &mut Context, sp!(loc, pitem_): P::SequenceItem) -> E::SequenceItem {
+pub fn sequence_item(context: &mut Context, sp!(loc, pitem_): P::SequenceItem) -> E::SequenceItem {
     use E::SequenceItem_ as ES;
     use P::SequenceItem_ as PS;
     let item_ = match pitem_ {
@@ -1061,15 +1061,15 @@ fn sequence_item(context: &mut Context, sp!(loc, pitem_): P::SequenceItem) -> E:
     sp(loc, item_)
 }
 
-fn exps(context: &mut Context, pes: Vec<P::Exp>) -> Vec<E::Exp> {
+pub fn exps(context: &mut Context, pes: Vec<P::Exp>) -> Vec<E::Exp> {
     pes.into_iter().map(|pe| exp_(context, pe)).collect()
 }
 
-fn exp(context: &mut Context, pe: P::Exp) -> Box<E::Exp> {
+pub fn exp(context: &mut Context, pe: P::Exp) -> Box<E::Exp> {
     Box::new(exp_(context, pe))
 }
 
-fn exp_(context: &mut Context, sp!(loc, pe_): P::Exp) -> E::Exp {
+pub fn exp_(context: &mut Context, sp!(loc, pe_): P::Exp) -> E::Exp {
     use E::Exp_ as EE;
     use P::Exp_ as PE;
     let e_ = match pe_ {
@@ -1235,7 +1235,7 @@ fn exp_(context: &mut Context, sp!(loc, pe_): P::Exp) -> E::Exp {
     sp(loc, e_)
 }
 
-fn exp_dotted(context: &mut Context, sp!(loc, pdotted_): P::Exp) -> Option<E::ExpDotted> {
+pub fn exp_dotted(context: &mut Context, sp!(loc, pdotted_): P::Exp) -> Option<E::ExpDotted> {
     use E::ExpDotted_ as EE;
     use P::Exp_ as PE;
     let edotted_ = match pdotted_ {
@@ -1248,7 +1248,7 @@ fn exp_dotted(context: &mut Context, sp!(loc, pdotted_): P::Exp) -> Option<E::Ex
     Some(sp(loc, edotted_))
 }
 
-fn value(context: &mut Context, sp!(loc, pvalue_): P::Value) -> Option<E::Value> {
+pub fn value(context: &mut Context, sp!(loc, pvalue_): P::Value) -> Option<E::Value> {
     use E::Value_ as EV;
     use P::Value_ as PV;
     let value_ = match pvalue_ {
@@ -1279,7 +1279,7 @@ fn value(context: &mut Context, sp!(loc, pvalue_): P::Value) -> Option<E::Value>
 // Fields
 //**************************************************************************************************
 
-fn fields<T>(
+pub fn fields<T>(
     context: &mut Context,
     loc: Loc,
     case: &str,
@@ -1306,12 +1306,12 @@ fn fields<T>(
 // LValues
 //**************************************************************************************************
 
-fn bind_list(context: &mut Context, sp!(loc, pbs_): P::BindList) -> Option<E::LValueList> {
+pub fn bind_list(context: &mut Context, sp!(loc, pbs_): P::BindList) -> Option<E::LValueList> {
     let bs_: Option<Vec<E::LValue>> = pbs_.into_iter().map(|pb| bind(context, pb)).collect();
     Some(sp(loc, bs_?))
 }
 
-fn bind(context: &mut Context, sp!(loc, pb_): P::Bind) -> Option<E::LValue> {
+pub fn bind(context: &mut Context, sp!(loc, pb_): P::Bind) -> Option<E::LValue> {
     use E::LValue_ as EL;
     use P::Bind_ as PB;
     let b_ = match pb_ {
@@ -1333,13 +1333,13 @@ fn bind(context: &mut Context, sp!(loc, pb_): P::Bind) -> Option<E::LValue> {
     Some(sp(loc, b_))
 }
 
-enum LValue {
+pub enum LValue {
     Assigns(E::LValueList),
     FieldMutate(Box<E::ExpDotted>),
     Mutate(Box<E::Exp>),
 }
 
-fn lvalues(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<LValue> {
+pub fn lvalues(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<LValue> {
     use LValue as L;
     use P::Exp_ as PE;
     let al: LValue = match e_ {
@@ -1362,7 +1362,7 @@ fn lvalues(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<LValue> {
     Some(al)
 }
 
-fn assign(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<E::LValue> {
+pub fn assign(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<E::LValue> {
     use E::LValue_ as EL;
     use P::Exp_ as PE;
     let a_ = match e_ {
@@ -1400,7 +1400,7 @@ fn assign(context: &mut Context, sp!(loc, e_): P::Exp) -> Option<E::LValue> {
     Some(sp(loc, a_))
 }
 
-fn assign_unpack_fields(
+pub fn assign_unpack_fields(
     context: &mut Context,
     loc: Loc,
     pfields: Vec<(Field, P::Exp)>,
@@ -1422,13 +1422,13 @@ fn assign_unpack_fields(
 // Unbound names
 //**************************************************************************************************
 
-fn unbound_names_spec_block(unbound: &mut BTreeSet<Name>, sp!(_, sb_): &E::SpecBlock) {
+pub fn unbound_names_spec_block(unbound: &mut BTreeSet<Name>, sp!(_, sb_): &E::SpecBlock) {
     sb_.members
         .iter()
         .for_each(|member| unbound_names_spec_block_member(unbound, member))
 }
 
-fn unbound_names_spec_block_member(unbound: &mut BTreeSet<Name>, sp!(_, m_): &E::SpecBlockMember) {
+pub fn unbound_names_spec_block_member(unbound: &mut BTreeSet<Name>, sp!(_, m_): &E::SpecBlockMember) {
     use E::SpecBlockMember_ as M;
     match m_ {
         M::Condition { exp, .. } => unbound_names_exp(unbound, exp),
@@ -1442,7 +1442,7 @@ fn unbound_names_spec_block_member(unbound: &mut BTreeSet<Name>, sp!(_, m_): &E:
     }
 }
 
-fn unbound_names_exp(unbound: &mut BTreeSet<Name>, sp!(_, e_): &E::Exp) {
+pub fn unbound_names_exp(unbound: &mut BTreeSet<Name>, sp!(_, e_): &E::Exp) {
     use E::Exp_ as EE;
     match e_ {
         EE::Value(_)
@@ -1508,17 +1508,17 @@ fn unbound_names_exp(unbound: &mut BTreeSet<Name>, sp!(_, e_): &E::Exp) {
     }
 }
 
-fn unbound_names_exps<'a>(unbound: &mut BTreeSet<Name>, es: impl IntoIterator<Item = &'a E::Exp>) {
+pub fn unbound_names_exps<'a>(unbound: &mut BTreeSet<Name>, es: impl IntoIterator<Item = &'a E::Exp>) {
     es.into_iter().for_each(|e| unbound_names_exp(unbound, e))
 }
 
-fn unbound_names_sequence(unbound: &mut BTreeSet<Name>, seq: &E::Sequence) {
+pub fn unbound_names_sequence(unbound: &mut BTreeSet<Name>, seq: &E::Sequence) {
     seq.iter()
         .rev()
         .for_each(|s| unbound_names_sequence_item(unbound, s))
 }
 
-fn unbound_names_sequence_item(unbound: &mut BTreeSet<Name>, sp!(_, es_): &E::SequenceItem) {
+pub fn unbound_names_sequence_item(unbound: &mut BTreeSet<Name>, sp!(_, es_): &E::SequenceItem) {
     use E::SequenceItem_ as ES;
     match es_ {
         ES::Seq(e) => unbound_names_exp(unbound, e),
@@ -1531,13 +1531,13 @@ fn unbound_names_sequence_item(unbound: &mut BTreeSet<Name>, sp!(_, es_): &E::Se
     }
 }
 
-fn unbound_names_binds(unbound: &mut BTreeSet<Name>, sp!(_, ls_): &E::LValueList) {
+pub fn unbound_names_binds(unbound: &mut BTreeSet<Name>, sp!(_, ls_): &E::LValueList) {
     ls_.iter()
         .rev()
         .for_each(|l| unbound_names_bind(unbound, l))
 }
 
-fn unbound_names_bind(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
+pub fn unbound_names_bind(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
     use E::LValue_ as EL;
     match l_ {
         EL::Var(sp!(_, E::ModuleAccess_::Name(n)), _) => {
@@ -1552,13 +1552,13 @@ fn unbound_names_bind(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
     }
 }
 
-fn unbound_names_assigns(unbound: &mut BTreeSet<Name>, sp!(_, ls_): &E::LValueList) {
+pub fn unbound_names_assigns(unbound: &mut BTreeSet<Name>, sp!(_, ls_): &E::LValueList) {
     ls_.iter()
         .rev()
         .for_each(|l| unbound_names_assign(unbound, l))
 }
 
-fn unbound_names_assign(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
+pub fn unbound_names_assign(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
     use E::LValue_ as EL;
     match l_ {
         EL::Var(sp!(_, E::ModuleAccess_::Name(n)), _) => {
@@ -1573,7 +1573,7 @@ fn unbound_names_assign(unbound: &mut BTreeSet<Name>, sp!(_, l_): &E::LValue) {
     }
 }
 
-fn unbound_names_dotted(unbound: &mut BTreeSet<Name>, sp!(_, edot_): &E::ExpDotted) {
+pub fn unbound_names_dotted(unbound: &mut BTreeSet<Name>, sp!(_, edot_): &E::ExpDotted) {
     use E::ExpDotted_ as ED;
     match edot_ {
         ED::Exp(e) => unbound_names_exp(unbound, e),
@@ -1585,7 +1585,7 @@ fn unbound_names_dotted(unbound: &mut BTreeSet<Name>, sp!(_, edot_): &E::ExpDott
 // Valid names
 //**************************************************************************************************
 
-fn check_valid_local_name(context: &mut Context, v: &Var) {
+pub fn check_valid_local_name(context: &mut Context, v: &Var) {
     fn is_valid(s: &str) -> bool {
         s.starts_with('_') || s.starts_with(|c| matches!(c, 'a'..='z'))
     }
@@ -1599,7 +1599,7 @@ fn check_valid_local_name(context: &mut Context, v: &Var) {
 }
 
 #[derive(Copy, Clone, Debug)]
-enum ModuleMemberKind {
+pub enum ModuleMemberKind {
     Constant,
     Function,
     Struct,
@@ -1617,7 +1617,7 @@ impl ModuleMemberKind {
     }
 }
 
-fn check_valid_module_member_name(
+pub fn check_valid_module_member_name(
     context: &mut Context,
     member: ModuleMemberKind,
     name: Name,
@@ -1628,7 +1628,7 @@ fn check_valid_module_member_name(
     }
 }
 
-fn check_valid_module_member_alias(
+pub fn check_valid_module_member_alias(
     context: &mut Context,
     member: ModuleMemberKind,
     alias: Name,
@@ -1644,7 +1644,7 @@ fn check_valid_module_member_alias(
     }
 }
 
-fn check_valid_module_member_name_impl(
+pub fn check_valid_module_member_name_impl(
     context: &mut Context,
     member: ModuleMemberKind,
     n: &Name,
@@ -1693,11 +1693,11 @@ pub fn is_valid_struct_constant_or_schema_name(s: &str) -> bool {
     s.starts_with(|c| matches!(c, 'A'..='Z'))
 }
 
-fn check_restricted_self_name(context: &mut Context, case: &str, n: &Name) -> Result<(), ()> {
+pub fn check_restricted_self_name(context: &mut Context, case: &str, n: &Name) -> Result<(), ()> {
     check_restricted_name(context, case, n, ModuleName::SELF_NAME)
 }
 
-fn check_restricted_name(
+pub fn check_restricted_name(
     context: &mut Context,
     case: &str,
     sp!(loc, n_): &Name,

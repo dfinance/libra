@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::health::{Event, HealthCheck, HealthCheckContext, ValidatorEvent};
 use async_trait::async_trait;
@@ -16,7 +16,7 @@ pub struct CommitHistoryHealthCheck {
     latest_committed_round: HashMap<String, u64>,
 }
 
-struct CommitAndValidators {
+pub struct CommitAndValidators {
     pub hash: String,
     pub validators: HashSet<String>,
 }

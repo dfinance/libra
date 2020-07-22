@@ -24,7 +24,7 @@ use vm::errors::PartialVMResult;
 // returns a `NativeFunction`
 // - `dispatch` which given a `NativeFunction` invokes the native
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum NativeFunction {
+pub enum NativeFunction {
     HashSha2_256,
     HashSha3_256,
     LCSToBytes,
@@ -47,7 +47,7 @@ pub(crate) enum NativeFunction {
 }
 
 impl NativeFunction {
-    pub(crate) fn resolve(
+    pub fn resolve(
         module_address: &AccountAddress,
         module_name: &str,
         function_name: &str,
@@ -80,7 +80,7 @@ impl NativeFunction {
     }
 
     /// Given the vector of aguments, it executes the native function.
-    pub(crate) fn dispatch(
+    pub fn dispatch(
         self,
         ctx: &mut impl NativeContext,
         t: Vec<Type>,
@@ -111,7 +111,7 @@ impl NativeFunction {
     }
 }
 
-pub(crate) struct FunctionContext<'a> {
+pub struct FunctionContext<'a> {
     interpreter: &'a mut Interpreter,
     data_store: &'a mut dyn DataStore,
     cost_strategy: &'a CostStrategy<'a>,
@@ -119,7 +119,7 @@ pub(crate) struct FunctionContext<'a> {
 }
 
 impl<'a> FunctionContext<'a> {
-    pub(crate) fn new(
+    pub fn new(
         interpreter: &'a mut Interpreter,
         data_store: &'a mut dyn DataStore,
         cost_strategy: &'a mut CostStrategy,

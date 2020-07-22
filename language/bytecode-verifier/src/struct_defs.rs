@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-//! This module provides a checker for verifing that struct definitions in a module are not
+//! This module provides a checker for verifing that pub struct definitions in a module are not
 //! recursive. Since the module dependency graph is acylic by construction, applying this checker to
 //! each module in isolation guarantees that there is no structural recursion globally.
 use libra_types::vm_status::StatusCode;
@@ -27,7 +27,7 @@ impl<'a> RecursiveStructDefChecker<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         let checker = Self { module };
         let graph = StructDefGraphBuilder::new(checker.module).build()?;
 
@@ -44,18 +44,18 @@ impl<'a> RecursiveStructDefChecker<'a> {
     }
 }
 
-/// Given a module, build a graph of struct definitions. This is useful when figuring out whether
-/// the struct definitions in module form a cycle.
-struct StructDefGraphBuilder<'a> {
+/// Given a module, build a graph of pub struct definitions. This is useful when figuring out whether
+/// the pub struct definitions in module form a cycle.
+pub struct StructDefGraphBuilder<'a> {
     module: &'a CompiledModule,
-    /// Used to follow field definitions' signatures' struct handles to their struct definitions.
+    /// Used to follow field definitions' signatures' pub struct handles to their pub struct definitions.
     handle_to_def: BTreeMap<StructHandleIndex, StructDefinitionIndex>,
 }
 
 impl<'a> StructDefGraphBuilder<'a> {
-    fn new(module: &'a CompiledModule) -> Self {
+    pub fn new(module: &'a CompiledModule) -> Self {
         let mut handle_to_def = BTreeMap::new();
-        // the mapping from struct definitions to struct handles is already checked to be 1-1 by
+        // the mapping from pub struct definitions to pub struct handles is already checked to be 1-1 by
         // DuplicationChecker
         for (idx, struct_def) in module.struct_defs().iter().enumerate() {
             let sh_idx = struct_def.struct_handle;
@@ -68,7 +68,7 @@ impl<'a> StructDefGraphBuilder<'a> {
         }
     }
 
-    fn build(self) -> PartialVMResult<DiGraphMap<StructDefinitionIndex, ()>> {
+    pub fn build(self) -> PartialVMResult<DiGraphMap<StructDefinitionIndex, ()>> {
         let mut neighbors = BTreeMap::new();
         for idx in 0..self.module.struct_defs().len() {
             let sd_idx = StructDefinitionIndex::new(idx as TableIndex);
@@ -81,7 +81,7 @@ impl<'a> StructDefGraphBuilder<'a> {
         Ok(DiGraphMap::from_edges(edges))
     }
 
-    fn add_struct_defs(
+    pub fn add_struct_defs(
         &self,
         neighbors: &mut BTreeMap<StructDefinitionIndex, BTreeSet<StructDefinitionIndex>>,
         idx: StructDefinitionIndex,
@@ -96,7 +96,7 @@ impl<'a> StructDefGraphBuilder<'a> {
         Ok(())
     }
 
-    fn add_signature_token(
+    pub fn add_signature_token(
         &self,
         neighbors: &mut BTreeMap<StructDefinitionIndex, BTreeSet<StructDefinitionIndex>>,
         cur_idx: StructDefinitionIndex,

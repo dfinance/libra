@@ -11,7 +11,7 @@ use structopt::StructOpt;
     author = "The Libra Association",
     about = "Utility tool to investigate fuzzing artifacts"
 )]
-struct Args {
+pub struct Args {
     /// Admission Control port to connect to.
     #[structopt(short = "i", long)]
     pub input_file: Option<String>,

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use config_builder::{FullNodeConfig, KeyManagerConfig, ValidatorConfig};
 use libra_config::config::{KeyManagerConfig as KMConfig, NodeConfig, PersistableConfig};
@@ -16,7 +16,7 @@ const NODE_CONFIG: &str = "node.yaml";
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Tool to create and extend Libra Configs")]
-enum Args {
+pub enum Args {
     #[structopt(about = "Generate a Libra faucet key")]
     Faucet(FaucetArgs),
     #[structopt(about = "Create a new FullNode config XOR extend a Validator config")]
@@ -30,7 +30,7 @@ enum Args {
 }
 
 #[derive(Debug, StructOpt)]
-struct FaucetArgs {
+pub struct FaucetArgs {
     #[structopt(short = "o", long, parse(from_os_str))]
     /// The output directory
     output_dir: PathBuf,
@@ -46,7 +46,7 @@ struct FaucetArgs {
 }
 
 #[derive(Debug, StructOpt)]
-enum FullNodeCommand {
+pub enum FullNodeCommand {
     #[structopt(about = "Create a new FullNode config")]
     Create(FullNodeArgs),
     #[structopt(about = "Extend a Validator config with a FullNode network")]
@@ -54,7 +54,7 @@ enum FullNodeCommand {
 }
 
 #[derive(Debug, StructOpt)]
-struct FullNodeArgs {
+pub struct FullNodeArgs {
     #[structopt(long)]
     /// Defines which chain version libra will use
     chain_id: Option<ChainId>,
@@ -101,7 +101,7 @@ struct FullNodeArgs {
 }
 
 #[derive(Debug, StructOpt)]
-struct KeyManagerArgs {
+pub struct KeyManagerArgs {
     #[structopt(long)]
     /// Defines which chain version libra will use
     chain_id: Option<ChainId>,
@@ -138,13 +138,13 @@ struct KeyManagerArgs {
 }
 
 #[derive(Debug, StructOpt)]
-struct SafetyRulesArgs {
+pub struct SafetyRulesArgs {
     #[structopt(flatten)]
     validator_common: ValidatorCommonArgs,
 }
 
 #[derive(Debug, StructOpt)]
-struct ValidatorArgs {
+pub struct ValidatorArgs {
     #[structopt(short = "a", long, parse(from_str = parse_addr))]
     /// Advertised address for this Validator, if this is null, listen is reused.
     advertised: NetworkAddress,
@@ -159,7 +159,7 @@ struct ValidatorArgs {
 }
 
 #[derive(Debug, StructOpt)]
-struct ValidatorCommonArgs {
+pub struct ValidatorCommonArgs {
     #[structopt(long)]
     /// Defines which chain version libra will use
     chain_id: Option<ChainId>,

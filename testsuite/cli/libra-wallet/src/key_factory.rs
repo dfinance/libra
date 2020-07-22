@@ -40,7 +40,7 @@ impl_array_newtype_encodable!(Main, u8, 32);
 
 /// A child number for a derived key, used to derive a certain private key from Main
 #[derive(Default, Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
-pub struct ChildNumber(pub(crate) u64);
+pub struct ChildNumber(pub u64);
 // invariant self.0 <= u64::max_value() / 2;
 
 impl ChildNumber {
@@ -125,7 +125,7 @@ impl ExtendedPrivKey {
     }
 }
 
-/// Wrapper struct from which we derive child keys
+/// Wrapper pub struct from which we derive child keys
 pub struct KeyFactory {
     main: Main,
 }

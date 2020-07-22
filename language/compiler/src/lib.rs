@@ -1,12 +1,12 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 pub mod util;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
 use anyhow::Result;
 use bytecode_source_map::source_map::SourceMap;
@@ -87,7 +87,7 @@ impl Compiler {
         Ok(serialized_module)
     }
 
-    fn compile_script(
+    pub fn compile_script(
         &mut self,
         file_name: &str,
         code: &str,
@@ -98,7 +98,7 @@ impl Compiler {
         Ok((compiled_script, source_map, deps))
     }
 
-    fn compile_mod(
+    pub fn compile_mod(
         &mut self,
         file_name: &str,
         code: &str,
@@ -109,7 +109,7 @@ impl Compiler {
         Ok((compiled_module, source_map, deps))
     }
 
-    fn deps(&mut self) -> Vec<CompiledModule> {
+    pub fn deps(&mut self) -> Vec<CompiledModule> {
         let extra_deps = mem::replace(&mut self.extra_deps, vec![]);
         if self.skip_stdlib_deps {
             extra_deps

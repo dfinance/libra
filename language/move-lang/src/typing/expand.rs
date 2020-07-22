@@ -33,7 +33,7 @@ pub fn function_signature(context: &mut Context, sig: &mut FunctionSignature) {
 // Types
 //**************************************************************************************************
 
-fn expected_types(context: &mut Context, ss: &mut Vec<Option<Type>>) {
+pub fn expected_types(context: &mut Context, ss: &mut Vec<Option<Type>>) {
     for st_opt in ss {
         if let Some(ss) = st_opt {
             type_(context, ss);
@@ -41,7 +41,7 @@ fn expected_types(context: &mut Context, ss: &mut Vec<Option<Type>>) {
     }
 }
 
-fn types(context: &mut Context, ss: &mut Vec<Type>) {
+pub fn types(context: &mut Context, ss: &mut Vec<Type>) {
     for st in ss {
         type_(context, st);
     }
@@ -83,7 +83,7 @@ pub fn type_(context: &mut Context, ty: &mut Type) {
     }
 }
 
-fn get_kind(sp!(loc, ty_): &Type) -> Kind {
+pub fn get_kind(sp!(loc, ty_): &Type) -> Kind {
     use Type_::*;
     match ty_ {
         Anything | UnresolvedError | Unit | Ref(_, _) => sp(*loc, Kind_::Copyable),
@@ -98,13 +98,13 @@ fn get_kind(sp!(loc, ty_): &Type) -> Kind {
 // Expressions
 //**************************************************************************************************
 
-fn sequence(context: &mut Context, seq: &mut T::Sequence) {
+pub fn sequence(context: &mut Context, seq: &mut T::Sequence) {
     for item in seq {
         sequence_item(context, item)
     }
 }
 
-fn sequence_item(context: &mut Context, item: &mut T::SequenceItem) {
+pub fn sequence_item(context: &mut Context, item: &mut T::SequenceItem) {
     use T::SequenceItem_ as S;
     match &mut item.value {
         S::Seq(te) => exp(context, te),
@@ -274,13 +274,13 @@ pub fn exp(context: &mut Context, e: &mut T::Exp) {
     }
 }
 
-fn lvalues(context: &mut Context, binds: &mut T::LValueList) {
+pub fn lvalues(context: &mut Context, binds: &mut T::LValueList) {
     for b in &mut binds.value {
         lvalue(context, b)
     }
 }
 
-fn lvalue(context: &mut Context, b: &mut T::LValue) {
+pub fn lvalue(context: &mut Context, b: &mut T::LValue) {
     use T::LValue_ as L;
     match &mut b.value {
         L::Ignore => (),
@@ -297,13 +297,13 @@ fn lvalue(context: &mut Context, b: &mut T::LValue) {
     }
 }
 
-fn module_call(context: &mut Context, call: &mut T::ModuleCall) {
+pub fn module_call(context: &mut Context, call: &mut T::ModuleCall) {
     types(context, &mut call.type_arguments);
     exp(context, &mut call.arguments);
     types(context, &mut call.parameter_types)
 }
 
-fn builtin_function(context: &mut Context, b: &mut T::BuiltinFunction) {
+pub fn builtin_function(context: &mut Context, b: &mut T::BuiltinFunction) {
     use T::BuiltinFunction_ as B;
     match &mut b.value {
         B::MoveTo(bt)
@@ -317,13 +317,13 @@ fn builtin_function(context: &mut Context, b: &mut T::BuiltinFunction) {
     }
 }
 
-fn exp_list(context: &mut Context, items: &mut Vec<T::ExpListItem>) {
+pub fn exp_list(context: &mut Context, items: &mut Vec<T::ExpListItem>) {
     for item in items {
         exp_list_item(context, item)
     }
 }
 
-fn exp_list_item(context: &mut Context, item: &mut T::ExpListItem) {
+pub fn exp_list_item(context: &mut Context, item: &mut T::ExpListItem) {
     use T::ExpListItem as I;
     match item {
         I::Single(e, st) => {

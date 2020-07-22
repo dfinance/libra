@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! # The VM runtime
 //!
@@ -102,15 +102,15 @@
 
 #[macro_use]
 extern crate mirai_annotations;
-mod access_path_cache;
+pub mod access_path_cache;
 #[macro_use]
-mod counters;
+pub mod counters;
 pub mod data_cache;
 
 #[cfg(feature = "mirai-contracts")]
 pub mod foreign_contracts;
 
-mod libra_vm;
+pub mod libra_vm;
 pub mod transaction_metadata;
 
 pub mod libra_transaction_executor;

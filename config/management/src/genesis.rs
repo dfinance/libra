@@ -129,7 +129,7 @@ impl Genesis {
 
     /// Retrieves the operator key from the remote storage using the given operator name, and uses
     /// this key to derive an operator account address.
-    fn fetch_operator_account(&self, operator_name: String) -> Result<AccountAddress, Error> {
+    pub fn fetch_operator_account(&self, operator_name: String) -> Result<AccountAddress, Error> {
         let shared_backend = self.backend.shared_backend.clone();
         let operator_backend = shared_backend.set_namespace(operator_name);
         let storage_name = self.backend.name();

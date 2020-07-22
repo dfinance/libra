@@ -152,7 +152,7 @@ impl MockStorage {
 // A impl that always start from genesis.
 impl PersistentLivenessStorage for MockStorage {
     fn save_tree(&self, blocks: Vec<Block>, quorum_certs: Vec<QuorumCert>) -> Result<()> {
-        // When the shared storage is empty, we are expected to not able to construct an block tree
+        // When the shared storage is empty, we are expected to not able to conpub struct an block tree
         // from it. During test we will intentionally clear shared_storage to simulate the situation
         // of restarting from an empty consensusDB
         let should_check_for_consistency = !(self.shared_storage.block.lock().unwrap().is_empty()
@@ -285,7 +285,7 @@ impl PersistentLivenessStorage for EmptyStorage {
             Ok(recovery_data) => LivenessStorageData::RecoveryData(recovery_data),
             Err(e) => {
                 eprintln!("{}", e);
-                panic!("Construct recovery data during genesis should never fail");
+                panic!("Conpub struct recovery data during genesis should never fail");
             }
         }
     }

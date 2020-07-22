@@ -58,11 +58,11 @@ pub struct EliminateImmRefs<'a> {
 }
 
 impl<'a> EliminateImmRefs<'a> {
-    fn new(func_target: &'a FunctionTarget) -> Self {
+    pub fn new(func_target: &'a FunctionTarget) -> Self {
         Self { func_target }
     }
 
-    fn transform_type(&self, ty: Type) -> Type {
+    pub fn transform_type(&self, ty: Type) -> Type {
         if let Type::Reference(false, y) = ty {
             *y
         } else {
@@ -70,7 +70,7 @@ impl<'a> EliminateImmRefs<'a> {
         }
     }
 
-    fn transform_bytecode(&self, bytecode: Bytecode) -> Bytecode {
+    pub fn transform_bytecode(&self, bytecode: Bytecode) -> Bytecode {
         match &bytecode {
             Call(attr_id, dests, op, srcs) => match op {
                 ReadRef => {

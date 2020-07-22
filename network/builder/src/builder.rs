@@ -49,7 +49,7 @@ use subscription_service::ReconfigSubscription;
 use tokio::runtime::Handle;
 
 #[derive(Debug, PartialEq, PartialOrd)]
-enum State {
+pub enum State {
     CREATED,
     BUILT,
     STARTED,
@@ -87,7 +87,7 @@ impl NetworkBuilder {
         max_frame_size: usize,
     ) -> Self {
         // A network cannot exist without a PeerManager
-        // TODO:  construct this in create and pass it to new() as a parameter. The complication is manual construction of NetworkBuilder in various tests.
+        // TODO:  conpub struct this in create and pass it to new() as a parameter. The complication is manual construction of NetworkBuilder in various tests.
         let peer_manager_builder = PeerManagerBuilder::create(
             chain_id,
             network_context.clone(),
@@ -237,14 +237,14 @@ impl NetworkBuilder {
         self.network_context.clone()
     }
 
-    fn conn_mgr_reqs_tx(&self) -> Option<channel::Sender<ConnectivityRequest>> {
+    pub fn conn_mgr_reqs_tx(&self) -> Option<channel::Sender<ConnectivityRequest>> {
         match self.connectivity_manager_builder.as_ref() {
             Some(conn_mgr_builder) => Some(conn_mgr_builder.conn_mgr_reqs_tx()),
             None => None,
         }
     }
 
-    fn add_connection_event_listener(&mut self) -> conn_notifs_channel::Receiver {
+    pub fn add_connection_event_listener(&mut self) -> conn_notifs_channel::Receiver {
         self.peer_manager_builder.add_connection_event_listener()
     }
 
@@ -252,13 +252,13 @@ impl NetworkBuilder {
         self.peer_manager_builder.listen_address()
     }
 
-    fn build_peer_manager(&mut self) -> &mut Self {
+    pub fn build_peer_manager(&mut self) -> &mut Self {
         self.peer_manager_builder
             .build(self.executor.as_mut().expect("Executor must exist"));
         self
     }
 
-    fn start_peer_manager(&mut self) -> &mut Self {
+    pub fn start_peer_manager(&mut self) -> &mut Self {
         self.peer_manager_builder
             .start(self.executor.as_mut().expect("Executor must exist"));
         self
@@ -319,21 +319,21 @@ impl NetworkBuilder {
         self
     }
 
-    fn build_connectivity_manager(&mut self) -> &mut Self {
+    pub fn build_connectivity_manager(&mut self) -> &mut Self {
         if let Some(builder) = self.connectivity_manager_builder.as_mut() {
             builder.build(self.executor.as_mut().expect("Executor must exist"));
         }
         self
     }
 
-    fn start_connectivity_manager(&mut self) -> &mut Self {
+    pub fn start_connectivity_manager(&mut self) -> &mut Self {
         if let Some(builder) = self.connectivity_manager_builder.as_mut() {
             builder.start(self.executor.as_mut().expect("Executor must exist"));
         }
         self
     }
 
-    fn add_configuration_change_listener(&mut self, role: RoleType) -> &mut Self {
+    pub fn add_configuration_change_listener(&mut self, role: RoleType) -> &mut Self {
         let conn_mgr_reqs_tx = self
             .conn_mgr_reqs_tx()
             .expect("ConnectivityManager must be installed for validator");
@@ -359,7 +359,7 @@ impl NetworkBuilder {
         self
     }
 
-    fn build_configuration_change_listener(&mut self) -> &mut Self {
+    pub fn build_configuration_change_listener(&mut self) -> &mut Self {
         if let Some(configuration_change_listener) =
             self.configuration_change_listener_builder.as_mut()
         {
@@ -368,7 +368,7 @@ impl NetworkBuilder {
         self
     }
 
-    fn start_configuration_change_listener(&mut self) -> &mut Self {
+    pub fn start_configuration_change_listener(&mut self) -> &mut Self {
         if let Some(configuration_change_listener) =
             self.configuration_change_listener_builder.as_mut()
         {
@@ -424,7 +424,7 @@ impl NetworkBuilder {
         self
     }
 
-    fn build_gossip_discovery(&mut self) -> &mut Self {
+    pub fn build_gossip_discovery(&mut self) -> &mut Self {
         if let Some(discovery_builder) = self.discovery_builder.as_mut() {
             discovery_builder.build(self.executor.as_mut().expect("Executor must exist"));
             debug!("{} Built Gossip Discovery", self.network_context());
@@ -432,7 +432,7 @@ impl NetworkBuilder {
         self
     }
 
-    fn start_gossip_discovery(&mut self) -> &mut Self {
+    pub fn start_gossip_discovery(&mut self) -> &mut Self {
         if let Some(discovery_builder) = self.discovery_builder.as_mut() {
             discovery_builder.start(self.executor.as_mut().expect("Executor must exist"));
             debug!("{} Started gossip discovery", self.network_context());
@@ -465,7 +465,7 @@ impl NetworkBuilder {
     }
 
     /// Build the HealthChecker, if it has been added.
-    fn build_connection_monitoring(&mut self) -> &mut Self {
+    pub fn build_connection_monitoring(&mut self) -> &mut Self {
         if let Some(health_checker) = self.health_checker_builder.as_mut() {
             health_checker.build(self.executor.as_mut().expect("Executor must exist"));
             debug!("{} Built health checker", self.network_context);
@@ -474,7 +474,7 @@ impl NetworkBuilder {
     }
 
     /// Star the built HealthChecker.
-    fn start_connection_monitoring(&mut self) -> &mut Self {
+    pub fn start_connection_monitoring(&mut self) -> &mut Self {
         if let Some(health_checker) = self.health_checker_builder.as_mut() {
             health_checker.start(self.executor.as_mut().expect("Executor must exist"));
             debug!("{} Started health checker", self.network_context);

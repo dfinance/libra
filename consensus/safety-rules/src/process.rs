@@ -47,7 +47,7 @@ impl Process {
     }
 }
 
-struct ProcessData {
+pub struct ProcessData {
     server_addr: SocketAddr,
     storage: PersistentSafetyStorage,
     verify_vote_proposal_signature: bool,

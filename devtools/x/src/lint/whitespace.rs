@@ -4,7 +4,7 @@
 use x_lint::prelude::*;
 
 #[derive(Clone, Copy, Debug)]
-pub(super) struct EofNewline;
+pub struct EofNewline;
 
 impl Linter for EofNewline {
     fn name(&self) -> &'static str {
@@ -34,7 +34,7 @@ impl ContentLinter for EofNewline {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(super) struct TrailingWhitespace;
+pub struct TrailingWhitespace;
 
 impl Linter for TrailingWhitespace {
     fn name(&self) -> &'static str {

@@ -11,7 +11,7 @@
 //! associated.
 
 #[cfg(test)]
-mod node_type_test;
+pub mod node_type_test;
 
 use crate::{nibble_path::NibblePath, ROOT_NIBBLE_HEIGHT};
 use anyhow::{ensure, Context, Result};
@@ -164,7 +164,7 @@ impl Child {
 
 /// [`Children`] is just a collection of children belonging to a [`InternalNode`], indexed from 0 to
 /// 15, inclusive.
-pub(crate) type Children = HashMap<Nibble, Child>;
+pub type Children = HashMap<Nibble, Child>;
 
 /// Represents a 4-level subtree with 16 children at the bottom level. Theoretically, this reduces
 /// IOPS to query a tree by 4x since we compress 4 levels in a standard Merkle tree into 1 node.
@@ -300,7 +300,7 @@ impl InternalNode {
             _ => (),
         }
 
-        // Reconstruct children
+        // Reconpub struct children
         let mut children = HashMap::new();
         for _ in 0..existence_bitmap.count_ones() {
             let next_child = existence_bitmap.trailing_zeros() as u8;
@@ -351,7 +351,7 @@ impl InternalNode {
     }
 
     /// Given a range [start, start + width), returns the sub-bitmap of that range.
-    fn range_bitmaps(start: u8, width: u8, bitmaps: (u16, u16)) -> (u16, u16) {
+    pub fn range_bitmaps(start: u8, width: u8, bitmaps: (u16, u16)) -> (u16, u16) {
         assert!(start < 16 && width.count_ones() == 1 && start % width == 0);
         // A range with `start == 8` and `width == 4` will generate a mask 0b0000111100000000.
         let mask = if width == 16 {
@@ -363,7 +363,7 @@ impl InternalNode {
         (bitmaps.0 & mask, bitmaps.1 & mask)
     }
 
-    fn merkle_hash(
+    pub fn merkle_hash(
         &self,
         start: u8,
         width: u8,
@@ -481,7 +481,7 @@ impl InternalNode {
 
 /// Given a nibble, computes the start position of its `child_half_start` and `sibling_half_start`
 /// at `height` level.
-pub(crate) fn get_child_and_sibling_half_start(n: Nibble, height: u8) -> (u8, u8) {
+pub fn get_child_and_sibling_half_start(n: Nibble, height: u8) -> (u8, u8) {
     // Get the index of the first child belonging to the same subtree whose root, let's say `r` is
     // at `height` that the n-th child belongs to.
     // Note: `child_half_start` will be always equal to `n` at height 0.
@@ -539,7 +539,7 @@ impl From<LeafNode> for SparseMerkleLeafNode {
 
 #[repr(u8)]
 #[derive(FromPrimitive, ToPrimitive)]
-enum NodeTag {
+pub enum NodeTag {
     Null = 0,
     Internal = 1,
     Leaf = 2,
@@ -666,7 +666,7 @@ pub enum NodeDecodeError {
 
 /// Helper function to serialize version in a more efficient encoding.
 /// We use a super simple encoding - the high bit is set if more bytes follow.
-fn serialize_u64_varint(mut num: u64, binary: &mut Vec<u8>) {
+pub fn serialize_u64_varint(mut num: u64, binary: &mut Vec<u8>) {
     for _ in 0..8 {
         let low_bits = num as u8 & 0x7f;
         num >>= 7;
@@ -683,7 +683,7 @@ fn serialize_u64_varint(mut num: u64, binary: &mut Vec<u8>) {
 }
 
 /// Helper function to deserialize versions from above encoding.
-fn deserialize_u64_varint<T>(reader: &mut T) -> Result<u64>
+pub fn deserialize_u64_varint<T>(reader: &mut T) -> Result<u64>
 where
     T: Read,
 {

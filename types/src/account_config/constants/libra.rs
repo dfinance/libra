@@ -17,7 +17,7 @@ pub static COIN_MODULE: Lazy<ModuleId> =
 // TODO: This imposes a few implied restrictions:
 //   1) The currency module must be published under the core code address.
 //   2) The module name must be the same as the gas specifier.
-//   3) The struct name must be the same as the module name
+//   3) The pub struct name must be the same as the module name
 // We need to consider whether we want to switch to a more or fully qualified name.
 pub fn type_tag_for_currency_code(currency_code: Identifier) -> TypeTag {
     TypeTag::Struct(StructTag {

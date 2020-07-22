@@ -30,8 +30,8 @@ pub struct StructSourceMap<Location: Clone + Eq> {
     /// Important: type parameters need to be added in the order of their declaration
     pub type_parameters: Vec<SourceName<Location>>,
 
-    /// Note that fields to a struct source map need to be added in the order of the fields in the
-    /// struct definition.
+    /// Note that fields to a pub struct source map need to be added in the order of the fields in the
+    /// pub struct definition.
     pub fields: Vec<Location>,
 }
 
@@ -449,7 +449,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
         location: Location,
     ) -> Result<()> {
         self.struct_map.insert(struct_def_idx.0, StructSourceMap::new(location)).map_or(Ok(()), |_| { Err(format_err!(
-                "Multiple structs at same struct definition index encountered when constructing source map"
+                "Multiple structs at same pub struct definition index encountered when constructing source map"
                 )) })
     }
 
@@ -475,7 +475,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
         let struct_entry = self
             .struct_map
             .get_mut(&struct_def_idx.0)
-            .ok_or_else(|| format_err!("Tried to add file mapping to undefined struct index"))?;
+            .ok_or_else(|| format_err!("Tried to add file mapping to undefined pub struct index"))?;
         struct_entry.add_field_location(location);
         Ok(())
     }
@@ -496,7 +496,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
         name: SourceName<Location>,
     ) -> Result<()> {
         let struct_entry = self.struct_map.get_mut(&struct_def_idx.0).ok_or_else(|| {
-            format_err!("Tried to add struct type parameter mapping to undefined struct index")
+            format_err!("Tried to add pub struct type parameter mapping to undefined pub struct index")
         })?;
         struct_entry.add_type_parameter(name);
         Ok(())
@@ -512,7 +512,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
             .and_then(|struct_source_map| {
                 struct_source_map.get_type_parameter_name(type_parameter_idx)
             })
-            .ok_or_else(|| format_err!("Unable to get struct type parameter name"))
+            .ok_or_else(|| format_err!("Unable to get pub struct type parameter name"))
     }
 
     pub fn get_function_source_map(
@@ -530,7 +530,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
     ) -> Result<&StructSourceMap<Location>> {
         self.struct_map
             .get(&struct_def_idx.0)
-            .ok_or_else(|| format_err!("Unable to get struct source map"))
+            .ok_or_else(|| format_err!("Unable to get pub struct source map"))
     }
 
     /// Create a 'dummy' source map for a compiled module. This is useful for e.g. disassembling
@@ -563,7 +563,7 @@ impl<Location: Clone + Eq> SourceMap<Location> {
             empty_source_map
                 .struct_map
                 .get_mut(&(struct_idx as TableIndex))
-                .ok_or_else(|| format_err!("Unable to get struct map while generating dummy"))?
+                .ok_or_else(|| format_err!("Unable to get pub struct map while generating dummy"))?
                 .dummy_struct_map(&module, &struct_def, default_loc.clone())?;
         }
 

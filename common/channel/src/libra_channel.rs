@@ -26,7 +26,7 @@ use std::{
 /// SharedState is a data structure private to this module which is
 /// shared by the `Receiver` and any `Sender`s.
 #[derive(Debug)]
-struct SharedState<K: Eq + Hash + Clone, M> {
+pub struct SharedState<K: Eq + Hash + Clone, M> {
     /// The internal queue of messages in this channel.
     internal_queue: PerKeyQueue<K, (M, Option<oneshot::Sender<ElementStatus<M>>>)>,
     /// The `Receiver` registers its `Waker` in this slot when the queue is empty.

@@ -43,7 +43,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
         }
     }
 
-    fn secure_backend(&self, ns: &str, usage: &str) -> SecureBackend {
+    pub fn secure_backend(&self, ns: &str, usage: &str) -> SecureBackend {
         let original = self.storage_helper.path();
         let dst_base = self.swarm_path.as_ref();
         let mut dst = dst_base.to_path_buf();
@@ -58,7 +58,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
     }
 
     /// Association uploads the validator layout to shared storage.
-    fn create_layout(&self) {
+    pub fn create_layout(&self) {
         let mut layout = Layout::default();
         layout.libra_root = vec![LIBRA_ROOT_SHARED_NS.into()];
         layout.owners = (0..self.num_validators)
@@ -74,7 +74,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
     }
 
     /// Association initializes its account and the libra root key.
-    fn create_libra_root(&self) {
+    pub fn create_libra_root(&self) {
         self.storage_helper.initialize(LIBRA_ROOT_NS.into());
         self.storage_helper
             .libra_root_key(LIBRA_ROOT_NS, LIBRA_ROOT_SHARED_NS)
@@ -82,7 +82,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
     }
 
     /// Generate owner key locally and upload to shared storage.
-    fn initialize_validator_owner(&self, index: usize) {
+    pub fn initialize_validator_owner(&self, index: usize) {
         let local_ns = index.to_string() + OWNER_NS;
         let remote_ns = index.to_string() + OWNER_SHARED_NS;
 
@@ -94,7 +94,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
     }
 
     /// Generate operator key locally and upload to shared storage.
-    fn initialize_validator_operator(&self, index: usize) {
+    pub fn initialize_validator_operator(&self, index: usize) {
         let local_ns = index.to_string() + OPERATOR_NS;
         let remote_ns = index.to_string() + OPERATOR_SHARED_NS;
 
@@ -107,7 +107,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
 
     /// Sets the operator for the owner by uploading a set-operator transaction to shared storage.
     /// Note, we assume that owner i chooses operator i to operate the validator.
-    fn set_validator_operator(&self, index: usize) {
+    pub fn set_validator_operator(&self, index: usize) {
         let local_ns = index.to_string() + OWNER_NS;
         let remote_ns = index.to_string() + OWNER_SHARED_NS;
 
@@ -118,7 +118,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
     }
 
     /// Operators upload their validator_config to shared storage.
-    fn initialize_validator_config(&self, index: usize) -> NodeConfig {
+    pub fn initialize_validator_config(&self, index: usize) -> NodeConfig {
         let local_ns = index.to_string() + OPERATOR_NS;
         let remote_ns = index.to_string() + OPERATOR_SHARED_NS;
 
@@ -157,7 +157,7 @@ impl<T: AsRef<Path>> ValidatorBuilder<T> {
 
     /// Operators generate genesis from shared storage and verify against waypoint.
     /// Insert the genesis/waypoint into local config.
-    fn finish_validator_config(&self, index: usize, config: &mut NodeConfig) {
+    pub fn finish_validator_config(&self, index: usize, config: &mut NodeConfig) {
         let local_ns = index.to_string() + OPERATOR_NS;
 
         let genesis_path = TempPath::new();
@@ -247,7 +247,7 @@ impl FullnodeBuilder {
         }
     }
 
-    fn attach_validator_full_node(&self, validator_config: &mut NodeConfig) -> NodeConfig {
+    pub fn attach_validator_full_node(&self, validator_config: &mut NodeConfig) -> NodeConfig {
         // Create two vfns, we'll pass one to the validator later
         let mut full_node_config = self.template.clone();
         full_node_config.randomize_ports();
@@ -289,13 +289,13 @@ impl FullnodeBuilder {
         full_node_config
     }
 
-    fn insert_waypoint_and_genesis(config: &mut NodeConfig, upstream: &NodeConfig) {
+    pub fn insert_waypoint_and_genesis(config: &mut NodeConfig, upstream: &NodeConfig) {
         config.base.waypoint = upstream.base.waypoint.clone();
         config.execution.genesis = upstream.execution.genesis.clone();
         config.execution.genesis_file_location = PathBuf::from("");
     }
 
-    fn build_vfn(&self) -> anyhow::Result<Vec<NodeConfig>> {
+    pub fn build_vfn(&self) -> anyhow::Result<Vec<NodeConfig>> {
         let mut configs = vec![];
         for path in &self.validator_config_path {
             let mut validator_config = NodeConfig::load(path)?;
@@ -306,7 +306,7 @@ impl FullnodeBuilder {
         Ok(configs)
     }
 
-    fn build_public_fn(&self, num_nodes: usize) -> anyhow::Result<Vec<NodeConfig>> {
+    pub fn build_public_fn(&self, num_nodes: usize) -> anyhow::Result<Vec<NodeConfig>> {
         let mut configs = vec![];
         let validator_config = NodeConfig::load(
             self.validator_config_path
@@ -324,7 +324,7 @@ impl FullnodeBuilder {
 }
 
 impl BuildSwarm for FullnodeBuilder {
-    fn build_swarm(&self) -> anyhow::Result<(Vec<NodeConfig>, Ed25519PrivateKey)> {
+    pub fn build_swarm(&self) -> anyhow::Result<(Vec<NodeConfig>, Ed25519PrivateKey)> {
         let configs = match self.build_type {
             FullnodeType::ValidatorFullnode => self.build_vfn(),
             FullnodeType::PublicFullnode(num_nodes) => self.build_public_fn(num_nodes),

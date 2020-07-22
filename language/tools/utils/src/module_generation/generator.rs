@@ -87,16 +87,16 @@ pub struct ModuleGenerator<'a> {
 }
 
 impl<'a> ModuleGenerator<'a> {
-    fn index(&mut self, bound: usize) -> usize {
+    pub fn index(&mut self, bound: usize) -> usize {
         self.gen.gen_range(0, bound)
     }
 
-    fn identifier(&mut self) -> String {
+    pub fn identifier(&mut self) -> String {
         let len = self.gen.gen_range(10, self.options.max_string_size);
         random_string(&mut self.gen, len)
     }
 
-    fn base_type(&mut self, ty_param_context: &[(TypeVar, Kind)]) -> Type {
+    pub fn base_type(&mut self, ty_param_context: &[(TypeVar, Kind)]) -> Type {
         // TODO: Don't generate nested resources for now. Once we allow functions to take resources
         // (and have type parameters of kind Resource or All) then we should revisit this here.
         let structs: Vec<_> = self
@@ -144,7 +144,7 @@ impl<'a> ModuleGenerator<'a> {
         }
     }
 
-    fn typ(&mut self, ty_param_context: &[(TypeVar, Kind)]) -> Type {
+    pub fn typ(&mut self, ty_param_context: &[(TypeVar, Kind)]) -> Type {
         let typ = self.base_type(ty_param_context);
         // TODO: Always change the base type to a reference if it's resource type. Then we can
         // allow functions to take resources.
@@ -157,7 +157,7 @@ impl<'a> ModuleGenerator<'a> {
         }
     }
 
-    fn type_parameters(&mut self) -> Vec<(TypeVar, Kind)> {
+    pub fn type_parameters(&mut self) -> Vec<(TypeVar, Kind)> {
         // Don't generate type parameters if we're generating simple types only
         if self.options.simple_types_only {
             vec![]
@@ -175,7 +175,7 @@ impl<'a> ModuleGenerator<'a> {
 
     // All functions will have unit return type, and an empty body with the exception of a return.
     // We'll scoop this out and replace it later on in the compiled module that we generate.
-    fn function_signature(&mut self) -> FunctionSignature {
+    pub fn function_signature(&mut self) -> FunctionSignature {
         let ty_params = self.type_parameters();
         let number_of_args = self.index(self.options.max_function_call_size);
         let mut formals: Vec<(Var, Type)> = init!(number_of_args, {
@@ -200,7 +200,7 @@ impl<'a> ModuleGenerator<'a> {
         FunctionSignature::new(formals, vec![], ty_params)
     }
 
-    fn struct_fields(&mut self, ty_params: &[(TypeVar, Kind)]) -> StructDefinitionFields {
+    pub fn struct_fields(&mut self, ty_params: &[(TypeVar, Kind)]) -> StructDefinitionFields {
         let num_fields = self
             .gen
             .gen_range(self.options.min_fields, self.options.max_fields);
@@ -214,7 +214,7 @@ impl<'a> ModuleGenerator<'a> {
         StructDefinitionFields::Move { fields }
     }
 
-    fn function_def(&mut self) {
+    pub fn function_def(&mut self) {
         let signature = self.function_signature();
         let num_locals = self.index(self.options.max_locals);
         let locals = init!(num_locals, {
@@ -243,7 +243,7 @@ impl<'a> ModuleGenerator<'a> {
             .push((fun_name, Spanned::unsafe_no_loc(fun)));
     }
 
-    fn struct_def(&mut self, is_nominal_resource: bool) {
+    pub fn struct_def(&mut self, is_nominal_resource: bool) {
         let name = StructName::new(self.identifier());
         let type_parameters = self.type_parameters();
         let fields = self.struct_fields(&type_parameters);
@@ -259,7 +259,7 @@ impl<'a> ModuleGenerator<'a> {
             .push(Spanned::unsafe_no_loc(strct))
     }
 
-    fn imports(callees: &Set<String>) -> Vec<ImportDefinition> {
+    pub fn imports(callees: &Set<String>) -> Vec<ImportDefinition> {
         callees
             .iter()
             .map(|ident| {
@@ -272,7 +272,7 @@ impl<'a> ModuleGenerator<'a> {
             .collect()
     }
 
-    fn gen(mut self) -> ModuleDefinition {
+    pub fn gen(mut self) -> ModuleDefinition {
         let num_structs = self.index(self.options.max_structs) + 1;
         let num_functions = self.index(self.options.max_functions) + 1;
         // TODO: the order of generation here means that functions can't take resources as arguments.
@@ -301,7 +301,7 @@ impl<'a> ModuleGenerator<'a> {
         options: ModuleGeneratorOptions,
         callable_modules: &Set<String>,
     ) -> ModuleDefinition {
-        // TODO: Generation of struct and function handles to the `callable_modules`
+        // TODO: Generation of pub struct and function handles to the `callable_modules`
         let module_name = {
             let len = gen.gen_range(10, options.max_string_size);
             random_string(gen, len)

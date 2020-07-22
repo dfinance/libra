@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //! This provides a runtime separation between ExecutionCorrectness and the rest without requiring the
-//! use of processes. Rust does not support fork and so the mechanics to actually construct a
+//! use of processes. Rust does not support fork and so the mechanics to actually conpub struct a
 //! ExecutionCorrectness that would run together and be started by SafetyRules requires a separate binary and
 //! making a call to start that via a command. This is a lightweight means of accomplishing a goal
 //! in testing correctness of the communication layer between ExecutionCorrectness and SafetyRules.

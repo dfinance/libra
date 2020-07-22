@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! # Libra Canonical Serialization (LCS)
 //!
@@ -61,8 +61,8 @@
 //! (de)serialization of a known LCS format cannot cause arbitrarily large stack allocations.
 //!
 //! As an example, if `v1` and `v2` are values of depth `n1` and `n2`,
-//! * a struct value `Foo { v1, v2 }` has depth `1 + max(n1, n2)`;
-//! * an enum value `E::Foo { v1, v2 }` has depth `1 + max(n1, n2)`;
+//! * a pub struct value `Foo { v1, v2 }` has depth `1 + max(n1, n2)`;
+//! * anpub enum value `E::Foo { v1, v2 }` has depth `1 + max(n1, n2)`;
 //! * a pair `(v1, v2)` has depth `max(n1, n2)`;
 //! * the value `Some(v1)` has depth `n1`.
 //!
@@ -86,7 +86,7 @@
 //!
 //! The LCS format also uses the [ULEB128 encoding](https://en.wikipedia.org/wiki/LEB128) internally
 //! to represent unsigned 32-bit integers in two cases where small values are usually expected:
-//! (1) lengths of variable-length sequences and (2) tags of enum values (see the corresponding
+//! (1) lengths of variable-length sequences and (2) tags ofpub enum values (see the corresponding
 //! sections below).
 //!
 //! |Type                       |Original data          |Hex representation |Serialized format  |
@@ -189,9 +189,9 @@
 //! ### Structures
 //!
 //! Structures are fixed length sequences consisting of fields with potentially different types.
-//! Each field within a struct is serialized in the order specified by the canonical structure
+//! Each field within a pub struct is serialized in the order specified by the canonical structure
 //! definition. Structs can exist within other structs and as such, LCS recurses into each struct
-//! and serializes them in order. There are no labels in the serialized format, the struct ordering
+//! and serializes them in order. There are no labels in the serialized format, the pub struct ordering
 //! defines the organization within the serialization stream.
 //!
 //! ```rust
@@ -199,14 +199,14 @@
 //! # use serde::Serialize;
 //! # fn main() -> Result<()> {
 //! # #[derive(Serialize)]
-//! struct MyStruct {
+//! pub struct MyStruct {
 //!     boolean: bool,
 //!     bytes: Vec<u8>,
 //!     label: String,
 //! }
 //!
 //! # #[derive(Serialize)]
-//! struct Wrapper {
+//! pub struct Wrapper {
 //!     inner: MyStruct,
 //!     name: String,
 //! }
@@ -238,7 +238,7 @@
 //! different variants. In LCS, each variant is mapped to a variant index, a ULEB128-encoded 32-bit unsigned
 //! integer, followed by serialized data if the type has an associated value. An
 //! associated type can be any LCS supported type. The variant index is determined based on the
-//! ordering of the variants in the canonical enum definition, where the first variant has an index
+//! ordering of the variants in the canonicalpub enum definition, where the first variant has an index
 //! of `0`, the second an index of `1`, etc.
 //!
 //! ```rust
@@ -246,7 +246,7 @@
 //! # use serde::Serialize;
 //! # fn main() -> Result<()> {
 //! # #[derive(Serialize)]
-//! enum E {
+//!pub enum E {
 //!     Variant0(u16),
 //!     Variant1(u8),
 //!     Variant2(String),
@@ -292,9 +292,9 @@
 //! direct provisions for versioning or backwards / forwards compatibility. A change in an objects
 //! structure could prevent historical clients from understanding new clients and vice-versa.
 
-mod de;
-mod error;
-mod ser;
+pub mod de;
+pub mod error;
+pub mod ser;
 pub mod test_helpers;
 
 /// Variable length sequences in LCS are limited to max length of 2^31 - 1.

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::coverage_map::CoverageMap;
 use bytecode_source_map::source_map::SourceMap;
@@ -230,7 +230,7 @@ impl SourceCoverage {
     }
 }
 
-fn merge_spans(cov: FunctionSourceCoverage) -> Vec<Span> {
+pub fn merge_spans(cov: FunctionSourceCoverage) -> Vec<Span> {
     if cov.uncovered_locations.is_empty() {
         return vec![];
     }

@@ -4,7 +4,7 @@
 use once_cell::sync::Lazy;
 use prometheus::{register_int_counter, IntCounter};
 
-/// Count of the struct logs.
+/// Count of the pub struct logs.
 pub static STRUCT_LOG_COUNT: Lazy<IntCounter> = Lazy::new(|| {
-    register_int_counter!("libra_struct_log_count", "Count of the struct logs.").unwrap()
+    register_int_counter!("libra_struct_log_count", "Count of the pub struct logs.").unwrap()
 });

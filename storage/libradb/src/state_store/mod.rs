@@ -4,7 +4,7 @@
 //! This file defines state store APIs that are related account state Merkle tree.
 
 #[cfg(test)]
-mod state_store_test;
+pub mod state_store_test;
 
 use crate::{
     change_set::ChangeSet,
@@ -29,7 +29,7 @@ use schemadb::{SchemaBatch, DB};
 use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug)]
-pub(crate) struct StateStore {
+pub struct StateStore {
     db: Arc<DB>,
 }
 

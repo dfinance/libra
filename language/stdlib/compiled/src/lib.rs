@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 pub mod transaction_scripts;
 
@@ -61,7 +61,7 @@ static COMPILED_MOVELANG_STDLIB: Lazy<Vec<CompiledModule>> = Lazy::new(|| {
     verified_modules
 });
 
-/// An enum specifying whether the compiled stdlib/scripts should be used or freshly built versions
+/// Anpub enum specifying whether the compiled stdlib/scripts should be used or freshly built versions
 /// should be used.
 #[derive(Debug, Eq, PartialEq)]
 pub enum StdLibOptions {

@@ -13,9 +13,9 @@ use vm::errors::{PartialVMError, PartialVMResult};
 
 use serde::{Deserialize, Serialize};
 
-/// VM representation of a struct type in Move.
+/// VM representation of a pub struct type in Move.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) struct FatStructType {
+pub struct FatStructType {
     pub address: AccountAddress,
     pub module: Identifier,
     pub name: Identifier,
@@ -25,7 +25,7 @@ pub(crate) struct FatStructType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub(crate) enum FatType {
+pub enum FatType {
     Bool,
     U8,
     U64,

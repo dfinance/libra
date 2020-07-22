@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
+
+
 
 //! Libra Client
 //!
@@ -17,17 +17,17 @@ use libra_crypto::{
 use libra_types::account_address::AccountAddress;
 use serde::{Deserialize, Serialize};
 
-mod account_commands;
+pub mod account_commands;
 /// Main instance of client holding corresponding information, e.g. account address.
 pub mod client_proxy;
-/// Command struct to interact with client.
+/// Command pub struct to interact with client.
 pub mod commands;
-mod dev_commands;
-mod info_commands;
+pub mod dev_commands;
+pub mod info_commands;
 /// Client wrapper to connect to validator.
-mod libra_client;
-mod query_commands;
-mod transfer_commands;
+pub mod libra_client;
+pub mod query_commands;
+pub mod transfer_commands;
 
 /// Struct used to store data for each created account.  We track the sequence number
 /// so we can create new transactions easily

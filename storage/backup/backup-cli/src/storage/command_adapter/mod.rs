@@ -1,10 +1,10 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod config;
+pub mod config;
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 use crate::storage::{
     command_adapter::config::{CommandAdapterConfig, EnvVar},
@@ -116,7 +116,7 @@ impl BackupStorage for CommandAdapter {
 }
 
 #[derive(Debug)]
-struct Command {
+pub struct Command {
     cmd_str: String,
     env_vars: Vec<EnvVar>,
 }
@@ -126,7 +126,7 @@ impl Command {
         Self { cmd_str, env_vars }
     }
 
-    fn tokio_cmd(&self, cmd_str: &str) -> tokio::process::Command {
+    pub fn tokio_cmd(&self, cmd_str: &str) -> tokio::process::Command {
         let mut cmd = tokio::process::Command::new("sh");
         cmd.args(&["-c", cmd_str]);
         cmd.stdin(Stdio::piped())
@@ -140,7 +140,7 @@ impl Command {
         cmd
     }
 
-    async fn spawn(&mut self) -> Result<tokio::process::Child> {
+    pub async fn spawn(&mut self) -> Result<tokio::process::Child> {
         println!("Spawning {:?}", self);
         Ok(self.tokio_cmd(&self.cmd_str).spawn()?)
     }

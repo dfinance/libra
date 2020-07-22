@@ -22,7 +22,7 @@ use libra_types::{
 use proptest::prelude::*;
 use std::collections::HashMap;
 
-fn verify_epochs(db: &LibraDB, ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) {
+pub fn verify_epochs(db: &LibraDB, ledger_infos_with_sigs: &[LedgerInfoWithSignatures]) {
     const LIMIT: usize = 2;
     let mut actual_epoch_change_lis = Vec::new();
     let latest_epoch = ledger_infos_with_sigs
@@ -143,7 +143,7 @@ fn test_sync_transactions_impl(input: Vec<(Vec<TransactionToCommit>, LedgerInfoW
     }
 }
 
-fn get_events_by_event_key(
+pub fn get_events_by_event_key(
     db: &LibraDB,
     ledger_info: &LedgerInfo,
     event_key: &EventKey,
@@ -233,7 +233,7 @@ fn get_events_by_event_key(
     Ok(ret)
 }
 
-fn verify_events_by_event_key(
+pub fn verify_events_by_event_key(
     db: &LibraDB,
     events: Vec<(EventKey, Vec<ContractEvent>)>,
     ledger_info: &LedgerInfo,
@@ -277,7 +277,7 @@ fn verify_events_by_event_key(
         .unwrap();
 }
 
-fn group_events_by_event_key(
+pub fn group_events_by_event_key(
     txns_to_commit: &[TransactionToCommit],
 ) -> Vec<(EventKey, Vec<ContractEvent>)> {
     let mut event_key_to_events: HashMap<EventKey, Vec<ContractEvent>> = HashMap::new();
@@ -292,7 +292,7 @@ fn group_events_by_event_key(
     event_key_to_events.into_iter().collect()
 }
 
-fn verify_committed_transactions(
+pub fn verify_committed_transactions(
     db: &LibraDB,
     txns_to_commit: &[TransactionToCommit],
     first_version: Version,
@@ -438,7 +438,7 @@ fn test_get_latest_tree_state() {
     );
 }
 
-fn put_transaction_info(db: &LibraDB, version: Version, txn_info: &TransactionInfo) {
+pub fn put_transaction_info(db: &LibraDB, version: Version, txn_info: &TransactionInfo) {
     let mut cs = ChangeSet::new();
     db.ledger_store
         .put_transaction_infos(version, &[txn_info.clone()], &mut cs)

@@ -211,12 +211,12 @@ impl<'cfg> LintEngine<'cfg> {
     // Helper methods
     // ---
 
-    fn get_file_list(&self) -> Result<Vec<&Path>> {
+    pub fn get_file_list(&self) -> Result<Vec<&Path>> {
         // TODO: It'd be pretty cool to be able to cache the `&Path` instances as well. The options
         // are:
         // 1. Cache them as `PathBuf` instances. That would involve lots of allocations.
         // 2. Store the `&Path` instances alongside `files_stdout`. That would be a self-referential
-        //    struct (so would require the use of something like
+        //    pub struct (so would require the use of something like
         //    [`rental`](https://docs.rs/rental/).
         // 3. Reorganize the code to use some sort of arena allocator which is passed into the lint
         //    context (and/or stored alongside with `rental`.)
@@ -246,7 +246,7 @@ impl<'cfg> LintEngine<'cfg> {
             .collect())
     }
 
-    fn files_stdout(&self) -> Result<&[u8]> {
+    pub fn files_stdout(&self) -> Result<&[u8]> {
         self.files_stdout
             .get_or_try_init(|| {
                 // TODO: abstract out SCM and command-running functionality.

@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod github;
-mod in_memory;
-mod on_disk;
-mod suite;
-mod vault;
+pub mod github;
+pub mod in_memory;
+pub mod on_disk;
+pub mod suite;
+pub mod vault;

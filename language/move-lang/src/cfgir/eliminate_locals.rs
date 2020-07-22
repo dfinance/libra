@@ -28,7 +28,7 @@ pub fn optimize(cfg: &mut BlockCFG) -> bool {
 // Count assignment and usage
 //**************************************************************************************************
 
-fn count(cfg: &BlockCFG) -> BTreeSet<Var> {
+pub fn count(cfg: &BlockCFG) -> BTreeSet<Var> {
     let mut context = count::Context::new();
     for block in cfg.blocks().values() {
         for cmd in block {
@@ -38,7 +38,7 @@ fn count(cfg: &BlockCFG) -> BTreeSet<Var> {
     context.finish()
 }
 
-mod count {
+pub mod count {
     use crate::{
         hlir::ast::*,
         parser::ast::{BinOp, UnaryOp, Var},
@@ -58,7 +58,7 @@ mod count {
             }
         }
 
-        fn assign(&mut self, var: &Var, substitutable: bool) {
+        pub fn assign(&mut self, var: &Var, substitutable: bool) {
             if !substitutable {
                 self.assigned.insert(var.clone(), None);
                 return;
@@ -69,7 +69,7 @@ mod count {
             }
         }
 
-        fn used(&mut self, var: &Var, substitutable: bool) {
+        pub fn used(&mut self, var: &Var, substitutable: bool) {
             if !substitutable {
                 self.used.insert(var.clone(), None);
                 return;
@@ -118,14 +118,14 @@ mod count {
         }
     }
 
-    fn lvalues(context: &mut Context, ls: &[LValue], substitutable_rvalues: Vec<bool>) {
+    pub fn lvalues(context: &mut Context, ls: &[LValue], substitutable_rvalues: Vec<bool>) {
         assert!(ls.len() == substitutable_rvalues.len());
         ls.iter()
             .zip(substitutable_rvalues)
             .for_each(|(l, substitutable)| lvalue(context, l, substitutable))
     }
 
-    fn lvalue(context: &mut Context, sp!(_, l_): &LValue, substitutable: bool) {
+    pub fn lvalue(context: &mut Context, sp!(_, l_): &LValue, substitutable: bool) {
         use LValue_ as L;
         match l_ {
             L::Ignore | L::Unpack(_, _, _) => (),
@@ -133,7 +133,7 @@ mod count {
         }
     }
 
-    fn exp(context: &mut Context, parent_e: &Exp) {
+    pub fn exp(context: &mut Context, parent_e: &Exp) {
         use UnannotatedExp_ as E;
         match &parent_e.exp.value {
             E::Unit { .. } | E::Value(_) | E::Constant(_) | E::UnresolvedError => (),
@@ -166,13 +166,13 @@ mod count {
         }
     }
 
-    fn exp_list_item(context: &mut Context, item: &ExpListItem) {
+    pub fn exp_list_item(context: &mut Context, item: &ExpListItem) {
         match item {
             ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(context, e),
         }
     }
 
-    fn can_subst_exp(lvalue_len: usize, exp: &Exp) -> Vec<bool> {
+    pub fn can_subst_exp(lvalue_len: usize, exp: &Exp) -> Vec<bool> {
         use ExpListItem as I;
         use UnannotatedExp_ as E;
         match (lvalue_len, &exp.exp.value) {
@@ -195,7 +195,7 @@ mod count {
         }
     }
 
-    fn can_subst_exp_single(parent_e: &Exp) -> bool {
+    pub fn can_subst_exp_single(parent_e: &Exp) -> bool {
         use UnannotatedExp_ as E;
         match &parent_e.exp.value {
             E::UnresolvedError
@@ -223,15 +223,15 @@ mod count {
         }
     }
 
-    fn can_subst_exp_unary(sp!(_, op_): &UnaryOp) -> bool {
+    pub fn can_subst_exp_unary(sp!(_, op_): &UnaryOp) -> bool {
         op_.is_pure()
     }
 
-    fn can_subst_exp_binary(sp!(_, op_): &BinOp) -> bool {
+    pub fn can_subst_exp_binary(sp!(_, op_): &BinOp) -> bool {
         op_.is_pure()
     }
 
-    fn can_subst_exp_item(item: &ExpListItem) -> bool {
+    pub fn can_subst_exp_item(item: &ExpListItem) -> bool {
         use ExpListItem as I;
         match item {
             I::Single(e, _) => can_subst_exp_single(e),
@@ -244,7 +244,7 @@ mod count {
 // Eliminate
 //**************************************************************************************************
 
-fn eliminate(cfg: &mut BlockCFG, ssa_temps: BTreeSet<Var>) {
+pub fn eliminate(cfg: &mut BlockCFG, ssa_temps: BTreeSet<Var>) {
     let context = &mut eliminate::Context::new(ssa_temps);
     loop {
         for block in cfg.blocks_mut().values_mut() {
@@ -258,7 +258,7 @@ fn eliminate(cfg: &mut BlockCFG, ssa_temps: BTreeSet<Var>) {
     }
 }
 
-mod eliminate {
+pub mod eliminate {
     use crate::{
         hlir::ast::{self as H, *},
         parser::ast::Var,
@@ -306,12 +306,12 @@ mod eliminate {
         }
     }
 
-    enum LRes {
+   pub enum LRes {
         Same(LValue),
         Elim(Var),
     }
 
-    fn lvalues(context: &mut Context, ls: &mut Vec<LValue>) -> Vec<Option<Var>> {
+    pub fn lvalues(context: &mut Context, ls: &mut Vec<LValue>) -> Vec<Option<Var>> {
         let old = std::mem::replace(ls, vec![]);
         old.into_iter()
             .map(|l| match lvalue(context, l) {
@@ -324,7 +324,7 @@ mod eliminate {
             .collect()
     }
 
-    fn lvalue(context: &mut Context, sp!(loc, l_): LValue) -> LRes {
+    pub fn lvalue(context: &mut Context, sp!(loc, l_): LValue) -> LRes {
         use LValue_ as L;
         match l_ {
             l_ @ L::Ignore | l_ @ L::Unpack(_, _, _) => LRes::Same(sp(loc, l_)),
@@ -339,7 +339,7 @@ mod eliminate {
         }
     }
 
-    fn exp(context: &mut Context, parent_e: &mut Exp) {
+    pub fn exp(context: &mut Context, parent_e: &mut Exp) {
         use UnannotatedExp_ as E;
         match &mut parent_e.exp.value {
             E::Copy { var, .. } | E::Move { var, .. } => {
@@ -376,13 +376,13 @@ mod eliminate {
         }
     }
 
-    fn exp_list_item(context: &mut Context, item: &mut ExpListItem) {
+    pub fn exp_list_item(context: &mut Context, item: &mut ExpListItem) {
         match item {
             ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(context, e),
         }
     }
 
-    fn remove_eliminated(context: &mut Context, mut eliminated: Vec<Option<Var>>, e: &mut Exp) {
+    pub fn remove_eliminated(context: &mut Context, mut eliminated: Vec<Option<Var>>, e: &mut Exp) {
         if eliminated.iter().all(|opt| opt.is_none()) {
             return;
         }
@@ -436,12 +436,12 @@ mod eliminate {
         }
     }
 
-    fn remove_eliminated_single(context: &mut Context, v: Var, e: &mut Exp) {
+    pub fn remove_eliminated_single(context: &mut Context, v: Var, e: &mut Exp) {
         let old = std::mem::replace(e, unit(e.exp.loc));
         context.eliminated.insert(v, old);
     }
 
-    fn unit(loc: Loc) -> Exp {
+    pub fn unit(loc: Loc) -> Exp {
         H::exp(
             sp(loc, Type_::Unit),
             sp(loc, UnannotatedExp_::Unit { trailing: false }),

@@ -6,11 +6,11 @@ use anyhow::anyhow;
 use structopt::StructOpt;
 use x_lint::{prelude::*, LintEngineConfig};
 
-mod guppy;
-mod license;
-mod toml;
-mod whitespace;
-mod workspace_classify;
+pub mod guppy;
+pub mod license;
+pub mod toml;
+pub mod whitespace;
+pub mod workspace_classify;
 
 #[derive(Debug, StructOpt)]
 pub struct Args {

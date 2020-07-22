@@ -19,7 +19,7 @@ pub struct AndThen<T, F> {
 }
 
 impl<T, F> AndThen<T, F> {
-    pub(crate) fn new(transport: T, function: F) -> Self {
+    pub fn new(transport: T, function: F) -> Self {
         Self {
             transport,
             function,
@@ -113,7 +113,7 @@ where
 
 #[pin_project(project = AndThenChainProj)]
 #[derive(Debug)]
-enum AndThenChain<Fut1, Fut2, F> {
+pub enum AndThenChain<Fut1, Fut2, F> {
     First(#[pin] Fut1, Option<(F, NetworkAddress, ConnectionOrigin)>),
     Second(#[pin] Fut2),
     Empty,

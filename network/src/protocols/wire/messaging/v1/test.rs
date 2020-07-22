@@ -3,7 +3,7 @@
 
 use super::*;
 
-// Ensure serialization of ProtocolId enum takes 1 byte.
+// Ensure serialization of ProtocolIdpub enum takes 1 byte.
 #[test]
 fn protocol_id_serialization() -> lcs::Result<()> {
     let protocol = ProtocolId::ConsensusRpc;

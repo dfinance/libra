@@ -8,7 +8,7 @@
 //!
 //! Note: While a JSON RPC client implementation already exists in the Libra codebase, this
 //! provides a simpler and (hopefully) more secure implementation with fewer dependencies.
-#![forbid(unsafe_code)]
+
 
 use hex::FromHexError;
 use libra_types::{
@@ -150,7 +150,7 @@ impl JsonRpcClient {
 
     // Executes the specified request method using the given parameters by contacting the JSON RPC
     // server.
-    fn execute_request(&self, method: String, params: Vec<Value>) -> Response {
+    pub fn execute_request(&self, method: String, params: Vec<Value>) -> Response {
         ureq::post(&self.host)
             .timeout_connect(REQUEST_TIMEOUT)
             .send_json(
@@ -168,7 +168,7 @@ impl JsonRpcClient {
 ///
 ///
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct SubmitTransactionResponse {
+pub struct SubmitTransactionResponse {
     id: u64,
     jsonrpc: String,
     result: Option<Value>,
@@ -189,7 +189,7 @@ struct SubmitTransactionResponse {
 ///   }
 /// }"
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct AccountStateWithProofResponse {
+pub struct AccountStateWithProofResponse {
     id: u64,
     jsonrpc: String,
     result: AccountStateResponse,
@@ -198,7 +198,7 @@ struct AccountStateWithProofResponse {
 /// In practice this represents an AccountStateWithProof, however, we only decode the relevant
 /// fields here.
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct AccountStateResponse {
+pub struct AccountStateResponse {
     version: u64,
     blob: Option<Bytes>,
 }
@@ -214,7 +214,7 @@ struct AccountStateResponse {
 ///   "jsonrpc: "2.0"
 /// }"
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct JSONRpcFailureResponse {
+pub struct JSONRpcFailureResponse {
     id: u64,
     jsonrpc: String,
     error: JsonRpcError,
@@ -223,7 +223,7 @@ struct JSONRpcFailureResponse {
 /// A custom error returned by the JSON RPC server for API calls that fail internally (e.g.,
 /// an internal error during execution on the server side).
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct JsonRpcError {
+pub struct JsonRpcError {
     code: i16,
     message: String,
     data: Option<Value>,
@@ -252,7 +252,7 @@ impl From<&Vec<u8>> for Bytes {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use anyhow::Result;
     use futures::{channel::mpsc::channel, StreamExt};
@@ -394,7 +394,7 @@ mod test {
     /// and the server is a JSON server that serves the JSON RPC requests. The server communicates
     /// with the given database to handle each JSON RPC request. If mock_validator is set to true,
     /// the server is also given a mock vm validator to validate any submitted transactions.
-    fn create_client_and_server(db: MockLibraDB, mock_validator: bool) -> (JsonRpcClient, Runtime) {
+    pub fn create_client_and_server(db: MockLibraDB, mock_validator: bool) -> (JsonRpcClient, Runtime) {
         let address = "0.0.0.0";
         let port = utils::get_available_port();
         let host = format!("{}:{}", address, port);
@@ -423,7 +423,7 @@ mod test {
     }
 
     /// Generates an AccountStateProof for testing.
-    fn create_test_state_proof() -> AccountStateProof {
+    pub fn create_test_state_proof() -> AccountStateProof {
         let transaction_info = TransactionInfo::new(
             HashValue::zero(),
             HashValue::zero(),
@@ -440,7 +440,7 @@ mod test {
 
     /// Generates an AccountStateWithProof using the given AccountState and version height for
     /// testing.
-    fn create_test_state_with_proof(
+    pub fn create_test_state_with_proof(
         account_state: &AccountState,
         version_height: u64,
     ) -> AccountStateWithProof {
@@ -452,14 +452,14 @@ mod test {
     }
 
     /// Generates an AccountState for testing.
-    fn create_test_account_state() -> AccountState {
+    pub fn create_test_account_state() -> AccountState {
         let account_resource = create_test_account_resource();
         let balance_resource = create_test_balance_resource();
         AccountState::try_from((&account_resource, &balance_resource)).unwrap()
     }
 
     /// Generates an AccountResource for testing.
-    fn create_test_account_resource() -> AccountResource {
+    pub fn create_test_account_resource() -> AccountResource {
         AccountResource::new(
             10,
             vec![],
@@ -471,19 +471,19 @@ mod test {
     }
 
     /// Generates a BalanceResource for testing.
-    fn create_test_balance_resource() -> BalanceResource {
+    pub fn create_test_balance_resource() -> BalanceResource {
         BalanceResource::new(100)
     }
 
     /// Generates and returns a (randomized) SignedTransaction for testing.
-    fn generate_signed_transaction() -> SignedTransaction {
+    pub fn generate_signed_transaction() -> SignedTransaction {
         let sender = AccountAddress::random();
         let private_key = Ed25519PrivateKey::generate_for_testing();
         get_test_signed_txn(sender, 0, &private_key, private_key.public_key(), None)
     }
 
     /// Returns an empty mock database for testing.
-    fn create_empty_mock_db() -> MockLibraDB {
+    pub fn create_empty_mock_db() -> MockLibraDB {
         MockLibraDB::new(BTreeMap::new())
     }
 

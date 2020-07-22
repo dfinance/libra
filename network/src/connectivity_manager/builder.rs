@@ -26,7 +26,7 @@ use tokio_retry::strategy::ExponentialBackoff;
 pub type ConnectivityManagerService = ConnectivityManager<Fuse<Interval>, ExponentialBackoff>;
 
 /// The configuration fields for ConnectivityManager
-struct ConnectivityManagerBuilderConfig {
+pub struct ConnectivityManagerBuilderConfig {
     network_context: Arc<NetworkContext>,
     eligible: Arc<RwLock<HashMap<PeerId, HashSet<x25519::PublicKey>>>>,
     seed_addrs: HashMap<PeerId, Vec<NetworkAddress>>,
@@ -41,7 +41,7 @@ struct ConnectivityManagerBuilderConfig {
 }
 
 #[derive(Debug, PartialEq, PartialOrd)]
-enum State {
+pub enum State {
     CREATED,
     BUILT,
     STARTED,

@@ -8,7 +8,7 @@ static LICENSE_HEADER: &str = "Copyright (c) The Libra Core Contributors\n\
                                ";
 
 #[derive(Copy, Clone, Debug)]
-pub(super) struct LicenseHeader;
+pub struct LicenseHeader;
 
 impl Linter for LicenseHeader {
     fn name(&self) -> &'static str {
@@ -71,7 +71,7 @@ impl ContentLinter for LicenseHeader {
     }
 }
 
-enum FileType {
+pub enum FileType {
     Rust,
     Shell,
     Proto,

@@ -15,7 +15,7 @@ use std::{
 /// evaluate a proposal / block for correctness / safety and to produce a Vote.
 #[derive(Clone, CryptoHasher, Deserialize, LCSCryptoHash, Serialize)]
 pub struct VoteProposal {
-    /// Contains the data necessary to construct the parent's execution output state
+    /// Contains the data necessary to conpub struct the parent's execution output state
     /// and the childs in a verifiable way
     accumulator_extension_proof: AccumulatorExtensionProof<TransactionAccumulatorHasher>,
     /// The block / proposal to evaluate

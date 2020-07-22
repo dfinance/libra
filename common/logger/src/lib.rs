@@ -124,15 +124,15 @@ pub mod prelude {
 }
 pub mod json_log;
 
-mod security;
-mod struct_log;
+pub mod security;
+pub mod struct_log;
 
 pub use struct_log::{
     init_file_struct_log, init_println_struct_log, init_struct_log_from_env, set_struct_logger,
     struct_logger_enabled, struct_logger_set, LoggingField, StructLogSink, StructuredLogEntry,
 };
 
-mod text_log;
+pub mod text_log;
 pub use log::Level;
 pub use text_log::{Logger, CHANNEL_SIZE, DEFAULT_TARGET};
 pub mod counters;

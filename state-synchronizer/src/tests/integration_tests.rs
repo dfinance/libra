@@ -132,7 +132,7 @@ impl ExecutorProxyTrait for MockExecutorProxy {
     }
 }
 
-struct SynchronizerEnv {
+pub struct SynchronizerEnv {
     runtime: Runtime,
     synchronizers: Vec<StateSynchronizer>,
     clients: Vec<Arc<StateSyncClient>>,

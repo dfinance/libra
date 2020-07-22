@@ -27,7 +27,7 @@ pub fn optimize(cfg: &mut BlockCFG) -> bool {
 // Scaffolding
 //**************************************************************************************************
 
-fn optimize_cmd(sp!(_, cmd_): &mut Command) -> bool {
+pub fn optimize_cmd(sp!(_, cmd_): &mut Command) -> bool {
     use Command_ as C;
     match cmd_ {
         C::Assign(_ls, e) => optimize_exp(e),
@@ -45,7 +45,7 @@ fn optimize_cmd(sp!(_, cmd_): &mut Command) -> bool {
     }
 }
 
-fn optimize_exp(e: &mut Exp) -> bool {
+pub fn optimize_exp(e: &mut Exp) -> bool {
     use UnannotatedExp_ as E;
     match &mut e.exp.value {
         //************************************
@@ -144,7 +144,7 @@ fn optimize_exp(e: &mut Exp) -> bool {
     }
 }
 
-fn optimize_exp_item(item: &mut ExpListItem) -> bool {
+pub fn optimize_exp_item(item: &mut ExpListItem) -> bool {
     match item {
         ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => optimize_exp(e),
     }
@@ -154,7 +154,7 @@ fn optimize_exp_item(item: &mut ExpListItem) -> bool {
 // Folding
 //**************************************************************************************************
 
-fn fold_unary_op(loc: Loc, sp!(_, op_): &UnaryOp, v: FoldableValue) -> Option<UnannotatedExp_> {
+pub fn fold_unary_op(loc: Loc, sp!(_, op_): &UnaryOp, v: FoldableValue) -> Option<UnannotatedExp_> {
     use FoldableValue as FV;
     use UnaryOp_ as U;
     let folded = match (op_, v) {
@@ -164,7 +164,7 @@ fn fold_unary_op(loc: Loc, sp!(_, op_): &UnaryOp, v: FoldableValue) -> Option<Un
     Some(evalue_(loc, folded))
 }
 
-fn fold_binary_op(
+pub fn fold_binary_op(
     loc: Loc,
     sp!(_, op_): &BinOp,
     v1: FoldableValue,
@@ -255,7 +255,7 @@ fn fold_binary_op(
     Some(evalue_(loc, v))
 }
 
-fn fold_cast(loc: Loc, sp!(_, bt_): &BuiltinTypeName, v: FoldableValue) -> Option<UnannotatedExp_> {
+pub fn fold_cast(loc: Loc, sp!(_, bt_): &BuiltinTypeName, v: FoldableValue) -> Option<UnannotatedExp_> {
     use BuiltinTypeName_ as BT;
     use FoldableValue as FV;
     let cast = match (bt_, v) {
@@ -276,7 +276,7 @@ fn fold_cast(loc: Loc, sp!(_, bt_): &BuiltinTypeName, v: FoldableValue) -> Optio
     Some(evalue_(loc, cast))
 }
 
-fn evalue_(loc: Loc, fv: FoldableValue) -> UnannotatedExp_ {
+pub fn evalue_(loc: Loc, fv: FoldableValue) -> UnannotatedExp_ {
     use FoldableValue as FV;
     use UnannotatedExp_ as E;
     use Value_ as V;
@@ -298,7 +298,7 @@ fn evalue_(loc: Loc, fv: FoldableValue) -> UnannotatedExp_ {
 //**************************************************************************************************
 
 #[derive(Debug)]
-enum FoldableValue {
+pub enum FoldableValue {
     U8(u8),
     U64(u64),
     U128(u128),
@@ -307,7 +307,7 @@ enum FoldableValue {
     Bytearray(Vec<u8>),
 }
 
-fn foldable_value(sp!(_, v_): &Value) -> Option<FoldableValue> {
+pub fn foldable_value(sp!(_, v_): &Value) -> Option<FoldableValue> {
     use FoldableValue as FV;
     use Value_ as V;
     Some(match v_ {
@@ -320,7 +320,7 @@ fn foldable_value(sp!(_, v_): &Value) -> Option<FoldableValue> {
     })
 }
 
-fn foldable_exp(e: &Exp) -> Option<FoldableValue> {
+pub fn foldable_exp(e: &Exp) -> Option<FoldableValue> {
     use UnannotatedExp_ as E;
     match &e.exp.value {
         E::Value(v) => foldable_value(v),

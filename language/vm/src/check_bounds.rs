@@ -74,17 +74,17 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_module_handle(&self, module_handle: &ModuleHandle) -> PartialVMResult<()> {
+    pub fn check_module_handle(&self, module_handle: &ModuleHandle) -> PartialVMResult<()> {
         check_bounds_impl(&self.module.address_identifiers, module_handle.address)?;
         check_bounds_impl(&self.module.identifiers, module_handle.name)
     }
 
-    fn check_struct_handle(&self, struct_handle: &StructHandle) -> PartialVMResult<()> {
+    pub fn check_struct_handle(&self, struct_handle: &StructHandle) -> PartialVMResult<()> {
         check_bounds_impl(&self.module.module_handles, struct_handle.module)?;
         check_bounds_impl(&self.module.identifiers, struct_handle.name)
     }
 
-    fn check_function_handle(&self, function_handle: &FunctionHandle) -> PartialVMResult<()> {
+    pub fn check_function_handle(&self, function_handle: &FunctionHandle) -> PartialVMResult<()> {
         check_bounds_impl(&self.module.module_handles, function_handle.module)?;
         check_bounds_impl(&self.module.identifiers, function_handle.name)?;
         check_bounds_impl(&self.module.signatures, function_handle.parameters)?;
@@ -112,9 +112,9 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_field_handle(&self, field_handle: &FieldHandle) -> PartialVMResult<()> {
+    pub fn check_field_handle(&self, field_handle: &FieldHandle) -> PartialVMResult<()> {
         check_bounds_impl(&self.module.struct_defs, field_handle.owner)?;
-        // field offset must be in bounds, struct def just checked above must exist
+        // field offset must be in bounds, pub struct def just checked above must exist
         if let Some(struct_def) = &self.module.struct_defs.get(field_handle.owner.into_index()) {
             let fields_count = match &struct_def.field_information {
                 StructFieldInformation::Native => 0,
@@ -132,7 +132,7 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_struct_instantiation(
+    pub fn check_struct_instantiation(
         &self,
         struct_instantiation: &StructDefInstantiation,
     ) -> PartialVMResult<()> {
@@ -143,7 +143,7 @@ impl<'a> BoundsChecker<'a> {
         )
     }
 
-    fn check_function_instantiation(
+    pub fn check_function_instantiation(
         &self,
         function_instantiation: &FunctionInstantiation,
     ) -> PartialVMResult<()> {
@@ -154,7 +154,7 @@ impl<'a> BoundsChecker<'a> {
         )
     }
 
-    fn check_field_instantiation(
+    pub fn check_field_instantiation(
         &self,
         field_instantiation: &FieldInstantiation,
     ) -> PartialVMResult<()> {
@@ -162,18 +162,18 @@ impl<'a> BoundsChecker<'a> {
         check_bounds_impl(&self.module.signatures, field_instantiation.type_parameters)
     }
 
-    fn check_signature(&self, signature: &Signature) -> PartialVMResult<()> {
+    pub fn check_signature(&self, signature: &Signature) -> PartialVMResult<()> {
         for ty in &signature.0 {
             self.check_type(ty)?
         }
         Ok(())
     }
 
-    fn check_constant(&self, constant: &Constant) -> PartialVMResult<()> {
+    pub fn check_constant(&self, constant: &Constant) -> PartialVMResult<()> {
         self.check_type(&constant.type_)
     }
 
-    fn check_struct_def(&self, struct_def: &StructDefinition) -> PartialVMResult<()> {
+    pub fn check_struct_def(&self, struct_def: &StructDefinition) -> PartialVMResult<()> {
         check_bounds_impl(&self.module.struct_handles, struct_def.struct_handle)?;
         // check signature (type) and type parameter for the field type
         if let StructFieldInformation::Declared(fields) = &struct_def.field_information {
@@ -192,7 +192,7 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_function_def(
+    pub fn check_function_def(
         &mut self,
         function_def_idx: usize,
         function_def: &FunctionDefinition,
@@ -205,7 +205,7 @@ impl<'a> BoundsChecker<'a> {
         self.check_code(function_def_idx, function_def)
     }
 
-    fn check_code(
+    pub fn check_code(
         &self,
         function_def_idx: usize,
         function_def: &FunctionDefinition,
@@ -378,7 +378,7 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_type(&self, ty: &SignatureToken) -> PartialVMResult<()> {
+    pub fn check_type(&self, ty: &SignatureToken) -> PartialVMResult<()> {
         use self::SignatureToken::*;
 
         for ty in ty.preorder_traversal() {
@@ -419,7 +419,7 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_type_parameter(
+    pub fn check_type_parameter(
         &self,
         ty: &SignatureToken,
         type_param_count: usize,
@@ -455,7 +455,7 @@ impl<'a> BoundsChecker<'a> {
         Ok(())
     }
 
-    fn check_code_unit_bounds_impl<T, I>(
+    pub fn check_code_unit_bounds_impl<T, I>(
         &self,
         pool: &[T],
         idx: I,
@@ -479,7 +479,7 @@ impl<'a> BoundsChecker<'a> {
         }
     }
 
-    fn offset_out_of_bounds(
+    pub fn offset_out_of_bounds(
         &self,
         status: StatusCode,
         kind: IndexKind,
@@ -504,7 +504,7 @@ impl<'a> BoundsChecker<'a> {
     }
 }
 
-fn check_bounds_impl<T, I>(pool: &[T], idx: I) -> PartialVMResult<()>
+pub fn check_bounds_impl<T, I>(pool: &[T], idx: I) -> PartialVMResult<()>
 where
     I: ModuleIndex,
 {

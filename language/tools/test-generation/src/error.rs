@@ -3,7 +3,7 @@
 
 use std::fmt;
 
-/// This struct represents an error that is returned during the
+/// This pub struct represents an error that is returned during the
 /// testcase generation process.
 #[derive(Debug)]
 pub struct VMError {

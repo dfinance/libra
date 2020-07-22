@@ -35,7 +35,7 @@ impl<'a> fmt::Display for SymbolDisplay<'a> {
 }
 
 /// A pool of symbols. Allows to lookup a symbol by a string representation, and discover
-/// the string representation of an existing symbol. This struct does not need be mutable
+/// the string representation of an existing symbol. This pub struct does not need be mutable
 /// for operations on it, which is important so references to it can be freely passed around.
 #[derive(Debug)]
 pub struct SymbolPool {
@@ -43,7 +43,7 @@ pub struct SymbolPool {
 }
 
 #[derive(Debug)]
-struct InnerPool {
+pub struct InnerPool {
     strings: Vec<Rc<String>>,
     lookup: HashMap<Rc<String>, usize>,
 }

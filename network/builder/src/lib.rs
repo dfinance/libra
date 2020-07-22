@@ -10,4 +10,4 @@ pub mod builder;
 // network directory is needed to break internal circular dependencies.
 pub mod dummy;
 #[cfg(test)]
-mod test;
+pub mod test;

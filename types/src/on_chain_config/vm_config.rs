@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 /// 1. No module publishing, only allowlisted scripts are allowed.
 /// 2. No module publishing, custom scripts are allowed.
 /// 3. Both module publishing and custom scripts are allowed.
-/// We represent these as an enum instead of a struct since allowlisting and module/script
+/// We represent these as anpub enum instead of a pub struct since allowlisting and module/script
 /// publishing are mutually exclusive options.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct VMPublishingOption {
@@ -93,14 +93,14 @@ pub struct VMConfig {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-struct CostTableInner {
+pub struct CostTableInner {
     pub instruction_table: Vec<u8>,
     pub native_table: Vec<u8>,
     pub gas_constants: GasConstants,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-struct VMConfigInner {
+pub struct VMConfigInner {
     pub publishing_option: Vec<u8>,
     pub gas_schedule: CostTableInner,
 }

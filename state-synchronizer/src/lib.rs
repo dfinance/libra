@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! Used to perform catching up between nodes for committed states.
 //! Used for node restarts, network partitions, full node syncs
@@ -11,14 +11,14 @@ use executor_types::ExecutedTrees;
 use libra_types::{epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures};
 pub use synchronizer::{StateSyncClient, StateSynchronizer};
 
-mod chunk_request;
-mod chunk_response;
+pub mod chunk_request;
+pub mod chunk_response;
 pub mod coordinator;
-mod counters;
-mod executor_proxy;
+pub mod counters;
+pub mod executor_proxy;
 pub mod network;
-mod peer_manager;
-mod synchronizer;
+pub mod peer_manager;
+pub mod synchronizer;
 
 /// The state distinguishes between the following fields:
 /// * highest_local_li is keeping the latest certified ledger info
@@ -65,4 +65,4 @@ impl SynchronizerState {
 }
 
 #[cfg(test)]
-mod tests;
+pub mod tests;

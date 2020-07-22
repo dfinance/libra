@@ -5,7 +5,7 @@ extern crate test_generation;
 use test_generation::abstract_state::{AbstractState, AbstractValue};
 use vm::file_format::{Bytecode, SignatureToken};
 
-mod common;
+pub mod common;
 
 #[test]
 fn bytecode_pop() {

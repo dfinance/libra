@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 macro_rules! debug_write {
     ($($toks: tt)*) => {
@@ -28,4 +28,4 @@ pub mod natives;
 pub mod values;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;

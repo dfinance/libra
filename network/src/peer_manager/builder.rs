@@ -47,7 +47,7 @@ pub enum AuthenticationMode {
     Mutual(x25519::PrivateKey),
 }
 
-struct TransportContext {
+pub struct TransportContext {
     chain_id: ChainId,
     direct_send_protocols: Vec<ProtocolId>,
     rpc_protocols: Vec<ProtocolId>,
@@ -72,14 +72,14 @@ impl TransportContext {
         }
     }
 
-    fn supported_protocols(&self) -> SupportedProtocols {
+    pub fn supported_protocols(&self) -> SupportedProtocols {
         self.direct_send_protocols
             .iter()
             .chain(&self.rpc_protocols)
             .into()
     }
 
-    fn augment_direct_send_protocols(
+    pub fn augment_direct_send_protocols(
         &mut self,
         direct_send_protocols: Vec<ProtocolId>,
     ) -> &mut Self {
@@ -87,13 +87,13 @@ impl TransportContext {
         self
     }
 
-    fn augment_rpc_protocols(&mut self, rpc_protocols: Vec<ProtocolId>) -> &mut Self {
+    pub fn augment_rpc_protocols(&mut self, rpc_protocols: Vec<ProtocolId>) -> &mut Self {
         self.rpc_protocols.extend(rpc_protocols);
         self
     }
 }
 
-struct PeerManagerContext {
+pub struct PeerManagerContext {
     // TODO(philiphayes): better support multiple listening addrs
     pm_reqs_tx: libra_channel::Sender<(PeerId, ProtocolId), PeerManagerRequest>,
     pm_reqs_rx: libra_channel::Receiver<(PeerId, ProtocolId), PeerManagerRequest>,
@@ -110,7 +110,7 @@ struct PeerManagerContext {
 }
 
 impl PeerManagerContext {
-    fn new(
+    pub fn new(
         pm_reqs_tx: libra_channel::Sender<(PeerId, ProtocolId), PeerManagerRequest>,
         pm_reqs_rx: libra_channel::Receiver<(PeerId, ProtocolId), PeerManagerRequest>,
         connection_reqs_tx: libra_channel::Sender<PeerId, ConnectionRequest>,
@@ -141,7 +141,7 @@ impl PeerManagerContext {
         }
     }
 
-    fn add_upstream_handler(
+    pub fn add_upstream_handler(
         &mut self,
         protocol_id: ProtocolId,
         channel: libra_channel::Sender<(PeerId, ProtocolId), PeerManagerNotification>,
@@ -162,7 +162,7 @@ type MemoryPeerManager =
 type TcpPeerManager = PeerManager<LibraNetTransport<TcpTransport>, NoiseStream<TcpSocket>>;
 
 #[derive(Debug, PartialEq, PartialOrd)]
-enum State {
+pub enum State {
     CREATED,
     BUILT,
     STARTED,
@@ -330,7 +330,7 @@ impl PeerManagerBuilder {
 
     /// Given a transport build and launch PeerManager.
     /// Return the actual NetworkAddress over which this peer is listening.
-    fn build_with_transport<TTransport, TSocket>(
+    pub fn build_with_transport<TTransport, TSocket>(
         &mut self,
         transport: TTransport,
         executor: &Handle,
@@ -367,7 +367,7 @@ impl PeerManagerBuilder {
         peer_mgr
     }
 
-    fn start_peer_manager<TTransport, TSocket>(
+    pub fn start_peer_manager<TTransport, TSocket>(
         &mut self,
         peer_manager: PeerManager<TTransport, TSocket>,
         executor: &Handle,

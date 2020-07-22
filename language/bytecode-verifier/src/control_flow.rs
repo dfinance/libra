@@ -39,25 +39,25 @@ pub fn verify(
 }
 
 #[derive(Clone, Copy)]
-enum Label {
+pub enum Label {
     Loop { last_continue: u16 },
     Code,
 }
 
-struct ControlFlowVerifier<'a> {
+pub struct ControlFlowVerifier<'a> {
     current_function: FunctionDefinitionIndex,
     code: &'a Vec<Bytecode>,
 }
 
 impl<'a> ControlFlowVerifier<'a> {
-    fn code(&self) -> impl Iterator<Item = (CodeOffset, &'a Bytecode)> {
+    pub fn code(&self) -> impl Iterator<Item = (CodeOffset, &'a Bytecode)> {
         self.code
             .iter()
             .enumerate()
             .map(|(idx, instr)| (idx.try_into().unwrap(), instr))
     }
 
-    fn labeled_code<'b: 'a>(
+    pub fn labeled_code<'b: 'a>(
         &self,
         labels: &'b [Label],
     ) -> impl Iterator<Item = (CodeOffset, &'a Bytecode, &'b Label)> {
@@ -66,12 +66,12 @@ impl<'a> ControlFlowVerifier<'a> {
             .map(|((i, instr), lbl)| (i, instr, lbl))
     }
 
-    fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
+    pub fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
         PartialVMError::new(status).at_code_offset(self.current_function, offset)
     }
 }
 
-fn instruction_labels(context: &ControlFlowVerifier) -> Vec<Label> {
+pub fn instruction_labels(context: &ControlFlowVerifier) -> Vec<Label> {
     let mut labels: Vec<Label> = (0..context.code.len()).map(|_| Label::Code).collect();
     let mut loop_continue = |loop_idx: CodeOffset, last_continue: CodeOffset| {
         labels[loop_idx as usize] = Label::Loop { last_continue }
@@ -94,7 +94,7 @@ fn instruction_labels(context: &ControlFlowVerifier) -> Vec<Label> {
 //   - All forward jumps do not enter into the middle of a loop
 //   - All "breaks" go to the "end" of the loop
 //   - All back jumps are only to the current loop
-fn check_jumps(context: &ControlFlowVerifier, labels: Vec<Label>) -> PartialVMResult<()> {
+pub fn check_jumps(context: &ControlFlowVerifier, labels: Vec<Label>) -> PartialVMResult<()> {
     // All back jumps are only to the current loop
     check_continues(context, &labels)?;
     // All "breaks" go to the "end" of the loop
@@ -103,7 +103,7 @@ fn check_jumps(context: &ControlFlowVerifier, labels: Vec<Label>) -> PartialVMRe
     check_no_loop_splits(context, &labels)
 }
 
-fn check_code<
+pub fn check_code<
     F: FnMut(&Vec<(CodeOffset, CodeOffset)>, CodeOffset, &Bytecode) -> PartialVMResult<()>,
 >(
     context: &ControlFlowVerifier,
@@ -135,7 +135,7 @@ fn check_code<
 }
 
 // All back jumps are only to the current loop
-fn check_continues(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
+pub fn check_continues(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
     check_code(context, labels, |loop_stack, i, instr| {
         match instr {
             // Back jump/"continue"
@@ -154,7 +154,7 @@ fn check_continues(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVM
     })
 }
 
-fn check_breaks(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
+pub fn check_breaks(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
     check_code(context, labels, |loop_stack, i, instr| {
         match instr {
             // Forward jump/"break"
@@ -175,7 +175,7 @@ fn check_breaks(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMRes
     })
 }
 
-fn check_no_loop_splits(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
+pub fn check_no_loop_splits(context: &ControlFlowVerifier, labels: &[Label]) -> PartialVMResult<()> {
     let is_break = |loop_stack: &Vec<(CodeOffset, CodeOffset)>, jump_target: CodeOffset| -> bool {
         match loop_stack.last() {
             None => false,
@@ -208,7 +208,7 @@ fn check_no_loop_splits(context: &ControlFlowVerifier, labels: &[Label]) -> Part
 }
 
 // Only called after continues are verified, so we can assume that loops are well nested
-fn count_loop_depth(labels: &[Label]) -> Vec<usize> {
+pub fn count_loop_depth(labels: &[Label]) -> Vec<usize> {
     let last_continues: HashSet<CodeOffset> = labels
         .iter()
         .filter_map(|label| match label {

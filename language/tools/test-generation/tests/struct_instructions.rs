@@ -19,7 +19,7 @@ use vm::{
     views::{StructDefinitionView, ViewInternals},
 };
 
-mod common;
+pub mod common;
 
 fn generate_module_with_struct(resource: bool) -> CompiledModuleMut {
     let mut module: CompiledModuleMut = empty_module();
@@ -119,7 +119,7 @@ fn bytecode_pack() {
     }
     let (state2, _) =
         common::run_instruction(Bytecode::Pack(StructDefinitionIndex::new(0)), state1);
-    let struct_value2 = state2.stack_peek(0).expect("struct not added to stack");
+    let struct_value2 = state2.stack_peek(0).expect("pub struct not added to stack");
     assert_eq!(
         struct_value1, struct_value2,
         "stack type postcondition not met"
@@ -203,7 +203,7 @@ fn bytecode_movefrom() {
     state1.stack_push(AbstractValue::new_primitive(SignatureToken::Address));
     let (state2, _) =
         common::run_instruction(Bytecode::MoveFrom(StructDefinitionIndex::new(0)), state1);
-    let struct_value = state2.stack_peek(0).expect("struct not added to stack");
+    let struct_value = state2.stack_peek(0).expect("pub struct not added to stack");
     assert!(
         matches!(struct_value.token, SignatureToken::Struct(struct_handle) if struct_handle == struct_def.struct_handle),
         "stack type postcondition not met"

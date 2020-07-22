@@ -5,7 +5,7 @@
 //! Merkle tree by providing powerful iterators advancing by either bit or nibble.
 
 #[cfg(test)]
-mod nibble_path_test;
+pub mod nibble_path_test;
 
 use crate::ROOT_NIBBLE_HEIGHT;
 use libra_nibble::Nibble;
@@ -59,7 +59,7 @@ impl Arbitrary for NibblePath {
 
 #[cfg(any(test, feature = "fuzzing"))]
 prop_compose! {
-    fn arb_nibble_path()(
+    pub fn arb_nibble_path()(
         mut bytes in vec(any::<u8>(), 0..=ROOT_NIBBLE_HEIGHT/2),
         is_odd in any::<bool>()
     ) -> NibblePath {
@@ -75,7 +75,7 @@ prop_compose! {
 
 #[cfg(any(test, feature = "fuzzing"))]
 prop_compose! {
-    fn arb_internal_nibble_path()(
+    pub fn arb_internal_nibble_path()(
         nibble_path in arb_nibble_path().prop_filter(
             "Filter out leaf paths.",
             |p| p.num_nibbles() < ROOT_NIBBLE_HEIGHT,
@@ -145,7 +145,7 @@ impl NibblePath {
     }
 
     /// Get the i-th bit.
-    fn get_bit(&self, i: usize) -> bool {
+    pub fn get_bit(&self, i: usize) -> bool {
         assert!(i / 4 < self.num_nibbles);
         let pos = i / 8;
         let bit = 7 - i % 8;
@@ -153,7 +153,7 @@ impl NibblePath {
     }
 
     /// Get the i-th nibble.
-    fn get_nibble(&self, i: usize) -> Nibble {
+    pub fn get_nibble(&self, i: usize) -> Nibble {
         assert!(i < self.num_nibbles);
         Nibble::from((self.bytes[i / 2] >> (if i % 2 == 1 { 0 } else { 4 })) & 0xf)
     }
@@ -260,7 +260,7 @@ impl<'a> Peekable for NibbleIterator<'a> {
 }
 
 impl<'a> NibbleIterator<'a> {
-    fn new(nibble_path: &'a NibblePath, start: usize, end: usize) -> Self {
+    pub fn new(nibble_path: &'a NibblePath, start: usize, end: usize) -> Self {
         precondition!(start <= end);
         precondition!(start <= ROOT_NIBBLE_HEIGHT);
         precondition!(end <= ROOT_NIBBLE_HEIGHT);

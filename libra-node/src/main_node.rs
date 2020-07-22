@@ -38,11 +38,11 @@ pub struct LibraHandle {
     _backup: Runtime,
 }
 
-fn setup_chunk_executor(db: DbReaderWriter) -> Box<dyn ChunkExecutor> {
+pub fn setup_chunk_executor(db: DbReaderWriter) -> Box<dyn ChunkExecutor> {
     Box::new(Executor::<LibraVM>::new(db))
 }
 
-fn setup_debug_interface(config: &NodeConfig) -> NodeDebugService {
+pub fn setup_debug_interface(config: &NodeConfig) -> NodeDebugService {
     let addr = format!(
         "{}:{}",
         config.debug_interface.address, config.debug_interface.admission_control_node_debug_port,

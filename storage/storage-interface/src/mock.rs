@@ -136,7 +136,7 @@ impl DbReader for MockDbReader {
     }
 }
 
-fn get_mock_account_state_blob() -> AccountStateBlob {
+pub fn get_mock_account_state_blob() -> AccountStateBlob {
     let account_resource = AccountResource::new(
         0,
         vec![],

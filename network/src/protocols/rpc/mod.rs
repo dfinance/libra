@@ -75,9 +75,9 @@ pub mod error;
 /// fuzzing module for the rpc protocol
 pub mod fuzzing;
 #[cfg(test)]
-mod test;
+pub mod test;
 
-/// A wrapper struct for an inbound rpc request and its associated context.
+/// A wrapper pub struct for an inbound rpc request and its associated context.
 #[derive(Debug)]
 pub struct InboundRpcRequest {
     /// Rpc method identifier, e.g., `/libra/rpc/0.1.0/consensus/0.1.0`. This is used
@@ -102,7 +102,7 @@ pub struct InboundRpcRequest {
     pub res_tx: oneshot::Sender<Result<Bytes, RpcError>>,
 }
 
-/// A wrapper struct for an outbound rpc request and its associated context.
+/// A wrapper pub struct for an outbound rpc request and its associated context.
 #[derive(Debug, Serialize)]
 pub struct OutboundRpcRequest {
     /// Rpc method identifier, e.g., `/libra/rpc/0.1.0/consensus/0.1.0`. This is the
@@ -137,7 +137,7 @@ type InboundRpcTasks = FuturesUnordered<BoxFuture<'static, ()>>;
 
 // Wraps the task of request id generation. Request ids start at 0 and increment till they hit
 // RequestId::MAX. After that, they wrap around to 0.
-struct RequestIdGenerator {
+pub struct RequestIdGenerator {
     next_id: RequestId,
     peer_id: PeerId,
 }
@@ -251,7 +251,7 @@ impl Rpc {
 
     // Handle inbound message -- the message can be an inbound RPC request, or a response to a
     // pending outbound RPC request.
-    fn handle_inbound_message(
+    pub fn handle_inbound_message(
         &mut self,
         notif: PeerNotification,
         inbound_rpc_tasks: &mut InboundRpcTasks,
@@ -282,7 +282,7 @@ impl Rpc {
 
     // Handles inbound response by either forwarding response to task waiting for response, or by
     // dropping it if the task has already terminated.
-    fn handle_inbound_response(&mut self, response: RpcResponse) {
+    pub fn handle_inbound_response(&mut self, response: RpcResponse) {
         let peer_id = self.peer_handle.peer_id();
         let request_id = response.request_id;
         if let Some((protocol, response_tx)) = self.pending_outbound_rpcs.remove(&request_id) {
@@ -313,7 +313,7 @@ impl Rpc {
     }
 
     // Handle inbound request by spawning task (with timeout).
-    fn handle_inbound_request(
+    pub fn handle_inbound_request(
         &mut self,
         request: RpcRequest,
         inbound_rpc_tasks: &mut InboundRpcTasks,
@@ -363,7 +363,7 @@ impl Rpc {
     /// canceled. Currently, we don't send a cancellation message to the remote peer.
     ///
     /// [`req.res_tx`]: OutboundRpcRequest::res_tx
-    async fn handle_outbound_rpc(
+    pub async fn handle_outbound_rpc(
         &mut self,
         req: OutboundRpcRequest,
         outbound_rpc_tasks: &mut OutboundRpcTasks,
@@ -454,7 +454,7 @@ impl Rpc {
     }
 }
 
-async fn handle_outbound_rpc_inner(
+pub async fn handle_outbound_rpc_inner(
     mut peer_handle: PeerHandle,
     request_id: RequestId,
     protocol: ProtocolId,
@@ -524,7 +524,7 @@ async fn handle_outbound_rpc_inner(
     Ok(Bytes::from(res_data))
 }
 
-async fn handle_inbound_request_inner(
+pub async fn handle_inbound_request_inner(
     mut notification_tx: channel::Sender<RpcNotification>,
     request: RpcRequest,
     mut peer_handle: PeerHandle,

@@ -9,7 +9,7 @@ use std::{
     num::NonZeroUsize,
 };
 
-/// QueueStyle is an enum which can be used as a configuration option for
+/// QueueStyle is anpub enum which can be used as a configuration option for
 /// PerValidatorQueue. Since the queue per key is going to be bounded,
 /// QueueStyle also determines the policy for dropping and retrieving messages.
 /// With LIFO, oldest messages are dropped.
@@ -30,7 +30,7 @@ pub enum QueueStyle {
 /// of the key's queue and returned. This happens in a round-robin
 /// fashion among keys.
 /// If there are no messages, in any of the queues, `None` is returned.
-pub(crate) struct PerKeyQueue<K: Eq + Hash + Clone, T> {
+pub struct PerKeyQueue<K: Eq + Hash + Clone, T> {
     /// QueueStyle for the messages stored per key
     queue_style: QueueStyle,
     /// per_key_queue maintains a map from a Key to a queue
@@ -63,7 +63,7 @@ impl<K: Eq + Hash + Clone, T> Debug for PerKeyQueue<K, T> {
 impl<K: Eq + Hash + Clone, T> PerKeyQueue<K, T> {
     /// Create a new PerKeyQueue with the provided QueueStyle and
     /// max_queue_size_per_key
-    pub(crate) fn new(
+    pub fn new(
         queue_style: QueueStyle,
         max_queue_size_per_key: NonZeroUsize,
         counters: Option<&'static IntCounterVec>,
@@ -80,7 +80,7 @@ impl<K: Eq + Hash + Clone, T> PerKeyQueue<K, T> {
     /// Given a key, pops the message from its queue and returns the message
     /// It also returns a boolean indicating whether the keys queue is empty
     /// after popping the message
-    fn pop_from_key_queue(&mut self, key: &K) -> (Option<T>, bool) {
+    pub fn pop_from_key_queue(&mut self, key: &K) -> (Option<T>, bool) {
         if let Some(q) = self.per_key_queue.get_mut(key) {
             // Extract message from the key's queue
             let retval = match self.queue_style {
@@ -96,7 +96,7 @@ impl<K: Eq + Hash + Clone, T> PerKeyQueue<K, T> {
     /// push a message to the appropriate queue in per_key_queue
     /// add the key to round_robin_queue if it didnt already exist.
     /// Returns Some(T) if the new or an existing element was dropped. Returns None otherwise.
-    pub(crate) fn push(&mut self, key: K, message: T) -> Option<T> {
+    pub fn push(&mut self, key: K, message: T) -> Option<T> {
         if let Some(c) = self.counters.as_ref() {
             c.with_label_values(&["enqueued"]).inc();
         }
@@ -132,7 +132,7 @@ impl<K: Eq + Hash + Clone, T> PerKeyQueue<K, T> {
 
     /// pop a message from the appropriate queue in per_key_queue
     /// remove the key from the round_robin_queue if it has no more messages
-    pub(crate) fn pop(&mut self) -> Option<T> {
+    pub fn pop(&mut self) -> Option<T> {
         let key = match self.round_robin_queue.pop_front() {
             Some(v) => v,
             _ => {
@@ -152,7 +152,7 @@ impl<K: Eq + Hash + Clone, T> PerKeyQueue<K, T> {
     }
 
     /// Clears all the pending messages and cleans up the queue from the previous metadata.
-    pub(crate) fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.per_key_queue.clear();
         self.round_robin_queue.clear();
     }

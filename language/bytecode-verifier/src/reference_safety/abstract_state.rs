@@ -23,7 +23,7 @@ type BorrowGraph = borrow_graph::graph::BorrowGraph<(), Label>;
 /// AbstractValue represents a reference or a non reference value, both on the stack and stored
 /// in a local
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum AbstractValue {
+pub enum AbstractValue {
     Reference(RefID),
     NonReference,
 }
@@ -53,7 +53,7 @@ impl AbstractValue {
 
 /// Label is an element of a label on an edge in the borrow graph.
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-enum Label {
+pub enum Label {
     Local(LocalIndex),
     Global(StructDefinitionIndex),
     Field(FieldHandleIndex),
@@ -72,7 +72,7 @@ impl std::fmt::Display for Label {
 
 /// AbstractState is the analysis state over which abstract interpretation is performed.
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct AbstractState {
+pub struct AbstractState {
     current_function: Option<FunctionDefinitionIndex>,
     locals: BTreeMap<LocalIndex, AbstractValue>,
     borrow_graph: BorrowGraph,
@@ -134,38 +134,38 @@ impl AbstractState {
     }
 
     /// adds and returns new id to borrow graph
-    fn new_ref(&mut self, mut_: bool) -> RefID {
+    pub fn new_ref(&mut self, mut_: bool) -> RefID {
         let id = RefID::new(self.next_id);
         self.borrow_graph.new_ref(id, mut_);
         self.next_id += 1;
         id
     }
 
-    fn add_copy(&mut self, parent: RefID, child: RefID) {
+    pub fn add_copy(&mut self, parent: RefID, child: RefID) {
         self.borrow_graph.add_strong_borrow((), parent, child)
     }
 
-    fn add_borrow(&mut self, parent: RefID, child: RefID) {
+    pub fn add_borrow(&mut self, parent: RefID, child: RefID) {
         self.borrow_graph.add_weak_borrow((), parent, child)
     }
 
-    fn add_field_borrow(&mut self, parent: RefID, field: FieldHandleIndex, child: RefID) {
+    pub fn add_field_borrow(&mut self, parent: RefID, field: FieldHandleIndex, child: RefID) {
         self.borrow_graph
             .add_strong_field_borrow((), parent, Label::Field(field), child)
     }
 
-    fn add_local_borrow(&mut self, local: LocalIndex, id: RefID) {
+    pub fn add_local_borrow(&mut self, local: LocalIndex, id: RefID) {
         self.borrow_graph
             .add_strong_field_borrow((), self.frame_root(), Label::Local(local), id)
     }
 
-    fn add_resource_borrow(&mut self, resource: StructDefinitionIndex, id: RefID) {
+    pub fn add_resource_borrow(&mut self, resource: StructDefinitionIndex, id: RefID) {
         self.borrow_graph
             .add_weak_field_borrow((), self.frame_root(), Label::Global(resource), id)
     }
 
     /// removes `id` from borrow graph
-    fn release(&mut self, id: RefID) {
+    pub fn release(&mut self, id: RefID) {
         self.borrow_graph.release(id);
     }
 
@@ -174,7 +174,7 @@ impl AbstractState {
     //**********************************************************************************************
 
     /// checks if `id` is borrowed, but ignores field borrows
-    fn has_full_borrows(&self, id: RefID) -> bool {
+    pub fn has_full_borrows(&self, id: RefID) -> bool {
         let (full_borrows, _field_borrows) = self.borrow_graph.borrowed_by(id);
         !full_borrows.is_empty()
     }
@@ -182,7 +182,7 @@ impl AbstractState {
     /// Checks if `id` is borrowed
     /// - All full/epsilon borrows are considered
     /// - Only field borrows the specified label (or all if one isn't specified) are considered
-    fn has_consistent_borrows(&self, id: RefID, label_opt: Option<Label>) -> bool {
+    pub fn has_consistent_borrows(&self, id: RefID, label_opt: Option<Label>) -> bool {
         let (full_borrows, field_borrows) = self.borrow_graph.borrowed_by(id);
         !full_borrows.is_empty() || {
             match label_opt {
@@ -199,7 +199,7 @@ impl AbstractState {
     /// - All full/epsilon mutable borrows are considered
     /// - Only field mutable borrows the specified label (or all if one isn't specified) are
     ///   considered
-    fn has_consistent_mutable_borrows(&self, id: RefID, label_opt: Option<Label>) -> bool {
+    pub fn has_consistent_mutable_borrows(&self, id: RefID, label_opt: Option<Label>) -> bool {
         let (full_borrows, field_borrows) = self.borrow_graph.borrowed_by(id);
         !self.all_immutable(&full_borrows) || {
             match label_opt {
@@ -217,7 +217,7 @@ impl AbstractState {
     /// checks if `id` is writable
     /// - Mutable references are freezable if there are no consistent borrows
     /// - Immutable references are not writable by the typing rules
-    fn is_writable(&self, id: RefID) -> bool {
+    pub fn is_writable(&self, id: RefID) -> bool {
         checked_precondition!(self.borrow_graph.is_mutable(id));
         !self.has_consistent_borrows(id, None)
     }
@@ -225,7 +225,7 @@ impl AbstractState {
     /// checks if `id` is freezable
     /// - Mutable references are freezable if there are no consistent mutable borrows
     /// - Immutable references are not freezable by the typing rules
-    fn is_freezable(&self, id: RefID, at_field_opt: Option<FieldHandleIndex>) -> bool {
+    pub fn is_freezable(&self, id: RefID, at_field_opt: Option<FieldHandleIndex>) -> bool {
         checked_precondition!(self.borrow_graph.is_mutable(id));
         !self.has_consistent_mutable_borrows(id, at_field_opt.map(Label::Field))
     }
@@ -233,35 +233,35 @@ impl AbstractState {
     /// checks if `id` is readable
     /// - Mutable references are readable if they are freezable
     /// - Immutable references are always readable
-    fn is_readable(&self, id: RefID, at_field_opt: Option<FieldHandleIndex>) -> bool {
+    pub fn is_readable(&self, id: RefID, at_field_opt: Option<FieldHandleIndex>) -> bool {
         let is_mutable = self.borrow_graph.is_mutable(id);
         !is_mutable || self.is_freezable(id, at_field_opt)
     }
 
     /// checks if local@idx is borrowed
-    fn is_local_borrowed(&self, idx: LocalIndex) -> bool {
+    pub fn is_local_borrowed(&self, idx: LocalIndex) -> bool {
         self.has_consistent_borrows(self.frame_root(), Some(Label::Local(idx)))
     }
 
     /// checks if local@idx is mutably borrowed
-    fn is_local_mutably_borrowed(&self, idx: LocalIndex) -> bool {
+    pub fn is_local_mutably_borrowed(&self, idx: LocalIndex) -> bool {
         self.has_consistent_mutable_borrows(self.frame_root(), Some(Label::Local(idx)))
     }
 
     /// checks if global@idx is borrowed
-    fn is_global_borrowed(&self, resource: StructDefinitionIndex) -> bool {
+    pub fn is_global_borrowed(&self, resource: StructDefinitionIndex) -> bool {
         self.has_consistent_borrows(self.frame_root(), Some(Label::Global(resource)))
     }
 
     /// checks if global@idx is mutably borrowed
-    fn is_global_mutably_borrowed(&self, resource: StructDefinitionIndex) -> bool {
+    pub fn is_global_mutably_borrowed(&self, resource: StructDefinitionIndex) -> bool {
         self.has_consistent_mutable_borrows(self.frame_root(), Some(Label::Global(resource)))
     }
 
     /// checks if the stack frame of the function being analyzed can be safely destroyed.
     /// safe destruction requires that all references in locals have already been destroyed
     /// and all values in locals are copyable and unborrowed.
-    fn is_frame_safe_to_destroy(&self) -> bool {
+    pub fn is_frame_safe_to_destroy(&self) -> bool {
         !self.has_consistent_borrows(self.frame_root(), None)
     }
 
@@ -576,11 +576,11 @@ impl AbstractState {
         canonical_state
     }
 
-    fn all_immutable(&self, borrows: &BTreeMap<RefID, ()>) -> bool {
+    pub fn all_immutable(&self, borrows: &BTreeMap<RefID, ()>) -> bool {
         !borrows.keys().any(|x| self.borrow_graph.is_mutable(*x))
     }
 
-    fn is_canonical(&self) -> bool {
+    pub fn is_canonical(&self) -> bool {
         self.num_locals + 1 == self.next_id
             && self.locals.iter().all(|(local, value)| {
                 value

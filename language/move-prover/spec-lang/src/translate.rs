@@ -86,7 +86,7 @@ pub struct Translator<'env> {
 
 /// A declaration of a specification function or operator in the translator state.
 #[derive(Debug, Clone)]
-struct SpecFunEntry {
+pub struct SpecFunEntry {
     loc: Loc,
     oper: Operation,
     type_params: Vec<Type>,
@@ -96,7 +96,7 @@ struct SpecFunEntry {
 
 /// A declaration of a specification variable in the translator state.
 #[derive(Debug, Clone)]
-struct SpecVarEntry {
+pub struct SpecVarEntry {
     loc: Loc,
     module_id: ModuleId,
     var_id: SpecVarId,
@@ -106,7 +106,7 @@ struct SpecVarEntry {
 
 /// A declaration of a schema in the translator state.
 #[derive(Debug)]
-struct SpecSchemaEntry {
+pub struct SpecSchemaEntry {
     loc: Loc,
     name: QualifiedSymbol,
     module_id: ModuleId,
@@ -123,7 +123,7 @@ struct SpecSchemaEntry {
 
 /// A declaration of a struct.
 #[derive(Debug, Clone)]
-struct StructEntry {
+pub struct StructEntry {
     loc: Loc,
     module_id: ModuleId,
     struct_id: StructId,
@@ -134,7 +134,7 @@ struct StructEntry {
 
 /// A declaration of a function.
 #[derive(Debug, Clone)]
-struct FunEntry {
+pub struct FunEntry {
     loc: Loc,
     module_id: ModuleId,
     fun_id: FunId,
@@ -145,7 +145,7 @@ struct FunEntry {
 }
 
 #[derive(Debug, Clone)]
-struct ConstEntry {
+pub struct ConstEntry {
     loc: Loc,
     module_id: ModuleId,
     const_id: ConstId,
@@ -179,12 +179,12 @@ impl<'env> Translator<'env> {
     }
 
     /// Reports a type checking error.
-    fn error(&self, at: &Loc, msg: &str) {
+    pub fn error(&self, at: &Loc, msg: &str) {
         self.env.error(at, msg)
     }
 
     /// Defines a spec function.
-    fn define_spec_fun(
+    pub fn define_spec_fun(
         &mut self,
         loc: &Loc,
         name: QualifiedSymbol,
@@ -209,7 +209,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Defines a spec variable.
-    fn define_spec_var(
+    pub fn define_spec_var(
         &mut self,
         loc: &Loc,
         name: QualifiedSymbol,
@@ -233,7 +233,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Defines a spec schema.
-    fn define_spec_schema(
+    pub fn define_spec_schema(
         &mut self,
         loc: &Loc,
         name: QualifiedSymbol,
@@ -265,8 +265,8 @@ impl<'env> Translator<'env> {
         self.unused_schema_set.insert(name);
     }
 
-    /// Defines a struct type.
-    fn define_struct(
+    /// Defines a pub struct type.
+    pub fn define_struct(
         &mut self,
         loc: Loc,
         name: QualifiedSymbol,
@@ -291,7 +291,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Defines a function.
-    fn define_fun(
+    pub fn define_fun(
         &mut self,
         loc: Loc,
         name: QualifiedSymbol,
@@ -316,7 +316,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Defines a constant.
-    fn define_const(
+    pub fn define_const(
         &mut self,
         loc: Loc,
         name: QualifiedSymbol,
@@ -337,7 +337,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Looks up a type (struct), reporting an error if it is not found.
-    fn lookup_type(&self, loc: &Loc, name: &QualifiedSymbol) -> Type {
+    pub fn lookup_type(&self, loc: &Loc, name: &QualifiedSymbol) -> Type {
         self.struct_table
             .get(name)
             .cloned()
@@ -358,7 +358,7 @@ impl<'env> Translator<'env> {
     /// Declares builtins in the translator. This adds functions and operators
     /// to the translator which will be treated the same as user defined specification functions
     /// during translation.
-    fn declare_builtins(&mut self) {
+    pub fn declare_builtins(&mut self) {
         let loc = self.env.internal_loc();
         let bool_t = &Type::new_prim(PrimitiveType::Bool);
         let num_t = &Type::new_prim(PrimitiveType::Num);
@@ -700,7 +700,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Returns the qualified symbol for the binary operator.
-    fn bin_op_symbol(&self, op: &PA::BinOp_) -> QualifiedSymbol {
+    pub fn bin_op_symbol(&self, op: &PA::BinOp_) -> QualifiedSymbol {
         QualifiedSymbol {
             module_name: self.builtin_module(),
             symbol: self.env.symbol_pool().make(&op.symbol()),
@@ -708,7 +708,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Returns the qualified symbol for the unary operator.
-    fn unary_op_symbol(&self, op: &PA::UnaryOp_) -> QualifiedSymbol {
+    pub fn unary_op_symbol(&self, op: &PA::UnaryOp_) -> QualifiedSymbol {
         QualifiedSymbol {
             module_name: self.builtin_module(),
             symbol: self.env.symbol_pool().make(&op.symbol()),
@@ -716,7 +716,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Returns the qualified symbol for a builtin function.
-    fn builtin_fun_symbol(&self, name: &str) -> QualifiedSymbol {
+    pub fn builtin_fun_symbol(&self, name: &str) -> QualifiedSymbol {
         QualifiedSymbol {
             module_name: self.builtin_module(),
             symbol: self.env.symbol_pool().make(name),
@@ -724,7 +724,7 @@ impl<'env> Translator<'env> {
     }
 
     /// Returns the symbol for the builtin function `old`.
-    fn old_symbol(&self) -> Symbol {
+    pub fn old_symbol(&self) -> Symbol {
         self.env.symbol_pool().make("old")
     }
 
@@ -762,7 +762,7 @@ pub struct ModuleTranslator<'env, 'translator> {
     spec_vars: Vec<SpecVarDecl>,
     /// Translated function specifications.
     fun_specs: BTreeMap<Symbol, Spec>,
-    /// Translated struct specifications.
+    /// Translated pub struct specifications.
     struct_specs: BTreeMap<Symbol, Spec>,
     /// Translated module spec
     module_spec: Spec,
@@ -833,7 +833,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// A value which we pass in to spec block analyzers, describing the resolved target of the spec
 /// block.
 #[derive(Debug)]
-enum SpecBlockContext<'a> {
+pub enum SpecBlockContext<'a> {
     Module,
     Struct(QualifiedSymbol),
     Function(QualifiedSymbol),
@@ -846,7 +846,7 @@ impl<'a> fmt::Display for SpecBlockContext<'a> {
         use SpecBlockContext::*;
         match self {
             Module => write!(f, "module context")?,
-            Struct(..) => write!(f, "struct context")?,
+            Struct(..) => write!(f, "pub struct context")?,
             Function(..) => write!(f, "function context")?,
             FunctionCode(..) => write!(f, "code context")?,
             Schema(..) => write!(f, "schema context")?,
@@ -857,19 +857,19 @@ impl<'a> fmt::Display for SpecBlockContext<'a> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Shortcut for accessing the symbol pool.
-    fn symbol_pool(&self) -> &SymbolPool {
+    pub fn symbol_pool(&self) -> &SymbolPool {
         self.parent.env.symbol_pool()
     }
 
     /// Creates a new node id.
-    fn new_node_id(&mut self) -> NodeId {
+    pub fn new_node_id(&mut self) -> NodeId {
         let node_id = NodeId::new(self.node_counter);
         self.node_counter += 1;
         node_id
     }
 
     /// Creates a new node id and assigns type and location to it.
-    fn new_node_id_with_type_loc(&mut self, ty: &Type, loc: &Loc) -> NodeId {
+    pub fn new_node_id_with_type_loc(&mut self, ty: &Type, loc: &Loc) -> NodeId {
         let id = self.new_node_id();
         self.loc_map.insert(id, loc.clone());
         self.type_map.insert(id, ty.clone());
@@ -877,7 +877,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Qualifies the given symbol by the current module.
-    fn qualified_by_module(&self, sym: Symbol) -> QualifiedSymbol {
+    pub fn qualified_by_module(&self, sym: Symbol) -> QualifiedSymbol {
         QualifiedSymbol {
             module_name: self.module_name.clone(),
             symbol: sym,
@@ -885,13 +885,13 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Qualifies the given name by the current module.
-    fn qualified_by_module_from_name(&self, name: &Name) -> QualifiedSymbol {
+    pub fn qualified_by_module_from_name(&self, name: &Name) -> QualifiedSymbol {
         let sym = self.symbol_pool().make(&name.value);
         self.qualified_by_module(sym)
     }
 
     /// Converts a ModuleAccess into its parts, an optional ModuleName and base name.
-    fn module_access_to_parts(&self, access: &EA::ModuleAccess) -> (Option<ModuleName>, Symbol) {
+    pub fn module_access_to_parts(&self, access: &EA::ModuleAccess) -> (Option<ModuleName>, Symbol) {
         match &access.value {
             EA::ModuleAccess_::Name(n) => (None, self.symbol_pool().make(n.value.as_str())),
             EA::ModuleAccess_::ModuleAccess(m, n) => {
@@ -906,7 +906,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
     /// Converts a ModuleAccess into a qualified symbol which can be used for lookup of
     /// types or functions.
-    fn module_access_to_qualified(&self, access: &EA::ModuleAccess) -> QualifiedSymbol {
+    pub fn module_access_to_qualified(&self, access: &EA::ModuleAccess) -> QualifiedSymbol {
         let (module_name_opt, symbol) = self.module_access_to_parts(access);
         let module_name = module_name_opt.unwrap_or_else(|| self.module_name.clone());
         QualifiedSymbol {
@@ -919,7 +919,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// definition analysis when visiting a schema block member (condition, invariant, etc.).
     /// This returns None if the SpecBlockTarget cannnot be resolved; error reporting happens
     /// at caller side.
-    fn get_spec_block_context<'pa>(
+    pub fn get_spec_block_context<'pa>(
         &self,
         target: &'pa PA::SpecBlockTarget,
     ) -> Option<SpecBlockContext<'pa>> {
@@ -957,7 +957,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// # Declaration Analysis
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
-    fn decl_ana(
+    pub fn decl_ana(
         &mut self,
         module_def: &EA::ModuleDefinition,
         compiled_module: &CompiledModule,
@@ -977,7 +977,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         }
     }
 
-    fn decl_ana_const(
+    pub fn decl_ana_const(
         &mut self,
         name: &PA::ConstantName,
         def: &EA::Constant,
@@ -1004,7 +1004,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
             .define_const(loc, qsym, et.parent.module_id, const_id, ty, value);
     }
 
-    fn decl_ana_struct(&mut self, name: &PA::StructName, def: &EA::StructDefinition) {
+    pub fn decl_ana_struct(&mut self, name: &PA::StructName, def: &EA::StructDefinition) {
         let qsym = self.qualified_by_module_from_name(&name.0);
         let struct_id = StructId::new(qsym.symbol);
         let mut et = ExpTranslator::new(self);
@@ -1020,7 +1020,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         );
     }
 
-    fn decl_ana_fun(&mut self, name: &PA::FunctionName, def: &EA::Function) {
+    pub fn decl_ana_fun(&mut self, name: &PA::FunctionName, def: &EA::Function) {
         let qsym = self.qualified_by_module_from_name(&name.0);
         let fun_id = FunId::new(qsym.symbol);
         let mut et = ExpTranslator::new(self);
@@ -1042,7 +1042,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         );
     }
 
-    fn decl_ana_spec_block(&mut self, block: &EA::SpecBlock) {
+    pub fn decl_ana_spec_block(&mut self, block: &EA::SpecBlock) {
         use EA::SpecBlockMember_::*;
         // Process any spec block members which introduce global declarations.
         for member in &block.value.members {
@@ -1069,7 +1069,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         }
     }
 
-    fn decl_ana_spec_fun(
+    pub fn decl_ana_spec_fun(
         &mut self,
         loc: &Loc,
         uninterpreted: bool,
@@ -1114,7 +1114,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         self.spec_funs.push(fun_decl);
     }
 
-    fn decl_ana_global_var(
+    pub fn decl_ana_global_var(
         &mut self,
         loc: &Loc,
         name: &Name,
@@ -1157,7 +1157,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         self.spec_vars.push(var_decl);
     }
 
-    fn decl_ana_schema(
+    pub fn decl_ana_schema(
         &mut self,
         block: &EA::SpecBlock,
         name: &Name,
@@ -1198,7 +1198,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// # Definition Analysis
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
-    fn def_ana(
+    pub fn def_ana(
         &mut self,
         module_def: &EA::ModuleDefinition,
         function_infos: UniqueMap<FunctionName, FunctionInfo>,
@@ -1293,13 +1293,13 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// ## Struct Definition Analysis
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
-    fn def_ana_struct(&mut self, name: &PA::StructName, def: &EA::StructDefinition) {
+    pub fn def_ana_struct(&mut self, name: &PA::StructName, def: &EA::StructDefinition) {
         let qsym = self.qualified_by_module_from_name(&name.0);
         let type_params = self
             .parent
             .struct_table
             .get(&qsym)
-            .expect("struct invalid")
+            .expect("pub struct invalid")
             .type_params
             .clone();
         let mut et = ExpTranslator::new(self);
@@ -1322,7 +1322,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         self.parent
             .struct_table
             .get_mut(&qsym)
-            .expect("struct invalid")
+            .expect("pub struct invalid")
             .fields = fields;
     }
 }
@@ -1330,7 +1330,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// ## Spec Block Definition Analysis
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
-    fn def_ana_spec_block(&mut self, context: &SpecBlockContext<'_>, block: &EA::SpecBlock) {
+    pub fn def_ana_spec_block(&mut self, context: &SpecBlockContext<'_>, block: &EA::SpecBlock) {
         use EA::SpecBlockMember_::*;
         for member in &block.value.members {
             let loc = &self.parent.env.to_loc(&member.loc);
@@ -1371,7 +1371,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Definition analysis for a pragma.
-    fn def_ana_pragma(
+    pub fn def_ana_pragma(
         &mut self,
         _loc: &Loc,
         context: &SpecBlockContext,
@@ -1383,7 +1383,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         });
     }
 
-    fn translate_properties(&mut self, properties: &[EA::PragmaProperty]) -> PropertyBag {
+    pub fn translate_properties(&mut self, properties: &[EA::PragmaProperty]) -> PropertyBag {
         // For now we pass properties just on. We may want to check against a set of known
         // property names and types in the future.
         let mut props = PropertyBag::default();
@@ -1405,7 +1405,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         props
     }
 
-    fn add_bool_property(&self, mut properties: PropertyBag, name: &str, val: bool) -> PropertyBag {
+    pub fn add_bool_property(&self, mut properties: PropertyBag, name: &str, val: bool) -> PropertyBag {
         let sym = self.symbol_pool().make(name);
         properties.insert(sym, Value::Bool(val));
         properties
@@ -1416,7 +1416,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Updates the Spec of a given context via an update function.
-    fn update_spec<F>(&mut self, context: &SpecBlockContext, update: F)
+    pub fn update_spec<F>(&mut self, context: &SpecBlockContext, update: F)
     where
         F: FnOnce(&mut Spec),
     {
@@ -1458,7 +1458,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Sets up an expression translator for the given spec block context. If kind
     /// is given, includes all the symbols which can be consumed by the condition,
     /// otherwise only defines type parameters.
-    fn exp_translator_for_context<'module_translator>(
+    pub fn exp_translator_for_context<'module_translator>(
         &'module_translator mut self,
         loc: &Loc,
         context: &SpecBlockContext,
@@ -1605,7 +1605,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Check whether the condition is allowed in the given context. Return true if so, otherwise
     /// report an error and return false.
-    fn check_condition_is_valid(
+    pub fn check_condition_is_valid(
         &mut self,
         context: &SpecBlockContext,
         loc: &Loc,
@@ -1638,7 +1638,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
     /// Add the given conditions to the context, after checking whether they are valid in the
     /// context. Reports errors for invalid conditions.
-    fn add_conditions_to_context(
+    pub fn add_conditions_to_context(
         &mut self,
         context: &SpecBlockContext,
         loc: &Loc,
@@ -1709,7 +1709,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Definition analysis for a condition.
-    fn def_ana_condition(
+    pub fn def_ana_condition(
         &mut self,
         loc: &Loc,
         context: &SpecBlockContext,
@@ -1741,7 +1741,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Compute the expected type for the expression in a condition.
-    fn expected_type_for_condition(&mut self, kind: &ConditionKind) -> Type {
+    pub fn expected_type_for_condition(&mut self, kind: &ConditionKind) -> Type {
         if let Some((mid, vid, ty_args)) = kind.get_spec_var_target() {
             if mid == self.module_id {
                 self.spec_vars[vid.as_usize()]
@@ -1765,7 +1765,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// identifies a spec var assignment expression and moves the var to the SpecConditionKind enum
     /// we use in our AST, returning the rhs expression of the assignment; otherwise it returns
     /// the passed expression.
-    fn extract_condition_kind<'a>(
+    pub fn extract_condition_kind<'a>(
         &mut self,
         context: &SpecBlockContext,
         kind: &PA::SpecConditionKind,
@@ -1815,7 +1815,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
     /// Extracts an assignment from an expression, returning the assigned spec var and
     /// rhs expression.
-    fn extract_assignment<'a>(
+    pub fn extract_assignment<'a>(
         &mut self,
         context: &SpecBlockContext,
         exp: &'a EA::Exp,
@@ -1865,7 +1865,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Definition analysis for a specification helper function.
-    fn def_ana_spec_fun(&mut self, _signature: &EA::FunctionSignature, body: &EA::FunctionBody) {
+    pub fn def_ana_spec_fun(&mut self, _signature: &EA::FunctionSignature, body: &EA::FunctionBody) {
         if let EA::FunctionBody_::Defined(seq) = &body.value {
             let entry = &self.spec_funs[self.spec_fun_index];
             let type_params = entry.type_params.clone();
@@ -1894,7 +1894,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Definition analysis for a schema. This proceeds in two steps: first we ensure recursively
     /// that all included schemas are analyzed, checking for cycles. Then we actually analyze this
     /// schema's content.
-    fn def_ana_schema(
+    pub fn def_ana_schema(
         &mut self,
         schema_defs: &BTreeMap<QualifiedSymbol, &EA::SpecBlock>,
         visited: &mut BTreeSet<QualifiedSymbol>,
@@ -1957,7 +1957,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Analysis of schema after it is ensured that all included schemas are fully analyzed.
-    fn def_ana_schema_content(&mut self, name: QualifiedSymbol, block: &EA::SpecBlock) {
+    pub fn def_ana_schema_content(&mut self, name: QualifiedSymbol, block: &EA::SpecBlock) {
         let loc = self.parent.env.to_loc(&block.loc);
         let entry = self
             .parent
@@ -2032,7 +2032,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Extracts all schema inclusions from a list of spec block members.
-    fn iter_schema_includes<'a>(
+    pub fn iter_schema_includes<'a>(
         &self,
         members: &'a [EA::SpecBlockMember],
     ) -> impl Iterator<Item = (&'a MoveIrLoc, &'a EA::Exp)> {
@@ -2063,7 +2063,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     ///
     /// The implementation works via a recursive function which accumulates a path condition
     /// leading to a Move "pack" expression which is interpreted as a schema reference.
-    fn def_ana_schema_exp(
+    pub fn def_ana_schema_exp(
         &mut self,
         context_type_params: &[(Symbol, Type)],
         vars: &mut BTreeMap<Symbol, LocalVarEntry>,
@@ -2076,7 +2076,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
     /// Analyzes operations in schema expressions. This extends the path condition as needed
     /// and continues recursively.
-    fn def_ana_schema_exp_oper(
+    pub fn def_ana_schema_exp_oper(
         &mut self,
         context_type_params: &[(Symbol, Type)],
         vars: &mut BTreeMap<Symbol, LocalVarEntry>,
@@ -2182,12 +2182,12 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
             ),
             _ => self
                 .parent
-                .error(&loc, "expression construct not supported for schemas"),
+                .error(&loc, "expression conpub struct not supported for schemas"),
         }
     }
 
     /// Analyzes a schema leaf expression.
-    fn def_ana_schema_exp_leaf(
+    pub fn def_ana_schema_exp_leaf(
         &mut self,
         context_type_params: &[(Symbol, Type)],
         vars: &mut BTreeMap<Symbol, LocalVarEntry>,
@@ -2371,7 +2371,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
     /// Creates an expression translator for use in schema expression. This defines the context
     /// type parameters and the variables.
-    fn exp_translator_for_schema<'module_translator>(
+    pub fn exp_translator_for_schema<'module_translator>(
         &'module_translator mut self,
         loc: &Loc,
         context_type_params: &[(Symbol, Type)],
@@ -2389,7 +2389,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Extends a path condition for schema expression analysis.
-    fn extend_path_condition(
+    pub fn extend_path_condition(
         &mut self,
         loc: &Loc,
         path_cond: Option<Exp>,
@@ -2403,14 +2403,14 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
         }
     }
 
-    /// Analyze schema inclusion in the spec block for a function, struct or module. This
+    /// Analyze schema inclusion in the spec block for a function, pub struct or module. This
     /// instantiates the schema and adds all conditions and invariants it contains to the context.
     ///
     /// The `alt_context_type_params` allows to use different type parameter names as would
     /// otherwise be inferred from the SchemaBlockContext. This is used for the apply weaving
     /// operator which allows to use different type parameter names than the function declarations
     /// to which it is applied to.
-    fn def_ana_schema_inclusion_outside_schema(
+    pub fn def_ana_schema_inclusion_outside_schema(
         &mut self,
         loc: &Loc,
         context: &SpecBlockContext,
@@ -2420,7 +2420,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     ) {
         // Compute the type parameters and variables this spec block uses. We do this by constructing
         // an expression translator and immediately extracting  from it. Depending on whether in
-        // function or struct context, we use a condition kind which defines the maximum
+        // function or pub struct context, we use a condition kind which defines the maximum
         // of available symbols. We need to potentially revise this to only declare variables which
         // have a proper use in a condition/invariant, depending on what is actually included in
         // the block.
@@ -2469,7 +2469,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     }
 
     /// Analyzes a schema apply weaving operator.
-    fn def_ana_schema_apply(
+    pub fn def_ana_schema_apply(
         &mut self,
         loc: &Loc,
         context: &SpecBlockContext,
@@ -2532,7 +2532,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// we match based only on visibility and name pattern. On the other hand, we want a user
     /// in inclusion matches to use a pattern like `*<X>` to match any generic function with
     /// one type argument.
-    fn apply_pattern_matches(
+    pub fn apply_pattern_matches(
         &self,
         name: Symbol,
         is_public: bool,
@@ -2578,7 +2578,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Compute state usage of spec funs.
-    fn compute_state_usage(&mut self) {
+    pub fn compute_state_usage(&mut self) {
         let mut visited = BTreeSet::new();
         for idx in 0..self.spec_funs.len() {
             self.compute_state_usage_for_fun(&mut visited, idx);
@@ -2614,7 +2614,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Compute state usage for a given spec fun, defined via its index into the spec_funs
     /// vector of the currently translated module. This recursively computes the values for
     /// functions called from this one; the visited set is there to break cycles.
-    fn compute_state_usage_for_fun(&mut self, visited: &mut BTreeSet<usize>, fun_idx: usize) {
+    pub fn compute_state_usage_for_fun(&mut self, visited: &mut BTreeSet<usize>, fun_idx: usize) {
         if !visited.insert(fun_idx) {
             return;
         }
@@ -2639,7 +2639,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Computes state usage for an expression. If the visited_opt is available, this recurses
     /// to compute the usage for any functions called. Otherwise it assumes this information is
     /// already computed.
-    fn compute_state_usage_for_exp(
+    pub fn compute_state_usage_for_exp(
         &mut self,
         mut visited_opt: Option<&mut BTreeSet<usize>>,
         exp: &Exp,
@@ -2696,7 +2696,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Reduce module invariants by making them requires/ensures on each function.
-    fn reduce_module_invariants(&mut self) {
+    pub fn reduce_module_invariants(&mut self) {
         for mut cond in self.module_spec.conditions.iter().cloned().collect_vec() {
             if self
                 .parent
@@ -2766,7 +2766,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
     /// Collect location and target information for all spec blocks. This is used for documentation
     /// generation.
-    fn collect_spec_block_infos(&mut self, module_def: &EA::ModuleDefinition) {
+    pub fn collect_spec_block_infos(&mut self, module_def: &EA::ModuleDefinition) {
         for block in &module_def.specs {
             let block_loc = self.parent.to_loc(&block.loc);
             let member_locs = block
@@ -2821,7 +2821,7 @@ impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
 /// # Environment Population
 
 impl<'env, 'translator> ModuleTranslator<'env, 'translator> {
-    fn populate_env_from_result(
+    pub fn populate_env_from_result(
         &mut self,
         loc: Loc,
         module: CompiledModule,
@@ -2961,7 +2961,7 @@ pub struct ExpTranslator<'env, 'translator, 'module_translator> {
 }
 
 #[derive(Debug, Clone)]
-struct LocalVarEntry {
+pub struct LocalVarEntry {
     loc: Loc,
     type_: Type,
     // If this local is associated with an operation, this is set.
@@ -2969,7 +2969,7 @@ struct LocalVarEntry {
 }
 
 #[derive(Debug, PartialEq)]
-enum OldExpStatus {
+pub enum OldExpStatus {
     NotSupported,
     OutsideOld,
     InsideOld,
@@ -2978,7 +2978,7 @@ enum OldExpStatus {
 /// ## General
 
 impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'module_translator> {
-    fn new(parent: &'module_translator mut ModuleTranslator<'env, 'translator>) -> Self {
+    pub fn new(parent: &'module_translator mut ModuleTranslator<'env, 'translator>) -> Self {
         let node_counter_start = parent.node_counter;
         Self {
             parent,
@@ -2992,7 +2992,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn new_with_old(
+    pub fn new_with_old(
         parent: &'module_translator mut ModuleTranslator<'env, 'translator>,
         allow_old: bool,
     ) -> Self {
@@ -3006,7 +3006,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Extract a map from names to types from the scopes of this translator.
-    fn extract_var_map(&self) -> BTreeMap<Symbol, LocalVarEntry> {
+    pub fn extract_var_map(&self) -> BTreeMap<Symbol, LocalVarEntry> {
         let mut vars: BTreeMap<Symbol, LocalVarEntry> = BTreeMap::new();
         for s in &self.local_table {
             vars.extend(s.clone());
@@ -3015,7 +3015,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     // Extract type parameters from this translator.
-    fn extract_type_params(&self) -> Vec<(Symbol, Type)> {
+    pub fn extract_type_params(&self) -> Vec<(Symbol, Type)> {
         self.type_params_table
             .iter()
             .map(|(n, ty)| (*n, ty.clone()))
@@ -3028,35 +3028,35 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Shortcut for translating a Move AST location into ours.
-    fn to_loc(&self, loc: &move_ir_types::location::Loc) -> Loc {
+    pub fn to_loc(&self, loc: &move_ir_types::location::Loc) -> Loc {
         self.parent.parent.env.to_loc(loc)
     }
 
     /// Shortcut for reporting an error.
-    fn error(&self, loc: &Loc, msg: &str) {
+    pub fn error(&self, loc: &Loc, msg: &str) {
         self.parent.parent.error(loc, msg);
     }
 
     /// Creates a fresh type variable.
-    fn fresh_type_var(&mut self) -> Type {
+    pub fn fresh_type_var(&mut self) -> Type {
         let var = Type::Var(self.type_var_counter);
         self.type_var_counter += 1;
         var
     }
 
     /// Creates a new node id and assigns type and location to it.
-    fn new_node_id_with_type_loc(&mut self, ty: &Type, loc: &Loc) -> NodeId {
+    pub fn new_node_id_with_type_loc(&mut self, ty: &Type, loc: &Loc) -> NodeId {
         self.parent.new_node_id_with_type_loc(ty, loc)
     }
 
     /// Sets instantiation for the given node id.
-    fn set_instantiation(&mut self, node_id: NodeId, instantiation: Vec<Type>) {
+    pub fn set_instantiation(&mut self, node_id: NodeId, instantiation: Vec<Type>) {
         self.parent.instantiation_map.insert(node_id, instantiation);
     }
 
     /// Finalizes types in this translator, producing errors if some could not be inferred
     /// and remained incomplete.
-    fn finalize_types(&mut self) {
+    pub fn finalize_types(&mut self) {
         if self.parent.parent.env.has_errors() {
             // Don't do that check if we already reported errors, as this would produce
             // useless followup errors.
@@ -3079,7 +3079,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Finalize the the given type, producing an error if it is not complete.
-    fn finalize_type(&self, node_id: NodeId, ty: &Type) -> Type {
+    pub fn finalize_type(&self, node_id: NodeId, ty: &Type) -> Type {
         let ty = self.subs.specialize(ty);
         if ty.is_incomplete() {
             // This type could not be fully inferred.
@@ -3100,7 +3100,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Constructs a type display context used to visualize types in error messages.
-    fn type_display_context(&self) -> TypeDisplayContext<'_> {
+    pub fn type_display_context(&self) -> TypeDisplayContext<'_> {
         TypeDisplayContext::WithoutEnv {
             symbol_pool: self.symbol_pool(),
             reverse_struct_table: &self.parent.parent.reverse_struct_table,
@@ -3108,24 +3108,24 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Creates an error expression.
-    fn new_error_exp(&mut self) -> Exp {
+    pub fn new_error_exp(&mut self) -> Exp {
         let id =
             self.new_node_id_with_type_loc(&Type::Error, &self.parent.parent.env.internal_loc());
         Exp::Error(id)
     }
 
     /// Enters a new scope in the locals table.
-    fn enter_scope(&mut self) {
+    pub fn enter_scope(&mut self) {
         self.local_table.push_front(BTreeMap::new());
     }
 
     /// Exits the most inner scope of the locals table.
-    fn exit_scope(&mut self) {
+    pub fn exit_scope(&mut self) {
         self.local_table.pop_front();
     }
 
     /// Defines a type parameter.
-    fn define_type_param(&mut self, loc: &Loc, name: Symbol, ty: Type) {
+    pub fn define_type_param(&mut self, loc: &Loc, name: Symbol, ty: Type) {
         if self.type_params_table.insert(name, ty).is_some() {
             let param_name = name.display(self.symbol_pool());
             self.parent
@@ -3138,7 +3138,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     /// if the name already exists. The invariant option is used for names
     /// which appear as locals in expressions, but are actually implicit selections
     /// of fields of an underlying struct.
-    fn define_local(&mut self, loc: &Loc, name: Symbol, type_: Type, operation: Option<Operation>) {
+    pub fn define_local(&mut self, loc: &Loc, name: Symbol, type_: Type, operation: Option<Operation>) {
         let entry = LocalVarEntry {
             loc: loc.clone(),
             type_,
@@ -3157,7 +3157,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Lookup a local in this translator.
-    fn lookup_local(&mut self, name: Symbol) -> Option<&LocalVarEntry> {
+    pub fn lookup_local(&mut self, name: Symbol) -> Option<&LocalVarEntry> {
         for scope in &self.local_table {
             if let Some(entry) = scope.get(&name) {
                 return Some(entry);
@@ -3168,7 +3168,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
     /// Analyzes the sequence of type parameters as they are provided via the source AST and enters
     /// them into the environment. Returns a vector for representing them in the target AST.
-    fn analyze_and_add_type_params(
+    pub fn analyze_and_add_type_params(
         &mut self,
         type_params: &[(Name, PA::Kind)],
     ) -> Vec<(Symbol, Type)> {
@@ -3186,7 +3186,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
     /// Analyzes the sequence of function parameters as they are provided via the source AST and
     /// enters them into the environment. Returns a vector for representing them in the target AST.
-    fn analyze_and_add_params(&mut self, params: &[(PA::Var, EA::Type)]) -> Vec<(Symbol, Type)> {
+    pub fn analyze_and_add_params(&mut self, params: &[(PA::Var, EA::Type)]) -> Vec<(Symbol, Type)> {
         params
             .iter()
             .map(|(v, ty)| {
@@ -3199,7 +3199,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Displays a call target for error messages.
-    fn display_call_target(&mut self, module: &Option<ModuleName>, name: Symbol) -> String {
+    pub fn display_call_target(&mut self, module: &Option<ModuleName>, name: Symbol) -> String {
         if let Some(m) = module {
             if m != &self.parent.parent.builtin_module() {
                 // Only print the module name if it is not the pseudo builtin module.
@@ -3217,7 +3217,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Displays a call target candidate for error messages.
-    fn display_call_cand(
+    pub fn display_call_cand(
         &mut self,
         module: &Option<ModuleName>,
         name: Symbol,
@@ -3242,7 +3242,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
 impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'module_translator> {
     /// Translates an hlir type into a target AST type.
-    fn translate_hlir_single_type(&mut self, ty: &SingleType) -> Type {
+    pub fn translate_hlir_single_type(&mut self, ty: &SingleType) -> Type {
         use move_lang::hlir::ast::SingleType_::*;
         match &ty.value {
             Ref(is_mut, ty) => {
@@ -3257,7 +3257,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn translate_hlir_base_type(&mut self, ty: &BaseType) -> Type {
+    pub fn translate_hlir_base_type(&mut self, ty: &BaseType) -> Type {
         use move_lang::{
             hlir::ast::{BaseType_::*, TypeName_::*},
             naming::ast::BuiltinTypeName_::*,
@@ -3315,14 +3315,14 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn translate_hlir_base_types(&mut self, tys: &[BaseType]) -> Vec<Type> {
+    pub fn translate_hlir_base_types(&mut self, tys: &[BaseType]) -> Vec<Type> {
         tys.iter()
             .map(|t| self.translate_hlir_base_type(t))
             .collect()
     }
 
     /// Translates a source AST type into a target AST type.
-    fn translate_type(&mut self, ty: &EA::Type) -> Type {
+    pub fn translate_type(&mut self, ty: &EA::Type) -> Type {
         use EA::Type_::*;
         match &ty.value {
             Apply(access, args) => {
@@ -3420,12 +3420,12 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Translates a slice of single types.
-    fn translate_types(&mut self, tys: &[EA::Type]) -> Vec<Type> {
+    pub fn translate_types(&mut self, tys: &[EA::Type]) -> Vec<Type> {
         tys.iter().map(|t| self.translate_type(t)).collect()
     }
 
     /// Translates option a slice of single types.
-    fn translate_types_opt(&mut self, tys_opt: &Option<Vec<EA::Type>>) -> Vec<Type> {
+    pub fn translate_types_opt(&mut self, tys_opt: &Option<Vec<EA::Type>>) -> Vec<Type> {
         tys_opt
             .as_deref()
             .map(|tys| self.translate_types(tys))
@@ -3437,7 +3437,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
 impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'module_translator> {
     /// Translates an expression, with given expected type, which might be a type variable.
-    fn translate_exp(&mut self, exp: &EA::Exp, expected_type: &Type) -> Exp {
+    pub fn translate_exp(&mut self, exp: &EA::Exp, expected_type: &Type) -> Exp {
         let loc = self.to_loc(&exp.loc);
         let make_value = |et: &mut ExpTranslator, val: Value, ty: Type| {
             let rty = et.check_type(&loc, &ty, expected_type, "in expression");
@@ -3542,13 +3542,13 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                 self.new_error_exp()
             }
             _ => {
-                self.error(&loc, "expression construct not supported in specifications");
+                self.error(&loc, "expression conpub struct not supported in specifications");
                 self.new_error_exp()
             }
         }
     }
 
-    fn translate_value(&mut self, v: &EA::Value) -> Option<(Value, Type)> {
+    pub fn translate_value(&mut self, v: &EA::Value) -> Option<(Value, Type)> {
         let loc = self.to_loc(&v.loc);
         match &v.value {
             EA::Value_::Address(addr) => {
@@ -3586,7 +3586,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn translate_fun_call(
+    pub fn translate_fun_call(
         &mut self,
         expected_type: &Type,
         loc: &Loc,
@@ -3635,14 +3635,14 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     /// Translates an expression without any known type expectation. This creates a fresh type
     /// variable and passes this in as expected type, then returns a pair of this type and the
     /// translated expression.
-    fn translate_exp_free(&mut self, exp: &EA::Exp) -> (Type, Exp) {
+    pub fn translate_exp_free(&mut self, exp: &EA::Exp) -> (Type, Exp) {
         let tvar = self.fresh_type_var();
         let exp = self.translate_exp(exp, &tvar);
         (self.subs.specialize(&tvar), exp)
     }
 
     /// Translates a sequence expression.
-    fn translate_seq(&mut self, loc: &Loc, seq: &EA::Sequence, expected_type: &Type) -> Exp {
+    pub fn translate_seq(&mut self, loc: &Loc, seq: &EA::Sequence, expected_type: &Type) -> Exp {
         let n = seq.len();
         if n == 0 {
             self.error(loc, "block sequence cannot be empty");
@@ -3720,7 +3720,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Translates a name. Reports an error if the name is not found.
-    fn translate_name(
+    pub fn translate_name(
         &mut self,
         loc: &Loc,
         maccess: &EA::ModuleAccess,
@@ -3788,7 +3788,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Translate an Index expression.
-    fn translate_index(
+    pub fn translate_index(
         &mut self,
         loc: &Loc,
         target: &EA::Exp,
@@ -3823,7 +3823,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Translate a Dotted expression.
-    fn translate_dotted(&mut self, dotted: &EA::ExpDotted, expected_type: &Type) -> Exp {
+    pub fn translate_dotted(&mut self, dotted: &EA::ExpDotted, expected_type: &Type) -> Exp {
         // Similar as with Index, we must concretize the type of the expression on which
         // field selection is performed, violating full type inference rules, so we can actually
         // check and retrieve the field. To avoid this, we would need to introduce the concept
@@ -3875,7 +3875,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                             self.error(
                                 &loc,
                                 &format!(
-                                    "field `{}` not declared in struct `{}`",
+                                    "field `{}` not declared in pub struct `{}`",
                                     field_name.display(self.symbol_pool()),
                                     struct_name.display(self.symbol_pool())
                                 ),
@@ -3886,7 +3886,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                         self.error(
                             &loc,
                             &format!(
-                                "struct `{}` is native and does not support field selection",
+                                "pub struct `{}` is native and does not support field selection",
                                 struct_name.display(self.symbol_pool())
                             ),
                         );
@@ -3908,7 +3908,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
     /// Translates a call, performing overload resolution. Reports an error if the function cannot be found.
     /// This is used to resolve both calls to user spec functions and builtin operators.
-    fn translate_call(
+    pub fn translate_call(
         &mut self,
         loc: &Loc,
         module: &Option<ModuleName>,
@@ -4023,7 +4023,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                     expected_type,
                     "in expression",
                 );
-                // Construct result.
+                // Conpub struct result.
                 let id = self.new_node_id_with_type_loc(&ty, loc);
                 self.set_instantiation(id, instantiation);
                 Exp::Call(id, cand.oper.clone(), translated_args)
@@ -4050,7 +4050,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Translate a list of expressions and deliver them together with their types.
-    fn translate_exp_list(
+    pub fn translate_exp_list(
         &mut self,
         exps: &[&EA::Exp],
         skip_lambda: bool,
@@ -4074,7 +4074,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
     }
 
     /// Creates a type instantiation based on provided actual type parameters.
-    fn make_instantiation(
+    pub fn make_instantiation(
         &mut self,
         param_count: usize,
         actuals: Option<Vec<Type>>,
@@ -4103,7 +4103,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn translate_pack(
+    pub fn translate_pack(
         &mut self,
         loc: &Loc,
         maccess: &EA::ModuleAccess,
@@ -4135,7 +4135,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                         self.error(
                             &self.to_loc(&name.0.loc),
                             &format!(
-                                "field `{}` not declared in struct `{}`",
+                                "field `{}` not declared in pub struct `{}`",
                                 field_name.display(self.symbol_pool()),
                                 struct_name.display(self.symbol_pool())
                             ),
@@ -4170,7 +4170,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
                 self.error(
                     &struct_name_loc,
                     &format!(
-                        "native struct `{}` cannot be packed",
+                        "native pub struct `{}` cannot be packed",
                         struct_name.display(self.symbol_pool())
                     ),
                 );
@@ -4180,7 +4180,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
             self.error(
                 &struct_name_loc,
                 &format!(
-                    "undeclared struct `{}`",
+                    "undeclared pub struct `{}`",
                     struct_name.display(self.symbol_pool())
                 ),
             );
@@ -4188,7 +4188,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         }
     }
 
-    fn translate_lambda(
+    pub fn translate_lambda(
         &mut self,
         loc: &Loc,
         bindings: &EA::LValueList,
@@ -4239,7 +4239,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         Exp::Lambda(id, decls, Box::new(rbody))
     }
 
-    fn check_type(&mut self, loc: &Loc, ty: &Type, expected: &Type, context_msg: &str) -> Type {
+    pub fn check_type(&mut self, loc: &Loc, ty: &Type, expected: &Type, context_msg: &str) -> Type {
         // Because of Rust borrow semantics, we must temporarily detach the substitution from
         // the translator. This is because we also need to inherently borrow self via the
         // type_display_context which is passed into unification.
@@ -4288,7 +4288,7 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
 
 /// Rewriter for expressions, allowing to substitute locals by expressions as well as instantiate
 /// types. Currently used to rewrite conditions and invariants included from schemas.
-struct ExpRewriter<'env, 'translator, 'rewriter> {
+pub struct ExpRewriter<'env, 'translator, 'rewriter> {
     parent: &'rewriter mut ModuleTranslator<'env, 'translator>,
     argument_map: &'rewriter BTreeMap<Symbol, Exp>,
     type_args: &'rewriter [Type],
@@ -4297,7 +4297,7 @@ struct ExpRewriter<'env, 'translator, 'rewriter> {
 }
 
 impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
-    fn new(
+    pub fn new(
         parent: &'rewriter mut ModuleTranslator<'env, 'translator>,
         originating_module: ModuleId,
         argument_map: &'rewriter BTreeMap<Symbol, Exp>,
@@ -4312,7 +4312,7 @@ impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
         }
     }
 
-    fn replace_local(&mut self, node_id: NodeId, sym: Symbol) -> Exp {
+    pub fn replace_local(&mut self, node_id: NodeId, sym: Symbol) -> Exp {
         for vars in &self.shadowed {
             if vars.contains(&sym) {
                 let node_id = self.rewrite_attrs(node_id);
@@ -4327,7 +4327,7 @@ impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
         }
     }
 
-    fn rewrite(&mut self, exp: &Exp) -> Exp {
+    pub fn rewrite(&mut self, exp: &Exp) -> Exp {
         use Exp::*;
         match exp {
             LocalVar(id, sym) => self.replace_local(*id, *sym),
@@ -4373,7 +4373,7 @@ impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
         }
     }
 
-    fn rewrite_vec(&mut self, exps: &[Exp]) -> Vec<Exp> {
+    pub fn rewrite_vec(&mut self, exps: &[Exp]) -> Vec<Exp> {
         // For some reason, we don't get the lifetime right when we use a map. Figure out
         // why and remove this explicit treatment.
         let mut res = vec![];
@@ -4383,7 +4383,7 @@ impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
         res
     }
 
-    fn rewrite_attrs(&mut self, node_id: NodeId) -> NodeId {
+    pub fn rewrite_attrs(&mut self, node_id: NodeId) -> NodeId {
         // Create a new node id and copy attributes over, after instantiation with type args.
         let (loc, ty, instantiation_opt) = if self.parent.module_id == self.originating_module {
             let loc = self
@@ -4431,7 +4431,7 @@ impl<'env, 'translator, 'rewriter> ExpRewriter<'env, 'translator, 'rewriter> {
 }
 
 /// Extract all accesses of a schema from a schema expression.
-fn extract_schema_access<'a>(exp: &'a EA::Exp, res: &mut Vec<&'a EA::ModuleAccess>) {
+pub fn extract_schema_access<'a>(exp: &'a EA::Exp, res: &mut Vec<&'a EA::ModuleAccess>) {
     match &exp.value {
         EA::Exp_::Name(maccess, _) => res.push(maccess),
         EA::Exp_::Pack(maccess, ..) => res.push(maccess),

@@ -11,11 +11,11 @@
 //! For examples of property-based tests written against this model, see the
 //! `tests/account_universe` directory.
 
-mod bad_transaction;
-mod create_account;
-mod peer_to_peer;
-mod rotate_key;
-mod universe;
+pub mod bad_transaction;
+pub mod create_account;
+pub mod peer_to_peer;
+pub mod rotate_key;
+pub mod universe;
 pub use bad_transaction::*;
 pub use create_account::*;
 pub use peer_to_peer::*;
@@ -66,7 +66,7 @@ static UNIVERSE_SIZE: Lazy<usize> = Lazy::new(|| {
 /// Larger values will provide greater testing but will take longer to run and shrink. Release mode
 /// is recommended for values above 100.
 #[inline]
-pub(crate) fn default_num_accounts() -> usize {
+pub fn default_num_accounts() -> usize {
     *UNIVERSE_SIZE
 }
 
@@ -76,7 +76,7 @@ pub(crate) fn default_num_accounts() -> usize {
 /// Larger values will provide greater testing but will take longer to run and shrink. Release mode
 /// is recommended for values above 100.
 #[inline]
-pub(crate) fn default_num_transactions() -> usize {
+pub fn default_num_transactions() -> usize {
     *UNIVERSE_SIZE * 2
 }
 

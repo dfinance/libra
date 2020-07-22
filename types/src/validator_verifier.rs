@@ -44,7 +44,7 @@ pub enum VerifyError {
     InvalidSignature,
 }
 
-/// Helper struct to manage validator information for validation
+/// Helper pub struct to manage validator information for validation
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct ValidatorConsensusInfo {
@@ -354,7 +354,7 @@ pub fn random_validator_verifier(
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use crate::validator_signer::ValidatorSigner;
     use libra_crypto::test_utils::{TestLibraCrypto, TEST_SEED};

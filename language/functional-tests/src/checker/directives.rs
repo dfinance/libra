@@ -8,7 +8,7 @@ use crate::{
 use std::iter::Peekable;
 
 /// The basic unit of input to the directive parser.
-enum Token {
+pub enum Token {
     String(String),
     QuotedString(String),
     Whitespace(String),

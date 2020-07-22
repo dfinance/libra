@@ -24,7 +24,7 @@ pub struct FunctionTargetsHolder {
 /// the processor is called, the target data is removed from the holder, and added back once
 /// transformation has finished. This allows the processor to take ownership
 /// on the target data. Notice that you can use `FunctionTarget{func_env, &data}` to temporarily
-/// construct a function target for access to the underlying data.
+/// conpub struct a function target for access to the underlying data.
 pub trait FunctionTargetProcessor {
     fn process(
         &self,
@@ -59,7 +59,7 @@ impl FunctionTargetsHolder {
     }
 
     /// Processes the function target data for given function.
-    fn process(&mut self, func_env: &FunctionEnv<'_>, processor: &dyn FunctionTargetProcessor) {
+    pub fn process(&mut self, func_env: &FunctionEnv<'_>, processor: &dyn FunctionTargetProcessor) {
         let key = (func_env.module_env.get_id(), func_env.get_id());
         let data = self.targets.remove(&key).expect("function target exists");
         let processed_data = processor.process(self, func_env, data);

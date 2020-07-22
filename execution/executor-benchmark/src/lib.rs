@@ -39,7 +39,7 @@ use transaction_builder::{
     encode_testnet_mint_script,
 };
 
-struct AccountData {
+pub struct AccountData {
     private_key: Ed25519PrivateKey,
     public_key: Ed25519PublicKey,
     address: AccountAddress,
@@ -54,7 +54,7 @@ impl AccountData {
     }
 }
 
-struct TransactionGenerator {
+pub struct TransactionGenerator {
     /// The current state of the accounts. The main purpose is to keep track of the sequence number
     /// so generated transactions are guaranteed to be successfully executed.
     accounts: Vec<AccountData>,
@@ -71,7 +71,7 @@ struct TransactionGenerator {
 }
 
 impl TransactionGenerator {
-    fn new(
+    pub fn new(
         genesis_key: Ed25519PrivateKey,
         num_accounts: usize,
         block_sender: mpsc::SyncSender<Vec<Transaction>>,
@@ -101,13 +101,13 @@ impl TransactionGenerator {
         }
     }
 
-    fn run(&mut self, init_account_balance: u64, block_size: usize, num_transfer_blocks: usize) {
+    pub fn run(&mut self, init_account_balance: u64, block_size: usize, num_transfer_blocks: usize) {
         self.gen_account_creations(block_size);
         self.gen_mint_transactions(init_account_balance, block_size);
         self.gen_transfer_transactions(block_size, num_transfer_blocks);
     }
 
-    fn gen_account_creations(&self, block_size: usize) {
+    pub fn gen_account_creations(&self, block_size: usize) {
         let assoc_account = libra_root_address();
 
         for (i, block) in self.accounts.chunks(block_size).enumerate() {
@@ -137,7 +137,7 @@ impl TransactionGenerator {
     }
 
     /// Generates transactions that allocate `init_account_balance` to every account.
-    fn gen_mint_transactions(&self, init_account_balance: u64, block_size: usize) {
+    pub fn gen_mint_transactions(&self, init_account_balance: u64, block_size: usize) {
         let testnet_dd_account = testnet_dd_account_address();
 
         for (i, block) in self.accounts.chunks(block_size).enumerate() {
@@ -162,7 +162,7 @@ impl TransactionGenerator {
     }
 
     /// Generates transactions for random pairs of accounts.
-    fn gen_transfer_transactions(&mut self, block_size: usize, num_blocks: usize) {
+    pub fn gen_transfer_transactions(&mut self, block_size: usize, num_blocks: usize) {
         for _i in 0..num_blocks {
             let mut transactions = Vec::with_capacity(block_size);
             for _j in 0..block_size {
@@ -199,7 +199,7 @@ impl TransactionGenerator {
     }
 
     /// Verifies the sequence numbers in storage match what we have locally.
-    fn verify_sequence_number(&self, db: &dyn DbReader) {
+    pub fn verify_sequence_number(&self, db: &dyn DbReader) {
         for account in &self.accounts {
             let address = account.address;
             let blob = db
@@ -212,19 +212,19 @@ impl TransactionGenerator {
     }
 
     /// Drops the sender to notify the receiving end of the channel.
-    fn drop_sender(&mut self) {
+    pub fn drop_sender(&mut self) {
         self.block_sender.take().unwrap();
     }
 }
 
-struct TransactionExecutor {
+pub struct TransactionExecutor {
     executor: Executor<LibraVM>,
     parent_block_id: HashValue,
     block_receiver: mpsc::Receiver<Vec<Transaction>>,
 }
 
 impl TransactionExecutor {
-    fn new(
+    pub fn new(
         executor: Executor<LibraVM>,
         parent_block_id: HashValue,
         block_receiver: mpsc::Receiver<Vec<Transaction>>,
@@ -236,7 +236,7 @@ impl TransactionExecutor {
         }
     }
 
-    fn run(&mut self) {
+    pub fn run(&mut self) {
         let mut version = 0;
 
         while let Ok(transactions) = self.block_receiver.recv() {
@@ -290,7 +290,7 @@ impl TransactionExecutor {
     }
 }
 
-fn create_storage_service_and_executor(
+pub fn create_storage_service_and_executor(
     config: &NodeConfig,
 ) -> (Arc<dyn DbReader>, Executor<LibraVM>) {
     let (db, db_rw) = DbReaderWriter::wrap(
@@ -357,7 +357,7 @@ pub fn run_benchmark(
     generator.verify_sequence_number(db.as_ref());
 }
 
-fn create_transaction(
+pub fn create_transaction(
     sender: AccountAddress,
     sequence_number: u64,
     private_key: &Ed25519PrivateKey,
@@ -386,7 +386,7 @@ fn create_transaction(
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     #[test]
     fn test_benchmark() {
         super::run_benchmark(

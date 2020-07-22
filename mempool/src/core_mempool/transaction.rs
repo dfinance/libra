@@ -16,7 +16,7 @@ pub struct MempoolTransaction {
 }
 
 impl MempoolTransaction {
-    pub(crate) fn new(
+    pub fn new(
         txn: SignedTransaction,
         expiration_time: Duration,
         gas_amount: u64,
@@ -33,13 +33,13 @@ impl MempoolTransaction {
             is_governance_txn,
         }
     }
-    pub(crate) fn get_sequence_number(&self) -> u64 {
+    pub fn get_sequence_number(&self) -> u64 {
         self.txn.sequence_number()
     }
-    pub(crate) fn get_sender(&self) -> AccountAddress {
+    pub fn get_sender(&self) -> AccountAddress {
         self.txn.sender()
     }
-    pub(crate) fn get_gas_price(&self) -> u64 {
+    pub fn get_gas_price(&self) -> u64 {
         self.txn.gas_unit_price()
     }
 }

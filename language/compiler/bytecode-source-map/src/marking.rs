@@ -18,7 +18,7 @@ pub struct FunctionMarking {
 }
 
 /// A data structure used to track any markings or extra information that is desired to be exposed
-/// in the disassembled struct definition. Every marking can have multiple messages associated with it.
+/// in the disassembled pub struct definition. Every marking can have multiple messages associated with it.
 #[derive(Debug, Default)]
 pub struct StructMarking {
     // Field markings
@@ -35,7 +35,7 @@ pub struct MarkedSourceMapping {
     // Any function markings
     function_marks: HashMap<TableIndex, FunctionMarking>,
 
-    // Any struct marking
+    // Any pub struct marking
     struct_marks: HashMap<TableIndex, StructMarking>,
 }
 

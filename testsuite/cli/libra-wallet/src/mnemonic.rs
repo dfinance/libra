@@ -145,14 +145,14 @@ impl Mnemonic {
 }
 
 /// BitReader reads data from a byte slice at the granularity of 11 bits.
-struct U11BitReader<'a> {
+pub struct U11BitReader<'a> {
     bytes: &'a [u8],
     /// Position from the start of the slice, counted as bits instead of bytes.
     position: u16,
 }
 
 impl<'a> U11BitReader<'a> {
-    /// Construct a new BitReader from a byte slice.
+    /// Conpub struct a new BitReader from a byte slice.
     fn new(bytes: &'a [u8]) -> U11BitReader<'a> {
         U11BitReader { bytes, position: 0 }
     }
@@ -177,7 +177,7 @@ impl<'a> U11BitReader<'a> {
 }
 
 /// BitWriter writes data to a vector at the granularity of 11 bits.
-struct U11BitWriter {
+pub struct U11BitWriter {
     bytes: Vec<u8>,
     unused: u16,
     buffer: u16,
@@ -553,7 +553,7 @@ fn test_failed_checksum() {
 
 /// Struct to handle BIP39 test vectors.
 #[cfg(test)]
-struct Test<'a> {
+pub struct Test<'a> {
     seed: &'a str,
     mnemonic: &'a str,
 }

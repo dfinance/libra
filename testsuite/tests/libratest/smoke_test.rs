@@ -41,7 +41,7 @@ use std::{
 
 const KEY_MANAGER_BIN: &str = "libra-key-manager";
 
-struct TestEnvironment {
+pub struct TestEnvironment {
     validator_swarm: LibraSwarm,
     vfn_swarm: Option<LibraSwarm>,
     public_fn_swarm: Option<LibraSwarm>,
@@ -1456,13 +1456,13 @@ fn test_key_manager_consensus_rotation() {
 }
 
 /// Helper function to build libra interfaces for smoke test
-fn get_libra_interface(node_config: &NodeConfig) -> JsonRpcLibraInterface {
+pub fn get_libra_interface(node_config: &NodeConfig) -> JsonRpcLibraInterface {
     let json_rpc_endpoint = format!("http://127.0.0.1:{}", node_config.rpc.address.port());
     JsonRpcLibraInterface::new(json_rpc_endpoint)
 }
 
 /// Helper function to wait for all nodes to reach a condition
-fn wait_for_all_nodes(
+pub fn wait_for_all_nodes(
     libra_interfaces: &[JsonRpcLibraInterface],
     condition: impl Fn(&JsonRpcLibraInterface) -> bool,
 ) {

@@ -15,7 +15,7 @@ use schemadb::{SchemaBatch, DB};
 use std::sync::Arc;
 
 #[derive(Debug)]
-pub(crate) struct SystemStore {
+pub struct SystemStore {
     db: Arc<DB>,
 }
 
@@ -60,4 +60,4 @@ impl SystemStore {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

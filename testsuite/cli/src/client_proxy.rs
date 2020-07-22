@@ -71,7 +71,7 @@ const TX_EXPIRATION: i64 = 100;
 
 /// Enum used for error formatting.
 #[derive(Debug)]
-enum InputType {
+pub enum InputType {
     Bool,
     UnsignedInt,
     Usize,
@@ -128,7 +128,7 @@ pub struct ClientProxy {
 }
 
 impl ClientProxy {
-    /// Construct a new TestClient.
+    /// Conpub struct a new TestClient.
     pub fn new(
         chain_id: ChainId,
         url: &str,
@@ -1672,7 +1672,7 @@ impl fmt::Display for AccountEntry {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use crate::client_proxy::{parse_bool, AddressAndIndex, ClientProxy};
     use libra_temppath::TempPath;
     use libra_types::{

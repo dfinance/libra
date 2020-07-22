@@ -171,7 +171,7 @@ where
 
 /// An error type for HKDF key derivation issues.
 ///
-/// This enum reflects there are various causes of HKDF failures, including:
+/// Thispub enum reflects there are various causes of HKDF failures, including:
 /// a) requested HKDF output size exceeds the maximum allowed or is zero.
 /// b) hash functions outputting less than 32 bits are not supported (i.e., SHA1 is not supported).
 /// c) small PRK value in HKDF-Expand according to RFC 5869.

@@ -39,7 +39,7 @@ pub struct TcpTransport {
 }
 
 impl TcpTransport {
-    fn apply_config(&self, stream: &TcpStream) -> ::std::io::Result<()> {
+    pub fn apply_config(&self, stream: &TcpStream) -> ::std::io::Result<()> {
         if let Some(size) = self.recv_buffer_size {
             stream.set_recv_buffer_size(size)?;
         }
@@ -116,7 +116,7 @@ impl Transport for TcpTransport {
 }
 
 /// Try to lookup the dns name, then filter addrs according to the `IpFilter`.
-fn resolve_with_filter<'a>(
+pub fn resolve_with_filter<'a>(
     ip_filter: IpFilter,
     dns_name: &'a str,
     port: u16,
@@ -130,7 +130,7 @@ fn resolve_with_filter<'a>(
 
 /// Note: we need to take ownership of this `NetworkAddress` (instead of just
 /// borrowing the `&[Protocol]` slice) so this future can be `Send + 'static`.
-async fn resolve_and_connect(addr: NetworkAddress) -> io::Result<TcpStream> {
+pub async fn resolve_and_connect(addr: NetworkAddress) -> io::Result<TcpStream> {
     let protos = addr.as_slice();
 
     if let Some(((ipaddr, port), _addr_suffix)) = parse_ip_tcp(protos) {
@@ -165,7 +165,7 @@ async fn resolve_and_connect(addr: NetworkAddress) -> io::Result<TcpStream> {
     }
 }
 
-fn invalid_addr_error(addr: &NetworkAddress) -> io::Error {
+pub fn invalid_addr_error(addr: &NetworkAddress) -> io::Error {
     io::Error::new(
         io::ErrorKind::InvalidInput,
         format!("Invalid NetworkAddress: '{}'", addr),
@@ -232,7 +232,7 @@ pub struct TcpSocket {
 }
 
 impl TcpSocket {
-    fn new(socket: TcpStream) -> Self {
+    pub fn new(socket: TcpStream) -> Self {
         Self {
             inner: IoCompat::new(socket),
         }
@@ -268,7 +268,7 @@ impl AsyncWrite for TcpSocket {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::transport::{ConnectionOrigin, Transport, TransportExt};
     use futures::{
@@ -280,7 +280,7 @@ mod test {
     use tokio::runtime::Runtime;
 
     #[tokio::test]
-    async fn simple_listen_and_dial() -> Result<(), ::std::io::Error> {
+    pub async fn simple_listen_and_dial() -> Result<(), ::std::io::Error> {
         let t = TcpTransport::default().and_then(|mut out, _addr, origin| async move {
             match origin {
                 ConnectionOrigin::Inbound => {

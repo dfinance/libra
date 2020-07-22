@@ -22,7 +22,7 @@ use vm::{
     CompiledModule,
 };
 
-pub(crate) struct Resolver<'a> {
+pub struct Resolver<'a> {
     state: &'a dyn StateView,
     cache: ModuleCache,
 }
@@ -39,7 +39,7 @@ impl<'a> Resolver<'a> {
         Resolver { state, cache }
     }
 
-    fn get_module(&self, address: &AccountAddress, name: &IdentStr) -> Result<Rc<CompiledModule>> {
+    pub fn get_module(&self, address: &AccountAddress, name: &IdentStr) -> Result<Rc<CompiledModule>> {
         let module_id = ModuleId::new(*address, name.to_owned());
         if let Some(module) = self.cache.get(&module_id) {
             return Ok(module);
@@ -91,7 +91,7 @@ impl<'a> Resolver<'a> {
         }
     }
 
-    fn resolve_signature(
+    pub fn resolve_signature(
         &self,
         module: Rc<CompiledModule>,
         sig: &SignatureToken,
@@ -128,7 +128,7 @@ impl<'a> Resolver<'a> {
         })
     }
 
-    fn resolve_struct_handle(
+    pub fn resolve_struct_handle(
         &self,
         module: Rc<CompiledModule>,
         idx: StructHandleIndex,
@@ -148,7 +148,7 @@ impl<'a> Resolver<'a> {
         self.resolve_struct_definition(target_module, target_idx)
     }
 
-    fn resolve_struct_definition(
+    pub fn resolve_struct_definition(
         &self,
         module: Rc<CompiledModule>,
         idx: StructDefinitionIndex,
@@ -179,7 +179,7 @@ impl<'a> Resolver<'a> {
     }
 }
 
-fn find_struct_def_in_module(
+pub fn find_struct_def_in_module(
     module: Rc<CompiledModule>,
     name: &IdentStr,
 ) -> Result<StructDefinitionIndex> {

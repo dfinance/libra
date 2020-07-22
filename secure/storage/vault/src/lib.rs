@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use libra_crypto::{
     ed25519::{Ed25519PrivateKey, Ed25519PublicKey, Ed25519Signature},
@@ -479,13 +479,13 @@ impl Client {
         }
     }
 
-    fn upgrade_request(&self, request: ureq::Request) -> ureq::Request {
+    pub fn upgrade_request(&self, request: ureq::Request) -> ureq::Request {
         let mut request = self.upgrade_request_without_token(request);
         request.set("X-Vault-Token", &self.token);
         request
     }
 
-    fn upgrade_request_without_token(&self, mut request: ureq::Request) -> ureq::Request {
+    pub fn upgrade_request_without_token(&self, mut request: ureq::Request) -> ureq::Request {
         request.timeout_connect(TIMEOUT);
         if let Some(tls_config) = self.tls_config.as_ref() {
             request.set_tls_config(tls_config.clone());
@@ -668,13 +668,13 @@ impl<T> ReadResponse<T> {
 ///   }
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct CreateTokenResponse {
+pub struct CreateTokenResponse {
     auth: CreateTokenAuth,
 }
 
 /// See CreateTokenResponse
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct CreateTokenAuth {
+pub struct CreateTokenAuth {
     client_token: String,
 }
 
@@ -689,12 +689,12 @@ struct CreateTokenAuth {
 ///  }
 ///}
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ExportKeyResponse {
+pub struct ExportKeyResponse {
     data: ExportKey,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ExportKey {
+pub struct ExportKey {
     name: String,
     keys: BTreeMap<u32, String>,
 }
@@ -704,7 +704,7 @@ struct ExportKey {
 ///   "policies": ["root", "deploy"]
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ListPoliciesResponse {
+pub struct ListPoliciesResponse {
     policies: Vec<String>,
 }
 
@@ -719,12 +719,12 @@ struct ListPoliciesResponse {
 ///   "renewable": false
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ListKeysResponse {
+pub struct ListKeysResponse {
     data: ListKeys,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ListKeys {
+pub struct ListKeys {
     keys: Vec<String>,
 }
 
@@ -749,12 +749,12 @@ struct ListKeys {
 ///   }
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadKeyResponse {
+pub struct ReadKeyResponse {
     data: ReadKeys,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadKeys {
+pub struct ReadKeys {
     keys: BTreeMap<u32, ReadKey>,
     name: String,
     #[serde(rename = "type")]
@@ -762,7 +762,7 @@ struct ReadKeys {
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadKey {
+pub struct ReadKey {
     creation_time: String,
     public_key: String,
 }
@@ -776,13 +776,13 @@ struct ReadKey {
 ///   }
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadSecretListResponse {
+pub struct ReadSecretListResponse {
     data: ReadSecretListData,
 }
 
 /// See ReadSecretListResponse
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadSecretListData {
+pub struct ReadSecretListData {
     keys: Vec<String>,
 }
 
@@ -802,20 +802,20 @@ struct ReadSecretListData {
 ///   }
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadSecretResponse {
+pub struct ReadSecretResponse {
     data: ReadSecretData,
 }
 
 /// See ReadPolicyResponse
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadSecretData {
+pub struct ReadSecretData {
     data: BTreeMap<String, String>,
     metadata: ReadSecretMetadata,
 }
 
 /// See ReadPolicyResponse
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct ReadSecretMetadata {
+pub struct ReadSecretMetadata {
     created_time: String,
     version: u32,
 }
@@ -909,12 +909,12 @@ pub enum Capability {
 ///   }
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct SignatureResponse {
+pub struct SignatureResponse {
     data: Signature,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct Signature {
+pub struct Signature {
     signature: String,
 }
 
@@ -932,6 +932,6 @@ struct Signature {
 ///   "nonce": "ef05d55d-4d2c-c594-a5e8-55bc88604c24"
 /// }
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct SealStatusResponse {
+pub struct SealStatusResponse {
     sealed: bool,
 }

@@ -100,7 +100,7 @@ pub fn get_test_unchecked_transaction(
 }
 
 // Test helper for creating transactions for which the signature hasn't been checked.
-fn get_test_unchecked_transaction_(
+pub fn get_test_unchecked_transaction_(
     sender: AccountAddress,
     sequence_number: u64,
     private_key: &Ed25519PrivateKey,

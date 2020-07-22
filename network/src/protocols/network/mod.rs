@@ -133,7 +133,7 @@ impl<TMessage> Stream for NetworkEvents<TMessage> {
     }
 }
 
-fn peer_mgr_notif_to_event<TMessage: Message>(
+pub fn peer_mgr_notif_to_event<TMessage: Message>(
     notif: PeerManagerNotification,
 ) -> Result<Event<TMessage>, NetworkError> {
     match notif {
@@ -148,7 +148,7 @@ fn peer_mgr_notif_to_event<TMessage: Message>(
     }
 }
 
-fn control_msg_to_event<TMessage>(
+pub fn control_msg_to_event<TMessage>(
     notif: ConnectionNotification,
 ) -> Result<Event<TMessage>, NetworkError> {
     match notif {

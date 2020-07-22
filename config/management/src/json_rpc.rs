@@ -58,7 +58,7 @@ impl JsonRpcClientWrapper {
     }
 }
 
-fn resource<T>(
+pub fn resource<T>(
     resource_name: &'static str,
     maybe_resource: Result<Option<T>, anyhow::Error>,
 ) -> Result<T, Error> {

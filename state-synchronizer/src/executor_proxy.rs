@@ -56,7 +56,7 @@ pub trait ExecutorProxyTrait: Send {
     fn publish_on_chain_config_updates(&mut self, events: Vec<ContractEvent>) -> Result<()>;
 }
 
-pub(crate) struct ExecutorProxy {
+pub struct ExecutorProxy {
     storage: Arc<dyn DbReader>,
     executor: Box<dyn ChunkExecutor>,
     reconfig_subscriptions: Vec<ReconfigSubscription>,
@@ -64,7 +64,7 @@ pub(crate) struct ExecutorProxy {
 }
 
 impl ExecutorProxy {
-    pub(crate) fn new(
+    pub fn new(
         storage: Arc<dyn DbReader>,
         executor: Box<dyn ChunkExecutor>,
         mut reconfig_subscriptions: Vec<ReconfigSubscription>,
@@ -86,7 +86,7 @@ impl ExecutorProxy {
 
     // TODO make this into more general trait method in `on_chain_config`
     // once `StorageRead` trait is replaced with `DbReader` and `batch_fetch_config` method is no longer async
-    fn fetch_all_configs(storage: &dyn DbReader) -> Result<OnChainConfigPayload> {
+    pub fn fetch_all_configs(storage: &dyn DbReader) -> Result<OnChainConfigPayload> {
         let access_paths = ON_CHAIN_CONFIG_REGISTRY
             .iter()
             .map(|config_id| config_id.access_path())

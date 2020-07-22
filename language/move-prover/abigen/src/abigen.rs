@@ -93,7 +93,7 @@ impl<'env> Abigen<'env> {
     }
 
     /// Compute the ABI of a script module.
-    fn compute_abi(&self, module_env: &ModuleEnv<'env>) -> anyhow::Result<ScriptABI> {
+    pub fn compute_abi(&self, module_env: &ModuleEnv<'env>) -> anyhow::Result<ScriptABI> {
         let symbol_pool = module_env.symbol_pool();
         let func = match module_env.get_functions().next() {
             Some(f) => f,
@@ -126,7 +126,7 @@ impl<'env> Abigen<'env> {
         Ok(ScriptABI::new(name, doc, code, ty_args, args))
     }
 
-    fn load_compiled_bytes(&self, module_env: &ModuleEnv<'env>) -> anyhow::Result<Vec<u8>> {
+    pub fn load_compiled_bytes(&self, module_env: &ModuleEnv<'env>) -> anyhow::Result<Vec<u8>> {
         let mut path = PathBuf::from(&self.options.compiled_script_directory);
         path.push(
             PathBuf::from(module_env.get_source_path())
@@ -143,7 +143,7 @@ impl<'env> Abigen<'env> {
         Ok(bytes)
     }
 
-    fn get_type_tag_skipping_references(&self, ty0: &ty::Type) -> anyhow::Result<Option<TypeTag>> {
+    pub fn get_type_tag_skipping_references(&self, ty0: &ty::Type) -> anyhow::Result<Option<TypeTag>> {
         use ty::Type::*;
         let tag = match ty0 {
             Primitive(prim) => {
@@ -178,7 +178,7 @@ impl<'env> Abigen<'env> {
         Ok(Some(tag))
     }
 
-    fn get_type_tag(&self, ty: &ty::Type) -> anyhow::Result<TypeTag> {
+    pub fn get_type_tag(&self, ty: &ty::Type) -> anyhow::Result<TypeTag> {
         if let Some(tag) = self.get_type_tag_skipping_references(ty)? {
             return Ok(tag);
         }

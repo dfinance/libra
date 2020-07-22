@@ -55,7 +55,7 @@ fn execute_and_commit_block(
     id
 }
 
-struct TestExecutor {
+pub struct TestExecutor {
     // The config is kept around because it owns the temp dir used in the test.
     _config: NodeConfig,
     executor: Executor<MockVM>,
@@ -448,7 +448,7 @@ fn test_noop_block_after_reconfiguration() {
     assert_eq!(output1.root_hash(), output2.root_hash());
 }
 
-struct TestBlock {
+pub struct TestBlock {
     txns: Vec<Transaction>,
     id: HashValue,
 }
@@ -596,7 +596,7 @@ proptest! {
             parent_block_id = block_a.id;
         }
 
-        // Now we construct a new executor and run one more block.
+        // Now we conpub struct a new executor and run one more block.
         {
             let mut executor = Executor::<MockVM>::new(db);
             let output_b = executor.execute_block((block_b.id, block_b.txns.clone()), parent_block_id).unwrap();

@@ -24,13 +24,13 @@ use std::{
 };
 
 #[derive(Debug, Default)]
-struct SignatureState {
+pub struct SignatureState {
     signatures: Vec<Signature>,
     signature_map: HashMap<Signature, SignatureIndex>,
 }
 
 impl SignatureState {
-    fn new(signatures: Vec<Signature>) -> Self {
+    pub fn new(signatures: Vec<Signature>) -> Self {
         let mut state = Self::default();
         for sig in signatures {
             state.add_signature(sig);
@@ -38,11 +38,11 @@ impl SignatureState {
         state
     }
 
-    fn signatures(self) -> Vec<Signature> {
+    pub fn signatures(self) -> Vec<Signature> {
         self.signatures
     }
 
-    fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
+    pub fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
         precondition!(self.signatures.len() < TableSize::max_value() as usize);
         if let Some(idx) = self.signature_map.get(&sig) {
             return *idx;
@@ -56,7 +56,7 @@ impl SignatureState {
 
 #[derive(Debug, Default)]
 #[allow(unused)]
-struct FieldHandleState {
+pub struct FieldHandleState {
     field_handles: Vec<FieldHandle>,
     field_map: HashMap<FieldHandle, FieldHandleIndex>,
 }
@@ -68,7 +68,7 @@ impl FieldHandleState {
     }
 
     #[allow(unused)]
-    fn add_field_handle(&mut self, fh: FieldHandle) -> FieldHandleIndex {
+    pub fn add_field_handle(&mut self, fh: FieldHandle) -> FieldHandleIndex {
         precondition!(self.field_handles.len() < TableSize::max_value() as usize);
         if let Some(idx) = self.field_map.get(&fh) {
             return *idx;
@@ -82,7 +82,7 @@ impl FieldHandleState {
 
 #[derive(Debug)]
 #[allow(unused)]
-struct InstantiationState<T>
+pub struct InstantiationState<T>
 where
     T: Eq + Clone + Hash,
 {
@@ -94,7 +94,7 @@ impl<T> InstantiationState<T>
 where
     T: Eq + Clone + Hash,
 {
-    fn new() -> Self {
+    pub fn new() -> Self {
         InstantiationState {
             instantiations: vec![],
             instantiation_map: HashMap::new(),
@@ -107,7 +107,7 @@ where
     }
 
     #[allow(unused)]
-    fn add_instantiation(&mut self, inst: T) -> TableIndex {
+    pub fn add_instantiation(&mut self, inst: T) -> TableIndex {
         precondition!(self.instantiations.len() < TableSize::max_value() as usize);
         if let Some(idx) = self.instantiation_map.get(&inst) {
             return *idx;
@@ -148,7 +148,7 @@ impl FnHandleMaterializeState {
         self.signatures.signatures()
     }
 
-    fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
+    pub fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
         self.signatures.add_signature(sig)
     }
 }
@@ -273,11 +273,11 @@ impl FnDefnMaterializeState {
         )
     }
 
-    fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
+    pub fn add_signature(&mut self, sig: Signature) -> SignatureIndex {
         self.signatures.add_signature(sig)
     }
 
-    fn add_function_handle(&mut self, handle: FunctionHandle) -> FunctionHandleIndex {
+    pub fn add_function_handle(&mut self, handle: FunctionHandle) -> FunctionHandleIndex {
         precondition!(self.function_handles.len() < TableSize::max_value() as usize);
         self.function_handles.push(handle);
         FunctionHandleIndex((self.function_handles.len() - 1) as TableIndex)
@@ -368,13 +368,13 @@ impl FunctionDefinitionGen {
 }
 
 #[derive(Clone, Debug)]
-struct CodeUnitGen {
+pub struct CodeUnitGen {
     locals_signature: Vec<SignatureTokenGen>,
     code: Vec<BytecodeGen>,
 }
 
 impl CodeUnitGen {
-    fn strategy(
+    pub fn strategy(
         arg_count: impl Into<SizeRange>,
         code_len: impl Into<SizeRange>,
     ) -> impl Strategy<Value = Self> {
@@ -388,7 +388,7 @@ impl CodeUnitGen {
             })
     }
 
-    fn materialize(self, state: &mut FnDefnMaterializeState) -> CodeUnit {
+    pub fn materialize(self, state: &mut FnDefnMaterializeState) -> CodeUnit {
         let locals_signature = Signature(
             self.locals_signature
                 .into_iter()
@@ -411,7 +411,7 @@ impl CodeUnitGen {
 }
 
 #[derive(Clone, Debug)]
-enum BytecodeGen {
+pub enum BytecodeGen {
     // "Simple" means this doesn't refer to any other indexes.
     Simple(Bytecode),
     // All of these refer to other indexes.
@@ -452,7 +452,7 @@ enum BytecodeGen {
 impl BytecodeGen {
     // This just generates nonsensical bytecodes. This will be cleaned up later as the generation
     // model is refined.
-    fn garbage_strategy() -> impl Strategy<Value = Self> {
+    pub fn garbage_strategy() -> impl Strategy<Value = Self> {
         use BytecodeGen::*;
 
         prop_oneof![
@@ -489,7 +489,7 @@ impl BytecodeGen {
         ]
     }
 
-    fn materialize(
+    pub fn materialize(
         self,
         state: &mut FnDefnMaterializeState,
         code_len: usize,
@@ -614,7 +614,7 @@ impl BytecodeGen {
         Some(bytecode)
     }
 
-    fn simple_bytecode_strategy() -> impl Strategy<Value = Bytecode> {
+    pub fn simple_bytecode_strategy() -> impl Strategy<Value = Bytecode> {
         prop_oneof![
             // The numbers are relative weights, somewhat arbitrarily picked.
             9 => Self::just_bytecode_strategy(),
@@ -622,7 +622,7 @@ impl BytecodeGen {
         ]
     }
 
-    fn just_bytecode_strategy() -> impl Strategy<Value = Bytecode> {
+    pub fn just_bytecode_strategy() -> impl Strategy<Value = Bytecode> {
         use Bytecode::*;
 
         static JUST_BYTECODES: &[Bytecode] = &[

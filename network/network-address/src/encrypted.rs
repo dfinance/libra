@@ -130,7 +130,7 @@ pub struct RawEncNetworkAddress(#[serde(with = "serde_bytes")] Vec<u8>);
 ///
 /// ### Key Rotation
 ///
-/// The `EncNetworkAddress` struct contains a `key_version` field, which
+/// The `EncNetworkAddress` pub struct contains a `key_version` field, which
 /// identifies the specific `shared_val_netaddr_key` used to encrypt/decrypt the
 /// `EncNetworkAddress`.
 ///
@@ -296,7 +296,7 @@ impl EncNetworkAddress {
 
     /// Given the shared `shared_val_netaddr_key`, derive the per-validator
     /// `derived_key`.
-    fn derive_key(shared_val_netaddr_key: &Key, account: &AccountAddress) -> Vec<u8> {
+    pub fn derive_key(shared_val_netaddr_key: &Key, account: &AccountAddress) -> Vec<u8> {
         let salt = Some(HKDF_SALT.as_ref());
         let info = Some(account.as_ref());
         Hkdf::<Sha3_256>::extract_then_expand(salt, shared_val_netaddr_key, info, KEY_LEN).expect(
@@ -355,7 +355,7 @@ impl Arbitrary for EncNetworkAddress {
 ///////////
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::NetworkAddress;
 

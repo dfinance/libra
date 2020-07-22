@@ -155,7 +155,7 @@ pub type TypeVar = Spanned<TypeVar_>;
 // Kinds
 //**************************************************************************************************
 
-// TODO: This enum is completely equivalent to vm::file_format::Kind.
+// TODO: Thispub enum is completely equivalent to vm::file_format::Kind.
 //       Should we just use vm::file_format::Kind or replace both with a common one?
 /// The kind of a type. Analogous to `vm::file_format::Kind`.
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -201,13 +201,13 @@ pub enum Type {
 // Structs
 //**************************************************************************************************
 
-/// Identifier for a struct definition. Tells us where to look in the storage layer to find the
+/// Identifier for a pub struct definition. Tells us where to look in the storage layer to find the
 /// code associated with the interface
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct QualifiedStructIdent {
-    /// Module name and address in which the struct is contained
+    /// Module name and address in which the pub struct is contained
     pub module: ModuleName,
-    /// Name for the struct class. Should be unique among structs published under the same
+    /// Name for the pub struct class. Should be unique among structs published under the same
     /// module+address
     pub name: StructName,
 }
@@ -229,10 +229,10 @@ pub struct StructName(String);
 /// A Move struct
 #[derive(Clone, Debug, PartialEq)]
 pub struct StructDefinition_ {
-    /// The struct will have kind resource if `is_nominal_resource` is true
+    /// The pub struct will have kind resource if `is_nominal_resource` is true
     /// and will be dependent on it's type arguments otherwise
     pub is_nominal_resource: bool,
-    /// Human-readable name for the struct that also serves as a nominal type
+    /// Human-readable name for the pub struct that also serves as a nominal type
     pub name: StructName,
     /// Kind constraints of the type parameters
     pub type_formals: Vec<(TypeVar, Kind)>,
@@ -244,24 +244,24 @@ pub struct StructDefinition_ {
 /// The type of a StructDefinition along with its source location information
 pub type StructDefinition = Spanned<StructDefinition_>;
 
-/// An explicit struct dependency
+/// An explicit pub struct dependency
 #[derive(Clone, Debug, PartialEq)]
 pub struct StructDependency {
-    /// The struct will have kind resource if `is_nominal_resource` is true
+    /// The pub struct will have kind resource if `is_nominal_resource` is true
     /// and will be dependent on it's type arguments otherwise
     pub is_nominal_resource: bool,
-    /// Human-readable name for the struct that also serves as a nominal type
+    /// Human-readable name for the pub struct that also serves as a nominal type
     pub name: StructName,
     /// Kind constraints of the type parameters
     pub type_formals: Vec<(TypeVar, Kind)>,
 }
 
-/// The fields of a Move struct definition
+/// The fields of a Move pub struct definition
 #[derive(Clone, Debug, PartialEq)]
 pub enum StructDefinitionFields {
     /// The fields are declared
     Move { fields: Fields<Type> },
-    /// The struct is a type provided by the VM
+    /// The pub struct is a type provided by the VM
     Native,
 }
 
@@ -370,7 +370,7 @@ pub type Function = Spanned<Function_>;
 /// type system and/or have access to some runtime/storage context
 #[derive(Debug, PartialEq, Clone)]
 pub enum Builtin {
-    /// Check if there is a struct object (`StructName` resolved by current module) associated with
+    /// Check if there is a pub struct object (`StructName` resolved by current module) associated with
     /// the given address
     Exists(StructName, Vec<Type>),
     /// Get a reference to the resource(`StructName` resolved by current module) associated
@@ -379,7 +379,7 @@ pub enum Builtin {
 
     /// Remove a resource of the given type from the account with the given address
     MoveFrom(StructName, Vec<Type>),
-    /// Publish an instantiated struct object into signer's (signer is the first arg) account.
+    /// Publish an instantiated pub struct object into signer's (signer is the first arg) account.
     MoveTo(StructName, Vec<Type>),
 
     /// Convert a mutable reference into an immutable one
@@ -590,7 +590,7 @@ pub enum Exp_ {
     Value(CopyableVal),
     /// Takes the given field values and instantiates the struct
     /// Returns a fresh `StructInstance` whose type and kind (resource or otherwise)
-    /// as the current struct class (i.e., the class of the method we're currently executing).
+    /// as the current pub struct class (i.e., the class of the method we're currently executing).
     /// `n { f_1: e_1, ... , f_j: e_j }`
     Pack(StructName, Vec<Type>, ExpFields),
     /// `&e.f`, `&mut e.f`
@@ -694,7 +694,7 @@ pub type Bytecode = Spanned<Bytecode_>;
 // impls
 //**************************************************************************************************
 
-fn get_external_deps(imports: &[ImportDefinition]) -> Vec<ModuleId> {
+pub fn get_external_deps(imports: &[ImportDefinition]) -> Vec<ModuleId> {
     let mut deps = HashSet::new();
     for dep in imports.iter() {
         if let ModuleIdent::Qualified(id) = &dep.ident {
@@ -831,7 +831,7 @@ impl ModuleDefinition {
 }
 
 impl Type {
-    /// Creates a new struct type
+    /// Creates a new pub struct type
     pub fn r#struct(ident: QualifiedStructIdent, type_actuals: Vec<Type>) -> Type {
         Type::Struct(ident, type_actuals)
     }
@@ -868,7 +868,7 @@ impl QualifiedStructIdent {
         &self.module
     }
 
-    /// Accessor for the struct name
+    /// Accessor for the pub struct name
     pub fn name(&self) -> &StructName {
         &self.name
     }
@@ -1011,7 +1011,7 @@ impl FunctionSignature {
 
 impl Function_ {
     /// Creates a new function declaration from the components of the function
-    /// See the declaration of the struct `Function` for more details
+    /// See the declaration of the pub struct `Function` for more details
     pub fn new(
         visibility: FunctionVisibility,
         formals: Vec<(Var, Type)>,

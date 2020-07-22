@@ -33,7 +33,7 @@ impl<'a> CodeUnitVerifier<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         for (idx, function_definition) in module.function_defs().iter().enumerate() {
             let index = FunctionDefinitionIndex(idx as TableIndex);
             Self::verify_function(index, function_definition, module)
@@ -46,7 +46,7 @@ impl<'a> CodeUnitVerifier<'a> {
         Self::verify_script_impl(module).map_err(|e| e.finish(Location::Script))
     }
 
-    fn verify_script_impl(script: &'a CompiledScript) -> PartialVMResult<()> {
+    pub fn verify_script_impl(script: &'a CompiledScript) -> PartialVMResult<()> {
         // create `FunctionView` and `BinaryIndexedView`
         let function_view = FunctionView::script(script);
         let resolver = BinaryIndexedView::Script(script);
@@ -59,7 +59,7 @@ impl<'a> CodeUnitVerifier<'a> {
         code_unit_verifier.verify_common()
     }
 
-    fn verify_function(
+    pub fn verify_function(
         index: FunctionDefinitionIndex,
         function_definition: &'a FunctionDefinition,
         module: &'a CompiledModule,
@@ -88,7 +88,7 @@ impl<'a> CodeUnitVerifier<'a> {
         AcquiresVerifier::verify(module, index, function_definition)
     }
 
-    fn verify_common(&self) -> PartialVMResult<()> {
+    pub fn verify_common(&self) -> PartialVMResult<()> {
         control_flow::verify(self.function_view.index(), self.function_view.code())?;
         StackUsageVerifier::verify(&self.resolver, &self.function_view)?;
         type_safety::verify(&self.resolver, &self.function_view)?;

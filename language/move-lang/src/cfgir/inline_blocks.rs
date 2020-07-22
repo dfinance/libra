@@ -18,12 +18,12 @@ pub fn optimize(cfg: &mut BlockCFG) -> bool {
     changed
 }
 
-fn optimize_(start: Label, blocks: &mut BasicBlocks) -> bool {
+pub fn optimize_(start: Label, blocks: &mut BasicBlocks) -> bool {
     let single_target_labels = find_single_target_labels(start, &blocks);
     inline_single_target_blocks(&single_target_labels, start, blocks)
 }
 
-fn find_single_target_labels(start: Label, blocks: &BasicBlocks) -> BTreeSet<Label> {
+pub fn find_single_target_labels(start: Label, blocks: &BasicBlocks) -> BTreeSet<Label> {
     use Command_ as C;
     let mut counts = BTreeMap::new();
     // 'start' block starts as one as it is the entry point of the function. In some sense,
@@ -50,7 +50,7 @@ fn find_single_target_labels(start: Label, blocks: &BasicBlocks) -> BTreeSet<Lab
         .collect()
 }
 
-fn inline_single_target_blocks(
+pub fn inline_single_target_blocks(
     single_jump_targets: &BTreeSet<Label>,
     start: Label,
     blocks: &mut BasicBlocks,
@@ -108,7 +108,7 @@ fn inline_single_target_blocks(
 ///
 /// After:
 ///   B: block_a; block_b
-fn remap_to_last_target(
+pub fn remap_to_last_target(
     mut remapping: BTreeMap<Label, Label>,
     start: Label,
     blocks: &mut BasicBlocks,

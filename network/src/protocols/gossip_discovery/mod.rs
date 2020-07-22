@@ -66,7 +66,7 @@ use std::{
 
 pub mod builder;
 #[cfg(test)]
-mod test;
+pub mod test;
 
 /// The interface from Network to Discovery module.
 ///
@@ -221,7 +221,7 @@ where
     // 1. Selecting a random peer to send state to.
     // 2. Compose the msg to send.
     // 3. Spawn off a new task to push the msg to the peer.
-    fn handle_tick(&mut self) {
+    pub fn handle_tick(&mut self) {
         debug!("{} Discovery interval tick", self.network_context);
         // On each tick, we choose a random neighbor and push our state to it.
         if let Some(peer) = self.choose_random_neighbor() {
@@ -241,7 +241,7 @@ where
         }
     }
 
-    async fn handle_network_event(
+    pub async fn handle_network_event(
         &mut self,
         event: Result<Event<GossipDiscoveryMsg>, NetworkError>,
     ) {
@@ -277,7 +277,7 @@ where
     }
 
     // Chooses a random connected neighbour.
-    fn choose_random_neighbor(&mut self) -> Option<PeerId> {
+    pub fn choose_random_neighbor(&mut self) -> Option<PeerId> {
         if !self.connected_peers.is_empty() {
             let peers: Vec<_> = self.connected_peers.iter().cloned().collect();
             let idx = self.rng.gen_range(0, peers.len());
@@ -288,13 +288,13 @@ where
     }
 
     // Creates GossipDiscoveryMsg to be sent to some remote peer.
-    fn compose_discovery_msg(&self) -> GossipDiscoveryMsg {
+    pub fn compose_discovery_msg(&self) -> GossipDiscoveryMsg {
         let notes = self.known_peers.values().cloned().collect::<Vec<_>>();
         GossipDiscoveryMsg { notes }
     }
 
     // Updates local state by reconciling with notes received from some remote peer.
-    async fn reconcile(&mut self, remote_peer: PeerId, remote_notes: Vec<Note>) {
+    pub async fn reconcile(&mut self, remote_peer: PeerId, remote_notes: Vec<Note>) {
         let mut change_detected = false;
         // If a peer is previously unknown, or has a newer epoch number, we update its
         // corresponding entry in the map.
@@ -371,7 +371,7 @@ where
     // Record the number of discovery notes we have for _other_ peers
     // (not including our own note). We exclude counting our own note to be
     // consistent with the "connected_peers" metric.
-    fn record_num_discovery_notes(&self) {
+    pub fn record_num_discovery_notes(&self) {
         let num_other_notes = self
             .known_peers
             .iter()
@@ -405,7 +405,7 @@ pub struct Note {
 }
 
 impl Note {
-    fn new(peer_id: PeerId, addrs: Vec<NetworkAddress>, dns_seed_addr: &[u8], epoch: u64) -> Self {
+    pub fn new(peer_id: PeerId, addrs: Vec<NetworkAddress>, dns_seed_addr: &[u8], epoch: u64) -> Self {
         Self {
             peer_id,
             peer_info: PeerInfo { addrs, epoch },
@@ -417,12 +417,12 @@ impl Note {
     }
 
     /// Shortcut to the addrs embedded within the Note
-    fn addrs(&self) -> &Vec<NetworkAddress> {
+    pub fn addrs(&self) -> &Vec<NetworkAddress> {
         &self.peer_info.addrs
     }
 
     /// The current implementation derives epoch from the PeerInfo.
-    fn epoch(&self) -> u64 {
+    pub fn epoch(&self) -> u64 {
         self.peer_info.epoch
     }
 }
@@ -450,7 +450,7 @@ pub struct FullNodeInfo {
     epoch: u64,
 }
 
-fn get_unix_epoch() -> u64 {
+pub fn get_unix_epoch() -> u64 {
     // TODO: Currently, SystemTime::now() in Rust is not guaranteed to use a monotonic clock.
     // At the moment, it's unclear how to do this in a platform-agnostic way. For Linux, we
     // could use something like the [timerfd trait](https://docs.rs/crate/timerfd/1.0.0).

@@ -47,7 +47,7 @@ impl ValidatorOperator {
     /// Verifies the operator name (given by the set-operator command) exists in remote storage.
     /// If the named operator is not found (i.e., the operator has not uploaded a public key) return
     /// an error. Otherwise, return the operator name.
-    fn get_and_verify_operator_name(&self) -> Result<String, Error> {
+    pub fn get_and_verify_operator_name(&self) -> Result<String, Error> {
         let storage_name = self.shared_backend.name();
         let operator_storage = self
             .shared_backend

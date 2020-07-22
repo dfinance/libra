@@ -20,7 +20,7 @@
 use libra_config::network_id::NetworkContext;
 use libra_logger::StructuredLogEntry;
 
-/// A helper function to cut down on a bunch of repeated network struct log code
+/// A helper function to cut down on a bunch of repeated network pub struct log code
 pub fn network_log(label: &'static str, network_context: &NetworkContext) -> StructuredLogEntry {
     StructuredLogEntry::new_named("network", label)
         .field(network_events::NETWORK_CONTEXT, network_context)

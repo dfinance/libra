@@ -61,7 +61,7 @@ pub fn gen_simple_discovery_reconfig_subscription(
     ReconfigSubscription::subscribe_all(ON_CHAIN_CONFIG_REGISTRY.to_vec(), vec![])
 }
 
-fn decrypt_validator_netaddr(
+pub fn decrypt_validator_netaddr(
     shared_val_netaddr_key_map: &HashMap<KeyVersion, Key>,
     account: &AccountAddress,
     addr_idx: u32,
@@ -85,7 +85,7 @@ fn decrypt_validator_netaddr(
 }
 
 /// Extracts a set of ConnectivityRequests from a ValidatorSet which are appropriate for a network with type role.
-fn extract_updates(
+pub fn extract_updates(
     role: RoleType,
     shared_val_netaddr_key_map: &HashMap<KeyVersion, Key>,
     node_set: ValidatorSet,
@@ -190,7 +190,7 @@ impl ConfigurationChangeListener {
 
     /// Processes a received OnChainConfigPayload.  Depending on role (Validator or FullNode), parses
     /// the appropriate configuration changes and passes it to the ConnectionManager channel.
-    async fn process_payload(&mut self, payload: OnChainConfigPayload) {
+    pub async fn process_payload(&mut self, payload: OnChainConfigPayload) {
         let node_set: ValidatorSet = payload
             .get()
             .expect("failed to get ValidatorSet from payload");

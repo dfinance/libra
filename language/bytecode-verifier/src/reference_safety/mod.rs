@@ -7,7 +7,7 @@
 //! - accesses to mutable references are safe
 //! - accesses to global storage references are safe
 
-mod abstract_state;
+pub mod abstract_state;
 
 use crate::{
     absint::{AbstractInterpreter, BlockInvariant, BlockPostcondition, TransferFunctions},
@@ -24,7 +24,7 @@ use vm::{
     },
 };
 
-struct ReferenceSafetyAnalysis<'a> {
+pub struct ReferenceSafetyAnalysis<'a> {
     resolver: &'a BinaryIndexedView<'a>,
     function_view: &'a FunctionView<'a>,
     name_def_map: &'a HashMap<IdentifierIndex, FunctionDefinitionIndex>,
@@ -32,7 +32,7 @@ struct ReferenceSafetyAnalysis<'a> {
 }
 
 impl<'a> ReferenceSafetyAnalysis<'a> {
-    fn new(
+    pub fn new(
         resolver: &'a BinaryIndexedView<'a>,
         function_view: &'a FunctionView<'a>,
         name_def_map: &'a HashMap<IdentifierIndex, FunctionDefinitionIndex>,
@@ -46,7 +46,7 @@ impl<'a> ReferenceSafetyAnalysis<'a> {
     }
 }
 
-pub(crate) fn verify<'a>(
+pub fn verify<'a>(
     resolver: &'a BinaryIndexedView<'a>,
     function_view: &FunctionView,
     name_def_map: &'a HashMap<IdentifierIndex, FunctionDefinitionIndex>,
@@ -66,7 +66,7 @@ pub(crate) fn verify<'a>(
     Ok(())
 }
 
-fn call(
+pub fn call(
     verifier: &mut ReferenceSafetyAnalysis,
     state: &mut AbstractState,
     offset: CodeOffset,
@@ -100,14 +100,14 @@ fn call(
     Ok(())
 }
 
-fn num_fields(struct_def: &StructDefinition) -> usize {
+pub fn num_fields(struct_def: &StructDefinition) -> usize {
     match &struct_def.field_information {
         StructFieldInformation::Native => 0,
         StructFieldInformation::Declared(fields) => fields.len(),
     }
 }
 
-fn pack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition) {
+pub fn pack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition) {
     for _ in 0..num_fields(struct_def) {
         checked_verify!(verifier.stack.pop().unwrap().is_value())
     }
@@ -115,7 +115,7 @@ fn pack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition) {
     verifier.stack.push(AbstractValue::NonReference)
 }
 
-fn unpack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition) {
+pub fn unpack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition) {
     checked_verify!(verifier.stack.pop().unwrap().is_value());
     // TODO maybe call state.value_for
     for _ in 0..num_fields(struct_def) {
@@ -123,7 +123,7 @@ fn unpack(verifier: &mut ReferenceSafetyAnalysis, struct_def: &StructDefinition)
     }
 }
 
-fn execute_inner(
+pub fn execute_inner(
     verifier: &mut ReferenceSafetyAnalysis,
     state: &mut AbstractState,
     bytecode: &Bytecode,

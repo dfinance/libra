@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod utils;
+pub mod utils;
 
 use crate::handlers::utils::{
     handle_rejection, reply_with_async_channel_writer, reply_with_lcs_bytes,
@@ -20,7 +20,7 @@ static EPOCH_ENDING_LEDGER_INFOS: &str = "epoch_ending_ledger_infos";
 static TRANSACTIONS: &str = "transactions";
 static TRANSACTION_RANGE_PROOF: &str = "transaction_range_proof";
 
-pub(crate) fn get_routes(backup_handler: BackupHandler) -> BoxedFilter<(impl Reply,)> {
+pub fn get_routes(backup_handler: BackupHandler) -> BoxedFilter<(impl Reply,)> {
     // GET db_state
     let bh = backup_handler.clone();
     let db_state = warp::path::end()

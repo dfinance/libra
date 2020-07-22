@@ -19,7 +19,7 @@ pub fn output(out: &mut dyn Write, abis: &[ScriptABI]) -> Result<()> {
     Ok(())
 }
 
-fn output_with_optional_packages(
+pub fn output_with_optional_packages(
     out: &mut dyn Write,
     abis: &[ScriptABI],
     serde_package_name: Option<String>,
@@ -32,21 +32,21 @@ fn output_with_optional_packages(
     Ok(())
 }
 
-fn quote_from_package(package_name: Option<String>) -> String {
+pub fn quote_from_package(package_name: Option<String>) -> String {
     match package_name {
         None => "".to_string(),
         Some(name) => format!("from {} ", name),
     }
 }
 
-fn quote_from_package_and_module(package_name: Option<String>, module_name: &str) -> String {
+pub fn quote_from_package_and_module(package_name: Option<String>, module_name: &str) -> String {
     match package_name {
         None => format!("from {} ", module_name),
         Some(name) => format!("from {}.{} ", name, module_name),
     }
 }
 
-fn output_preamble(
+pub fn output_preamble(
     out: &mut dyn Write,
     serde_package_name: Option<String>,
     libra_package_name: Option<String>,
@@ -62,7 +62,7 @@ fn output_preamble(
     )
 }
 
-fn output_builder(out: &mut dyn Write, abi: &ScriptABI) -> Result<()> {
+pub fn output_builder(out: &mut dyn Write, abi: &ScriptABI) -> Result<()> {
     writeln!(
         out,
         "\ndef encode_{}_script({}) -> Script:",
@@ -89,7 +89,7 @@ fn output_builder(out: &mut dyn Write, abi: &ScriptABI) -> Result<()> {
     Ok(())
 }
 
-fn quote_doc(doc: &str) -> String {
+pub fn quote_doc(doc: &str) -> String {
     let doc = crate::common::prepare_doc_string(doc);
     let s: Vec<_> = doc.splitn(2, |c| c == '.').collect();
     if s.len() <= 1 || s[1].is_empty() {
@@ -105,20 +105,20 @@ fn quote_doc(doc: &str) -> String {
     }
 }
 
-fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
+pub fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
     ty_args
         .iter()
         .map(|ty_arg| format!("{}: TypeTag", ty_arg.name()))
         .collect()
 }
 
-fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
+pub fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
     args.iter()
         .map(|arg| format!("{}: {}", arg.name(), quote_type(arg.type_tag())))
         .collect()
 }
 
-fn quote_code(code: &[u8]) -> String {
+pub fn quote_code(code: &[u8]) -> String {
     format!(
         "b\"{}\"",
         code.iter()
@@ -128,7 +128,7 @@ fn quote_code(code: &[u8]) -> String {
     )
 }
 
-fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
+pub fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
     ty_args
         .iter()
         .map(|ty_arg| ty_arg.name().to_string())
@@ -136,14 +136,14 @@ fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
         .join(", ")
 }
 
-fn quote_arguments(args: &[ArgumentABI]) -> String {
+pub fn quote_arguments(args: &[ArgumentABI]) -> String {
     args.iter()
         .map(|arg| make_transaction_argument(arg.type_tag(), arg.name()))
         .collect::<Vec<_>>()
         .join(", ")
 }
 
-fn quote_type(type_tag: &TypeTag) -> String {
+pub fn quote_type(type_tag: &TypeTag) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => "st.bool".into(),
@@ -160,7 +160,7 @@ fn quote_type(type_tag: &TypeTag) -> String {
     }
 }
 
-fn make_transaction_argument(type_tag: &TypeTag, name: &str) -> String {
+pub fn make_transaction_argument(type_tag: &TypeTag, name: &str) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => format!("TransactionArgument__Bool({})", name),
@@ -196,7 +196,7 @@ impl Installer {
         }
     }
 
-    fn open_module_init_file(&self, name: &str) -> Result<std::fs::File> {
+    pub fn open_module_init_file(&self, name: &str) -> Result<std::fs::File> {
         let dir_path = self.install_dir.join(name);
         std::fs::create_dir_all(&dir_path)?;
         std::fs::File::create(dir_path.join("__init__.py"))

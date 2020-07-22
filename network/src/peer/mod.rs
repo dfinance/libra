@@ -33,7 +33,7 @@ pub const MESSAGE_RATE_LIMIT_WINDOW: Duration = Duration::from_millis(10);
 pub const MESSAGE_RATE_LIMIT_COUNT: usize = 100;
 
 #[cfg(test)]
-mod test;
+pub mod test;
 
 #[derive(Debug)]
 pub enum PeerRequest {
@@ -57,7 +57,7 @@ pub enum PeerNotification {
     PeerDisconnected(ConnectionMetadata, DisconnectReason),
 }
 
-enum State {
+pub enum State {
     Connected,
     ShuttingDown(DisconnectReason),
 }
@@ -114,7 +114,7 @@ where
         }
     }
 
-    fn peer_id(&self) -> PeerId {
+    pub fn peer_id(&self) -> PeerId {
         self.connection_metadata.peer_id()
     }
 
@@ -219,10 +219,10 @@ where
     // the wire. The function returns two channels which can be used to send intructions to the
     // task:
     // 1. The first channel is used to send outbound NetworkMessages to the task
-    // 2. The second channel is used to instruct the task to close the connection and terminate.
+    // 2. The second channel is used to inpub struct the task to close the connection and terminate.
     // If outbound messages are queued when the task receives a close instruction, it discards
     // them and immediately closes the connection.
-    fn start_writer_task<T: tokio::io::AsyncWrite + Send + Unpin + 'static>(
+    pub fn start_writer_task<T: tokio::io::AsyncWrite + Send + Unpin + 'static>(
         executor: &Handle,
         self_peer_id: PeerId,
         mut writer: FramedWrite<T, LengthDelimitedCodec>,
@@ -297,7 +297,7 @@ where
         (write_reqs_tx, close_tx)
     }
 
-    async fn handle_inbound_message(
+    pub async fn handle_inbound_message(
         &mut self,
         message: BytesMut,
         mut write_reqs_tx: channel::Sender<(
@@ -343,7 +343,7 @@ where
         }
     }
 
-    async fn handle_request<'a>(
+    pub async fn handle_request<'a>(
         &'a mut self,
         request: PeerRequest,
         mut write_reqs_tx: channel::Sender<(
@@ -373,7 +373,7 @@ where
         }
     }
 
-    async fn close_connection(&mut self, reason: DisconnectReason) {
+    pub async fn close_connection(&mut self, reason: DisconnectReason) {
         // Set the state of the actor to `State::ShuttingDown` to true ensures that the peer actor
         // will terminate and close the connection.
         self.state = State::ShuttingDown(reason);

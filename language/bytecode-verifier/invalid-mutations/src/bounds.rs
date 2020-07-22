@@ -20,7 +20,7 @@ use vm::{
     IndexKind,
 };
 
-mod code_unit;
+pub mod code_unit;
 pub use code_unit::{ApplyCodeUnitBoundsContext, CodeUnitBoundsMutation};
 use vm::file_format::SignatureToken;
 
@@ -84,7 +84,7 @@ pub static VALID_POINTER_SRCS: &[IndexKind] = &[
 ];
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]
@@ -139,11 +139,11 @@ impl OutOfBoundsMutation {
     }
 
     // Not all source kinds can be made to be out of bounds (e.g. inherent types can't.)
-    fn src_kind_strategy() -> impl Strategy<Value = IndexKind> {
+    pub fn src_kind_strategy() -> impl Strategy<Value = IndexKind> {
         sample::select(VALID_POINTER_SRCS)
     }
 
-    fn dst_kind(src_kind: IndexKind, dst_kind_idx: PropIndex) -> IndexKind {
+    pub fn dst_kind(src_kind: IndexKind, dst_kind_idx: PropIndex) -> IndexKind {
         dst_kind_idx
             .get(PointerKind::pointers_from(src_kind))
             .to_index_kind()
@@ -205,7 +205,7 @@ impl ApplyOutOfBoundsContext {
         (self.module, results)
     }
 
-    fn apply_one(
+    pub fn apply_one(
         &mut self,
         src_kind: IndexKind,
         dst_kind: IndexKind,
@@ -241,7 +241,7 @@ impl ApplyOutOfBoundsContext {
     /// this will set self.module_handles[src_idx].address to new_idx.
     ///
     /// This is mainly used for test generation.
-    fn set_index(
+    pub fn set_index(
         &mut self,
         src_kind: IndexKind,
         src_idx: usize,
@@ -315,8 +315,8 @@ impl ApplyOutOfBoundsContext {
         Some(err.at_index(src_kind, src_idx as TableIndex))
     }
 
-    /// Returns the indexes of locals signatures that contain struct handles inside them.
-    fn sig_structs<'b>(
+    /// Returns the indexes of locals signatures that contain pub struct handles inside them.
+    pub fn sig_structs<'b>(
         module: &'b CompiledModule,
     ) -> impl Iterator<Item = (SignatureIndex, usize)> + 'b {
         let module_view = ModuleView::new(module);
@@ -330,7 +330,7 @@ impl ApplyOutOfBoundsContext {
     }
 
     #[inline]
-    fn find_struct_tokens<'b, F, T>(
+    pub fn find_struct_tokens<'b, F, T>(
         tokens: impl IntoIterator<Item = SignatureTokenView<'b, CompiledModule>> + 'b,
         map_fn: F,
     ) -> impl Iterator<Item = T> + 'b
@@ -346,7 +346,7 @@ impl ApplyOutOfBoundsContext {
     }
 }
 
-fn struct_handle(token: &SignatureToken) -> Option<StructHandleIndex> {
+pub fn struct_handle(token: &SignatureToken) -> Option<StructHandleIndex> {
     use SignatureToken::*;
 
     match token {

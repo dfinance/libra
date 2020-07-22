@@ -235,7 +235,7 @@ impl<'a, T: ModuleAccess> StructHandleView<'a, T> {
         self.module.module_id_for_handle(self.module_handle())
     }
 
-    /// Return the StructHandleIndex of this handle in the module's struct handle table
+    /// Return the StructHandleIndex of this handle in the module's pub struct handle table
     pub fn handle_idx(&self) -> StructHandleIndex {
         for (idx, handle) in self.module.struct_handles().iter().enumerate() {
             if handle == self.handle() {
@@ -411,15 +411,15 @@ pub struct LocalsSignatureView<'a, T> {
 }
 
 impl<'a, T: ModuleAccess> LocalsSignatureView<'a, T> {
-    fn new(function_def_view: FunctionDefinitionView<'a, T>) -> Self {
+    pub fn new(function_def_view: FunctionDefinitionView<'a, T>) -> Self {
         Self { function_def_view }
     }
 
-    fn parameters(&self) -> &'a [SignatureToken] {
+    pub fn parameters(&self) -> &'a [SignatureToken] {
         &self.function_def_view.parameters().0
     }
 
-    fn additional_locals(&self) -> &'a [SignatureToken] {
+    pub fn additional_locals(&self) -> &'a [SignatureToken] {
         &self
             .function_def_view
             .module

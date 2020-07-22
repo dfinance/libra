@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! Test infrastructure for the Libra VM.
 //!
@@ -10,7 +10,7 @@
 use libra_types::{transaction::TransactionStatus, vm_status::KeptVMStatus};
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 pub mod account;
 pub mod account_universe;
@@ -21,7 +21,7 @@ pub mod execution_strategies;
 pub mod executor;
 pub mod gas_costs;
 pub mod keygen;
-mod proptest_types;
+pub mod proptest_types;
 
 pub fn assert_status_eq(s1: &KeptVMStatus, s2: &KeptVMStatus) -> bool {
     assert_eq!(s1, s2);

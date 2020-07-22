@@ -52,7 +52,7 @@ pub fn verify_main_signature(script: &CompiledScript) -> VMResult<()> {
     verify_main_signature_impl(script).map_err(|e| e.finish(Location::Script))
 }
 
-fn verify_main_signature_impl(script: &CompiledScript) -> PartialVMResult<()> {
+pub fn verify_main_signature_impl(script: &CompiledScript) -> PartialVMResult<()> {
     fn is_valid_arg_type(idx: usize, arg_type: &SignatureToken) -> bool {
         use SignatureToken as S;
         match arg_type {

@@ -110,27 +110,27 @@ pub fn main() {
     }
 }
 
-fn print_all(cs: &ChangeSet) {
+pub fn print_all(cs: &ChangeSet) {
     print_write_set_by_type(cs.write_set());
     println!("* Events:");
     print_events(cs.events());
 }
 
-fn print_events_raw(events: &[ContractEvent]) {
+pub fn print_events_raw(events: &[ContractEvent]) {
     println!("{:#?}", events);
 }
 
-fn print_write_set_raw(ws: &WriteSet) {
+pub fn print_write_set_raw(ws: &WriteSet) {
     println!("{:#?}", ws);
 }
 
-fn print_keys(ws: &WriteSet) {
+pub fn print_keys(ws: &WriteSet) {
     for (key, _) in ws {
         println!("{:?}", key);
     }
 }
 
-fn print_keys_sorted(ws: &WriteSet) {
+pub fn print_keys_sorted(ws: &WriteSet) {
     let mut sorted_ws: BTreeSet<AccessPath> = BTreeSet::new();
     for (key, _) in ws {
         sorted_ws.insert(key.clone());
@@ -140,20 +140,20 @@ fn print_keys_sorted(ws: &WriteSet) {
     }
 }
 
-fn print_events_key(events: &[ContractEvent]) {
+pub fn print_events_key(events: &[ContractEvent]) {
     for event in events {
         println!("+ {:?} ->\n\tType: {:?}", event.key(), event.type_tag());
     }
 }
 
-fn print_write_set_by_type(ws: &WriteSet) {
+pub fn print_write_set_by_type(ws: &WriteSet) {
     println!("* Modules:");
     print_modules(ws);
     println!("* Resources:");
     print_resources(ws);
 }
 
-fn print_events(events: &[ContractEvent]) {
+pub fn print_events(events: &[ContractEvent]) {
     let view = NullStateView::default();
     let annotator = MoveValueAnnotator::new(&view);
 
@@ -168,7 +168,7 @@ fn print_events(events: &[ContractEvent]) {
     }
 }
 
-fn print_modules(ws: &WriteSet) {
+pub fn print_modules(ws: &WriteSet) {
     let mut modules: BTreeMap<AccessPath, CompiledModule> = BTreeMap::new();
     for (k, v) in ws {
         match v {
@@ -190,7 +190,7 @@ fn print_modules(ws: &WriteSet) {
     }
 }
 
-fn print_resources(ws: &WriteSet) {
+pub fn print_resources(ws: &WriteSet) {
     let mut resources: BTreeMap<AccessPath, Vec<u8>> = BTreeMap::new();
     for (k, v) in ws {
         match v {
@@ -215,7 +215,7 @@ fn print_resources(ws: &WriteSet) {
     }
 }
 
-fn print_account_states(ws: &WriteSet) {
+pub fn print_account_states(ws: &WriteSet) {
     let mut accounts: BTreeMap<AccountAddress, Vec<(AccessPath, Vec<u8>)>> = BTreeMap::new();
     for (k, v) in ws {
         match v {

@@ -126,7 +126,7 @@ impl<T> RepeatVec<T> {
         self.remove_all_impl(logical_indexes)
     }
 
-    fn remove_all_impl(&mut self, logical_indexes: Vec<usize>) {
+    pub fn remove_all_impl(&mut self, logical_indexes: Vec<usize>) {
         // # Notes
         //
         // * This looks pretty long and complicated, mostly because the logic is complex enough to
@@ -238,13 +238,13 @@ impl<T> RepeatVec<T> {
     }
 
     #[inline]
-    fn binary_search(&self, at: usize) -> Result<usize, usize> {
+    pub fn binary_search(&self, at: usize) -> Result<usize, usize> {
         self.items.binary_search_by_key(&at, |(start, _)| *start)
     }
 
     /// Check and assert the internal invariants for this RepeatVec.
     #[cfg(test)]
-    pub(crate) fn assert_invariants(&self) {
+    pub fn assert_invariants(&self) {
         for window in self.items.windows(2) {
             let (idx1, idx2) = match window {
                 [(idx1, _), (idx2, _)] => (*idx1, *idx2),

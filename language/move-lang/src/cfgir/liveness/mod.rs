@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod state;
+pub mod state;
 
 use super::{
     absint::*,
@@ -26,12 +26,12 @@ type PerCommandStates = BTreeMap<Label, VecDeque<LivenessState>>;
 type ForwardIntersections = BTreeMap<Label, BTreeSet<Var>>;
 type FinalInvariants = BTreeMap<Label, LivenessState>;
 
-struct Liveness {
+pub struct Liveness {
     states: PerCommandStates,
 }
 
 impl Liveness {
-    fn new(cfg: &super::cfg::ReverseBlockCFG) -> Self {
+    pub fn new(cfg: &super::cfg::ReverseBlockCFG) -> Self {
         let states = cfg
             .blocks()
             .iter()
@@ -80,7 +80,7 @@ fn analyze(
     (final_invariants, liveness.states)
 }
 
-fn command(state: &mut LivenessState, sp!(_, cmd_): &Command) {
+pub fn command(state: &mut LivenessState, sp!(_, cmd_): &Command) {
     use Command_ as C;
     match cmd_ {
         C::Assign(ls, e) => {
@@ -100,11 +100,11 @@ fn command(state: &mut LivenessState, sp!(_, cmd_): &Command) {
     }
 }
 
-fn lvalues(state: &mut LivenessState, ls: &[LValue]) {
+pub fn lvalues(state: &mut LivenessState, ls: &[LValue]) {
     ls.iter().for_each(|l| lvalue(state, l))
 }
 
-fn lvalue(state: &mut LivenessState, sp!(_, l_): &LValue) {
+pub fn lvalue(state: &mut LivenessState, sp!(_, l_): &LValue) {
     use LValue_ as L;
     match l_ {
         L::Ignore => (),
@@ -115,7 +115,7 @@ fn lvalue(state: &mut LivenessState, sp!(_, l_): &LValue) {
     }
 }
 
-fn exp(state: &mut LivenessState, parent_e: &Exp) {
+pub fn exp(state: &mut LivenessState, parent_e: &Exp) {
     use UnannotatedExp_ as E;
     match &parent_e.exp.value {
         E::Unit { .. } | E::Value(_) | E::Constant(_) | E::UnresolvedError => (),
@@ -149,7 +149,7 @@ fn exp(state: &mut LivenessState, parent_e: &Exp) {
     }
 }
 
-fn exp_list_item(state: &mut LivenessState, item: &ExpListItem) {
+pub fn exp_list_item(state: &mut LivenessState, item: &ExpListItem) {
     match item {
         ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(state, e),
     }
@@ -179,7 +179,7 @@ pub fn last_usage(
     }
 }
 
-mod last_usage {
+pub mod last_usage {
     use crate::{
         cfgir::liveness::state::LivenessState,
         errors::*,
@@ -193,7 +193,7 @@ mod last_usage {
     use move_ir_types::location::*;
     use std::collections::{BTreeSet, VecDeque};
 
-    struct Context<'a, 'b> {
+    pub struct Context<'a, 'b> {
         errors: &'a mut Errors,
         locals: &'a UniqueMap<Var, SingleType>,
         next_live: &'b BTreeSet<Var>,
@@ -201,7 +201,7 @@ mod last_usage {
     }
 
     impl<'a, 'b> Context<'a, 'b> {
-        fn new(
+        pub fn new(
             errors: &'a mut Errors,
             locals: &'a UniqueMap<Var, SingleType>,
             next_live: &'b BTreeSet<Var>,
@@ -215,13 +215,13 @@ mod last_usage {
             }
         }
 
-        fn is_resourceful(&self, local: &Var) -> bool {
+        pub fn is_resourceful(&self, local: &Var) -> bool {
             let ty = self.locals.get(local).unwrap();
             let k = ty.value.kind(ty.loc);
             k.value.is_resourceful()
         }
 
-        fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
+        pub fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
             self.errors
                 .push(e.into_iter().map(|(loc, msg)| (loc, msg.into())).collect())
         }
@@ -259,7 +259,7 @@ mod last_usage {
         }
     }
 
-    fn command(context: &mut Context, sp!(_, cmd_): &mut Command) {
+    pub fn command(context: &mut Context, sp!(_, cmd_): &mut Command) {
         use Command_ as C;
         match cmd_ {
             C::Assign(ls, e) => {
@@ -280,11 +280,11 @@ mod last_usage {
         }
     }
 
-    fn lvalues(context: &mut Context, ls: &mut [LValue]) {
+    pub fn lvalues(context: &mut Context, ls: &mut [LValue]) {
         ls.iter_mut().for_each(|l| lvalue(context, l))
     }
 
-    fn lvalue(context: &mut Context, l: &mut LValue) {
+    pub fn lvalue(context: &mut Context, l: &mut LValue) {
         use LValue_ as L;
         match &mut l.value {
             L::Ignore => (),
@@ -311,7 +311,7 @@ mod last_usage {
         }
     }
 
-    fn exp(context: &mut Context, parent_e: &mut Exp) {
+    pub fn exp(context: &mut Context, parent_e: &mut Exp) {
         use UnannotatedExp_ as E;
         match &mut parent_e.exp.value {
             E::Unit { .. } | E::Value(_) | E::Constant(_) | E::UnresolvedError => (),
@@ -374,7 +374,7 @@ mod last_usage {
         }
     }
 
-    fn exp_list_item(context: &mut Context, item: &mut ExpListItem) {
+    pub fn exp_list_item(context: &mut Context, item: &mut ExpListItem) {
         match item {
             ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(context, e),
         }
@@ -425,7 +425,7 @@ pub fn release_dead_refs(
     }
 }
 
-fn build_forward_intersections(
+pub fn build_forward_intersections(
     cfg: &BlockCFG,
     final_invariants: &FinalInvariants,
 ) -> ForwardIntersections {
@@ -445,7 +445,7 @@ fn build_forward_intersections(
         .collect()
 }
 
-fn release_dead_refs_block(
+pub fn release_dead_refs_block(
     locals: &UniqueMap<Var, SingleType>,
     locals_pre_state: &locals::state::LocalStates,
     liveness_pre_state: &LivenessState,
@@ -476,14 +476,14 @@ fn release_dead_refs_block(
     }
 }
 
-fn is_ref((_local, sp!(_, local_ty_)): &(&Var, &SingleType)) -> bool {
+pub fn is_ref((_local, sp!(_, local_ty_)): &(&Var, &SingleType)) -> bool {
     match local_ty_ {
         SingleType_::Ref(_, _) => true,
         SingleType_::Base(_) => false,
     }
 }
 
-fn pop_ref(loc: Loc, var: Var, ty: SingleType) -> Command {
+pub fn pop_ref(loc: Loc, var: Var, ty: SingleType) -> Command {
     use Command_ as C;
     use UnannotatedExp_ as E;
     let move_e_ = E::Move {

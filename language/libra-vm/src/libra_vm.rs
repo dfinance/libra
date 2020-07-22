@@ -72,14 +72,14 @@ impl LibraVMImpl {
         LibraVMInternals(self)
     }
 
-    pub(crate) fn on_chain_config(&self) -> Result<&VMConfig, VMStatus> {
+    pub fn on_chain_config(&self) -> Result<&VMConfig, VMStatus> {
         self.on_chain_config.as_ref().ok_or_else(|| {
             error!("VM Startup Failed. On Chain Config Not Found");
             VMStatus::Error(StatusCode::VM_STARTUP_FAILURE)
         })
     }
 
-    fn load_configs_impl<S: ConfigStorage>(&mut self, data_cache: &S) {
+    pub fn load_configs_impl<S: ConfigStorage>(&mut self, data_cache: &S) {
         self.on_chain_config = VMConfig::fetch_config(data_cache);
         self.version = LibraVersion::fetch_config(data_cache);
     }
@@ -174,7 +174,7 @@ impl LibraVMImpl {
         Ok(())
     }
 
-    pub(crate) fn is_allowed_script(&self, script: &Script) -> Result<(), VMStatus> {
+    pub fn is_allowed_script(&self, script: &Script) -> Result<(), VMStatus> {
         if !self
             .on_chain_config()?
             .publishing_option
@@ -187,7 +187,7 @@ impl LibraVMImpl {
         }
     }
 
-    pub(crate) fn is_allowed_module(
+    pub fn is_allowed_module(
         &self,
         txn_data: &TransactionMetadata,
         _remote_cache: &StateViewCache,
@@ -206,7 +206,7 @@ impl LibraVMImpl {
 
     /// Run the prologue of a transaction by calling into `PROLOGUE_NAME` function stored
     /// in the `ACCOUNT_MODULE` on chain.
-    pub(crate) fn run_prologue<R: RemoteCache>(
+    pub fn run_prologue<R: RemoteCache>(
         &self,
         session: &mut Session<R>,
         cost_strategy: &mut CostStrategy,
@@ -243,7 +243,7 @@ impl LibraVMImpl {
 
     /// Run the epilogue of a transaction by calling into `EPILOGUE_NAME` function stored
     /// in the `ACCOUNT_MODULE` on chain.
-    pub(crate) fn run_success_epilogue<R: RemoteCache>(
+    pub fn run_success_epilogue<R: RemoteCache>(
         &self,
         session: &mut Session<R>,
         cost_strategy: &mut CostStrategy,
@@ -276,7 +276,7 @@ impl LibraVMImpl {
 
     /// Run the failure epilogue of a transaction by calling into `FAILURE_EPILOGUE_NAME` function
     /// stored in the `ACCOUNT_MODULE` on chain.
-    pub(crate) fn run_failure_epilogue<R: RemoteCache>(
+    pub fn run_failure_epilogue<R: RemoteCache>(
         &self,
         session: &mut Session<R>,
         cost_strategy: &mut CostStrategy,
@@ -309,7 +309,7 @@ impl LibraVMImpl {
 
     /// Run the prologue of a transaction by calling into `PROLOGUE_NAME` function stored
     /// in the `WRITESET_MODULE` on chain.
-    pub(crate) fn run_writeset_prologue<R: RemoteCache>(
+    pub fn run_writeset_prologue<R: RemoteCache>(
         &self,
         session: &mut Session<R>,
         txn_data: &TransactionMetadata,
@@ -336,7 +336,7 @@ impl LibraVMImpl {
 
     /// Run the epilogue of a transaction by calling into `WRITESET_EPILOGUE_NAME` function stored
     /// in the `WRITESET_MODULE` on chain.
-    pub(crate) fn run_writeset_epilogue<R: RemoteCache>(
+    pub fn run_writeset_epilogue<R: RemoteCache>(
         &self,
         session: &mut Session<R>,
         change_set: &ChangeSet,
@@ -458,7 +458,7 @@ pub fn txn_effects_to_writeset_and_events_cached<C: AccessPathCache>(
     Ok((ws, events))
 }
 
-pub(crate) fn charge_global_write_gas_usage<R: RemoteCache>(
+pub fn charge_global_write_gas_usage<R: RemoteCache>(
     cost_strategy: &mut CostStrategy,
     session: &Session<R>,
 ) -> Result<(), VMStatus> {
@@ -479,7 +479,7 @@ pub(crate) fn charge_global_write_gas_usage<R: RemoteCache>(
         .map_err(|p_err| p_err.finish(Location::Undefined).into_vm_status())
 }
 
-pub(crate) fn get_transaction_output<A: AccessPathCache, R: RemoteCache>(
+pub fn get_transaction_output<A: AccessPathCache, R: RemoteCache>(
     ap_cache: &mut A,
     session: Session<R>,
     cost_strategy: &CostStrategy,

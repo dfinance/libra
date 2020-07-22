@@ -10,7 +10,7 @@ use network::connectivity_manager::ConnectivityRequest;
 use std::collections::HashMap;
 use tokio::runtime::Handle;
 
-struct ConfigurationChangeListenerConfig {
+pub struct ConfigurationChangeListenerConfig {
     role: RoleType,
     shared_val_netaddr_key_map: HashMap<KeyVersion, Key>,
     conn_mgr_reqs_tx: channel::Sender<ConnectivityRequest>,
@@ -18,7 +18,7 @@ struct ConfigurationChangeListenerConfig {
 }
 
 impl ConfigurationChangeListenerConfig {
-    fn new(
+    pub fn new(
         role: RoleType,
         shared_val_netaddr_key_map: HashMap<KeyVersion, Key>,
         conn_mgr_reqs_tx: channel::Sender<ConnectivityRequest>,
@@ -34,7 +34,7 @@ impl ConfigurationChangeListenerConfig {
 }
 
 #[derive(Debug, PartialEq, PartialOrd)]
-enum State {
+pub enum State {
     CREATED,
     BUILT,
     STARTED,

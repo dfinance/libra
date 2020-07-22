@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use backtrace::Backtrace;
 use libra_logger::prelude::*;
@@ -29,7 +29,7 @@ pub fn setup_panic_handler() {
 }
 
 // Formats and logs panic information
-fn handle_panic(panic_info: &PanicInfo<'_>) {
+pub fn handle_panic(panic_info: &PanicInfo<'_>) {
     // The Display formatter for a PanicInfo contains the message, payload and location.
     let details = format!("{}", panic_info);
     let backtrace = format!("{:#?}", Backtrace::new());

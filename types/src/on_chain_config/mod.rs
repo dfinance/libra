@@ -16,10 +16,10 @@ use move_core_types::{
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{collections::HashMap, sync::Arc};
 
-mod libra_version;
-mod registered_currencies;
-mod validator_set;
-mod vm_config;
+pub mod libra_version;
+pub mod registered_currencies;
+pub mod validator_set;
+pub mod vm_config;
 
 pub use self::{
     libra_version::LibraVersion,
@@ -91,7 +91,7 @@ pub trait ConfigStorage {
     fn fetch_config(&self, access_path: AccessPath) -> Option<Vec<u8>>;
 }
 
-/// Trait to be implemented by a Rust struct representation of an on-chain config
+/// Trait to be implemented by a Rust pub struct representation of an on-chain config
 /// that is stored in storage as a serialized byte array
 pub trait OnChainConfig: Send + Sync + DeserializeOwned {
     // libra_root_address

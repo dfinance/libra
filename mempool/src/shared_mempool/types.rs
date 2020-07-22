@@ -39,7 +39,7 @@ use vm_validator::vm_validator::TransactionValidation;
 
 /// Struct that owns all dependencies required by shared mempool routines
 #[derive(Clone)]
-pub(crate) struct SharedMempool<V>
+pub struct SharedMempool<V>
 where
     V: TransactionValidation + 'static,
 {
@@ -60,7 +60,7 @@ pub enum SharedMempoolNotification {
     Broadcast,
 }
 
-pub(crate) fn notify_subscribers(
+pub fn notify_subscribers(
     event: SharedMempoolNotification,
     subscribers: &[UnboundedSender<SharedMempoolNotification>],
 ) {
@@ -70,7 +70,7 @@ pub(crate) fn notify_subscribers(
 }
 
 /// A future that represents a scheduled mempool txn broadcast
-pub(crate) struct ScheduledBroadcast {
+pub struct ScheduledBroadcast {
     /// time of scheduled broadcast
     deadline: Instant,
     /// broadcast recipient

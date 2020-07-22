@@ -35,7 +35,7 @@ impl ReachingDefProcessor {
     }
 
     /// Union all the reaching definitions of a temp.
-    fn union_defs(one: &mut DefMap, other: &DefMap) {
+    pub fn union_defs(one: &mut DefMap, other: &DefMap) {
         for (temp, defs) in other {
             one.entry(*temp)
                 .and_modify(|e| {
@@ -46,7 +46,7 @@ impl ReachingDefProcessor {
     }
 
     /// Returns Some(temp, def) if temp has a unique reaching definition and None otherwise.
-    fn get_unique_def(temp: TempIndex, defs: BTreeSet<Def>) -> Option<(TempIndex, TempIndex)> {
+    pub fn get_unique_def(temp: TempIndex, defs: BTreeSet<Def>) -> Option<(TempIndex, TempIndex)> {
         if defs.len() != 1 {
             return None;
         }
@@ -56,7 +56,7 @@ impl ReachingDefProcessor {
         None
     }
 
-    fn defs_reaching_exits(
+    pub fn defs_reaching_exits(
         exit_offsets: Vec<CodeOffset>,
         annotations: &BTreeMap<CodeOffset, DefMap>,
         func_target: FunctionTarget,
@@ -76,7 +76,7 @@ impl ReachingDefProcessor {
             .collect()
     }
 
-    fn get_src_local(idx: TempIndex, reaching_defs: &BTreeMap<TempIndex, TempIndex>) -> TempIndex {
+    pub fn get_src_local(idx: TempIndex, reaching_defs: &BTreeMap<TempIndex, TempIndex>) -> TempIndex {
         let mut res = idx;
         while reaching_defs.contains_key(&res) {
             res = *reaching_defs.get(&res).unwrap();
@@ -186,17 +186,17 @@ impl FunctionTargetProcessor for ReachingDefProcessor {
     }
 }
 
-struct ReachingDefAnalysis<'a> {
+pub struct ReachingDefAnalysis<'a> {
     _target: FunctionTarget<'a>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct ReachingDefState {
+pub struct ReachingDefState {
     map: BTreeMap<TempIndex, BTreeSet<Def>>,
 }
 
 impl<'a> ReachingDefAnalysis<'a> {
-    fn execute(
+    pub fn execute(
         &mut self,
         pre: ReachingDefState,
         instr: &Bytecode,
@@ -265,19 +265,19 @@ impl AbstractDomain for ReachingDefState {
 }
 
 impl ReachingDefState {
-    fn def_alias(&mut self, dest: TempIndex, src: TempIndex) {
+    pub fn def_alias(&mut self, dest: TempIndex, src: TempIndex) {
         let set = self.map.entry(dest).or_insert_with(BTreeSet::new);
         set.clear();
         set.insert(Def::Alias(src));
     }
 
-    fn def_const(&mut self, dest: TempIndex, cons: Constant) {
+    pub fn def_const(&mut self, dest: TempIndex, cons: Constant) {
         let set = self.map.entry(dest).or_insert_with(BTreeSet::new);
         set.clear();
         set.insert(Def::Const(cons));
     }
 
-    fn kill(&mut self, dest: TempIndex) {
+    pub fn kill(&mut self, dest: TempIndex) {
         self.map.remove(&dest);
     }
 }

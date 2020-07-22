@@ -178,7 +178,7 @@ impl Cargo {
     /// If log is true, any environment variable overrides will be logged, the full command will be logged,
     /// and after the command's output reaches stdout, the command will be printed again along with the time took
     /// to process the command (wallclock) in ms.
-    fn do_run(&mut self, log: bool) -> Result<Output> {
+    pub fn do_run(&mut self, log: bool) -> Result<Output> {
         // these arguments are passed through cargo/x to underlying executable (test, clippy, etc)
         if !self.pass_through_args.is_empty() {
             self.inner.arg("--").args(&self.pass_through_args);
@@ -319,7 +319,7 @@ impl<'a> CargoCommand<'a> {
         }
     }
 
-    fn pass_through_args(&self) -> &[OsString] {
+    pub fn pass_through_args(&self) -> &[OsString] {
         match self {
             CargoCommand::Bench(_, args) => args,
             CargoCommand::Check(_) => &[],
@@ -329,7 +329,7 @@ impl<'a> CargoCommand<'a> {
         }
     }
 
-    fn direct_args(&self) -> &[OsString] {
+    pub fn direct_args(&self) -> &[OsString] {
         match self {
             CargoCommand::Bench(_, _) => &[],
             CargoCommand::Check(_) => &[],
@@ -349,7 +349,7 @@ impl<'a> CargoCommand<'a> {
         }
     }
 
-    fn apply_args(cargo: &mut Cargo, args: &CargoArgs) {
+    pub fn apply_args(cargo: &mut Cargo, args: &CargoArgs) {
         if args.all_targets {
             cargo.all_targets();
         }

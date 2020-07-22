@@ -15,25 +15,25 @@ use libra_types::{
 };
 use std::{collections::HashMap, sync::Arc};
 
-fn hash_internal(left_child: HashValue, right_child: HashValue) -> HashValue {
+pub fn hash_internal(left_child: HashValue, right_child: HashValue) -> HashValue {
     libra_types::proof::SparseMerkleInternalNode::new(left_child, right_child).hash()
 }
 
-fn hash_leaf(key: HashValue, value_hash: HashValue) -> HashValue {
+pub fn hash_leaf(key: HashValue, value_hash: HashValue) -> HashValue {
     SparseMerkleLeafNode::new(key, value_hash).hash()
 }
 
 #[derive(Default)]
-struct ProofReader(HashMap<HashValue, SparseMerkleProof>);
+pub struct ProofReader(HashMap<HashValue, SparseMerkleProof>);
 
 impl ProofReader {
-    fn new(key_with_proof: Vec<(HashValue, SparseMerkleProof)>) -> Self {
+    pub fn new(key_with_proof: Vec<(HashValue, SparseMerkleProof)>) -> Self {
         ProofReader(key_with_proof.into_iter().collect())
     }
 }
 
 impl ProofRead for ProofReader {
-    fn get_proof(&self, key: HashValue) -> Option<&SparseMerkleProof> {
+    pub fn get_proof(&self, key: HashValue) -> Option<&SparseMerkleProof> {
         self.0.get(&key)
     }
 }

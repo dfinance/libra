@@ -124,7 +124,7 @@ impl OnDiskStorageConfig {
     }
 }
 
-fn read_file(path: &PathBuf) -> Result<String, Error> {
+pub fn read_file(path: &PathBuf) -> Result<String, Error> {
     let mut file =
         File::open(path).map_err(|e| Error::IO(path.to_str().unwrap().to_string(), e))?;
     let mut contents = String::new();
@@ -170,12 +170,12 @@ impl From<&SecureBackend> for Storage {
     }
 }
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use std::io::Write;
 
     #[derive(Debug, Deserialize, PartialEq, Serialize)]
-    struct Config {
+    pub struct Config {
         vault: VaultConfig,
     }
 

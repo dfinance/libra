@@ -5,22 +5,22 @@ use crate::{Result, WorkspaceSubset, XCoreContext};
 use guppy::MetadataCommand;
 
 rental! {
-    mod rent_package_graph {
+    pub mod rent_package_graph {
         use crate::WorkspaceSubset;
         use guppy::graph::PackageGraph;
 
         #[rental(covariant)]
-        pub(crate) struct PackageGraphPlus {
+        pub struct PackageGraphPlus {
             g: Box<PackageGraph>,
             default_members: WorkspaceSubset<'g>,
         }
     }
 }
 
-pub(crate) use rent_package_graph::PackageGraphPlus;
+pub use rent_package_graph::PackageGraphPlus;
 
 impl PackageGraphPlus {
-    pub(crate) fn create(ctx: &XCoreContext) -> Result<Self> {
+    pub fn create(ctx: &XCoreContext) -> Result<Self> {
         let mut cmd = MetadataCommand::new();
         // Run cargo metadata from the root of the workspace.
         let project_root = ctx.project_root();

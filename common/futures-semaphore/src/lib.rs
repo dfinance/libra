@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! `Semaphore` holds a set of permits. Permits are used to synchronize access
 //! to a shared resource. Before accessing the shared resource, callers must
@@ -23,7 +23,7 @@ use tokio::sync::Semaphore as TokioSemaphore;
 
 /// The wrapped tokio [`Semaphore`](TokioSemaphore) and total permit capacity.
 #[derive(Debug)]
-struct Inner {
+pub struct Inner {
     semaphore: TokioSemaphore,
     capacity: usize,
 }
@@ -129,7 +129,7 @@ impl Drop for Permit {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use futures::{
         executor::block_on,
@@ -172,7 +172,7 @@ mod test {
         assert!(s.try_acquire().is_some());
     }
 
-    fn yield_task() -> impl Future<Output = ()> {
+    pub fn yield_task() -> impl Future<Output = ()> {
         delay_for(Duration::from_millis(1)).map(|_| ())
     }
 

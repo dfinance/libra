@@ -21,13 +21,13 @@ use std::collections::BTreeMap;
 // Entry and trait bindings
 //**************************************************************************************************
 
-struct LocalsSafety<'a> {
+pub struct LocalsSafety<'a> {
     local_types: &'a UniqueMap<Var, SingleType>,
     signature: &'a FunctionSignature,
 }
 
 impl<'a> LocalsSafety<'a> {
-    fn new(local_types: &'a UniqueMap<Var, SingleType>, signature: &'a FunctionSignature) -> Self {
+    pub fn new(local_types: &'a UniqueMap<Var, SingleType>, signature: &'a FunctionSignature) -> Self {
         Self {
             local_types,
             signature,
@@ -35,7 +35,7 @@ impl<'a> LocalsSafety<'a> {
     }
 }
 
-struct Context<'a, 'b> {
+pub struct Context<'a, 'b> {
     local_types: &'a UniqueMap<Var, SingleType>,
     local_states: &'b mut LocalStates,
     signature: &'a FunctionSignature,
@@ -43,7 +43,7 @@ struct Context<'a, 'b> {
 }
 
 impl<'a, 'b> Context<'a, 'b> {
-    fn new(locals_safety: &'a LocalsSafety, local_states: &'b mut LocalStates) -> Self {
+    pub fn new(locals_safety: &'a LocalsSafety, local_states: &'b mut LocalStates) -> Self {
         let local_types = &locals_safety.local_types;
         let signature = &locals_safety.signature;
         Self {
@@ -54,24 +54,24 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 
-    fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
+    pub fn error(&mut self, e: Vec<(Loc, impl Into<String>)>) {
         self.errors
             .push(e.into_iter().map(|(loc, msg)| (loc, msg.into())).collect())
     }
 
-    fn get_errors(self) -> Errors {
+    pub fn get_errors(self) -> Errors {
         self.errors
     }
 
-    fn get_state(&self, local: &Var) -> &LocalState {
+    pub fn get_state(&self, local: &Var) -> &LocalState {
         self.local_states.get_state(local)
     }
 
-    fn set_state(&mut self, local: Var, state: LocalState) {
+    pub fn set_state(&mut self, local: Var, state: LocalState) {
         self.local_states.set_state(local, state)
     }
 
-    fn local_type(&self, local: &Var) -> &SingleType {
+    pub fn local_type(&self, local: &Var) -> &SingleType {
         self.local_types.get(local).unwrap()
     }
 }
@@ -112,7 +112,7 @@ pub fn verify(
 // Command
 //**************************************************************************************************
 
-fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
+pub fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
     use Command_ as C;
     match cmd_ {
         C::Assign(ls, e) => {
@@ -174,11 +174,11 @@ fn command(context: &mut Context, sp!(loc, cmd_): &Command) {
     }
 }
 
-fn lvalues(context: &mut Context, ls: &[LValue]) {
+pub fn lvalues(context: &mut Context, ls: &[LValue]) {
     ls.iter().for_each(|l| lvalue(context, l))
 }
 
-fn lvalue(context: &mut Context, sp!(loc, l_): &LValue) {
+pub fn lvalue(context: &mut Context, sp!(loc, l_): &LValue) {
     use LValue_ as L;
     match l_ {
         L::Ignore => (),
@@ -219,7 +219,7 @@ fn lvalue(context: &mut Context, sp!(loc, l_): &LValue) {
     }
 }
 
-fn exp(context: &mut Context, parent_e: &Exp) {
+pub fn exp(context: &mut Context, parent_e: &Exp) {
     use UnannotatedExp_ as E;
     let eloc = &parent_e.exp.loc;
     match &parent_e.exp.value {
@@ -253,13 +253,13 @@ fn exp(context: &mut Context, parent_e: &Exp) {
     }
 }
 
-fn exp_list_item(context: &mut Context, item: &ExpListItem) {
+pub fn exp_list_item(context: &mut Context, item: &ExpListItem) {
     match item {
         ExpListItem::Single(e, _) | ExpListItem::Splat(_, e, _) => exp(context, e),
     }
 }
 
-fn use_local(context: &mut Context, loc: &Loc, local: &Var) {
+pub fn use_local(context: &mut Context, loc: &Loc, local: &Var) {
     use LocalState as L;
     let state = context.get_state(local);
     match state {

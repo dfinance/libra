@@ -70,7 +70,7 @@ pub enum BoogieErrorKind {
 }
 
 impl BoogieErrorKind {
-    fn is_from_verification(self) -> bool {
+    pub fn is_from_verification(self) -> bool {
         use BoogieErrorKind::*;
         matches!(
             self,
@@ -101,7 +101,7 @@ pub enum TraceKind {
 }
 
 impl<'env> BoogieWrapper<'env> {
-    /// Calls boogie on the given file. On success, returns a struct representing the analyzed
+    /// Calls boogie on the given file. On success, returns a pub struct representing the analyzed
     /// output of boogie.
     pub fn call_boogie(
         &self,
@@ -172,7 +172,7 @@ impl<'env> BoogieWrapper<'env> {
 
     /// Determine whether the boogie error represents the failure of a negative condition
     /// and return its location of so.
-    fn try_get_negative_error(&self, error: &BoogieError) -> Option<Loc> {
+    pub fn try_get_negative_error(&self, error: &BoogieError) -> Option<Loc> {
         // Find the source location of the error
         let (_, loc_opt) = self.get_locations(error.position);
         let source_loc = self.to_proper_source_location(loc_opt).and_then(|loc| {
@@ -192,7 +192,7 @@ impl<'env> BoogieWrapper<'env> {
 
     /// Go over all negative conditions and check whether errors occurred for them.
     /// For those which did not occur, report error.
-    fn add_negative_errors(&self, negative_cond_errors: BTreeSet<Loc>) {
+    pub fn add_negative_errors(&self, negative_cond_errors: BTreeSet<Loc>) {
         self.env.with_condition_infos(|loc, info| {
             if !info.negative_cond || negative_cond_errors.contains(loc) {
                 // Not a negative condition, or expected error happened.
@@ -209,7 +209,7 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Helper to add a boogie error as a codespan Diagnostic.
-    fn add_error(&self, error: &BoogieError) {
+    pub fn add_error(&self, error: &BoogieError) {
         let (index, loc_opt) = self.get_locations(error.position);
         // Create label (position information) for main error.
         let loc_opt = self.to_proper_source_location(loc_opt).and_then(|loc| {
@@ -391,12 +391,12 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Transform a source location into a proper one, filtering out internal locations.
-    fn to_proper_source_location(&self, location: Option<Loc>) -> Option<Loc> {
+    pub fn to_proper_source_location(&self, location: Option<Loc>) -> Option<Loc> {
         location.filter(|loc| loc != &self.env.internal_loc())
     }
 
     /// Renders trace information.
-    fn render_trace_info(&self, file: String, pos: Location, info: PrettyDoc) -> String {
+    pub fn render_trace_info(&self, file: String, pos: Location, info: PrettyDoc) -> String {
         self.render(
             &PrettyDoc::text(format!(
                 "    at {}:{}:{}: ",
@@ -409,7 +409,7 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Renders the doc.
-    fn render(&self, doc: &PrettyDoc) -> String {
+    pub fn render(&self, doc: &PrettyDoc) -> String {
         let mut lines = vec![];
         doc.render(70, &mut lines).unwrap();
         String::from_utf8_lossy(&lines).to_string()
@@ -417,7 +417,7 @@ impl<'env> BoogieWrapper<'env> {
 
     /// Gets the code byte index and source location (if available) from a target line/column
     /// position.
-    fn get_locations(&self, pos: Location) -> (ByteIndex, Option<Loc>) {
+    pub fn get_locations(&self, pos: Location) -> (ByteIndex, Option<Loc>) {
         let index = self
             .writer
             .get_output_byte_index(pos.line, pos.column)
@@ -426,7 +426,7 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Pretty print trace information, injecting function name and variable bindings if available.
-    fn pretty_trace_info(
+    pub fn pretty_trace_info(
         &'env self,
         mut loc: Loc,
         model_opt: Option<&'env Model>,
@@ -495,7 +495,7 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Returns the type of either a local or a return parameter.
-    fn get_type_of_local_or_return(
+    pub fn get_type_of_local_or_return(
         &self,
         func_target: &'env FunctionTarget<'env>,
         idx: usize,
@@ -524,7 +524,7 @@ impl<'env> BoogieWrapper<'env> {
     ///    output.bpl(2989,5): inline$LibraAccount_pay_from_sender_with_metadata$0$anon0
     ///    ...
     /// ```
-    fn extract_verification_errors(&self, out: &str) -> Vec<BoogieError> {
+    pub fn extract_verification_errors(&self, out: &str) -> Vec<BoogieError> {
         let model_region =
             Regex::new(r"(?m)^\*\*\* MODEL$(?P<mod>(?s:.)*?^\*\*\* END_MODEL$)").unwrap();
         let verification_diag_start =
@@ -626,7 +626,7 @@ impl<'env> BoogieWrapper<'env> {
     }
 
     /// Extracts inconclusive (timeout) errors.
-    fn extract_inconclusive_errors(&self, out: &str) -> Vec<BoogieError> {
+    pub fn extract_inconclusive_errors(&self, out: &str) -> Vec<BoogieError> {
         let diag_re =
             Regex::new(r"(?m)^.*\((?P<line>\d+),(?P<col>\d+)\).*Verification (inconclusive|out of resource).*$")
                 .unwrap();
@@ -657,7 +657,7 @@ impl<'env> BoogieWrapper<'env> {
 
     /// Extracts compilation errors. This captures any kind of errors different than the
     /// verification errors (as seen so far).
-    fn extract_compilation_errors(&self, out: &str) -> Vec<BoogieError> {
+    pub fn extract_compilation_errors(&self, out: &str) -> Vec<BoogieError> {
         let diag_re =
             Regex::new(r"(?m)^.*\((?P<line>\d+),(?P<col>\d+)\).*(Error:|error:).*$").unwrap();
         diag_re
@@ -680,7 +680,7 @@ impl<'env> BoogieWrapper<'env> {
 }
 
 /// Creates a position (line/column pair) from strings which are known to consist only of digits.
-fn make_position(line_str: &str, col_str: &str) -> Location {
+pub fn make_position(line_str: &str, col_str: &str) -> Location {
     // This will crash on overflow.
     let mut line = line_str.parse::<u32>().unwrap();
     let col = col_str.parse::<u32>().unwrap();
@@ -712,7 +712,7 @@ pub struct Model {
 
 impl Model {
     /// Parses the given string into a model. The string is expected to end with MODULE_END_MARKER.
-    fn parse(wrapper: &BoogieWrapper<'_>, input: &str) -> Result<Model, ModelParseError> {
+    pub fn parse(wrapper: &BoogieWrapper<'_>, input: &str) -> Result<Model, ModelParseError> {
         let mut model_parser = ModelParser { input, at: 0 };
         model_parser
             .parse_map()
@@ -812,7 +812,7 @@ impl Model {
     }
 
     /// Extract and validate a tracked local from $DebugTrackLocal map.
-    fn extract_debug_var(
+    pub fn extract_debug_var(
         wrapper: &BoogieWrapper<'_>,
         map_entry: &ModelValue,
     ) -> Result<(LocalDescriptor, Loc, ModelValue), ModelParseError> {
@@ -847,7 +847,7 @@ impl Model {
     }
 
     /// Extract and validate a tracked abort from $DebugTrackAbort map.
-    fn extract_abort_marker(
+    pub fn extract_abort_marker(
         wrapper: &BoogieWrapper<'_>,
         map_entry: &ModelValue,
     ) -> Result<(AbortDescriptor, Loc), ModelParseError> {
@@ -874,7 +874,7 @@ impl Model {
     }
 
     /// Extract and validate a tracked expression from $DebugTrackExp map.
-    fn extract_debug_exp(
+    pub fn extract_debug_exp(
         wrapper: &BoogieWrapper<'_>,
         map_entry: &ModelValue,
     ) -> Result<(ExpDescriptor, ModelValue), ModelParseError> {
@@ -904,7 +904,7 @@ impl Model {
     }
 
     // Extract Loc from model values.
-    fn extract_loc(
+    pub fn extract_loc(
         wrapper: &BoogieWrapper<'_>,
         args: &[ModelValue],
     ) -> Result<Loc, ModelParseError> {
@@ -930,14 +930,14 @@ impl Model {
         }
     }
 
-    fn invalid_track_info() -> ModelParseError {
+    pub fn invalid_track_info() -> ModelParseError {
         // DEBUG
         // let bt = Backtrace::new();
         // ModelParseError::new(&format!("invalid debug track info. Stack trace:\n{:?}", bt))
         ModelParseError::new("invalid debug track info")
     }
 
-    fn index_range_check(max: usize) -> impl FnOnce(usize) -> Result<usize, ModelParseError> {
+    pub fn index_range_check(max: usize) -> impl FnOnce(usize) -> Result<usize, ModelParseError> {
         move |idx: usize| -> Result<usize, ModelParseError> {
             if idx < max {
                 Ok(idx)
@@ -959,7 +959,7 @@ impl Model {
     /// track this via the `locals_shown` set which consists of pairs of code byte index and the
     /// variable as it has been updated at this point. This heuristic works reliable for the
     /// cases seen so far, but may need further refinement.
-    fn relevant_tracked_locals(
+    pub fn relevant_tracked_locals(
         &self,
         func_target: &FunctionTarget<'_>,
         loc: Loc,
@@ -1007,18 +1007,18 @@ pub struct ModelValueVector {
 
 impl ModelValue {
     /// Makes a literal from a str.
-    fn literal(s: &str) -> ModelValue {
+    pub fn literal(s: &str) -> ModelValue {
         ModelValue::Literal(s.to_string())
     }
 
     // Makes an error value.
-    fn error() -> ModelValue {
+    pub fn error() -> ModelValue {
         ModelValue::List(vec![ModelValue::literal("Error")])
     }
 
     /// Extracts a vector from `(Vector value_array)`. This follows indirections in the model
     /// to extract the actual values.
-    fn extract_vector(&self, model: &Model) -> Option<ModelValueVector> {
+    pub fn extract_vector(&self, model: &Model) -> Option<ModelValueVector> {
         let args = self.extract_list("$Vector")?;
         if args.len() != 1 {
             return None;
@@ -1046,7 +1046,7 @@ impl ModelValue {
     // In this case the sequence representation does not explicitly denote a constructor like ValueArray(..),
     // instead reducing expressions to native SMT sequence theory expressions.
 
-    fn extract_value_array(&self, model: &Model) -> Option<ModelValueVector> {
+    pub fn extract_value_array(&self, model: &Model) -> Option<ModelValueVector> {
         if ValueArrayRep::ValueArrayIsSeq == model.value_array_rep {
             // Implementation of $ValueArray using sequences
             let seq_type_modelvalue = ModelValue::List(vec![
@@ -1109,7 +1109,7 @@ impl ModelValue {
         }
     }
 
-    fn extract_map(&self) -> Option<&BTreeMap<ModelValue, ModelValue>> {
+    pub fn extract_map(&self) -> Option<&BTreeMap<ModelValue, ModelValue>> {
         if let ModelValue::Map(map) = self {
             Some(map)
         } else {
@@ -1118,7 +1118,7 @@ impl ModelValue {
     }
 
     /// Extract the arguments of a list of the form `(<ctor> element...)`.
-    fn extract_list(&self, ctor: &str) -> Option<&[ModelValue]> {
+    pub fn extract_list(&self, ctor: &str) -> Option<&[ModelValue]> {
         if let ModelValue::List(elems) = self {
             if !elems.is_empty() && elems[0] == ModelValue::literal(ctor) {
                 return Some(&elems[1..]);
@@ -1128,7 +1128,7 @@ impl ModelValue {
     }
 
     /// Extract a number from a literal.
-    fn extract_number(&self) -> Option<usize> {
+    pub fn extract_number(&self) -> Option<usize> {
         if let Ok(n) = self.extract_literal()?.parse::<usize>() {
             Some(n)
         } else {
@@ -1137,7 +1137,7 @@ impl ModelValue {
     }
 
     /// Extract the value of a primitive.
-    fn extract_primitive(&self, ctor: &str) -> Option<&String> {
+    pub fn extract_primitive(&self, ctor: &str) -> Option<&String> {
         let args = self.extract_list(ctor)?;
         if args.len() != 1 {
             return None;
@@ -1146,7 +1146,7 @@ impl ModelValue {
     }
 
     /// Extract a literal.
-    fn extract_literal(&self) -> Option<&String> {
+    pub fn extract_literal(&self) -> Option<&String> {
         if let ModelValue::Literal(s) = self {
             Some(s)
         } else {
@@ -1216,7 +1216,7 @@ impl ModelValue {
         }
     }
 
-    /// Pretty prints the body of a struct or vector, enclosed in braces.
+    /// Pretty prints the body of a pub struct or vector, enclosed in braces.
     pub fn pretty_vec_or_struct_body(entries: Vec<PrettyDoc>) -> PrettyDoc {
         PrettyDoc::text("{")
             .append(
@@ -1310,7 +1310,7 @@ impl ModelValue {
 
 /// Represents a descriptor for a tracked local.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-struct LocalDescriptor {
+pub struct LocalDescriptor {
     module_id: ModuleId,
     func_id: FunId,
     var_idx: usize,
@@ -1318,7 +1318,7 @@ struct LocalDescriptor {
 
 impl LocalDescriptor {
     /// Pretty prints a tracked local.
-    fn pretty(
+    pub fn pretty(
         &self,
         wrapper: &BoogieWrapper,
         func_target: &FunctionTarget<'_>,
@@ -1355,29 +1355,29 @@ impl LocalDescriptor {
 
 /// Represents an abort descriptor.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-struct AbortDescriptor {
+pub struct AbortDescriptor {
     module_id: ModuleId,
     func_id: FunId,
 }
 
 /// Represents an expression descriptor.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-struct ExpDescriptor {
+pub struct ExpDescriptor {
     module_id: ModuleId,
     node_id: NodeId,
 }
 
 /// Represents parser for a boogie model.
-struct ModelParser<'s> {
+pub struct ModelParser<'s> {
     input: &'s str,
     at: usize,
 }
 
 /// Represents error resulting from model parsing.
-struct ModelParseError(String);
+pub struct ModelParseError(String);
 
 impl ModelParseError {
-    fn new(s: &str) -> Self {
+    pub fn new(s: &str) -> Self {
         ModelParseError(s.to_string())
     }
 }
@@ -1385,18 +1385,18 @@ impl ModelParseError {
 const MODEL_END_MARKER: &str = "*** END_MODEL";
 
 impl<'s> ModelParser<'s> {
-    fn skip_space(&mut self) {
+    pub fn skip_space(&mut self) {
         while self.input[self.at..].starts_with(|ch| [' ', '\r', '\n', '\t'].contains(&ch)) {
             self.at += 1;
         }
     }
 
-    fn looking_at(&mut self, s: &str) -> bool {
+    pub fn looking_at(&mut self, s: &str) -> bool {
         self.skip_space();
         self.input[self.at..].starts_with(s)
     }
 
-    fn looking_at_then_consume(&mut self, s: &str) -> bool {
+    pub fn looking_at_then_consume(&mut self, s: &str) -> bool {
         if self.looking_at(s) {
             self.at += s.len();
             true
@@ -1405,7 +1405,7 @@ impl<'s> ModelParser<'s> {
         }
     }
 
-    fn expect(&mut self, s: &str) -> Result<(), ModelParseError> {
+    pub fn expect(&mut self, s: &str) -> Result<(), ModelParseError> {
         self.skip_space();
         if self.input[self.at..].starts_with(s) {
             self.at += s.len();
@@ -1420,7 +1420,7 @@ impl<'s> ModelParser<'s> {
         }
     }
 
-    fn parse_map(&mut self) -> Result<ModelValue, ModelParseError> {
+    pub fn parse_map(&mut self) -> Result<ModelValue, ModelParseError> {
         let mut map = BTreeMap::new();
         while !self.looking_at("}") && !self.looking_at(MODEL_END_MARKER) {
             let key = self.parse_key()?;
@@ -1437,7 +1437,7 @@ impl<'s> ModelParser<'s> {
         Ok(ModelValue::Map(map))
     }
 
-    fn parse_key(&mut self) -> Result<ModelValue, ModelParseError> {
+    pub fn parse_key(&mut self) -> Result<ModelValue, ModelParseError> {
         let mut comps = vec![];
         while !self.looking_at("->") {
             let value = self.parse_value()?;
@@ -1454,7 +1454,7 @@ impl<'s> ModelParser<'s> {
         }
     }
 
-    fn parse_value(&mut self) -> Result<ModelValue, ModelParseError> {
+    pub fn parse_value(&mut self) -> Result<ModelValue, ModelParseError> {
         if self.looking_at_then_consume("(") {
             let mut comps = vec![];
             while !self.looking_at_then_consume(")") {

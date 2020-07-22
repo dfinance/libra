@@ -40,7 +40,7 @@ where
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use crate::{
         protocols::{
             identity::exchange_handshake,
@@ -53,7 +53,7 @@ mod tests {
     use libra_types::chain_id::ChainId;
     use memsocket::MemorySocket;
 
-    fn build_test_connection() -> (MemorySocket, MemorySocket) {
+    pub fn build_test_connection() -> (MemorySocket, MemorySocket) {
         MemorySocket::new_pair()
     }
 

@@ -26,10 +26,10 @@ use vm::errors::{Location, PartialVMError};
 
 pub use cached_access_path_table::update_mapping;
 
-mod cached_access_path_table;
-mod fat_type;
-mod module_cache;
-mod resolver;
+pub mod cached_access_path_table;
+pub mod fat_type;
+pub mod module_cache;
+pub mod resolver;
 
 #[derive(Debug)]
 pub struct AnnotatedAccountStateBlob(BTreeMap<StructTag, AnnotatedMoveStruct>);
@@ -43,7 +43,7 @@ pub struct AnnotatedMoveStruct {
 
 /// AnnotatedMoveValue is a fully expanded version of on chain move data. This should only be used
 /// for debugging/client purpose right now and just for a better visualization of on chain data. In
-/// the long run, we would like to transform this struct to a Json value so that we can have a cross
+/// the long run, we would like to transform this pub struct to a Json value so that we can have a cross
 /// platform interpretation of the on chain data.
 #[derive(Debug)]
 pub enum AnnotatedMoveValue {
@@ -110,7 +110,7 @@ impl<'a> MoveValueAnnotator<'a> {
         Ok(AnnotatedAccountStateBlob(output))
     }
 
-    fn annotate_struct(
+    pub fn annotate_struct(
         &self,
         move_struct: &MoveStruct,
         ty: &FatStructType,
@@ -133,7 +133,7 @@ impl<'a> MoveValueAnnotator<'a> {
         })
     }
 
-    fn annotate_value(&self, value: &MoveValue, ty: &FatType) -> Result<AnnotatedMoveValue> {
+    pub fn annotate_value(&self, value: &MoveValue, ty: &FatType) -> Result<AnnotatedMoveValue> {
         Ok(match (value, ty) {
             (MoveValue::Bool(b), FatType::Bool) => AnnotatedMoveValue::Bool(*b),
             (MoveValue::U8(i), FatType::U8) => AnnotatedMoveValue::U8(*i),
@@ -169,14 +169,14 @@ impl<'a> MoveValueAnnotator<'a> {
     }
 }
 
-fn write_indent(f: &mut Formatter, indent: u64) -> std::fmt::Result {
+pub fn write_indent(f: &mut Formatter, indent: u64) -> std::fmt::Result {
     for _i in 0..indent {
         write!(f, " ")?;
     }
     Ok(())
 }
 
-fn pretty_print_value(
+pub fn pretty_print_value(
     f: &mut Formatter,
     value: &AnnotatedMoveValue,
     indent: u64,
@@ -202,7 +202,7 @@ fn pretty_print_value(
     }
 }
 
-fn pretty_print_struct(
+pub fn pretty_print_struct(
     f: &mut Formatter,
     value: &AnnotatedMoveStruct,
     indent: u64,

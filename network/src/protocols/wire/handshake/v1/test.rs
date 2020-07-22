@@ -3,7 +3,7 @@
 
 use super::*;
 
-// Ensure serialization of MessagingProtocolVersion enum takes 1 byte.
+// Ensure serialization of MessagingProtocolVersionpub enum takes 1 byte.
 #[test]
 fn net_protocol() -> lcs::Result<()> {
     let protocol = MessagingProtocolVersion::V1;

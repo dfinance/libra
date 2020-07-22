@@ -154,7 +154,7 @@ impl<'a> ApplyCodeUnitBoundsContext<'a> {
         results
     }
 
-    fn apply_one(
+    pub fn apply_one(
         &mut self,
         fidx: usize,
         mutations: Vec<CodeUnitBoundsMutation>,
@@ -411,7 +411,7 @@ impl<'a> ApplyCodeUnitBoundsContext<'a> {
     }
 }
 
-fn is_interesting(bytecode: &Bytecode) -> bool {
+pub fn is_interesting(bytecode: &Bytecode) -> bool {
     use Bytecode::*;
 
     match bytecode {

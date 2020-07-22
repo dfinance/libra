@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 /// This module provides an experiment which introduces packet loss for
 /// a given number of instances in the cluster. It undoes the packet loss

@@ -38,7 +38,7 @@ pub struct IncomingBlockRetrievalRequest {
     pub response_sender: oneshot::Sender<Result<Bytes, RpcError>>,
 }
 
-/// Just a convenience struct to keep all the network proxy receiving queues in one place.
+/// Just a convenience pub struct to keep all the network proxy receiving queues in one place.
 /// Will be returned by the NetworkTask upon startup.
 pub struct NetworkReceivers {
     /// Provide a LIFO buffer for each (Author, MessageType) key
@@ -125,7 +125,7 @@ impl NetworkSender {
         self.broadcast(msg).await
     }
 
-    async fn broadcast(&mut self, msg: ConsensusMsg) {
+    pub async fn broadcast(&mut self, msg: ConsensusMsg) {
         // Directly send the message to ourself without going through network.
         let self_msg = Event::Message((self.author, msg.clone()));
         if let Err(err) = self.self_sender.send(Ok(self_msg)).await {

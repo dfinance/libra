@@ -15,10 +15,10 @@ pub struct SourceMapping<Location: Clone + Eq> {
 
     // The source code for the bytecode. This is not required for disassembly, but it is required
     // for being able to print out corresponding source code for marked functions and structs.
-    // Unused for now, this will be used when we start printing function/struct markings
+    // Unused for now, this will be used when we start printing function/pub struct markings
     pub source_code: Option<(String, String)>,
 
-    // Function and struct markings. These are used to lift up annotations/messages on the bytecode
+    // Function and pub struct markings. These are used to lift up annotations/messages on the bytecode
     // into the disassembled program and/or IR source code.
     pub marks: Option<MarkedSourceMapping>,
 }

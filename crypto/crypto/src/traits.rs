@@ -16,7 +16,7 @@ use thiserror::Error;
 
 /// An error type for key and signature validation issues, see [`ValidCryptoMaterial`][ValidCryptoMaterial].
 ///
-/// This enum reflects there are two interesting causes of validation
+/// Thispub enum reflects there are two interesting causes of validation
 /// failure for the ingestion of key or signature material: deserialization errors
 /// (often, due to mangled material or curve equation failure for ECC) and
 /// validation errors (material recognizable but unacceptable for use,
@@ -106,7 +106,7 @@ pub trait PrivateKey: Sized {
 
 /// A type family of valid keys that know how to sign.
 ///
-/// This trait has a requirement on a `pub(crate)` marker trait meant to
+/// This trait has a requirement on a `pub` marker trait meant to
 /// specifically limit its implementations to the present crate.
 ///
 /// A trait for a [`ValidCryptoMaterial`][ValidCryptoMaterial] which knows how to sign a
@@ -163,7 +163,7 @@ pub trait PublicKey: Sized + Clone + Eq + Hash +
 
 /// A type family of public keys that are used for signing.
 ///
-/// This trait has a requirement on a `pub(crate)` marker trait meant to
+/// This trait has a requirement on a `pub` marker trait meant to
 /// specifically limit its implementations to the present crate.
 ///
 /// It is linked to a type of the Signature family, which carries the
@@ -203,7 +203,7 @@ pub trait VerifyingKey:
 /// This trait simply requires an association to some type of the
 /// [`PublicKey`][PublicKey] family of which we are the `SignatureMaterial`.
 ///
-/// This trait has a requirement on a `pub(crate)` marker trait meant to
+/// This trait has a requirement on a `pub` marker trait meant to
 /// specifically limit its implementations to the present crate.
 ///
 /// It should be possible to write a generic signature function that
@@ -225,7 +225,7 @@ pub trait Signature:
     /// The associated signing key type for this signature
     type SigningKeyMaterial: SigningKey<SignatureMaterial = Self>;
 
-    /// Verification for a struct we unabmiguously know how to serialize and
+    /// Verification for a pub struct we unabmiguously know how to serialize and
     /// that we have a domain separation prefix for.
     fn verify<T: CryptoHash + Serialize>(
         &self,
@@ -283,10 +283,10 @@ pub trait Genesis: PrivateKey {
     fn genesis() -> Self;
 }
 
-/// A pub(crate) mod hiding a Sealed trait and its implementations, allowing
+/// A pub mod hiding a Sealed trait and its implementations, allowing
 /// us to make sure implementations are constrained to the crypto crate.
 // See https://rust-lang.github.io/api-guidelines/future-proofing.html#sealed-traits-protect-against-downstream-implementations-c-sealed
-pub(crate) mod private {
+pub mod private {
     pub trait Sealed {}
 
     // Implement for the ed25519, multi-ed25519 signatures

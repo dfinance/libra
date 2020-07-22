@@ -64,7 +64,7 @@ pub enum CoordinatorMessage {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct PendingRequestInfo {
+pub struct PendingRequestInfo {
     expiration_time: SystemTime,
     known_version: u64,
     request_epoch: u64,
@@ -74,7 +74,7 @@ struct PendingRequestInfo {
 // DS to help sync requester to keep track of ledger infos in the future
 // if it is lagging far behind the upstream node
 // Should only be modified upon local storage sync
-struct PendingLedgerInfos {
+pub struct PendingLedgerInfos {
     // In-memory store of ledger infos that are pending commits
     // (k, v) - (LI version, LI)
     pending_li_queue: BTreeMap<Version, LedgerInfoWithSignatures>,
@@ -83,14 +83,14 @@ struct PendingLedgerInfos {
 }
 
 impl PendingLedgerInfos {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             pending_li_queue: BTreeMap::new(),
             target_li: None,
         }
     }
 
-    fn add_li(&mut self, new_li: LedgerInfoWithSignatures) {
+    pub fn add_li(&mut self, new_li: LedgerInfoWithSignatures) {
         // update pending_ledgers if new LI is ahead of target LI (in terms of version)
         let target_version = self
             .target_li
@@ -102,7 +102,7 @@ impl PendingLedgerInfos {
         }
     }
 
-    fn update(&mut self, sync_state: &SynchronizerState, chunk_limit: u64) {
+    pub fn update(&mut self, sync_state: &SynchronizerState, chunk_limit: u64) {
         let highest_committed_li = sync_state.highest_local_li.ledger_info().version();
         let highest_synced = sync_state.highest_version_in_local_storage();
 
@@ -125,7 +125,7 @@ impl PendingLedgerInfos {
         };
     }
 
-    fn target_li(&self) -> Option<LedgerInfoWithSignatures> {
+    pub fn target_li(&self) -> Option<LedgerInfoWithSignatures> {
         self.target_li.clone()
     }
 }
@@ -138,7 +138,7 @@ impl PendingLedgerInfos {
 /// higher within the timeout interval).
 /// * Validator: the ChunkRequests are generated on demand for a specific target LedgerInfo to
 /// synchronize to.
-pub(crate) struct SyncCoordinator<T> {
+pub struct SyncCoordinator<T> {
     // used to process client requests
     client_events: mpsc::UnboundedReceiver<CoordinatorMessage>,
     // used to send messages (e.g. notifications about newly committed txns) to mempool
@@ -279,7 +279,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
         }
     }
 
-    async fn process_one_message(&mut self, peer: PeerNetworkId, msg: StateSynchronizerMsg) {
+    pub async fn process_one_message(&mut self, peer: PeerNetworkId, msg: StateSynchronizerMsg) {
         match msg {
             StateSynchronizerMsg::GetChunkRequest(request) => {
                 if let Err(err) = self.process_chunk_request(peer.clone(), *request) {
@@ -315,7 +315,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
 
     /// Sync up coordinator state with the local storage
     /// and updates the pending ledger info accordingly
-    fn sync_state_with_local_storage(&mut self) -> Result<()> {
+    pub fn sync_state_with_local_storage(&mut self) -> Result<()> {
         let new_state = self.executor_proxy.get_local_storage_state()?;
         if new_state.epoch() > self.local_state.epoch() {
             debug!(
@@ -332,11 +332,11 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     }
 
     /// In case waypoint is set verify that the local LI has reached the waypoint version.
-    fn is_initialized(&self) -> bool {
+    pub fn is_initialized(&self) -> bool {
         self.waypoint.version() <= self.local_state.highest_local_li.ledger_info().version()
     }
 
-    fn set_initialization_listener(&mut self, cb_sender: oneshot::Sender<Result<()>>) {
+    pub fn set_initialization_listener(&mut self, cb_sender: oneshot::Sender<Result<()>>) {
         if self.is_initialized() {
             if cb_sender.send(Ok(())).is_err() {
                 error!("Error sending initialization notification");
@@ -352,7 +352,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// target LI.
     /// StateSynchronizer assumes that it's the only one modifying the storage (consensus is not
     /// trying to commit transactions concurrently).
-    fn request_sync(&mut self, request: SyncRequest) -> Result<()> {
+    pub fn request_sync(&mut self, request: SyncRequest) -> Result<()> {
         self.sync_state_with_local_storage()?;
         ensure!(
             self.is_initialized(),
@@ -394,7 +394,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// The function is called after new txns have been applied to the local storage.
     /// As a result it might:
     /// 1) help remote subscribers with long poll requests, 2) finish local sync request
-    async fn process_commit(
+    pub async fn process_commit(
         &mut self,
         transactions: Vec<Transaction>,
         commit_callback: Option<oneshot::Sender<Result<CommitResponse>>>,
@@ -504,7 +504,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
         Ok(())
     }
 
-    fn get_state(&self, callback: oneshot::Sender<SynchronizerState>) {
+    pub fn get_state(&self, callback: oneshot::Sender<SynchronizerState>) {
         if callback.send(self.local_state.clone()).is_err() {
             error!("[state sync] failed to send internal state");
         }
@@ -513,7 +513,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// There are two types of ChunkRequests:
     /// 1) Validator chunk requests are for a specific target LI and don't ask for long polling.
     /// 2) FullNode chunk requests don't specify a target LI and can allow long polling.
-    fn process_chunk_request(
+    pub fn process_chunk_request(
         &mut self,
         peer: PeerNetworkId,
         request: GetChunkRequest,
@@ -540,7 +540,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
 
     /// Processing requests with a specified target LedgerInfo.
     /// Assumes that the local state is uptodate with storage.
-    fn process_request_target_li(
+    pub fn process_request_target_li(
         &mut self,
         peer: PeerNetworkId,
         request: GetChunkRequest,
@@ -565,7 +565,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// Processing requests with no target LedgerInfo (highest available) and potentially long
     /// polling.
     /// Assumes that the local state is uptodate with storage.
-    fn process_request_highest_available(
+    pub fn process_request_highest_available(
         &mut self,
         peer: PeerNetworkId,
         request: GetChunkRequest,
@@ -605,7 +605,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
         )
     }
 
-    fn process_request_waypoint(
+    pub fn process_request_waypoint(
         &mut self,
         peer: PeerNetworkId,
         request: GetChunkRequest,
@@ -655,7 +655,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// The chunk response contains transactions from the local storage with the proofs relative to
     /// the given target ledger info.
     /// In case target is None, the ledger info is set to the local highest ledger info.
-    fn deliver_chunk(
+    pub fn deliver_chunk(
         &mut self,
         peer: PeerNetworkId,
         known_version: u64,
@@ -682,7 +682,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// * response LI is either the requested target or the highest local LI if target is None.
     /// * if the response LI would not belong to `request_epoch`, change
     /// the response LI to the LI that is terminating `request_epoch`.
-    fn choose_response_li(
+    pub fn choose_response_li(
         &self,
         known_version: u64,
         request_epoch: u64,
@@ -700,7 +700,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// * Issue a request for the next chunk.
     /// * Validate and execute the transactions.
     /// * Notify the clients in case a sync request has been completed.
-    async fn process_chunk_response(
+    pub async fn process_chunk_response(
         &mut self,
         peer: &PeerNetworkId,
         response: GetChunkResponse,
@@ -787,7 +787,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
 
     /// Processing chunk responses that carry a LedgerInfo that should be verified using the
     /// current local trusted validator set.
-    fn process_response_with_verifiable_li(
+    pub fn process_response_with_verifiable_li(
         &mut self,
         txn_list_with_proof: TransactionListWithProof,
         response_li: LedgerInfoWithSignatures,
@@ -831,7 +831,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     }
 
     /// Processing chunk responses that carry a LedgerInfo corresponding to the waypoint.
-    fn process_response_with_waypoint_li(
+    pub fn process_response_with_waypoint_li(
         &mut self,
         txn_list_with_proof: TransactionListWithProof,
         waypoint_li: LedgerInfoWithSignatures,
@@ -864,7 +864,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     }
 
     // Assumes that the target LI has been already verified by the caller.
-    fn validate_and_store_chunk(
+    pub fn validate_and_store_chunk(
         &mut self,
         txn_list_with_proof: TransactionListWithProof,
         target: LedgerInfoWithSignatures,
@@ -894,7 +894,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
 
     /// Ensures that StateSynchronizer is making progress:
     /// issue a new request if too much time passed since requesting highest_committed_version + 1.
-    fn check_progress(&mut self) {
+    pub fn check_progress(&mut self) {
         if self.peer_manager.is_empty() {
             return;
         }
@@ -946,7 +946,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// Sends a chunk request with a given `known_version` and `known_epoch`
     /// (might be chosen optimistically).
     /// The request includes a target for Validator and a non-zero timeout for a FullNode.
-    fn send_chunk_request(&mut self, known_version: u64, known_epoch: u64) -> Result<()> {
+    pub fn send_chunk_request(&mut self, known_version: u64, known_epoch: u64) -> Result<()> {
         let peer = self
             .peer_manager
             .pick_peer()
@@ -998,7 +998,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
         Ok(())
     }
 
-    fn deliver_subscription(
+    pub fn deliver_subscription(
         &mut self,
         peer: PeerNetworkId,
         request_info: PendingRequestInfo,
@@ -1020,7 +1020,7 @@ impl<T: ExecutorProxyTrait> SyncCoordinator<T> {
     /// the highest ledger info in the local storage (some committed transactions are ahead of the
     /// latest ledger info and are not going to be used for helping the remote subscribers).
     /// The function assumes that the local state has been synced with storage.
-    fn check_subscriptions(&mut self) {
+    pub fn check_subscriptions(&mut self) {
         let highest_li_version = self.local_state.highest_local_li.ledger_info().version();
 
         let mut ready = vec![];

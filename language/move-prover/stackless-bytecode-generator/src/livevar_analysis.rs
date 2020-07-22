@@ -70,7 +70,7 @@ impl FunctionTargetProcessor for LiveVarAnalysisProcessor {
 }
 
 impl LiveVarAnalysisProcessor {
-    fn analyze_and_transform(
+    pub fn analyze_and_transform(
         func_target: &FunctionTarget,
         code: Vec<Bytecode>,
     ) -> (Vec<Bytecode>, BTreeMap<CodeOffset, LiveVarInfoAtCodeOffset>) {
@@ -89,19 +89,19 @@ impl LiveVarAnalysisProcessor {
     }
 }
 
-struct LiveVarAnalysis<'a> {
+pub struct LiveVarAnalysis<'a> {
     func_target: &'a FunctionTarget<'a>,
     next_label_id: usize,
     next_attr_id: usize,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct LiveVarState {
+pub struct LiveVarState {
     livevars: BTreeSet<TempIndex>,
 }
 
 impl LiveVarState {
-    fn remove(&mut self, vars: &[TempIndex]) -> bool {
+    pub fn remove(&mut self, vars: &[TempIndex]) -> bool {
         let mut removed = false;
         for v in vars {
             if self.livevars.remove(v) {
@@ -111,7 +111,7 @@ impl LiveVarState {
         removed
     }
 
-    fn insert(&mut self, vars: Vec<TempIndex>) {
+    pub fn insert(&mut self, vars: Vec<TempIndex>) {
         for v in vars {
             self.livevars.insert(v);
         }
@@ -119,7 +119,7 @@ impl LiveVarState {
 }
 
 impl<'a> LiveVarAnalysis<'a> {
-    fn new(func_target: &'a FunctionTarget) -> Self {
+    pub fn new(func_target: &'a FunctionTarget) -> Self {
         Self {
             func_target,
             next_label_id: 0,
@@ -127,7 +127,7 @@ impl<'a> LiveVarAnalysis<'a> {
         }
     }
 
-    fn possibly_transform_code(
+    pub fn possibly_transform_code(
         &mut self,
         annotations: &mut BTreeMap<CodeOffset, LiveVarInfoAtCodeOffset>,
         code: Vec<Bytecode>,
@@ -190,19 +190,19 @@ impl<'a> LiveVarAnalysis<'a> {
         transformed_code
     }
 
-    fn new_label(&mut self) -> Label {
+    pub fn new_label(&mut self) -> Label {
         let label = Label::new(self.next_label_id);
         self.next_label_id += 1;
         label
     }
 
-    fn new_attr_id(&mut self) -> AttrId {
+    pub fn new_attr_id(&mut self) -> AttrId {
         let attr_id = AttrId::new(self.next_attr_id);
         self.next_attr_id += 1;
         attr_id
     }
 
-    fn create_block_to_destroy_refs(
+    pub fn create_block_to_destroy_refs(
         &mut self,
         jump_label: Label,
         refs: Vec<TempIndex>,
@@ -225,7 +225,7 @@ impl<'a> LiveVarAnalysis<'a> {
         (start_label, new_bytecodes)
     }
 
-    fn lost_refs_along_edge(
+    pub fn lost_refs_along_edge(
         &self,
         annotations: &BTreeMap<CodeOffset, LiveVarInfoAtCodeOffset>,
         src_code_offset: CodeOffset,
@@ -242,7 +242,7 @@ impl<'a> LiveVarAnalysis<'a> {
             .collect()
     }
 
-    fn post_process(
+    pub fn post_process(
         &mut self,
         cfg: &StacklessControlFlowGraph,
         instrs: &[Bytecode],

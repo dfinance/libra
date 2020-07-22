@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 #[macro_use]
 extern crate mirai_annotations;
@@ -23,7 +23,7 @@ pub mod serializer;
 pub mod views;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
 pub use file_format::CompiledModule;
 
@@ -83,13 +83,13 @@ impl fmt::Display for IndexKind {
 
         let desc = match self {
             ModuleHandle => "module handle",
-            StructHandle => "struct handle",
+            StructHandle => "pub struct handle",
             FunctionHandle => "function handle",
             FieldHandle => "field handle",
-            StructDefInstantiation => "struct instantiation",
+            StructDefInstantiation => "pub struct instantiation",
             FunctionInstantiation => "function instantiation",
             FieldInstantiation => "field instantiation",
-            StructDefinition => "struct definition",
+            StructDefinition => "pub struct definition",
             FunctionDefinition => "function definition",
             FieldDefinition => "field definition",
             Signature => "signature",

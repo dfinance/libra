@@ -21,7 +21,7 @@ pub fn output(out: &mut dyn Write, abis: &[ScriptABI], local_types: bool) -> Res
     Ok(())
 }
 
-fn output_preamble(out: &mut dyn Write, local_types: bool) -> Result<()> {
+pub fn output_preamble(out: &mut dyn Write, local_types: bool) -> Result<()> {
     let preamble = if local_types {
         r#"
 // Copyright (c) The Libra Core Contributors
@@ -44,7 +44,7 @@ use serde_bytes::ByteBuf;
     writeln!(out, "{}", preamble)
 }
 
-fn output_builder(out: &mut dyn Write, abi: &ScriptABI, local_types: bool) -> Result<()> {
+pub fn output_builder(out: &mut dyn Write, abi: &ScriptABI, local_types: bool) -> Result<()> {
     write!(out, "\n{}", quote_doc(abi.doc()))?;
     writeln!(
         out,
@@ -86,26 +86,26 @@ fn output_builder(out: &mut dyn Write, abi: &ScriptABI, local_types: bool) -> Re
     Ok(())
 }
 
-fn quote_doc(doc: &str) -> String {
+pub fn quote_doc(doc: &str) -> String {
     let doc = crate::common::prepare_doc_string(doc);
     let text = textwrap::fill(&doc, 86);
     textwrap::indent(&text, "/// ")
 }
 
-fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
+pub fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
     ty_args
         .iter()
         .map(|ty_arg| format!("{}: TypeTag", ty_arg.name()))
         .collect()
 }
 
-fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
+pub fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
     args.iter()
         .map(|arg| format!("{}: {}", arg.name(), quote_type(arg.type_tag())))
         .collect()
 }
 
-fn quote_code(code: &[u8]) -> String {
+pub fn quote_code(code: &[u8]) -> String {
     format!(
         "vec![{}]",
         code.iter()
@@ -115,7 +115,7 @@ fn quote_code(code: &[u8]) -> String {
     )
 }
 
-fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
+pub fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
     ty_args
         .iter()
         .map(|ty_arg| ty_arg.name().to_string())
@@ -123,14 +123,14 @@ fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
         .join(", ")
 }
 
-fn quote_arguments(args: &[ArgumentABI], local_types: bool) -> String {
+pub fn quote_arguments(args: &[ArgumentABI], local_types: bool) -> String {
     args.iter()
         .map(|arg| make_transaction_argument(arg.type_tag(), arg.name(), local_types))
         .collect::<Vec<_>>()
         .join(", ")
 }
 
-fn quote_type(type_tag: &TypeTag) -> String {
+pub fn quote_type(type_tag: &TypeTag) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => "bool".into(),
@@ -147,7 +147,7 @@ fn quote_type(type_tag: &TypeTag) -> String {
     }
 }
 
-fn make_transaction_argument(type_tag: &TypeTag, name: &str, local_types: bool) -> String {
+pub fn make_transaction_argument(type_tag: &TypeTag, name: &str, local_types: bool) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => format!("TransactionArgument::Bool({})", name),

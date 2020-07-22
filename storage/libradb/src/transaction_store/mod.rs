@@ -18,7 +18,7 @@ use schemadb::{SchemaIterator, DB};
 use std::sync::Arc;
 
 #[derive(Debug)]
-pub(crate) struct TransactionStore {
+pub struct TransactionStore {
     db: Arc<DB>,
 }
 
@@ -121,7 +121,7 @@ pub struct TransactionIter<'a> {
 }
 
 impl<'a> TransactionIter<'a> {
-    fn next_impl(&mut self) -> Result<Option<Transaction>> {
+    pub fn next_impl(&mut self) -> Result<Option<Transaction>> {
         if self.expected_next_version >= self.end_version {
             return Ok(None);
         }
@@ -151,4 +151,4 @@ impl<'a> Iterator for TransactionIter<'a> {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

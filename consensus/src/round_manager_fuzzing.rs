@@ -58,7 +58,7 @@ static STATIC_RUNTIME: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 static FUZZING_SIGNER: Lazy<ValidatorSigner> = Lazy::new(|| ValidatorSigner::from_int(1));
 
 // helpers
-fn build_empty_store(
+pub fn build_empty_store(
     storage: Arc<dyn PersistentLivenessStorage>,
     initial_data: RecoveryData,
 ) -> Arc<BlockStore> {
@@ -74,7 +74,7 @@ fn build_empty_store(
 }
 
 // helpers for safety rule initialization
-fn make_initial_epoch_change_proof(signer: &ValidatorSigner) -> EpochChangeProof {
+pub fn make_initial_epoch_change_proof(signer: &ValidatorSigner) -> EpochChangeProof {
     let validator_info =
         ValidatorInfo::new_with_test_network_keys(signer.author(), signer.public_key(), 1);
     let validator_set = ValidatorSet::new(vec![validator_info]);
@@ -84,7 +84,7 @@ fn make_initial_epoch_change_proof(signer: &ValidatorSigner) -> EpochChangeProof
 }
 
 // TODO: MockStorage -> EmptyStorage
-fn create_round_state() -> RoundState {
+pub fn create_round_state() -> RoundState {
     let base_timeout = std::time::Duration::new(60, 0);
     let time_interval = Box::new(ExponentialTimeInterval::fixed(base_timeout));
     let (round_timeout_sender, _) = channel::new_test(1_024);
@@ -93,7 +93,7 @@ fn create_round_state() -> RoundState {
 }
 
 // Creates an RoundManager for fuzzing
-fn create_node_for_fuzzing() -> RoundManager {
+pub fn create_node_for_fuzzing() -> RoundManager {
     // signer is re-used accross fuzzing runs
     let signer = FUZZING_SIGNER.clone();
 

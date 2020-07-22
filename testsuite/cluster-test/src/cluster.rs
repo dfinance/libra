@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::instance::{Instance, ValidatorGroup};
 use config_builder::ValidatorConfig;
@@ -49,7 +49,7 @@ impl Cluster {
         }
     }
 
-    fn get_mint_key_pair() -> KeyPair<Ed25519PrivateKey, Ed25519PublicKey> {
+    pub fn get_mint_key_pair() -> KeyPair<Ed25519PrivateKey, Ed25519PublicKey> {
         let seed = "1337133713371337133713371337133713371337133713371337133713371337";
         let seed = hex::decode(seed).expect("Invalid hex in seed.");
         let seed = seed[..32].try_into().expect("Invalid seed");
@@ -183,7 +183,7 @@ impl Cluster {
         )
     }
 
-    fn new_validator_sub_cluster(&self, instances: Vec<Instance>) -> Self {
+    pub fn new_validator_sub_cluster(&self, instances: Vec<Instance>) -> Self {
         Cluster {
             validator_instances: instances,
             fullnode_instances: vec![],
@@ -193,7 +193,7 @@ impl Cluster {
         }
     }
 
-    fn new_fullnode_sub_cluster(&self, instances: Vec<Instance>) -> Self {
+    pub fn new_fullnode_sub_cluster(&self, instances: Vec<Instance>) -> Self {
         Cluster {
             validator_instances: vec![],
             fullnode_instances: instances,

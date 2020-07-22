@@ -41,7 +41,7 @@ impl VaultStorage {
     }
 
     #[cfg(any(test, feature = "testing"))]
-    fn reset_kv(&self, path: &str) -> Result<(), Error> {
+    pub fn reset_kv(&self, path: &str) -> Result<(), Error> {
         let secrets = self.client.list_secrets(path)?;
         for secret in secrets {
             if secret.ends_with('/') {
@@ -54,7 +54,7 @@ impl VaultStorage {
     }
 
     #[cfg(any(test, feature = "testing"))]
-    fn reset_crypto(&self) -> Result<(), Error> {
+    pub fn reset_crypto(&self) -> Result<(), Error> {
         let keys = match self.client.list_keys() {
             Ok(keys) => keys,
             // No keys were found, so there's no need to reset.
@@ -68,7 +68,7 @@ impl VaultStorage {
     }
 
     #[cfg(any(test, feature = "testing"))]
-    fn reset_policies(&self) -> Result<(), Error> {
+    pub fn reset_policies(&self) -> Result<(), Error> {
         let policies = match self.client.list_policies() {
             Ok(policies) => policies,
             Err(libra_vault_client::Error::NotFound(_, _)) => return Ok(()),
@@ -141,7 +141,7 @@ impl VaultStorage {
         Ok(())
     }
 
-    fn key_version(&self, name: &str, version: &Ed25519PublicKey) -> Result<u32, Error> {
+    pub fn key_version(&self, name: &str, version: &Ed25519PublicKey) -> Result<u32, Error> {
         let pubkeys = self.client.read_ed25519_key(name)?;
         let pubkey = pubkeys.iter().find(|pubkey| version == &pubkey.value);
         Ok(pubkey
@@ -167,15 +167,15 @@ impl VaultStorage {
         Ok(())
     }
 
-    fn crypto_name(&self, name: &str) -> String {
+    pub fn crypto_name(&self, name: &str) -> String {
         self.name(name, &VaultEngine::Transit)
     }
 
-    fn secret_name(&self, name: &str) -> String {
+    pub fn secret_name(&self, name: &str) -> String {
         self.name(name, &VaultEngine::KVSecrets)
     }
 
-    fn name(&self, name: &str, engine: &VaultEngine) -> String {
+    pub fn name(&self, name: &str, engine: &VaultEngine) -> String {
         if let Some(namespace) = &self.namespace {
             format!("{}{}{}", namespace, engine.ns_seperator(), name)
         } else {
@@ -316,14 +316,14 @@ pub enum VaultEngine {
 }
 
 impl VaultEngine {
-    fn to_policy_path(&self) -> &str {
+    pub fn to_policy_path(&self) -> &str {
         match self {
             VaultEngine::KVSecrets => "secret/data",
             VaultEngine::Transit => "transit/keys",
         }
     }
 
-    fn ns_seperator(&self) -> &str {
+    pub fn ns_seperator(&self) -> &str {
         match self {
             VaultEngine::KVSecrets => "/",
             VaultEngine::Transit => "__",

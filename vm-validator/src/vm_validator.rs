@@ -16,7 +16,7 @@ use storage_interface::{state_view::VerifiedStateView, DbReader};
 
 #[cfg(test)]
 #[path = "unit_tests/vm_validator_test.rs"]
-mod vm_validator_test;
+pub mod vm_validator_test;
 
 pub trait TransactionValidation: Send + Sync + Clone {
     type ValidationInstance: libra_vm::VMValidator;

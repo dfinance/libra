@@ -52,4 +52,4 @@ impl ValueCodec<LedgerCountersSchema> for LedgerCounters {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

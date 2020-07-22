@@ -34,7 +34,7 @@ impl MockTransactionManager {
 }
 
 // mock transaction status on the fly
-fn mock_transaction_status(count: usize) -> Vec<TransactionStatus> {
+pub fn mock_transaction_status(count: usize) -> Vec<TransactionStatus> {
     let mut statuses = vec![];
     // generate count + 1 status to mock the block metadata txn in mempool proxy
     for _ in 0..=count {

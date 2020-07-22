@@ -29,16 +29,16 @@ use termion::color::*;
 
 #[cfg(test)]
 #[path = "block_store_test.rs"]
-mod block_store_test;
+pub mod block_store_test;
 
 #[cfg(test)]
 #[path = "block_store_and_lec_recovery_test.rs"]
-mod block_store_and_lec_recovery_test;
+pub mod block_store_and_lec_recovery_test;
 
 #[path = "sync_manager.rs"]
 pub mod sync_manager;
 
-fn update_counters_for_committed_blocks(blocks_to_commit: &[Arc<ExecutedBlock>]) {
+pub fn update_counters_for_committed_blocks(blocks_to_commit: &[Arc<ExecutedBlock>]) {
     for block in blocks_to_commit {
         if let Some(time_to_commit) =
             duration_since_epoch().checked_sub(Duration::from_micros(block.timestamp_usecs()))
@@ -122,7 +122,7 @@ impl BlockStore {
         )
     }
 
-    fn build(
+    pub fn build(
         root: RootInfo,
         root_metadata: RootMetadata,
         blocks: Vec<Block>,
@@ -321,7 +321,7 @@ impl BlockStore {
         self.inner.write().unwrap().insert_block(executed_block)
     }
 
-    fn execute_block(&self, block: Block) -> anyhow::Result<ExecutedBlock, Error> {
+    pub fn execute_block(&self, block: Block) -> anyhow::Result<ExecutedBlock, Error> {
         trace_code_block!("block_store::execute_block", {"block", block.id()});
 
         // Although NIL blocks don't have a payload, we still send a T::default() to compute
@@ -382,7 +382,7 @@ impl BlockStore {
     /// B3--> B4, root = B3
     ///
     /// Returns the block ids of the blocks removed.
-    fn prune_tree(&self, next_root_id: HashValue) -> VecDeque<HashValue> {
+    pub fn prune_tree(&self, next_root_id: HashValue) -> VecDeque<HashValue> {
         let id_to_remove = self
             .inner
             .read()
@@ -457,17 +457,17 @@ impl BlockReader for BlockStore {
 #[cfg(any(test, feature = "fuzzing"))]
 impl BlockStore {
     /// Returns the number of blocks in the tree
-    pub(crate) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.inner.read().unwrap().len()
     }
 
     /// Returns the number of child links in the tree
-    pub(crate) fn child_links(&self) -> usize {
+    pub fn child_links(&self) -> usize {
         self.inner.read().unwrap().child_links()
     }
 
     /// The number of pruned blocks that are still available in memory
-    pub(super) fn pruned_blocks_in_mem(&self) -> usize {
+    pub fn pruned_blocks_in_mem(&self) -> usize {
         self.inner.read().unwrap().pruned_blocks_in_mem()
     }
 

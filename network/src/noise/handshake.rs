@@ -105,7 +105,7 @@ impl HandshakeAuthMode {
         }
     }
 
-    fn anti_replay_timestamps(&self) -> Option<&RwLock<AntiReplayTimestamps>> {
+    pub fn anti_replay_timestamps(&self) -> Option<&RwLock<AntiReplayTimestamps>> {
         match &self {
             HandshakeAuthMode::Mutual {
                 anti_replay_timestamps,
@@ -115,7 +115,7 @@ impl HandshakeAuthMode {
         }
     }
 
-    fn trusted_peers(&self) -> Option<&RwLock<HashMap<PeerId, HashSet<x25519::PublicKey>>>> {
+    pub fn trusted_peers(&self) -> Option<&RwLock<HashMap<PeerId, HashSet<x25519::PublicKey>>>> {
         match &self {
             HandshakeAuthMode::Mutual { trusted_peers, .. } => Some(&trusted_peers),
             HandshakeAuthMode::ServerOnly => None,
@@ -422,7 +422,7 @@ impl NoiseUpgrader {
             anti_replay_timestamps.store_timestamp(remote_public_key, client_timestamp);
         }
 
-        // construct the response
+        // conpub struct the response
         let mut rng = rand::rngs::OsRng;
         let mut server_response = [0u8; Self::SERVER_MESSAGE_SIZE];
         let session = self
@@ -444,7 +444,7 @@ impl NoiseUpgrader {
 //
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::testutils::fake_socket::ReadWriteTestSocket;
     use futures::{executor::block_on, future::join};
@@ -457,7 +457,7 @@ mod test {
     };
 
     /// helper to setup two testing peers
-    fn build_peers(
+    pub fn build_peers(
         is_mutual_auth: bool,
     ) -> (
         (NoiseUpgrader, x25519::PublicKey),
@@ -505,7 +505,7 @@ mod test {
     }
 
     /// helper to perform a noise handshake with two peers
-    fn perform_handshake(
+    pub fn perform_handshake(
         client: &NoiseUpgrader,
         server: &NoiseUpgrader,
         server_public_key: x25519::PublicKey,
@@ -524,7 +524,7 @@ mod test {
     }
 
     /// provide a function that will return the same given value as a timestamp
-    fn bad_timestamp(value: u64) -> impl Fn() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE] {
+    pub fn bad_timestamp(value: u64) -> impl Fn() -> [u8; AntiReplayTimestamps::TIMESTAMP_SIZE] {
         move || value.to_le_bytes()
     }
 

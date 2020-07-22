@@ -117,7 +117,7 @@ impl ValidatorConfig {
 }
 
 /// Encode an address into bytes
-fn encode_address(address: NetworkAddress) -> Result<RawNetworkAddress, Error> {
+pub fn encode_address(address: NetworkAddress) -> Result<RawNetworkAddress, Error> {
     RawNetworkAddress::try_from(&address).map_err(|e| {
         Error::UnexpectedError(format!(
             "error serializing address: '{}', error: {}",

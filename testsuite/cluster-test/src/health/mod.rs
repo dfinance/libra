@@ -1,13 +1,13 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod commit_check;
-mod debug_interface_log_tail;
-mod fullnode_check;
-mod liveness_check;
-mod log_tail;
+
+pub mod commit_check;
+pub mod debug_interface_log_tail;
+pub mod fullnode_check;
+pub mod liveness_check;
+pub mod log_tail;
 
 use crate::{cluster::Cluster, util::unix_timestamp_now};
 use anyhow::{bail, Result};
@@ -200,7 +200,7 @@ pub enum PrintFailures {
 }
 
 impl PrintFailures {
-    fn should_print(&self, has_unexpected_failures: bool) -> bool {
+    pub fn should_print(&self, has_unexpected_failures: bool) -> bool {
         match self {
             PrintFailures::None => false,
             PrintFailures::UnexpectedOnly => has_unexpected_failures,

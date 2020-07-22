@@ -17,13 +17,13 @@ use std::convert::TryFrom;
 /// use serde::Deserialize;
 ///
 /// #[derive(Deserialize)]
-/// struct Ip([u8; 4]);
+/// pub struct Ip([u8; 4]);
 ///
 /// #[derive(Deserialize)]
-/// struct Port(u16);
+/// pub struct Port(u16);
 ///
 /// #[derive(Deserialize)]
-/// struct SocketAddr {
+/// pub struct SocketAddr {
 ///     ip: Ip,
 ///     port: Port,
 /// }
@@ -54,7 +54,7 @@ where
 }
 
 /// Deserialization implementation for LCS
-struct Deserializer<'de> {
+pub struct Deserializer<'de> {
     input: &'de [u8],
     max_remaining_depth: usize,
 }
@@ -62,7 +62,7 @@ struct Deserializer<'de> {
 impl<'de> Deserializer<'de> {
     /// Creates a new `Deserializer` which will be deserializing the provided
     /// input.
-    fn new(input: &'de [u8], max_remaining_depth: usize) -> Self {
+    pub fn new(input: &'de [u8], max_remaining_depth: usize) -> Self {
         Deserializer {
             input,
             max_remaining_depth,
@@ -72,7 +72,7 @@ impl<'de> Deserializer<'de> {
     /// The `Deserializer::end` method should be called after a type has been
     /// fully deserialized. This allows the `Deserializer` to validate that
     /// the there are no more bytes remaining in the input stream.
-    fn end(&mut self) -> Result<()> {
+    pub fn end(&mut self) -> Result<()> {
         if self.input.is_empty() {
             Ok(())
         } else {
@@ -82,17 +82,17 @@ impl<'de> Deserializer<'de> {
 }
 
 impl<'de> Deserializer<'de> {
-    fn peek(&mut self) -> Result<u8> {
+    pub fn peek(&mut self) -> Result<u8> {
         self.input.first().copied().ok_or(Error::Eof)
     }
 
-    fn next(&mut self) -> Result<u8> {
+    pub fn next(&mut self) -> Result<u8> {
         let byte = self.peek()?;
         self.input = &self.input[1..];
         Ok(byte)
     }
 
-    fn parse_bool(&mut self) -> Result<bool> {
+    pub fn parse_bool(&mut self) -> Result<bool> {
         let byte = self.next()?;
 
         match byte {
@@ -102,42 +102,42 @@ impl<'de> Deserializer<'de> {
         }
     }
 
-    fn fill_slice(&mut self, slice: &mut [u8]) -> Result<()> {
+    pub fn fill_slice(&mut self, slice: &mut [u8]) -> Result<()> {
         for byte in slice {
             *byte = self.next()?;
         }
         Ok(())
     }
 
-    fn parse_u8(&mut self) -> Result<u8> {
+    pub fn parse_u8(&mut self) -> Result<u8> {
         self.next()
     }
 
-    fn parse_u16(&mut self) -> Result<u16> {
+    pub fn parse_u16(&mut self) -> Result<u16> {
         let mut le_bytes = [0; 2];
         self.fill_slice(&mut le_bytes)?;
         Ok(u16::from_le_bytes(le_bytes))
     }
 
-    fn parse_u32(&mut self) -> Result<u32> {
+    pub fn parse_u32(&mut self) -> Result<u32> {
         let mut le_bytes = [0; 4];
         self.fill_slice(&mut le_bytes)?;
         Ok(u32::from_le_bytes(le_bytes))
     }
 
-    fn parse_u64(&mut self) -> Result<u64> {
+    pub fn parse_u64(&mut self) -> Result<u64> {
         let mut le_bytes = [0; 8];
         self.fill_slice(&mut le_bytes)?;
         Ok(u64::from_le_bytes(le_bytes))
     }
 
-    fn parse_u128(&mut self) -> Result<u128> {
+    pub fn parse_u128(&mut self) -> Result<u128> {
         let mut le_bytes = [0; 16];
         self.fill_slice(&mut le_bytes)?;
         Ok(u128::from_le_bytes(le_bytes))
     }
 
-    fn parse_u32_from_uleb128(&mut self) -> Result<u32> {
+    pub fn parse_u32_from_uleb128(&mut self) -> Result<u32> {
         let mut value: u64 = 0;
         for shift in (0..32).step_by(7) {
             let byte = self.next()?;
@@ -159,7 +159,7 @@ impl<'de> Deserializer<'de> {
         Err(Error::IntegerOverflowDuringUleb128Decoding)
     }
 
-    fn parse_length(&mut self) -> Result<usize> {
+    pub fn parse_length(&mut self) -> Result<usize> {
         let len = self.parse_u32_from_uleb128()? as usize;
         if len > crate::MAX_SEQUENCE_LENGTH {
             return Err(Error::ExceededMaxLen(len));
@@ -167,19 +167,19 @@ impl<'de> Deserializer<'de> {
         Ok(len)
     }
 
-    fn parse_bytes(&mut self) -> Result<&'de [u8]> {
+    pub fn parse_bytes(&mut self) -> Result<&'de [u8]> {
         let len = self.parse_length()?;
         let slice = self.input.get(..len).ok_or(Error::Eof)?;
         self.input = &self.input[len..];
         Ok(slice)
     }
 
-    fn parse_string(&mut self) -> Result<&'de str> {
+    pub fn parse_string(&mut self) -> Result<&'de str> {
         let slice = self.parse_bytes()?;
         std::str::from_utf8(slice).map_err(|_| Error::Utf8)
     }
 
-    fn enter_named_container(&mut self, name: &'static str) -> Result<()> {
+    pub fn enter_named_container(&mut self, name: &'static str) -> Result<()> {
         if self.max_remaining_depth == 0 {
             return Err(Error::ExceededContainerDepthLimit(name));
         }
@@ -187,7 +187,7 @@ impl<'de> Deserializer<'de> {
         Ok(())
     }
 
-    fn leave_named_container(&mut self) {
+    pub fn leave_named_container(&mut self) {
         self.max_remaining_depth += 1;
     }
 }
@@ -459,13 +459,13 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     }
 }
 
-struct SeqDeserializer<'a, 'de: 'a> {
+pub struct SeqDeserializer<'a, 'de: 'a> {
     de: &'a mut Deserializer<'de>,
     remaining: usize,
 }
 
 impl<'a, 'de> SeqDeserializer<'a, 'de> {
-    fn new(de: &'a mut Deserializer<'de>, remaining: usize) -> Self {
+    pub fn new(de: &'a mut Deserializer<'de>, remaining: usize) -> Self {
         Self { de, remaining }
     }
 }
@@ -490,14 +490,14 @@ impl<'de, 'a> de::SeqAccess<'de> for SeqDeserializer<'a, 'de> {
     }
 }
 
-struct MapDeserializer<'a, 'de: 'a> {
+pub struct MapDeserializer<'a, 'de: 'a> {
     de: &'a mut Deserializer<'de>,
     remaining: usize,
     previous_key_bytes: Option<&'a [u8]>,
 }
 
 impl<'a, 'de> MapDeserializer<'a, 'de> {
-    fn new(de: &'a mut Deserializer<'de>, remaining: usize) -> Self {
+    pub fn new(de: &'a mut Deserializer<'de>, remaining: usize) -> Self {
         Self {
             de,
             remaining,

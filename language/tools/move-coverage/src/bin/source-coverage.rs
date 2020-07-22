@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use bytecode_source_map::utils::{remap_owned_loc_to_loc, source_map_from_file, OwnedLoc};
 use move_coverage::{coverage_map::CoverageMap, source_coverage::SourceCoverageBuilder};
@@ -19,7 +19,7 @@ use vm::file_format::CompiledModule;
     name = "Move Source Coverage",
     about = "Annotate Move Source Code with Coverage Information"
 )]
-struct Args {
+pub struct Args {
     /// The path to the coverage map or trace file
     #[structopt(long = "input-trace-path", short = "t")]
     pub input_trace_path: String,

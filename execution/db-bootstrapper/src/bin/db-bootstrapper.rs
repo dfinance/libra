@@ -15,7 +15,7 @@ use structopt::StructOpt;
     name = "db-bootstrapper",
     about = "Calculate, verify and commit the genesis to local DB without a consensus among validators."
 )]
-struct Opt {
+pub struct Opt {
     #[structopt(parse(from_os_str))]
     db_dir: PathBuf,
 
@@ -72,7 +72,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn load_genesis_txn(path: &PathBuf) -> Result<Transaction> {
+pub fn load_genesis_txn(path: &PathBuf) -> Result<Transaction> {
     let mut file = File::open(&path)?;
     let mut buffer = vec![];
     file.read_to_end(&mut buffer)?;

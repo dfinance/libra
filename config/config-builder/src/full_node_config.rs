@@ -130,7 +130,7 @@ impl FullNodeConfig {
         Ok(())
     }
 
-    fn build_internal(
+    pub fn build_internal(
         &self,
         randomize_ports: bool,
     ) -> Result<(Vec<NodeConfig>, Ed25519PrivateKey)> {
@@ -221,7 +221,7 @@ impl BuildSwarm for FullNodeConfig {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

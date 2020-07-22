@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use libra_config::config::NodeConfig;
 use libra_genesis_tool::config_builder::FullnodeType;
@@ -13,7 +13,7 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Libra swarm to start local nodes")]
-struct Args {
+pub struct Args {
     /// Number of nodes to start (1 by default)
     #[structopt(short = "n", long, default_value = "1")]
     pub num_nodes: usize,

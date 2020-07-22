@@ -149,7 +149,7 @@ pub struct InternalNode {
 }
 
 impl InternalNode {
-    fn new(left_child: Arc<SparseMerkleNode>, right_child: Arc<SparseMerkleNode>) -> Self {
+    pub fn new(left_child: Arc<SparseMerkleNode>, right_child: Arc<SparseMerkleNode>) -> Self {
         match (&*left_child.read_lock(), &*right_child.read_lock()) {
             (Node::Subtree(_), Node::Subtree(_)) => {
                 panic!("Two subtree children should have been merged into a single subtree node.")
@@ -175,7 +175,7 @@ impl InternalNode {
         }
     }
 
-    fn hash(&self) -> HashValue {
+    pub fn hash(&self) -> HashValue {
         self.hash
     }
 
@@ -249,7 +249,7 @@ pub struct SubtreeNode {
 }
 
 impl SubtreeNode {
-    fn new(hash: HashValue) -> Self {
+    pub fn new(hash: HashValue) -> Self {
         assert_ne!(
             hash, *SPARSE_MERKLE_PLACEHOLDER_HASH,
             "A subtree should never be empty."

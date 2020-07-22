@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! The core Move VM logic.
 //!
@@ -13,15 +13,15 @@
 extern crate mirai_annotations;
 
 pub mod data_cache;
-mod data_operations;
-mod interpreter;
-mod loader;
+pub mod data_operations;
+pub mod interpreter;
+pub mod loader;
 pub mod move_vm;
-mod native_functions;
-mod runtime;
+pub mod native_functions;
+pub mod runtime;
 pub mod session;
 #[macro_use]
-mod tracing;
+pub mod tracing;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;

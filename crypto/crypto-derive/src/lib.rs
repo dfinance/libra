@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! # Derive macros for crypto operations
 //! This crate contains four types of derive macros:
@@ -32,13 +32,13 @@
 //! Those types typically come into play when you need to accept several
 //! alternatives at runtime for several signature and verification schemes
 //! (ex: BLS or EdDSA, see below). In this case, it is possible to declare
-//! a triplet of enum types that each describe a 'sum type' (coproduct) of these
+//! a triplet ofpub enum types that each describe a 'sum type' (coproduct) of these
 //! alternatives. This happens to be a signing scheme itself (it has
 //! canonical signature, signing & verifying key types, and verifies all
 //! expected properties by trivial dispatch).
 //!
 //! The macros below let you define this type of union trivially under two conditions:
-//! - that the variant tags for the enum have the same name, i.e. if the BLS variant for the
+//! - that the variant tags for thepub enum have the same name, i.e. if the BLS variant for the
 //!   `SignatureUnion` is `SignatureUnion::BLS(BLS12381Signature)`, then the variant of the
 //!   `PublicKeyUnion` for BLS must also be `PublicKeyUnion::BLS`,
 //! - that you specify the associated types `PrivateKeyType`, `SignatureType` and `PublicKeyType`
@@ -94,8 +94,6 @@
 //!     BLS(BLS12381Signature),
 //! }
 //! ```
-
-#![forbid(unsafe_code)]
 
 extern crate proc_macro;
 
@@ -162,7 +160,7 @@ pub fn deserialize_key(source: TokenStream) -> TokenStream {
                     // as the original type.
                     #[derive(::serde::Deserialize)]
                     #[serde(rename = #name_string)]
-                    struct Value<'a>(&'a [u8]);
+                    pub struct Value<'a>(&'a [u8]);
 
                     let value = Value::deserialize(deserializer)?;
                     #name::try_from(value.0).map_err(|s| {
@@ -356,7 +354,7 @@ pub fn hasher_dispatch(input: TokenStream) -> TokenStream {
         static #static_seed_name: libra_crypto::_once_cell::sync::OnceCell<[u8; 32]> = libra_crypto::_once_cell::sync::OnceCell::new();
 
         impl #hasher_name {
-            fn new() -> Self {
+            pub fn new() -> Self {
                 let name = libra_crypto::_serde_name::trace_name::<#type_name #param>()
                     .expect("The `CryptoHasher` macro only applies to structs and enums");
                 #hasher_name(

@@ -8,7 +8,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-fn generate_diagram_per_module(
+pub fn generate_diagram_per_module(
     graph: &BTreeMap<String, Vec<String>>,
     out_dir: &Path,
     is_forward: bool,
@@ -54,7 +54,7 @@ fn generate_diagram_per_module(
     Ok(())
 }
 
-fn generate(inp_dir: &Path, out_dir: &Path) -> anyhow::Result<()> {
+pub fn generate(inp_dir: &Path, out_dir: &Path) -> anyhow::Result<()> {
     let mut dep_graph: BTreeMap<String, Vec<String>> = BTreeMap::new();
     let mut dep_graph_inverse: BTreeMap<String, Vec<String>> = BTreeMap::new();
 
@@ -135,7 +135,7 @@ fn generate(inp_dir: &Path, out_dir: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn locate_inp_out_dir() -> io::Result<(PathBuf, PathBuf)> {
+pub fn locate_inp_out_dir() -> io::Result<(PathBuf, PathBuf)> {
     // locate the language directory
     let lang_dir = env::current_exe()
         .unwrap()
@@ -149,7 +149,7 @@ fn locate_inp_out_dir() -> io::Result<(PathBuf, PathBuf)> {
 
     println!("The `language` directory is located as:\n{:?}\n", lang_dir);
 
-    // construct the input and the output paths
+    // conpub struct the input and the output paths
     let inp_dir = lang_dir.join("stdlib/modules");
     let out_dir = lang_dir.join("move-prover/diagen/diagrams");
 

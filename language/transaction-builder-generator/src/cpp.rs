@@ -52,7 +52,7 @@ pub fn output_library_body(
     output_close_namespace(out, namespace)
 }
 
-fn output_preamble(out: &mut dyn Write) -> Result<()> {
+pub fn output_preamble(out: &mut dyn Write) -> Result<()> {
     writeln!(
         out,
         r#"
@@ -63,7 +63,7 @@ fn output_preamble(out: &mut dyn Write) -> Result<()> {
     )
 }
 
-fn output_using_namespaces(out: &mut dyn Write) -> Result<()> {
+pub fn output_using_namespaces(out: &mut dyn Write) -> Result<()> {
     writeln!(
         out,
         r#"
@@ -73,7 +73,7 @@ using namespace libra_types;
     )
 }
 
-fn output_open_namespace(out: &mut dyn std::io::Write, namespace: Option<&str>) -> Result<()> {
+pub fn output_open_namespace(out: &mut dyn std::io::Write, namespace: Option<&str>) -> Result<()> {
     if let Some(name) = namespace {
         writeln!(out, "namespace {} {{\n", name,)?;
     }
@@ -87,7 +87,7 @@ fn output_close_namespace(out: &mut dyn std::io::Write, namespace: Option<&str>)
     Ok(())
 }
 
-fn output_builder_declaration(out: &mut dyn Write, abi: &ScriptABI) -> Result<()> {
+pub fn output_builder_declaration(out: &mut dyn Write, abi: &ScriptABI) -> Result<()> {
     write!(out, "\n{}", quote_doc(abi.doc()))?;
     writeln!(
         out,
@@ -103,7 +103,7 @@ fn output_builder_declaration(out: &mut dyn Write, abi: &ScriptABI) -> Result<()
     Ok(())
 }
 
-fn output_builder_definition(out: &mut dyn Write, abi: &ScriptABI, inlined: bool) -> Result<()> {
+pub fn output_builder_definition(out: &mut dyn Write, abi: &ScriptABI, inlined: bool) -> Result<()> {
     if inlined {
         write!(out, "\n{}", quote_doc(abi.doc()))?;
     }
@@ -134,26 +134,26 @@ fn output_builder_definition(out: &mut dyn Write, abi: &ScriptABI, inlined: bool
     Ok(())
 }
 
-fn quote_doc(doc: &str) -> String {
+pub fn quote_doc(doc: &str) -> String {
     let doc = crate::common::prepare_doc_string(doc);
     let text = textwrap::fill(&doc, 86);
     textwrap::indent(&text, "/// ")
 }
 
-fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
+pub fn quote_type_parameters(ty_args: &[TypeArgumentABI]) -> Vec<String> {
     ty_args
         .iter()
         .map(|ty_arg| format!("TypeTag {}", ty_arg.name()))
         .collect()
 }
 
-fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
+pub fn quote_parameters(args: &[ArgumentABI]) -> Vec<String> {
     args.iter()
         .map(|arg| format!("{} {}", quote_type(arg.type_tag()), arg.name()))
         .collect()
 }
 
-fn quote_code(code: &[u8]) -> String {
+pub fn quote_code(code: &[u8]) -> String {
     format!(
         "std::vector<uint8_t> {{{}}}",
         code.iter()
@@ -163,7 +163,7 @@ fn quote_code(code: &[u8]) -> String {
     )
 }
 
-fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
+pub fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
     ty_args
         .iter()
         .map(|ty_arg| format!("std::move({})", ty_arg.name()))
@@ -171,14 +171,14 @@ fn quote_type_arguments(ty_args: &[TypeArgumentABI]) -> String {
         .join(", ")
 }
 
-fn quote_arguments(args: &[ArgumentABI]) -> String {
+pub fn quote_arguments(args: &[ArgumentABI]) -> String {
     args.iter()
         .map(|arg| make_transaction_argument(arg.type_tag(), arg.name()))
         .collect::<Vec<_>>()
         .join(", ")
 }
 
-fn quote_type(type_tag: &TypeTag) -> String {
+pub fn quote_type(type_tag: &TypeTag) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => "bool".into(),
@@ -195,7 +195,7 @@ fn quote_type(type_tag: &TypeTag) -> String {
     }
 }
 
-fn make_transaction_argument(type_tag: &TypeTag, name: &str) -> String {
+pub fn make_transaction_argument(type_tag: &TypeTag, name: &str) -> String {
     use TypeTag::*;
     match type_tag {
         Bool => format!("{{TransactionArgument::Bool {{{}}} }}", name),

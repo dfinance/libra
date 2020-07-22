@@ -21,7 +21,7 @@ pub struct TransitiveUsage {
 }
 
 #[derive(Default)]
-struct TransitiveFunctionUsage {
+pub struct TransitiveFunctionUsage {
     called_functions: BTreeSet<QualifiedId<FunId>>,
     used_memory: BTreeSet<QualifiedId<StructId>>,
 }
@@ -103,7 +103,7 @@ impl TransitiveUsage {
 
 /// The annotation for usage of functions. This is computed by the function target processor.
 #[derive(Default)]
-struct UsageAnnotation {
+pub struct UsageAnnotation {
     // The functions which are directly called by this function.
     called_functions: BTreeSet<QualifiedId<FunId>>,
     // The memory which is directly accessed by this function.
@@ -136,7 +136,7 @@ impl FunctionTargetProcessor for UsageProcessor {
 }
 
 impl UsageProcessor {
-    fn analyze(annotation: &mut UsageAnnotation, func_target: FunctionTarget<'_>) {
+    pub fn analyze(annotation: &mut UsageAnnotation, func_target: FunctionTarget<'_>) {
         use Bytecode::*;
         use Operation::*;
         for code in func_target.get_bytecode() {

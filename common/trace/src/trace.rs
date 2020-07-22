@@ -23,9 +23,9 @@ const UNINITIALIZED: usize = 0;
 const INITIALIZING: usize = 1;
 const INITIALIZED: usize = 2;
 
-struct Sampling(HashMap<&'static str, CategorySampling>);
+pub struct Sampling(HashMap<&'static str, CategorySampling>);
 
-struct CategorySampling {
+pub struct CategorySampling {
     denominator: u64,
     nominator: u64,
 }
@@ -323,11 +323,11 @@ pub fn trace_node(entries: &[JsonLogEntry], node_name: &str) {
     }
 }
 
-fn reset_color() -> &'static str {
+pub fn reset_color() -> &'static str {
     "\x1B[K\x1B[49m"
 }
 
-fn crate_color(path: &str) -> &'static str {
+pub fn crate_color(path: &str) -> &'static str {
     match path {
         "consensus" => "\x1B[43m",
         "mempool" => "\x1B[46m",
@@ -339,7 +339,7 @@ fn crate_color(path: &str) -> &'static str {
     }
 }
 
-fn crate_name(path: &str) -> &str {
+pub fn crate_name(path: &str) -> &str {
     let name = match path.find("::") {
         Some(pos) => &path[0..pos],
         None => path,
@@ -352,7 +352,7 @@ fn crate_name(path: &str) -> &str {
     abbreviate_crate(name)
 }
 
-fn abbreviate_crate(name: &str) -> &str {
+pub fn abbreviate_crate(name: &str) -> &str {
     match name {
         "admission_control_service" => "ac",
         _ => name,
@@ -382,7 +382,7 @@ pub fn set_libra_trace(config: &HashMap<String, String>) -> Result<()> {
     }
 }
 
-fn parse_sampling_config(config: &HashMap<String, String>) -> Result<Sampling> {
+pub fn parse_sampling_config(config: &HashMap<String, String>) -> Result<Sampling> {
     let mut map = HashMap::new();
     for (category, rate) in config {
         let k: &'static str = Box::leak(category.clone().into_boxed_str());

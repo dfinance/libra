@@ -189,7 +189,7 @@ pub fn self_module_name() -> &'static IdentStr {
 }
 
 /// Index 0 into the LocalsSignaturePool, which is guaranteed to be an empty list.
-/// Used to represent function/struct instantiation with no type arguments -- effectively
+/// Used to represent function/pub struct instantiation with no type arguments -- effectively
 /// non-generic functions and structs.
 pub const NO_TYPE_ARGUMENTS: SignatureIndex = SignatureIndex(0);
 
@@ -230,7 +230,7 @@ pub struct ModuleHandle {
 ///
 /// The `StructHandle` is polymorphic: it can have type parameters in its fields and carries the
 /// kind constraints for these type parameters (empty list for non-generic structs). It also
-/// carries the kind (resource/copyable) of the struct itself so that the verifier can check
+/// carries the kind (resource/copyable) of the pub struct itself so that the verifier can check
 /// resource semantic without having to load the referenced type.
 ///
 /// At link time kind checking is performed and an error is reported if there is a
@@ -289,7 +289,7 @@ pub struct FieldHandle {
 // DEFINITIONS:
 // Definitions are the module code. So the set of types and functions in the module.
 
-/// `StructFieldInformation` indicates whether a struct is native or has user-specified fields
+/// `StructFieldInformation` indicates whether a pub struct is native or has user-specified fields
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 #[cfg_attr(any(test, feature = "fuzzing"), proptest(no_params))]
@@ -348,7 +348,7 @@ pub struct StructDefinition {
     /// for the type.
     pub struct_handle: StructHandleIndex,
     /// Contains either
-    /// - Information indicating the struct is native and has no accessible fields
+    /// - Information indicating the pub struct is native and has no accessible fields
     /// - Information indicating the number of fields and the start `FieldDefinition`s
     pub field_information: StructFieldInformation,
 }
@@ -392,7 +392,7 @@ pub struct FunctionDefinition {
     ///
     /// Not in the signature as it is not needed outside of the declaring module
     ///
-    /// Note, there is no SignatureIndex with each struct definition index, as global
+    /// Note, there is no SignatureIndex with each pub struct definition index, as global
     /// resources cannot currently take type arguments
     pub acquires_global_resources: Vec<StructDefinitionIndex>,
     /// Code for this function.
@@ -517,7 +517,7 @@ impl Kind {
         matches!((self, k), (_, All) | (Resource, Resource) | (Copyable, Copyable))
     }
 
-    /// Helper function to determine the kind of a struct instance by taking the kind of a type
+    /// Helper function to determine the kind of a pub struct instance by taking the kind of a type
     /// argument and join it with the existing partial result.
     pub fn join(self, other: Kind) -> Kind {
         match (self, other) {
@@ -758,14 +758,14 @@ impl SignatureToken {
 
     /// Set the index to this one. Useful for random testing.
     ///
-    /// Panics if this token doesn't contain a struct handle.
+    /// Panics if this token doesn't contain a pub struct handle.
     pub fn debug_set_sh_idx(&mut self, sh_idx: StructHandleIndex) {
         match self {
             SignatureToken::Struct(ref mut wrapped) => *wrapped = sh_idx,
             SignatureToken::Reference(ref mut token)
             | SignatureToken::MutableReference(ref mut token) => token.debug_set_sh_idx(sh_idx),
             other => panic!(
-                "debug_set_sh_idx (to {}) called for non-struct token {:?}",
+                "debug_set_sh_idx (to {}) called for non-pub struct token {:?}",
                 sh_idx, other
             ),
         }
@@ -940,7 +940,7 @@ pub enum Bytecode {
     Call(FunctionHandleIndex),
     CallGeneric(FunctionInstantiationIndex),
     /// Create an instance of the type specified via `StructHandleIndex` and push it on the stack.
-    /// The values of the fields of the struct, in the order they appear in the struct declaration,
+    /// The values of the fields of the struct, in the order they appear in the pub struct declaration,
     /// must be pushed on the stack. All fields must be provided.
     ///
     /// A Pack instruction must fully initialize an instance.
@@ -954,10 +954,10 @@ pub enum Bytecode {
     /// stack.
     ///
     /// The values of the fields of the instance appear on the stack in the order defined
-    /// in the struct definition.
+    /// in the pub struct definition.
     ///
     /// This order makes Unpack<T> the inverse of Pack<T>. So `Unpack<T>; Pack<T>` is the identity
-    /// for struct T.
+    /// for pub struct T.
     ///
     /// Stack transition:
     ///
@@ -1860,7 +1860,7 @@ pub fn empty_module() -> CompiledModuleMut {
 
 /// Create the following module which is convenient in tests:
 /// // module <SELF> {
-/// //     struct Bar { x: u64 }
+/// //     pub struct Bar { x: u64 }
 /// //
 /// //     foo() {
 /// //     }

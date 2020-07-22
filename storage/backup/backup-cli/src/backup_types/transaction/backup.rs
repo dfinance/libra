@@ -106,29 +106,29 @@ impl TransactionBackupController {
 }
 
 impl TransactionBackupController {
-    fn backup_name(&self) -> ShellSafeName {
+    pub fn backup_name(&self) -> ShellSafeName {
         format!("transaction_{}-", self.start_version)
             .try_into()
             .unwrap()
     }
 
-    fn manifest_name() -> &'static ShellSafeName {
+    pub fn manifest_name() -> &'static ShellSafeName {
         static NAME: Lazy<ShellSafeName> =
             Lazy::new(|| ShellSafeName::from_str("transaction.manifest").unwrap());
         &NAME
     }
 
-    fn chunk_name(first_ver: Version) -> ShellSafeName {
+    pub fn chunk_name(first_ver: Version) -> ShellSafeName {
         format!("{}-.chunk", first_ver).try_into().unwrap()
     }
 
-    fn chunk_proof_name(first_ver: u64, last_ver: Version) -> ShellSafeName {
+    pub fn chunk_proof_name(first_ver: u64, last_ver: Version) -> ShellSafeName {
         format!("{}-{}.proof", first_ver, last_ver)
             .try_into()
             .unwrap()
     }
 
-    async fn write_chunk(
+    pub async fn write_chunk(
         &self,
         backup_handle: &BackupHandleRef,
         chunk_bytes: &[u8],
@@ -165,7 +165,7 @@ impl TransactionBackupController {
         })
     }
 
-    async fn write_manifest(
+    pub async fn write_manifest(
         &self,
         backup_handle: &BackupHandleRef,
         first_version: Version,

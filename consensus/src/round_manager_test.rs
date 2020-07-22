@@ -58,7 +58,7 @@ use safety_rules::{ConsensusState, PersistentSafetyStorage, SafetyRulesManager};
 use std::{num::NonZeroUsize, sync::Arc, time::Duration};
 use tokio::runtime::Handle;
 
-/// Auxiliary struct that is setting up node environment for the test.
+/// Auxiliary pub struct that is setting up node environment for the test.
 pub struct NodeSetup {
     block_store: Arc<BlockStore>,
     round_manager: RoundManager,
@@ -73,18 +73,18 @@ pub struct NodeSetup {
 }
 
 impl NodeSetup {
-    fn create_round_state(time_service: Arc<dyn TimeService>) -> RoundState {
+    pub fn create_round_state(time_service: Arc<dyn TimeService>) -> RoundState {
         let base_timeout = Duration::new(60, 0);
         let time_interval = Box::new(ExponentialTimeInterval::fixed(base_timeout));
         let (round_timeout_sender, _) = channel::new_test(1_024);
         RoundState::new(time_interval, time_service, round_timeout_sender)
     }
 
-    fn create_proposer_election(author: Author) -> Box<dyn ProposerElection + Send + Sync> {
+    pub fn create_proposer_election(author: Author) -> Box<dyn ProposerElection + Send + Sync> {
         Box::new(RotatingProposer::new(vec![author], 1))
     }
 
-    fn create_nodes(
+    pub fn create_nodes(
         playground: &mut NetworkPlayground,
         executor: Handle,
         num_nodes: usize,
@@ -122,7 +122,7 @@ impl NodeSetup {
         nodes
     }
 
-    fn new(
+    pub fn new(
         playground: &mut NetworkPlayground,
         executor: Handle,
         signer: ValidatorSigner,
@@ -220,7 +220,7 @@ impl NodeSetup {
         }
     }
 
-    pub fn restart(self, playground: &mut NetworkPlayground, executor: Handle) -> Self {
+    pub pub fn restart(self, playground: &mut NetworkPlayground, executor: Handle) -> Self {
         let recover_data = self
             .storage
             .try_start()

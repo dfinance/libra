@@ -93,7 +93,7 @@ impl TestConfig {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use rand::{rngs::StdRng, SeedableRng};
 

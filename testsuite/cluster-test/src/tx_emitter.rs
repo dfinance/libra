@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{atomic_histogram::*, cluster::Cluster, instance::Instance};
 use std::{
@@ -58,7 +58,7 @@ pub struct EmitJob {
 }
 
 #[derive(Default)]
-struct StatsAccumulator {
+pub struct StatsAccumulator {
     submitted: AtomicU64,
     committed: AtomicU64,
     expired: AtomicU64,
@@ -165,14 +165,14 @@ impl TxEmitter {
         self.accounts.clear();
     }
 
-    fn pick_mint_instance<'a, 'b>(&'a self, instances: &'b [Instance]) -> &'b Instance {
+    pub fn pick_mint_instance<'a, 'b>(&'a self, instances: &'b [Instance]) -> &'b Instance {
         let mut rng = ThreadRng::default();
         instances
             .choose(&mut rng)
             .expect("Instances can not be empty")
     }
 
-    fn pick_mint_client(&self, instances: &[Instance]) -> JsonRpcAsyncClient {
+    pub fn pick_mint_client(&self, instances: &[Instance]) -> JsonRpcAsyncClient {
         self.pick_mint_instance(instances).json_rpc_client()
     }
 
@@ -415,11 +415,11 @@ impl TxEmitter {
     }
 }
 
-struct Worker {
+pub struct Worker {
     join_handle: JoinHandle<Vec<AccountData>>,
 }
 
-struct SubmissionWorker {
+pub struct SubmissionWorker {
     accounts: Vec<AccountData>,
     client: JsonRpcAsyncClient,
     all_addresses: Arc<Vec<AccountAddress>>,
@@ -430,7 +430,7 @@ struct SubmissionWorker {
 
 impl SubmissionWorker {
     #[allow(clippy::collapsible_if)]
-    async fn run(mut self) -> Vec<AccountData> {
+    pub async fn run(mut self) -> Vec<AccountData> {
         let wait = Duration::from_millis(self.params.wait_millis);
         while !self.stop.load(Ordering::Relaxed) {
             let requests = self.gen_requests();
@@ -498,7 +498,7 @@ impl SubmissionWorker {
         self.accounts
     }
 
-    fn gen_requests(&mut self) -> Vec<SignedTransaction> {
+    pub fn gen_requests(&mut self) -> Vec<SignedTransaction> {
         let mut rng = ThreadRng::default();
         let batch_size = max(MAX_TXN_BATCH_SIZE, self.accounts.len());
         let accounts = self
@@ -518,7 +518,7 @@ impl SubmissionWorker {
     }
 }
 
-async fn wait_for_accounts_sequence(
+pub async fn wait_for_accounts_sequence(
     client: &JsonRpcAsyncClient,
     accounts: &mut [AccountData],
 ) -> Result<(), Vec<(AccountAddress, u64)>> {
@@ -555,7 +555,7 @@ async fn wait_for_accounts_sequence(
     Ok(())
 }
 
-fn is_sequence_equal(accounts: &[AccountData], sequence_numbers: &[u64]) -> bool {
+pub fn is_sequence_equal(accounts: &[AccountData], sequence_numbers: &[u64]) -> bool {
     for (account, sequence_number) in zip(accounts, sequence_numbers) {
         if *sequence_number != account.sequence_number {
             return false;
@@ -564,7 +564,7 @@ fn is_sequence_equal(accounts: &[AccountData], sequence_numbers: &[u64]) -> bool
     true
 }
 
-async fn query_sequence_numbers(
+pub async fn query_sequence_numbers(
     client: &JsonRpcAsyncClient,
     addresses: &[AccountAddress],
 ) -> Result<Vec<u64>> {
@@ -592,7 +592,7 @@ const TXN_EXPIRATION_SECONDS: i64 = 50;
 const TXN_MAX_WAIT: Duration = Duration::from_secs(TXN_EXPIRATION_SECONDS as u64 + 30);
 const LIBRA_PER_NEW_ACCOUNT: u64 = 1_000_000;
 
-fn gen_submit_transaction_request(
+pub fn gen_submit_transaction_request(
     script: Script,
     sender_account: &mut AccountData,
 ) -> SignedTransaction {
@@ -612,7 +612,7 @@ fn gen_submit_transaction_request(
     transaction
 }
 
-fn gen_mint_request(faucet_account: &mut AccountData, num_coins: u64) -> SignedTransaction {
+pub fn gen_mint_request(faucet_account: &mut AccountData, num_coins: u64) -> SignedTransaction {
     let receiver = faucet_account.address;
     gen_submit_transaction_request(
         transaction_builder::encode_testnet_mint_script(
@@ -624,7 +624,7 @@ fn gen_mint_request(faucet_account: &mut AccountData, num_coins: u64) -> SignedT
     )
 }
 
-fn gen_transfer_txn_request(
+pub fn gen_transfer_txn_request(
     sender: &mut AccountData,
     receiver: &AccountAddress,
     num_coins: u64,
@@ -641,7 +641,7 @@ fn gen_transfer_txn_request(
     )
 }
 
-fn gen_create_child_txn_request(
+pub fn gen_create_child_txn_request(
     sender: &mut AccountData,
     receiver: &AccountAddress,
     receiver_auth_key_prefix: Vec<u8>,
@@ -660,7 +660,7 @@ fn gen_create_child_txn_request(
     )
 }
 
-fn gen_create_account_txn_request(
+pub fn gen_create_account_txn_request(
     sender: &mut AccountData,
     receiver: &AccountAddress,
     auth_key_prefix: Vec<u8>,
@@ -676,7 +676,7 @@ fn gen_create_account_txn_request(
     )
 }
 
-fn gen_mint_txn_request(
+pub fn gen_mint_txn_request(
     sender: &mut AccountData,
     receiver: &AccountAddress,
     num_coins: u64,
@@ -691,7 +691,7 @@ fn gen_mint_txn_request(
     )
 }
 
-fn gen_random_account(rng: &mut StdRng) -> AccountData {
+pub fn gen_random_account(rng: &mut StdRng) -> AccountData {
     let key_pair = KeyPair::generate(rng);
     AccountData {
         address: libra_types::account_address::from_public_key(&key_pair.public_key),
@@ -700,7 +700,7 @@ fn gen_random_account(rng: &mut StdRng) -> AccountData {
     }
 }
 
-fn gen_random_accounts(num_accounts: usize) -> Vec<AccountData> {
+pub fn gen_random_accounts(num_accounts: usize) -> Vec<AccountData> {
     let seed: [u8; 32] = OsRng.gen();
     let mut rng = StdRng::from_seed(seed);
     (0..num_accounts)
@@ -708,7 +708,7 @@ fn gen_random_accounts(num_accounts: usize) -> Vec<AccountData> {
         .collect()
 }
 
-fn gen_create_child_txn_requests(
+pub fn gen_create_child_txn_requests(
     source_account: &mut AccountData,
     accounts: &[AccountData],
     amount: u64,
@@ -726,7 +726,7 @@ fn gen_create_child_txn_requests(
         .collect()
 }
 
-fn gen_account_creation_txn_requests(
+pub fn gen_account_creation_txn_requests(
     sending_account: &mut AccountData,
     accounts: &[AccountData],
 ) -> Vec<SignedTransaction> {
@@ -742,7 +742,7 @@ fn gen_account_creation_txn_requests(
         .collect()
 }
 
-fn gen_mint_txn_requests(
+pub fn gen_mint_txn_requests(
     sending_account: &mut AccountData,
     accounts: &[AccountData],
     amount: u64,
@@ -793,7 +793,7 @@ pub async fn execute_and_wait_transactions(
 
 /// Create `num_new_accounts` by transferring libra from `source_account`. Return Vec of created
 /// accounts
-async fn create_new_accounts(
+pub async fn create_new_accounts(
     mut source_account: AccountData,
     num_new_accounts: usize,
     libra_per_new_account: u64,
@@ -817,7 +817,7 @@ async fn create_new_accounts(
 }
 
 /// Create `num_new_accounts`. Return Vec of created accounts
-async fn create_seed_accounts(
+pub async fn create_seed_accounts(
     creation_account: &mut AccountData,
     num_new_accounts: usize,
     max_num_accounts_per_batch: u64,
@@ -839,7 +839,7 @@ async fn create_seed_accounts(
 }
 
 /// Mint `libra_per_new_account` from `minting_account` to each account in `accounts`.
-async fn mint_to_new_accounts(
+pub async fn mint_to_new_accounts(
     minting_account: &mut AccountData,
     accounts: &[AccountData],
     libra_per_new_account: u64,
@@ -942,7 +942,7 @@ impl fmt::Display for TxStatsRate {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use crate::tx_emitter::EmitJobRequest;
 
     #[test]

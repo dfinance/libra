@@ -65,7 +65,7 @@ pub struct WritebackAnalysis<'a> {
 }
 
 impl<'a> WritebackAnalysis<'a> {
-    fn new(func_target: &'a FunctionTarget<'a>, code: &[Bytecode]) -> Self {
+    pub fn new(func_target: &'a FunctionTarget<'a>, code: &[Bytecode]) -> Self {
         let borrow_annotation = func_target
             .get_annotations()
             .get::<BorrowAnnotation>()
@@ -78,7 +78,7 @@ impl<'a> WritebackAnalysis<'a> {
         }
     }
 
-    fn compute_instrumentation(
+    pub fn compute_instrumentation(
         &mut self,
         offset: CodeOffset,
         bytecode: &Bytecode,
@@ -93,7 +93,7 @@ impl<'a> WritebackAnalysis<'a> {
         }
     }
 
-    fn visit(
+    pub fn visit(
         idx: TempIndex,
         borrows_from: &BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
         visited: &mut BTreeSet<TempIndex>,
@@ -114,13 +114,13 @@ impl<'a> WritebackAnalysis<'a> {
         dfs_order.push(idx);
     }
 
-    fn new_attr_id(&mut self) -> AttrId {
+    pub fn new_attr_id(&mut self) -> AttrId {
         let attr_id = AttrId::new(self.next_attr_id);
         self.next_attr_id += 1;
         attr_id
     }
 
-    fn writeback_bytecodes(&mut self, before: &BorrowInfo, after: &BorrowInfo) -> Vec<Bytecode> {
+    pub fn writeback_bytecodes(&mut self, before: &BorrowInfo, after: &BorrowInfo) -> Vec<Bytecode> {
         let before_refs = before.all_refs();
         let after_refs = after.all_refs();
         let writeback_refs: BTreeSet<TempIndex> = before_refs

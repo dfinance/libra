@@ -68,16 +68,16 @@ where
     }
 }
 
-struct TransactionBenchState {
+pub struct TransactionBenchState {
     // Use the fake executor for now.
     // TODO: Hook up the real executor in the future. Here's what needs to be done:
-    // 1. Provide a way to construct a write set from the genesis write set + initial balances.
+    // 1. Provide a way to conpub struct a write set from the genesis write set + initial balances.
     // 2. Provide a trait for an executor with the functionality required for account_universe.
     // 3. Implement the trait for the fake executor.
     // 4. Implement the trait for the real executor, using the genesis write set implemented in 1
     //    and the helpers in the execution_tests crate.
     // 5. Add a type parameter that implements the trait here and switch "executor" to use it.
-    // 6. Add an enum to TransactionBencher that lets callers choose between the fake and real
+    // 6. Add anpub enum to TransactionBencher that lets callers choose between the fake and real
     //    executors.
     executor: FakeExecutor,
     transactions: Vec<SignedTransaction>,
@@ -85,7 +85,7 @@ struct TransactionBenchState {
 
 impl TransactionBenchState {
     /// Creates a new benchmark state with the given number of accounts and transactions.
-    fn with_size<S>(strategy: S, num_accounts: usize, num_transactions: usize) -> Self
+    pub fn with_size<S>(strategy: S, num_accounts: usize, num_transactions: usize) -> Self
     where
         S: Strategy,
         S::Value: AUTransactionGen,
@@ -99,7 +99,7 @@ impl TransactionBenchState {
 
     /// Creates a new benchmark state with the given account universe strategy and number of
     /// transactions.
-    fn with_universe<S>(
+    pub fn with_universe<S>(
         strategy: S,
         universe_strategy: impl Strategy<Value = AccountUniverseGen>,
         num_transactions: usize,
@@ -129,7 +129,7 @@ impl TransactionBenchState {
     }
 
     /// Executes this state in a single block.
-    fn execute(self) {
+    pub fn execute(self) {
         // The output is ignored here since we're just testing transaction performance, not trying
         // to assert correctness.
         self.executor
@@ -139,7 +139,7 @@ impl TransactionBenchState {
 }
 
 /// Returns a strategy for the account universe customized for benchmarks.
-fn universe_strategy(
+pub fn universe_strategy(
     num_accounts: usize,
     num_transactions: usize,
 ) -> impl Strategy<Value = AccountUniverseGen> {

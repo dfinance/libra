@@ -56,4 +56,4 @@ impl SeekKeyCodec<JellyfishMerkleNodeSchema> for (Version, u8) {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

@@ -13,7 +13,7 @@ fn test() {
     suite::run_test_suite(execution_correctness());
 }
 
-fn execution_correctness() -> (Box<dyn ExecutionCorrectness>, Option<Ed25519PublicKey>) {
+pub fn execution_correctness() -> (Box<dyn ExecutionCorrectness>, Option<Ed25519PublicKey>) {
     let (config, _handle, _db) = start_storage_service();
     let client_wrapper = ProcessClientWrapper::new(config.storage.address);
     let pubkey = client_wrapper.pubkey();

@@ -55,4 +55,4 @@ impl ValueCodec<TransactionInfoSchema> for TransactionInfo {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

@@ -40,7 +40,7 @@ use vm::{
 // A simple cache that offers both a HashMap and a Vector lookup.
 // Values are forced into a `Arc` so they can be used from multiple thread.
 // Access to this cache is always under a `Mutex`.
-struct BinaryCache<K, V> {
+pub struct BinaryCache<K, V> {
     id_map: HashMap<K, usize>,
     binaries: Vec<Arc<V>>,
 }
@@ -49,14 +49,14 @@ impl<K, V> BinaryCache<K, V>
 where
     K: Eq + Hash,
 {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             id_map: HashMap::new(),
             binaries: vec![],
         }
     }
 
-    fn insert(&mut self, key: K, binary: V) -> &Arc<V> {
+    pub fn insert(&mut self, key: K, binary: V) -> &Arc<V> {
         self.binaries.push(Arc::new(binary));
         let idx = self.binaries.len() - 1;
         self.id_map.insert(key, idx);
@@ -65,7 +65,7 @@ where
             .expect("BinaryCache: last() after push() impossible failure")
     }
 
-    fn get(&self, key: &K) -> Option<&Arc<V>> {
+    pub fn get(&self, key: &K) -> Option<&Arc<V>> {
         self.id_map
             .get(&key)
             .and_then(|idx| self.binaries.get(*idx))
@@ -75,22 +75,22 @@ where
 // A script cache is a map from the hash value of a script and the `Script` itself.
 // Script are added in the cache once verified and so getting a script out the cache
 // does not require further verification (except for parameters and type parameters)
-struct ScriptCache {
+pub struct ScriptCache {
     scripts: BinaryCache<HashValue, Script>,
 }
 
 impl ScriptCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             scripts: BinaryCache::new(),
         }
     }
 
-    fn get(&self, hash: &HashValue) -> Option<Arc<Function>> {
+    pub fn get(&self, hash: &HashValue) -> Option<Arc<Function>> {
         self.scripts.get(hash).map(|script| script.entry_point())
     }
 
-    fn insert(&mut self, hash: HashValue, script: Script) -> PartialVMResult<Arc<Function>> {
+    pub fn insert(&mut self, hash: HashValue, script: Script) -> PartialVMResult<Arc<Function>> {
         match self.get(&hash) {
             Some(script) => Ok(script),
             None => Ok(self.scripts.insert(hash, script).entry_point()),
@@ -109,7 +109,7 @@ pub struct ModuleCache {
 }
 
 impl ModuleCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             modules: BinaryCache::new(),
             structs: vec![],
@@ -123,17 +123,17 @@ impl ModuleCache {
 
     // Retrieve a module by `ModuleId`. The module may have not been loaded yet in which
     // case `None` is returned
-    fn module_at(&self, id: &ModuleId) -> Option<Arc<Module>> {
+    pub fn module_at(&self, id: &ModuleId) -> Option<Arc<Module>> {
         self.modules.get(id).map(|module| Arc::clone(module))
     }
 
     // Retrieve a function by index
-    fn function_at(&self, idx: usize) -> Arc<Function> {
+    pub fn function_at(&self, idx: usize) -> Arc<Function> {
         Arc::clone(&self.functions[idx])
     }
 
-    // Retrieve a struct by index
-    fn struct_at(&self, idx: usize) -> Arc<StructType> {
+    // Retrieve a pub struct by index
+    pub fn struct_at(&self, idx: usize) -> Arc<StructType> {
         Arc::clone(&self.structs[idx])
     }
 
@@ -142,7 +142,7 @@ impl ModuleCache {
     // The VM is pretty much stopped waiting for this to finish
     //
 
-    fn insert(&mut self, id: ModuleId, module: CompiledModule) -> VMResult<Arc<Module>> {
+    pub fn insert(&mut self, id: ModuleId, module: CompiledModule) -> VMResult<Arc<Module>> {
         if let Some(module) = self.module_at(&id) {
             return Ok(module);
         }
@@ -164,7 +164,7 @@ impl ModuleCache {
         }
     }
 
-    fn add_module(&mut self, module: &CompiledModule) -> VMResult<()> {
+    pub fn add_module(&mut self, module: &CompiledModule) -> VMResult<()> {
         let starting_idx = self.structs.len();
         for (idx, struct_def) in module.struct_defs().iter().enumerate() {
             let st = self.make_struct_type(module, struct_def, StructDefinitionIndex(idx as u16));
@@ -183,7 +183,7 @@ impl ModuleCache {
         Ok(())
     }
 
-    fn make_struct_type(
+    pub fn make_struct_type(
         &self,
         module: &CompiledModule,
         struct_def: &StructDefinition,
@@ -204,7 +204,7 @@ impl ModuleCache {
         }
     }
 
-    fn load_field_types(
+    pub fn load_field_types(
         &mut self,
         module: &CompiledModule,
         starting_idx: usize,
@@ -247,7 +247,7 @@ impl ModuleCache {
     }
 
     // `make_type` is the entry point to "translate" a `SignatureToken` to a `Type`
-    fn make_type(&self, module: &CompiledModule, tok: &SignatureToken) -> PartialVMResult<Type> {
+    pub fn make_type(&self, module: &CompiledModule, tok: &SignatureToken) -> PartialVMResult<Type> {
         self.make_type_internal(module, tok, &|struct_name, module_id| {
             Ok(self.resolve_struct_by_name(struct_name, module_id)?.0)
         })
@@ -256,7 +256,7 @@ impl ModuleCache {
     // While in the process of loading, and before a `Module` is saved into the cache the loader
     // needs to resolve type references to the module itself (self) "manually"; that is,
     // looping through the types of the module itself
-    fn make_type_while_loading(
+    pub fn make_type_while_loading(
         &self,
         module: &CompiledModule,
         tok: &SignatureToken,
@@ -286,8 +286,8 @@ impl ModuleCache {
     }
 
     // `make_type_internal` returns a `Type` given a signature and a resolver which
-    // is resonsible to map a local struct index to a global one
-    fn make_type_internal<F>(
+    // is resonsible to map a local pub struct index to a global one
+    pub fn make_type_internal<F>(
         &self,
         module: &CompiledModule,
         tok: &SignatureToken,
@@ -348,7 +348,7 @@ impl ModuleCache {
 
     // Given a ModuleId::struct_name, retrieve the `StructType` and the index associated.
     // Return and error if the type has not been loaded
-    fn resolve_struct_by_name(
+    pub fn resolve_struct_by_name(
         &self,
         struct_name: &IdentStr,
         module_id: &ModuleId,
@@ -370,7 +370,7 @@ impl ModuleCache {
 
     // Given a ModuleId::func_name, retrieve the `StructType` and the index associated.
     // Return and error if the function has not been loaded
-    fn resolve_function_by_name(
+    pub fn resolve_function_by_name(
         &self,
         func_name: &IdentStr,
         module_id: &ModuleId,
@@ -398,15 +398,15 @@ impl ModuleCache {
 // A Loader is responsible to load scripts and modules and holds the cache of all loaded
 // entities. Each cache is protected by a `Mutex`. Operation in the Loader must be thread safe
 // (operating on values on the stack) and when cache needs updating the mutex must be taken.
-// The `pub(crate)` API is what a Loader offers to the runtime.
-pub(crate) struct Loader {
+// The `pub` API is what a Loader offers to the runtime.
+pub struct Loader {
     scripts: Mutex<ScriptCache>,
     module_cache: Mutex<ModuleCache>,
     type_cache: Mutex<TypeCache>,
 }
 
 impl Loader {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         //println!("new loader");
         Self {
             scripts: Mutex::new(ScriptCache::new()),
@@ -427,7 +427,7 @@ impl Loader {
     // Entry point for script execution (`MoveVM::execute_script`).
     // Verifies the script if it is not in the cache of scripts loaded.
     // Type parameters are checked as well after every type is loaded.
-    pub(crate) fn load_script(
+    pub fn load_script(
         &self,
         script_blob: &[u8],
         ty_args: &[TypeTag],
@@ -465,7 +465,7 @@ impl Loader {
     // So when publishing modules through the dependency DAG it may happen that a different
     // thread had loaded the module after this process fetched it from storage.
     // Caching will take care of that by asking for each dependency module again under lock.
-    fn deserialize_and_verify_script(
+    pub fn deserialize_and_verify_script(
         &self,
         script: &[u8],
         data_store: &mut impl DataStore,
@@ -503,7 +503,7 @@ impl Loader {
 
     // Script verification steps.
     // See `verify_module()` for module verification steps.
-    fn verify_script(&self, script: &CompiledScript) -> VMResult<()> {
+    pub fn verify_script(&self, script: &CompiledScript) -> VMResult<()> {
         DuplicationChecker::verify_script(&script)?;
         SignatureChecker::verify_script(&script)?;
         InstructionConsistency::verify_script(&script)?;
@@ -512,7 +512,7 @@ impl Loader {
         verify_main_signature(&script)
     }
 
-    fn verify_script_dependencies(
+    pub fn verify_script_dependencies(
         &self,
         script: CompiledScript,
         dependencies: Vec<Arc<Module>>,
@@ -531,7 +531,7 @@ impl Loader {
     // Entry point for function execution (`MoveVM::execute_function`).
     // Loading verifies the module if it was never loaded.
     // Type parameters are checked as well after every type is loaded.
-    pub(crate) fn load_function(
+    pub fn load_function(
         &self,
         function_name: &IdentStr,
         module_id: &ModuleId,
@@ -563,7 +563,7 @@ impl Loader {
     // This step performs all verification steps to load the module without loading it.
     // The module is not added to the code cache. It is simply published to the data cache.
     // See `verify_script()` for script verification steps.
-    pub(crate) fn verify_module(&self, module: &CompiledModule) -> VMResult<()> {
+    pub fn verify_module(&self, module: &CompiledModule) -> VMResult<()> {
         DuplicationChecker::verify_module(&module)?;
         SignatureChecker::verify_module(&module)?;
         InstructionConsistency::verify_module(&module)?;
@@ -588,7 +588,7 @@ impl Loader {
     // So when publishing modules through the dependency DAG it may happen that a different
     // thread had loaded the module after this process fetched it from storage.
     // Caching will take care of that by asking for each dependency module again under lock.
-    fn deserialize_and_verify_module(
+    pub fn deserialize_and_verify_module(
         &self,
         id: &ModuleId,
         data_store: &mut impl DataStore,
@@ -608,7 +608,7 @@ impl Loader {
         Ok(module)
     }
 
-    fn check_dependencies(
+    pub fn check_dependencies(
         &self,
         module: &CompiledModule,
         data_store: &mut impl DataStore,
@@ -621,7 +621,7 @@ impl Loader {
         self.verify_module_dependencies(module, dependencies)
     }
 
-    fn verify_module_dependencies(
+    pub fn verify_module_dependencies(
         &self,
         module: &CompiledModule,
         dependencies: Vec<Arc<Module>>,
@@ -634,7 +634,7 @@ impl Loader {
     }
 
     // All native functions must be known to the loader
-    fn check_natives(module: &CompiledModule) -> VMResult<()> {
+    pub fn check_natives(module: &CompiledModule) -> VMResult<()> {
         fn check_natives_impl(module: &CompiledModule) -> PartialVMResult<()> {
             for (idx, native_function) in module
                 .function_defs()
@@ -677,7 +677,7 @@ impl Loader {
     // Helpers for loading and verification
     //
 
-    fn load_type(&self, type_tag: &TypeTag, data_store: &mut impl DataStore) -> VMResult<Type> {
+    pub fn load_type(&self, type_tag: &TypeTag, data_store: &mut impl DataStore) -> VMResult<Type> {
         Ok(match type_tag {
             TypeTag::Bool => Type::Bool,
             TypeTag::U8 => Type::U8,
@@ -711,7 +711,7 @@ impl Loader {
         })
     }
 
-    fn load_module(&self, id: &ModuleId, data_store: &mut impl DataStore) -> VMResult<Arc<Module>> {
+    pub fn load_module(&self, id: &ModuleId, data_store: &mut impl DataStore) -> VMResult<Arc<Module>> {
         if let Some(module) = self.module_cache.lock().unwrap().module_at(id) {
             return Ok(module);
         }
@@ -722,7 +722,7 @@ impl Loader {
     // Verify the kind (constraints) of an instantiation.
     // Both function and script invocation use this function to verify correctness
     // of type arguments provided
-    fn verify_ty_args(&self, constraints: &[Kind], ty_args: &[Type]) -> PartialVMResult<()> {
+    pub fn verify_ty_args(&self, constraints: &[Kind], ty_args: &[Type]) -> PartialVMResult<()> {
         if constraints.len() != ty_args.len() {
             return Err(PartialVMError::new(
                 StatusCode::NUMBER_OF_TYPE_ARGUMENTS_MISMATCH,
@@ -745,15 +745,15 @@ impl Loader {
     // Internal helpers
     //
 
-    fn function_at(&self, idx: usize) -> Arc<Function> {
+    pub fn function_at(&self, idx: usize) -> Arc<Function> {
         self.module_cache.lock().unwrap().function_at(idx)
     }
 
-    fn struct_at(&self, idx: usize) -> Arc<StructType> {
+    pub fn struct_at(&self, idx: usize) -> Arc<StructType> {
         self.module_cache.lock().unwrap().struct_at(idx)
     }
 
-    fn get_module(&self, idx: &ModuleId) -> Arc<Module> {
+    pub fn get_module(&self, idx: &ModuleId) -> Arc<Module> {
         Arc::clone(
             self.module_cache
                 .lock()
@@ -764,7 +764,7 @@ impl Loader {
         )
     }
 
-    fn get_script(&self, hash: &HashValue) -> Arc<Script> {
+    pub fn get_script(&self, hash: &HashValue) -> Arc<Script> {
         Arc::clone(
             self.scripts
                 .lock()
@@ -775,7 +775,7 @@ impl Loader {
         )
     }
 
-    fn is_resource(&self, type_: &Type) -> PartialVMResult<bool> {
+    pub fn is_resource(&self, type_: &Type) -> PartialVMResult<bool> {
         match type_ {
             Type::Struct(idx) => Ok(self
                 .module_cache
@@ -812,7 +812,7 @@ impl Loader {
 //
 
 // A simple wrapper for a `Module` or a `Script` in the `Resolver`
-enum BinaryType {
+pub enum BinaryType {
     Module(Arc<Module>),
     Script(Arc<Script>),
 }
@@ -820,18 +820,18 @@ enum BinaryType {
 // A Resolver is a simple and small structure allocated on the stack and used by the
 // interpreter. It's the only API known to the interpreter and it's tailored to the interpreter
 // needs.
-pub(crate) struct Resolver<'a> {
+pub struct Resolver<'a> {
     loader: &'a Loader,
     binary: BinaryType,
 }
 
 impl<'a> Resolver<'a> {
-    fn for_module(loader: &'a Loader, module: Arc<Module>) -> Self {
+    pub fn for_module(loader: &'a Loader, module: Arc<Module>) -> Self {
         let binary = BinaryType::Module(module);
         Self { loader, binary }
     }
 
-    fn for_script(loader: &'a Loader, script: Arc<Script>) -> Self {
+    pub fn for_script(loader: &'a Loader, script: Arc<Script>) -> Self {
         let binary = BinaryType::Script(script);
         Self { loader, binary }
     }
@@ -840,7 +840,7 @@ impl<'a> Resolver<'a> {
     // Constant resolution
     //
 
-    pub(crate) fn constant_at(&self, idx: ConstantPoolIndex) -> &Constant {
+    pub fn constant_at(&self, idx: ConstantPoolIndex) -> &Constant {
         match &self.binary {
             BinaryType::Module(module) => module.module.constant_at(idx),
             BinaryType::Script(script) => script.script.constant_at(idx),
@@ -851,7 +851,7 @@ impl<'a> Resolver<'a> {
     // Function resolution
     //
 
-    pub(crate) fn function_from_handle(&self, idx: FunctionHandleIndex) -> Arc<Function> {
+    pub fn function_from_handle(&self, idx: FunctionHandleIndex) -> Arc<Function> {
         let idx = match &self.binary {
             BinaryType::Module(module) => module.function_at(idx.0),
             BinaryType::Script(script) => script.function_at(idx.0),
@@ -859,7 +859,7 @@ impl<'a> Resolver<'a> {
         self.loader.function_at(idx)
     }
 
-    pub(crate) fn function_from_instantiation(
+    pub fn function_from_instantiation(
         &self,
         idx: FunctionInstantiationIndex,
     ) -> Arc<Function> {
@@ -870,7 +870,7 @@ impl<'a> Resolver<'a> {
         self.loader.function_at(func_inst.handle)
     }
 
-    pub(crate) fn instantiate_generic_function(
+    pub fn instantiate_generic_function(
         &self,
         idx: FunctionInstantiationIndex,
         type_params: &[Type],
@@ -886,7 +886,7 @@ impl<'a> Resolver<'a> {
         Ok(instantiation)
     }
 
-    pub(crate) fn type_params_count(
+    pub fn type_params_count(
         &self,
         idx: FunctionInstantiationIndex,
     ) -> PartialVMResult<usize> {
@@ -901,7 +901,7 @@ impl<'a> Resolver<'a> {
     // Type resolution
     //
 
-    pub(crate) fn struct_from_definition(&self, idx: StructDefinitionIndex) -> Arc<StructType> {
+    pub fn struct_from_definition(&self, idx: StructDefinitionIndex) -> Arc<StructType> {
         match &self.binary {
             BinaryType::Module(module) => {
                 let gidx = module.struct_at(idx);
@@ -911,7 +911,7 @@ impl<'a> Resolver<'a> {
         }
     }
 
-    pub(crate) fn get_struct_type(&self, idx: StructDefinitionIndex) -> Type {
+    pub fn get_struct_type(&self, idx: StructDefinitionIndex) -> Type {
         let struct_def = match &self.binary {
             BinaryType::Module(module) => module.struct_at(idx),
             BinaryType::Script(_) => unreachable!("Scripts cannot have type instructions"),
@@ -919,7 +919,7 @@ impl<'a> Resolver<'a> {
         Type::Struct(struct_def)
     }
 
-    pub(crate) fn instantiate_generic_type(
+    pub fn instantiate_generic_type(
         &self,
         idx: StructDefInstantiationIndex,
         ty_args: &[Type],
@@ -938,11 +938,11 @@ impl<'a> Resolver<'a> {
         ))
     }
 
-    pub(crate) fn is_resource(&self, ty: &Type) -> PartialVMResult<bool> {
+    pub fn is_resource(&self, ty: &Type) -> PartialVMResult<bool> {
         self.loader.is_resource(ty)
     }
 
-    pub(crate) fn instantiation_is_resource(
+    pub fn instantiation_is_resource(
         &self,
         idx: StructDefInstantiationIndex,
         instantiation: &[Type],
@@ -970,35 +970,35 @@ impl<'a> Resolver<'a> {
     // Fields resolution
     //
 
-    pub(crate) fn field_offset(&self, idx: FieldHandleIndex) -> usize {
+    pub fn field_offset(&self, idx: FieldHandleIndex) -> usize {
         match &self.binary {
             BinaryType::Module(module) => module.field_offset(idx),
             BinaryType::Script(_) => unreachable!("Scripts cannot have field instructions"),
         }
     }
 
-    pub(crate) fn field_instantiation_offset(&self, idx: FieldInstantiationIndex) -> usize {
+    pub fn field_instantiation_offset(&self, idx: FieldInstantiationIndex) -> usize {
         match &self.binary {
             BinaryType::Module(module) => module.field_instantiation_offset(idx),
             BinaryType::Script(_) => unreachable!("Scripts cannot have field instructions"),
         }
     }
 
-    pub(crate) fn field_count(&self, idx: StructDefinitionIndex) -> u16 {
+    pub fn field_count(&self, idx: StructDefinitionIndex) -> u16 {
         match &self.binary {
             BinaryType::Module(module) => module.field_count(idx.0),
             BinaryType::Script(_) => unreachable!("Scripts cannot have type instructions"),
         }
     }
 
-    pub(crate) fn field_instantiation_count(&self, idx: StructDefInstantiationIndex) -> u16 {
+    pub fn field_instantiation_count(&self, idx: StructDefInstantiationIndex) -> u16 {
         match &self.binary {
             BinaryType::Module(module) => module.field_instantiation_count(idx.0),
             BinaryType::Script(_) => unreachable!("Scripts cannot have type instructions"),
         }
     }
 
-    pub(crate) fn make_type(
+    pub fn make_type(
         &self,
         token: &SignatureToken,
         type_context: &[Type],
@@ -1018,10 +1018,10 @@ impl<'a> Resolver<'a> {
         }
     }
 
-    pub(crate) fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag> {
+    pub fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag> {
         self.loader.type_to_type_tag(ty)
     }
-    pub(crate) fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout> {
+    pub fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout> {
         self.loader.type_to_type_layout(ty)
     }
 }
@@ -1031,7 +1031,7 @@ impl<'a> Resolver<'a> {
 // When code executes indexes in instructions are resolved against those runtime structure
 // so that any data needed for execution is immediately available
 #[derive(Debug)]
-pub(crate) struct Module {
+pub struct Module {
     id: ModuleId,
     // primitive pools
     module: CompiledModule,
@@ -1040,7 +1040,7 @@ pub(crate) struct Module {
     // types as indexes into the Loader type list
     //
 
-    // struct references carry the index into the global vector of types.
+    // pub struct references carry the index into the global vector of types.
     // That is effectively an indirection over the ref table:
     // the instruction carries an index into this table which contains the index into the
     // glabal table of types. No instantiation of generic types is saved into the global table.
@@ -1066,13 +1066,13 @@ pub(crate) struct Module {
     // function name to index into the Loader function list.
     // This allows a direct access from function name to `Function`
     function_map: HashMap<Identifier, usize>,
-    // struct name to index into the Loader type list
-    // This allows a direct access from struct name to `Struct`
+    // pub struct name to index into the Loader type list
+    // This allows a direct access from pub struct name to `Struct`
     struct_map: HashMap<Identifier, usize>,
 }
 
 impl Module {
-    fn new(
+    pub fn new(
         module: CompiledModule,
         cache: &ModuleCache,
     ) -> Result<Self, (PartialVMError, CompiledModule)> {
@@ -1220,39 +1220,39 @@ impl Module {
         }
     }
 
-    fn struct_at(&self, idx: StructDefinitionIndex) -> usize {
+    pub fn struct_at(&self, idx: StructDefinitionIndex) -> usize {
         self.structs[idx.0 as usize].idx
     }
 
-    fn struct_instantiation_at(&self, idx: u16) -> &StructInstantiation {
+    pub fn struct_instantiation_at(&self, idx: u16) -> &StructInstantiation {
         &self.struct_instantiations[idx as usize]
     }
 
-    fn function_at(&self, idx: u16) -> usize {
+    pub fn function_at(&self, idx: u16) -> usize {
         self.function_refs[idx as usize]
     }
 
-    fn function_instantiation_at(&self, idx: u16) -> &FunctionInstantiation {
+    pub fn function_instantiation_at(&self, idx: u16) -> &FunctionInstantiation {
         &self.function_instantiations[idx as usize]
     }
 
-    fn field_count(&self, idx: u16) -> u16 {
+    pub fn field_count(&self, idx: u16) -> u16 {
         self.structs[idx as usize].field_count
     }
 
-    fn field_instantiation_count(&self, idx: u16) -> u16 {
+    pub fn field_instantiation_count(&self, idx: u16) -> u16 {
         self.struct_instantiations[idx as usize].field_count
     }
 
-    fn module(&self) -> &CompiledModule {
+    pub fn module(&self) -> &CompiledModule {
         &self.module
     }
 
-    fn field_offset(&self, idx: FieldHandleIndex) -> usize {
+    pub fn field_offset(&self, idx: FieldHandleIndex) -> usize {
         self.field_handles[idx.0 as usize].offset
     }
 
-    fn field_instantiation_offset(&self, idx: FieldInstantiationIndex) -> usize {
+    pub fn field_instantiation_offset(&self, idx: FieldInstantiationIndex) -> usize {
         self.field_instantiations[idx.0 as usize].offset
     }
 }
@@ -1262,7 +1262,7 @@ impl Module {
 // When code executes, indexes in instructions are resolved against runtime structures
 // (rather then "compiled") to make available data needed for execution
 #[derive(Debug)]
-struct Script {
+pub struct Script {
     // primitive pools
     script: CompiledScript,
 
@@ -1279,7 +1279,7 @@ struct Script {
 }
 
 impl Script {
-    fn new(script: CompiledScript, script_hash: &HashValue, cache: &ModuleCache) -> VMResult<Self> {
+    pub fn new(script: CompiledScript, script_hash: &HashValue, cache: &ModuleCache) -> VMResult<Self> {
         let mut struct_refs = vec![];
         for struct_handle in script.struct_handles() {
             let struct_name = script.identifier_at(struct_handle.name);
@@ -1367,29 +1367,29 @@ impl Script {
         })
     }
 
-    fn entry_point(&self) -> Arc<Function> {
+    pub fn entry_point(&self) -> Arc<Function> {
         self.main.clone()
     }
 
-    fn function_at(&self, idx: u16) -> usize {
+    pub fn function_at(&self, idx: u16) -> usize {
         self.function_refs[idx as usize]
     }
 
-    fn function_instantiation_at(&self, idx: u16) -> &FunctionInstantiation {
+    pub fn function_instantiation_at(&self, idx: u16) -> &FunctionInstantiation {
         &self.function_instantiations[idx as usize]
     }
 }
 
 // A simple wrapper for the "owner" of the function (Module or Script)
 #[derive(Debug)]
-enum Scope {
+pub enum Scope {
     Module(ModuleId),
     Script(HashValue),
 }
 
 // A runtime function
 #[derive(Debug)]
-pub(crate) struct Function {
+pub struct Function {
     index: FunctionDefinitionIndex,
     code: Vec<Bytecode>,
     parameters: Signature,
@@ -1402,7 +1402,7 @@ pub(crate) struct Function {
 }
 
 impl Function {
-    fn new(
+    pub fn new(
         index: FunctionDefinitionIndex,
         def: &FunctionDefinition,
         module: &CompiledModule,
@@ -1451,18 +1451,18 @@ impl Function {
         }
     }
 
-    pub(crate) fn module_id(&self) -> Option<&ModuleId> {
+    pub fn module_id(&self) -> Option<&ModuleId> {
         match &self.scope {
             Scope::Module(module_id) => Some(module_id),
             Scope::Script(_) => None,
         }
     }
 
-    pub(crate) fn index(&self) -> FunctionDefinitionIndex {
+    pub fn index(&self) -> FunctionDefinitionIndex {
         self.index
     }
 
-    pub(crate) fn get_resolver<'a>(&self, loader: &'a Loader) -> Resolver<'a> {
+    pub fn get_resolver<'a>(&self, loader: &'a Loader) -> Resolver<'a> {
         match &self.scope {
             Scope::Module(module_id) => {
                 let module = loader.get_module(module_id);
@@ -1475,35 +1475,35 @@ impl Function {
         }
     }
 
-    pub(crate) fn local_count(&self) -> usize {
+    pub fn local_count(&self) -> usize {
         self.locals.len()
     }
 
-    pub(crate) fn locals(&self) -> &Signature {
+    pub fn locals(&self) -> &Signature {
         &self.locals
     }
 
-    pub(crate) fn arg_count(&self) -> usize {
+    pub fn arg_count(&self) -> usize {
         self.parameters.len()
     }
 
-    pub(crate) fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         self.name.as_str()
     }
 
-    pub(crate) fn code(&self) -> &[Bytecode] {
+    pub fn code(&self) -> &[Bytecode] {
         &self.code
     }
 
-    pub(crate) fn type_parameters(&self) -> &[Kind] {
+    pub fn type_parameters(&self) -> &[Kind] {
         &self.type_parameters
     }
 
-    pub(crate) fn parameters(&self) -> &Signature {
+    pub fn parameters(&self) -> &Signature {
         &self.parameters
     }
 
-    pub(crate) fn pretty_string(&self) -> String {
+    pub fn pretty_string(&self) -> String {
         match &self.scope {
             Scope::Script(_) => "Script::main".into(),
             Scope::Module(id) => format!(
@@ -1515,11 +1515,11 @@ impl Function {
         }
     }
 
-    pub(crate) fn is_native(&self) -> bool {
+    pub fn is_native(&self) -> bool {
         self.native.is_some()
     }
 
-    pub(crate) fn get_native(&self) -> PartialVMResult<NativeFunction> {
+    pub fn get_native(&self) -> PartialVMResult<NativeFunction> {
         self.native.ok_or_else(|| {
             PartialVMError::new(StatusCode::UNREACHABLE)
                 .with_message("Missing Native Function".to_string())
@@ -1531,29 +1531,29 @@ impl Function {
 // Internal structures that are saved at the proper index in the proper tables to access
 // execution information (interpreter).
 // The following structs are internal to the loader and never exposed out.
-// The `Loader` will create those struct and the proper table when loading a module.
+// The `Loader` will create those pub struct and the proper table when loading a module.
 // The `Resolver` uses those structs to return information to the `Interpreter`.
 //
 
 // A function instantiation.
 #[derive(Debug)]
-struct FunctionInstantiation {
+pub struct FunctionInstantiation {
     // index to `ModuleCache::functions` global table
     handle: usize,
     instantiation: Vec<Type>,
 }
 
 #[derive(Debug)]
-struct StructDef {
-    // struct field count
+pub struct StructDef {
+    // pub struct field count
     field_count: u16,
     // `ModuelCache::structs` global table index
     idx: usize,
 }
 
 #[derive(Debug)]
-struct StructInstantiation {
-    // struct field count
+pub struct StructInstantiation {
+    // pub struct field count
     field_count: u16,
     // `ModuelCache::structs` global table index. It is the generic type.
     def: usize,
@@ -1562,7 +1562,7 @@ struct StructInstantiation {
 
 // A field handle. The offset is the only used information when operating on a field
 #[derive(Debug)]
-struct FieldHandle {
+pub struct FieldHandle {
     offset: usize,
     // `ModuelCache::structs` global table index. It is the generic type.
     owner: usize,
@@ -1570,7 +1570,7 @@ struct FieldHandle {
 
 // A field instantiation. The offset is the only used information when operating on a field
 #[derive(Debug)]
-struct FieldInstantiation {
+pub struct FieldInstantiation {
     offset: usize,
     // `ModuelCache::structs` global table index. It is the generic type.
     owner: usize,
@@ -1580,7 +1580,7 @@ struct FieldInstantiation {
 // Utility functions
 //
 
-fn load_script_dependencies(script: &CompiledScript) -> Vec<ModuleId> {
+pub fn load_script_dependencies(script: &CompiledScript) -> Vec<ModuleId> {
     let mut deps = vec![];
     for module in script.module_handles() {
         deps.push(ModuleId::new(
@@ -1591,7 +1591,7 @@ fn load_script_dependencies(script: &CompiledScript) -> Vec<ModuleId> {
     deps
 }
 
-fn load_module_dependencies(module: &CompiledModule) -> Vec<ModuleId> {
+pub fn load_module_dependencies(module: &CompiledModule) -> Vec<ModuleId> {
     let self_module = module.self_handle();
     let mut deps = vec![];
     for module_handle in module.module_handles() {
@@ -1610,14 +1610,14 @@ fn load_module_dependencies(module: &CompiledModule) -> Vec<ModuleId> {
 // Cache for data associated to a Struct, used for de/serialization and more
 //
 
-struct StructInfo {
+pub struct StructInfo {
     struct_tag: Option<StructTag>,
     struct_layout: Option<MoveStructLayout>,
     kind_info: Option<(MoveKind, Vec<MoveKindInfo>)>,
 }
 
 impl StructInfo {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             struct_tag: None,
             struct_layout: None,
@@ -1626,12 +1626,12 @@ impl StructInfo {
     }
 }
 
-pub(crate) struct TypeCache {
+pub struct TypeCache {
     structs: HashMap<usize, HashMap<Vec<Type>, StructInfo>>,
 }
 
 impl TypeCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             structs: HashMap::new(),
         }
@@ -1641,7 +1641,7 @@ impl TypeCache {
 const VALUE_DEPTH_MAX: usize = 256;
 
 impl Loader {
-    fn struct_gidx_to_type_tag(&self, gidx: usize, ty_args: &[Type]) -> PartialVMResult<StructTag> {
+    pub fn struct_gidx_to_type_tag(&self, gidx: usize, ty_args: &[Type]) -> PartialVMResult<StructTag> {
         if let Some(struct_map) = self.type_cache.lock().unwrap().structs.get(&gidx) {
             if let Some(struct_info) = struct_map.get(ty_args) {
                 if let Some(struct_tag) = &struct_info.struct_tag {
@@ -1675,7 +1675,7 @@ impl Loader {
         Ok(struct_tag)
     }
 
-    fn type_to_type_tag_impl(&self, ty: &Type) -> PartialVMResult<TypeTag> {
+    pub fn type_to_type_tag_impl(&self, ty: &Type) -> PartialVMResult<TypeTag> {
         Ok(match ty {
             Type::Bool => TypeTag::Bool,
             Type::U8 => TypeTag::U8,
@@ -1697,7 +1697,7 @@ impl Loader {
         })
     }
 
-    fn struct_gidx_to_type_layout(
+    pub fn struct_gidx_to_type_layout(
         &self,
         gidx: usize,
         ty_args: &[Type],
@@ -1736,7 +1736,7 @@ impl Loader {
         Ok(struct_layout)
     }
 
-    fn type_to_type_layout_impl(&self, ty: &Type, depth: usize) -> PartialVMResult<MoveTypeLayout> {
+    pub fn type_to_type_layout_impl(&self, ty: &Type, depth: usize) -> PartialVMResult<MoveTypeLayout> {
         if depth > VALUE_DEPTH_MAX {
             return Err(PartialVMError::new(StatusCode::VM_MAX_VALUE_DEPTH_REACHED));
         }
@@ -1765,7 +1765,7 @@ impl Loader {
         })
     }
 
-    fn struct_gidx_to_kind_info(
+    pub fn struct_gidx_to_kind_info(
         &self,
         gidx: usize,
         ty_args: &[Type],
@@ -1813,7 +1813,7 @@ impl Loader {
         Ok(kind_info)
     }
 
-    pub(crate) fn type_to_kind_info_impl(
+    pub fn type_to_kind_info_impl(
         &self,
         ty: &Type,
         depth: usize,
@@ -1849,13 +1849,13 @@ impl Loader {
         })
     }
 
-    pub(crate) fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag> {
+    pub fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag> {
         self.type_to_type_tag_impl(ty)
     }
-    pub(crate) fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout> {
+    pub fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout> {
         self.type_to_type_layout_impl(ty, 1)
     }
-    pub(crate) fn type_to_kind_info(&self, ty: &Type) -> PartialVMResult<MoveKindInfo> {
+    pub fn type_to_kind_info(&self, ty: &Type) -> PartialVMResult<MoveKindInfo> {
         self.type_to_kind_info_impl(ty, 1)
     }
 }

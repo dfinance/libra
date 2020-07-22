@@ -35,7 +35,7 @@ pub struct Mempool {
     // for each transaction, entry with timestamp is added when transaction enters mempool
     // used to measure e2e latency of transaction in system, as well as time it takes to pick it up
     // by consensus
-    pub(crate) metrics_cache: TtlCache<(AccountAddress, u64), SystemTime>,
+    pub metrics_cache: TtlCache<(AccountAddress, u64), SystemTime>,
     pub system_transaction_timeout: Duration,
 }
 
@@ -52,7 +52,7 @@ impl Mempool {
     }
 
     /// This function will be called once the transaction has been stored
-    pub(crate) fn remove_transaction(
+    pub fn remove_transaction(
         &mut self,
         sender: &AccountAddress,
         sequence_number: u64,
@@ -97,7 +97,7 @@ impl Mempool {
         }
     }
 
-    fn log_latency(&mut self, account: AccountAddress, sequence_number: u64, metric: &str) {
+    pub fn log_latency(&mut self, account: AccountAddress, sequence_number: u64, metric: &str) {
         if let Some(&creation_time) = self.metrics_cache.get(&(account, sequence_number)) {
             if let Ok(time_delta) = SystemTime::now().duration_since(creation_time) {
                 counters::CORE_MEMPOOL_TXN_COMMIT_LATENCY
@@ -109,7 +109,7 @@ impl Mempool {
 
     /// Used to add a transaction to the Mempool
     /// Performs basic validation: checks account's sequence number
-    pub(crate) fn add_txn(
+    pub fn add_txn(
         &mut self,
         txn: SignedTransaction,
         gas_amount: u64,
@@ -168,7 +168,7 @@ impl Mempool {
     /// `seen_txns` - transactions that were sent to Consensus but were not committed yet
     ///  Mempool should filter out such transactions
     #[allow(clippy::explicit_counter_loop)]
-    pub(crate) fn get_block(
+    pub fn get_block(
         &mut self,
         batch_size: u64,
         mut seen: HashSet<TxnPointer>,
@@ -239,7 +239,7 @@ impl Mempool {
     /// periodic core mempool garbage collection
     /// removes all expired transactions
     /// clears expired entries in metrics cache and sequence number cache
-    pub(crate) fn gc(&mut self) {
+    pub fn gc(&mut self) {
         let now = SystemTime::now();
         self.transactions.gc_by_system_ttl(&self.metrics_cache);
         self.metrics_cache.gc(now);
@@ -247,14 +247,14 @@ impl Mempool {
     }
 
     /// Garbage collection based on client-specified expiration time
-    pub(crate) fn gc_by_expiration_time(&mut self, block_time: Duration) {
+    pub fn gc_by_expiration_time(&mut self, block_time: Duration) {
         self.transactions
             .gc_by_expiration_time(block_time, &self.metrics_cache);
     }
 
     /// Read `count` transactions from timeline since `timeline_id`
     /// Returns block of transactions and new last_timeline_id
-    pub(crate) fn read_timeline(
+    pub fn read_timeline(
         &mut self,
         timeline_id: u64,
         count: usize,
@@ -264,7 +264,7 @@ impl Mempool {
 
     /// Read transactions as (timeline_id, transaction) with timeline IDs in `timeline_ids`
     /// Note for some requested timeline IDs, the corresponding transaction may not be in the timeline
-    pub(crate) fn filter_read_timeline(
+    pub fn filter_read_timeline(
         &mut self,
         timeline_ids: Vec<u64>,
     ) -> Vec<(u64, SignedTransaction)> {

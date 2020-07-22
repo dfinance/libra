@@ -48,7 +48,7 @@ impl BlockStore {
     }
 
     /// Checks if quorum certificate can be inserted in block store without RPC
-    /// Returns the enum to indicate the detailed status.
+    /// Returns thepub enum to indicate the detailed status.
     pub fn need_fetch_for_quorum_cert(&self, qc: &QuorumCert) -> NeedFetchResult {
         if qc.certified_block().round() < self.root().round() {
             return NeedFetchResult::QCRoundBeforeRoot;
@@ -118,7 +118,7 @@ impl BlockStore {
     /// updating the consensus state(with qc) and deciding whether to vote(with block)
     /// The missing ancestors are going to be retrieved from the given peer. If a given peer
     /// fails to provide the missing ancestors, the qc is not going to be added.
-    async fn fetch_quorum_cert(
+    pub async fn fetch_quorum_cert(
         &self,
         qc: QuorumCert,
         retriever: &mut BlockRetriever,
@@ -152,7 +152,7 @@ impl BlockStore {
     /// 2. We persist the 3-chain to storage before start sync to ensure we could restart if we
     /// crash in the middle of the sync.
     /// 3. We prune the old tree and replace with a new tree built with the 3-chain.
-    async fn sync_to_highest_commit_cert(
+    pub async fn sync_to_highest_commit_cert(
         &self,
         highest_commit_cert: QuorumCert,
         retriever: &mut BlockRetriever,
@@ -223,7 +223,7 @@ impl BlockStore {
             .await?;
         let recovery_data = storage
             .start()
-            .expect_recovery_data("Failed to construct recovery data after fast forward sync");
+            .expect_recovery_data("Failed to conpub struct recovery data after fast forward sync");
 
         Ok(recovery_data)
     }
@@ -253,7 +253,7 @@ impl BlockRetriever {
     /// leader to drive quorum certificate creation The other peers from the quorum certificate
     /// will be randomly tried next.  If all members of the quorum certificate are exhausted, an
     /// error is returned
-    async fn retrieve_block_for_qc<'a>(
+    pub async fn retrieve_block_for_qc<'a>(
         &'a mut self,
         qc: &'a QuorumCert,
         num_blocks: u64,
@@ -304,7 +304,7 @@ impl BlockRetriever {
         }
     }
 
-    fn pick_peer(&self, attempt: u32, peers: &mut Vec<&AccountAddress>) -> AccountAddress {
+    pub fn pick_peer(&self, attempt: u32, peers: &mut Vec<&AccountAddress>) -> AccountAddress {
         assert!(!peers.is_empty(), "pick_peer on empty peer list");
 
         if attempt == 0 {
@@ -331,7 +331,7 @@ const RETRIEVAL_MAX_EXP: u32 = 4;
 /// Returns exponentially increasing timeout with
 /// limit of RETRIEVAL_INITIAL_TIMEOUT*(2^RETRIEVAL_MAX_EXP)
 #[allow(clippy::trivially_copy_pass_by_ref)]
-fn retrieval_timeout(attempt: u32) -> Duration {
+pub fn retrieval_timeout(attempt: u32) -> Duration {
     assert!(attempt > 0, "retrieval_timeout attempt can't be 0");
     let exp = RETRIEVAL_MAX_EXP.min(attempt - 1); // [0..RETRIEVAL_MAX_EXP]
     RETRIEVAL_INITIAL_TIMEOUT * 2_u32.pow(exp)

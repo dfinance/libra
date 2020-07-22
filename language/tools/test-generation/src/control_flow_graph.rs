@@ -63,7 +63,7 @@ pub struct CFG {
 }
 
 impl CFG {
-    /// Construct a control flow graph that contains empty basic blocks with set incoming
+    /// Conpub struct a control flow graph that contains empty basic blocks with set incoming
     /// and outgoing locals.
     /// Currently the control flow graph is acyclic.
     pub fn new(
@@ -188,7 +188,7 @@ impl CFG {
     }
 
     /// Merge the outgoing locals of a set of blocks
-    fn merge_locals(&self, block_ids: Vec<BlockIDSize>) -> BlockLocals {
+    pub fn merge_locals(&self, block_ids: Vec<BlockIDSize>) -> BlockLocals {
         checked_precondition!(
             !block_ids.is_empty(),
             "Cannot merge locals of empty block list"
@@ -218,7 +218,7 @@ impl CFG {
     }
 
     /// Randomly vary the availability of locals
-    fn vary_locals(rng: &mut StdRng, locals: BlockLocals) -> BlockLocals {
+    pub fn vary_locals(rng: &mut StdRng, locals: BlockLocals) -> BlockLocals {
         let mut locals = locals;
         for (_, (abstr_val, availability)) in locals.iter_mut() {
             if rng.gen_bool(0.5) {
@@ -238,7 +238,7 @@ impl CFG {
 
     /// Add the incoming and outgoing locals for each basic block in the control flow graph.
     /// Currently the incoming and outgoing locals are the same for each block.
-    fn add_locals(cfg: &mut CFG, rng: &mut StdRng, locals: &[SignatureToken], args_len: usize) {
+    pub fn add_locals(cfg: &mut CFG, rng: &mut StdRng, locals: &[SignatureToken], args_len: usize) {
         precondition!(
             !cfg.basic_blocks.is_empty(),
             "Cannot add locals to empty cfg"
@@ -296,7 +296,7 @@ impl CFG {
             } else if child_ids.len() == 1 {
                 block_queue.push_back(child_ids[0]);
             } else if !child_ids.is_empty() {
-                // We construct the CFG such that blocks have either 0, 1, or 2
+                // We conpub struct the CFG such that blocks have either 0, 1, or 2
                 // children.
                 unreachable!(
                     "Invalid number of children for basic block {:?}",
@@ -315,7 +315,7 @@ impl CFG {
 
     /// Get the serialized code offset of a basic block based on its position in the serialized
     /// instruction sequence.
-    fn get_block_offset(cfg: &CFG, block_order: &[BlockIDSize], block_id: BlockIDSize) -> u16 {
+    pub fn get_block_offset(cfg: &CFG, block_order: &[BlockIDSize], block_id: BlockIDSize) -> u16 {
         checked_assume!(
             (0..block_id).all(|id| cfg.basic_blocks.get(&id).is_some()),
             "Error: Invalid block_id given"

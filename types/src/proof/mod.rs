@@ -8,7 +8,7 @@ pub mod position;
 pub mod proptest_proof;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
 use crate::{
     ledger_info::LedgerInfo,
@@ -39,7 +39,7 @@ pub use self::definition::{
 pub use self::definition::{TestAccumulatorProof, TestAccumulatorRangeProof};
 
 /// Verifies that a given `transaction_info` exists in the ledger using provided proof.
-fn verify_transaction_info(
+pub fn verify_transaction_info(
     ledger_info: &LedgerInfo,
     transaction_version: Version,
     transaction_info: &TransactionInfo,

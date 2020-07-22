@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod local;
-mod serializer;
-mod spawned_process;
-mod suite;
-mod thread;
+pub mod local;
+pub mod serializer;
+pub mod spawned_process;
+pub mod suite;
+pub mod thread;

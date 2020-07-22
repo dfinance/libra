@@ -71,7 +71,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
     // Helpers
     //***************************************************************************
 
-    fn get_function_def(
+    pub fn get_function_def(
         &self,
         function_definition_index: FunctionDefinitionIndex,
     ) -> Result<&FunctionDefinition> {
@@ -85,12 +85,12 @@ impl<Location: Clone + Eq> Disassembler<Location> {
             .function_def_at(function_definition_index))
     }
 
-    fn get_struct_def(
+    pub fn get_struct_def(
         &self,
         struct_definition_index: StructDefinitionIndex,
     ) -> Result<&StructDefinition> {
         if struct_definition_index.0 as usize >= self.source_mapper.bytecode.struct_defs().len() {
-            bail!("Invalid struct definition index supplied when marking struct")
+            bail!("Invalid pub struct definition index supplied when marking struct")
         }
         Ok(self
             .source_mapper
@@ -102,7 +102,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
     // Code Coverage Helpers
     //***************************************************************************
 
-    fn get_function_coverage(&self, function_name: &IdentStr) -> Option<&FunctionCoverage> {
+    pub fn get_function_coverage(&self, function_name: &IdentStr) -> Option<&FunctionCoverage> {
         self.source_mapper
             .source_map
             .module_name_opt
@@ -117,11 +117,11 @@ impl<Location: Clone + Eq> Disassembler<Location> {
             })
     }
 
-    fn is_function_called(&self, function_name: &IdentStr) -> bool {
+    pub fn is_function_called(&self, function_name: &IdentStr) -> bool {
         self.get_function_coverage(function_name).is_some()
     }
 
-    fn format_function_coverage(&self, name: &IdentStr, function_body: String) -> String {
+    pub fn format_function_coverage(&self, name: &IdentStr, function_body: String) -> String {
         if self.is_function_called(name) {
             function_body.green()
         } else {
@@ -130,7 +130,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         .to_string()
     }
 
-    fn format_with_instruction_coverage(
+    pub fn format_with_instruction_coverage(
         pc: usize,
         function_coverage_map: Option<&FunctionCoverage>,
         instruction: String,
@@ -147,7 +147,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
     // Formatting Helpers
     //***************************************************************************
 
-    fn name_for_field(&self, field_idx: FieldHandleIndex) -> Result<String> {
+    pub fn name_for_field(&self, field_idx: FieldHandleIndex) -> Result<String> {
         let field_handle = self.source_mapper.bytecode.field_handle_at(field_idx);
         let struct_def = self
             .source_mapper
@@ -178,7 +178,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Ok(format!("{}.{}", struct_name, field_name))
     }
 
-    fn type_for_field(&self, field_idx: FieldHandleIndex) -> Result<String> {
+    pub fn type_for_field(&self, field_idx: FieldHandleIndex) -> Result<String> {
         let field_handle = self.source_mapper.bytecode.field_handle_at(field_idx);
         let struct_def = self
             .source_mapper
@@ -201,7 +201,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Ok(ty)
     }
 
-    fn struct_type_info(
+    pub fn struct_type_info(
         &self,
         struct_idx: StructDefinitionIndex,
         signature: &Signature,
@@ -231,7 +231,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Ok((name, Self::format_type_params(&type_arguments)))
     }
 
-    fn name_for_parameter_or_local(
+    pub fn name_for_parameter_or_local(
         &self,
         local_idx: usize,
         function_source_map: &FunctionSourceMap<Location>,
@@ -247,7 +247,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Ok(name)
     }
 
-    fn type_for_parameter_or_local(
+    pub fn type_for_parameter_or_local(
         &self,
         idx: usize,
         parameters: &Signature,
@@ -264,7 +264,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         self.disassemble_sig_tok(sig_tok.clone(), &function_source_map.type_parameters)
     }
 
-    fn type_for_local(
+    pub fn type_for_local(
         &self,
         local_idx: usize,
         locals: &Signature,
@@ -277,7 +277,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         self.disassemble_sig_tok(sig_tok.clone(), &function_source_map.type_parameters)
     }
 
-    fn format_type_params(ty_params: &[String]) -> String {
+    pub fn format_type_params(ty_params: &[String]) -> String {
         if ty_params.is_empty() {
             "".to_string()
         } else {
@@ -285,7 +285,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         }
     }
 
-    fn format_ret_type(ty_rets: &[String]) -> String {
+    pub fn format_ret_type(ty_rets: &[String]) -> String {
         if ty_rets.is_empty() {
             "".to_string()
         } else {
@@ -293,7 +293,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         }
     }
 
-    fn format_function_body(locals: Vec<String>, bytecode: Vec<String>) -> String {
+    pub fn format_function_body(locals: Vec<String>, bytecode: Vec<String>) -> String {
         if locals.is_empty() && bytecode.is_empty() {
             "".to_string()
         } else {
@@ -311,9 +311,9 @@ impl<Location: Clone + Eq> Disassembler<Location> {
     // Disassemblers
     //***************************************************************************
 
-    // These need to be in the context of a function or a struct definition since type parameters
-    // can refer to function/struct type parameters.
-    fn disassemble_sig_tok(
+    // These need to be in the context of a function or a pub struct definition since type parameters
+    // can refer to function/pub struct type parameters.
+    pub fn disassemble_sig_tok(
         &self,
         sig_tok: SignatureToken,
         type_param_context: &[SourceName<Location>],
@@ -378,7 +378,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         })
     }
 
-    fn disassemble_instruction(
+    pub fn disassemble_instruction(
         &self,
         parameters: &Signature,
         instruction: &Bytecode,
@@ -717,7 +717,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         }
     }
 
-    fn disassemble_bytecode(
+    pub fn disassemble_bytecode(
         &self,
         function_definition_index: FunctionDefinitionIndex,
     ) -> Result<Vec<String>> {
@@ -791,7 +791,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Ok(instrs)
     }
 
-    fn disassemble_type_formals(
+    pub fn disassemble_type_formals(
         source_map_ty_params: &[SourceName<Location>],
         kinds: &[Kind],
     ) -> String {
@@ -803,7 +803,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         Self::format_type_params(&ty_params)
     }
 
-    fn disassemble_locals(
+    pub fn disassemble_locals(
         &self,
         function_source_map: &FunctionSourceMap<Location>,
         locals_idx: SignatureIndex,
@@ -917,7 +917,7 @@ impl<Location: Clone + Eq> Disassembler<Location> {
         ))
     }
 
-    // The struct defs will filter out the structs that we print to only be the ones that are
+    // The pub struct defs will filter out the structs that we print to only be the ones that are
     // defined in the module in question.
     pub fn disassemble_struct_def(&self, struct_def_idx: StructDefinitionIndex) -> Result<String> {
         let struct_definition = self.get_struct_def(struct_def_idx)?;

@@ -99,7 +99,7 @@ prop_compose! {
 }
 
 prop_compose! {
-    fn bigger_round(initial_round: Round)(
+    pub fn bigger_round(initial_round: Round)(
         increment in 2..8,
         initial_round in Just(initial_round),
     ) -> Round {
@@ -120,7 +120,7 @@ prop_compose! {
     /// This creates a child with a parent on its left, and a QC on the left
     /// of the parent. This, depending on branching, does not require the
     /// QC to always be an ancestor or the parent to always be the highest QC
-    fn child(
+    pub fn child(
         signer_strategy: impl Strategy<Value = ValidatorSigner>,
         block_forest_strategy: impl Strategy<Value = LinearizedBlockForest>,
     )(
@@ -151,7 +151,7 @@ prop_compose! {
 
 /// This creates a block forest with keys extracted from a specific
 /// vector
-fn block_forest_from_keys(
+pub fn block_forest_from_keys(
     depth: u32,
     keypairs: Vec<Ed25519PrivateKey>,
 ) -> impl Strategy<Value = LinearizedBlockForest> {

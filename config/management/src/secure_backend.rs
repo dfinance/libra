@@ -215,7 +215,7 @@ secure_backend!(
 
 #[allow(dead_code)]
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use std::{fs::File, io::Write};
 

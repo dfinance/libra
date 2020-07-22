@@ -32,12 +32,12 @@ impl Pad {
         slf.pad_function_bodies(module);
     }
 
-    fn pad_cosntant_table(&mut self, module: &mut CompiledModuleMut) {
+    pub fn pad_cosntant_table(&mut self, module: &mut CompiledModuleMut) {
         // TODO actual constant generation
         module.constant_pool = vec![]
     }
 
-    fn pad_identifier_table(&mut self, module: &mut CompiledModuleMut) {
+    pub fn pad_identifier_table(&mut self, module: &mut CompiledModuleMut) {
         module.identifiers = (0..(self.table_size + module.identifiers.len()))
             .map(|_| {
                 let len = self.gen.gen_range(10, self.options.max_string_size);
@@ -46,13 +46,13 @@ impl Pad {
             .collect()
     }
 
-    fn pad_address_identifier_table(&mut self, module: &mut CompiledModuleMut) {
+    pub fn pad_address_identifier_table(&mut self, module: &mut CompiledModuleMut) {
         module.address_identifiers = (0..(self.table_size + module.address_identifiers.len()))
             .map(|_| AccountAddress::random())
             .collect()
     }
 
-    fn pad_function_bodies(&mut self, module: &mut CompiledModuleMut) {
+    pub fn pad_function_bodies(&mut self, module: &mut CompiledModuleMut) {
         for fdef in module.function_defs.iter_mut() {
             if let Some(code) = &mut fdef.code {
                 code.code = vec![
@@ -67,7 +67,7 @@ impl Pad {
     }
 
     // Ensure that locals signatures always contain an empty signature
-    fn pad_signatures(&mut self, module: &mut CompiledModuleMut) {
+    pub fn pad_signatures(&mut self, module: &mut CompiledModuleMut) {
         if module.signatures.iter().all(|v| !v.is_empty()) {
             module.signatures.push(Signature(Vec::new()));
         }

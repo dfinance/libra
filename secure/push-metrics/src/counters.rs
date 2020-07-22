@@ -3,8 +3,8 @@
 
 use std::sync::atomic::{AtomicBool, AtomicI64, Ordering};
 
-/// BaseMetric is a struct used by `Counter` and `Gauge`
-struct BaseMetric {
+/// BaseMetric is a pub struct used by `Counter` and `Gauge`
+pub struct BaseMetric {
     counter_name: String,
     counter_help: String,
     counter: AtomicI64,

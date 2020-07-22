@@ -67,7 +67,7 @@
 //! node.
 
 #[cfg(test)]
-mod tree_cache_test;
+pub mod tree_cache_test;
 
 use crate::{
     node_type::{Node, NodeKey},
@@ -86,7 +86,7 @@ use std::{
 /// `FrozenTreeCache` is to let `TreeCache` freeze intermediate results from each transaction to
 /// help commit more than one transaction in a row atomically.
 #[derive(Default)]
-struct FrozenTreeCache {
+pub struct FrozenTreeCache {
     /// Immutable node_cache.
     node_cache: BTreeMap<NodeKey, Node>,
 

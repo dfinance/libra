@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
+
+
 
 //! A library supplying various cryptographic primitives
 pub mod compat;
@@ -17,7 +17,7 @@ pub mod traits;
 pub mod x25519;
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
 pub use self::traits::*;
 pub use hash::HashValue;

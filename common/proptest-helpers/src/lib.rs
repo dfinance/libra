@@ -1,14 +1,14 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
-mod growing_subset;
-mod repeat_vec;
-mod value_generator;
+pub mod growing_subset;
+pub mod repeat_vec;
+pub mod value_generator;
 
 pub use crate::{
     growing_subset::GrowingSubset, repeat_vec::RepeatVec, value_generator::ValueGenerator,

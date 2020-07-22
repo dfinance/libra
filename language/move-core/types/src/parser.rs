@@ -11,7 +11,7 @@ use anyhow::{bail, Result};
 use std::iter::Peekable;
 
 #[derive(Eq, PartialEq, Debug)]
-enum Token {
+pub enum Token {
     U8Type,
     U64Type,
     U128Type,
@@ -35,7 +35,7 @@ enum Token {
 }
 
 impl Token {
-    fn is_whitespace(&self) -> bool {
+    pub fn is_whitespace(&self) -> bool {
         match self {
             Self::Whitespace(_) => true,
             _ => false,
@@ -43,7 +43,7 @@ impl Token {
     }
 }
 
-fn name_token(s: String) -> Token {
+pub fn name_token(s: String) -> Token {
     match s.as_str() {
         "u8" => Token::U8Type,
         "u64" => Token::U64Type,
@@ -57,7 +57,7 @@ fn name_token(s: String) -> Token {
     }
 }
 
-fn next_number(initial: char, mut it: impl Iterator<Item = char>) -> Result<(Token, usize)> {
+pub fn next_number(initial: char, mut it: impl Iterator<Item = char>) -> Result<(Token, usize)> {
     let mut num = String::new();
     num.push(initial);
     loop {
@@ -91,7 +91,7 @@ fn next_number(initial: char, mut it: impl Iterator<Item = char>) -> Result<(Tok
 }
 
 #[allow(clippy::many_single_char_names)]
-fn next_token(s: &str) -> Result<Option<(Token, usize)>> {
+pub fn next_token(s: &str) -> Result<Option<(Token, usize)>> {
     let mut it = s.chars().peekable();
     match it.next() {
         None => Ok(None),
@@ -169,7 +169,7 @@ fn next_token(s: &str) -> Result<Option<(Token, usize)>> {
     }
 }
 
-fn tokenize(mut s: &str) -> Result<Vec<Token>> {
+pub fn tokenize(mut s: &str) -> Result<Vec<Token>> {
     let mut v = vec![];
     while let Some((tok, n)) = next_token(s)? {
         v.push(tok);
@@ -178,7 +178,7 @@ fn tokenize(mut s: &str) -> Result<Vec<Token>> {
     Ok(v)
 }
 
-struct Parser<I: Iterator<Item = Token>> {
+pub struct Parser<I: Iterator<Item = Token>> {
     it: Peekable<I>,
 }
 
@@ -234,7 +234,7 @@ impl<I: Iterator<Item = Token>> Parser<I> {
         Ok(v)
     }
 
-    fn parse_type_tag(&mut self) -> Result<TypeTag> {
+    pub fn parse_type_tag(&mut self) -> Result<TypeTag> {
         Ok(match self.next()? {
             Token::U8Type => TypeTag::U8,
             Token::U64Type => TypeTag::U64,
@@ -283,7 +283,7 @@ impl<I: Iterator<Item = Token>> Parser<I> {
         })
     }
 
-    fn parse_transaction_argument(&mut self) -> Result<TransactionArgument> {
+    pub fn parse_transaction_argument(&mut self) -> Result<TransactionArgument> {
         Ok(match self.next()? {
             Token::U8(s) => TransactionArgument::U8(s.parse()?),
             Token::U64(s) => TransactionArgument::U64(s.parse()?),
@@ -299,7 +299,7 @@ impl<I: Iterator<Item = Token>> Parser<I> {
     }
 }
 
-fn parse<F, T>(s: &str, f: F) -> Result<T>
+pub fn parse<F, T>(s: &str, f: F) -> Result<T>
 where
     F: Fn(&mut Parser<std::vec::IntoIter<Token>>) -> Result<T>,
 {

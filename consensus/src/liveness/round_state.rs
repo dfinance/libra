@@ -274,7 +274,7 @@ impl RoundState {
     }
 
     /// Setup the timeout task and return the duration of the current timeout
-    fn setup_timeout(&mut self) -> Duration {
+    pub fn setup_timeout(&mut self) -> Duration {
         let timeout_sender = self.timeout_sender.clone();
         let timeout = self.setup_deadline();
         trace!(
@@ -288,7 +288,7 @@ impl RoundState {
     }
 
     /// Setup the current round deadline and return the duration of the current round
-    fn setup_deadline(&mut self) -> Duration {
+    pub fn setup_deadline(&mut self) -> Duration {
         let round_index_after_committed_round = {
             if self.highest_committed_round == 0 {
                 // Genesis doesn't require the 3-chain rule for commit, hence start the index at

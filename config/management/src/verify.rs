@@ -90,12 +90,12 @@ impl Verify {
     }
 }
 
-fn write_assert(buffer: &mut String, name: &str, value: bool) {
+pub fn write_assert(buffer: &mut String, name: &str, value: bool) {
     let value = if value { "match" } else { "MISMATCH" };
     writeln!(buffer, "{} - {}", name, value).unwrap();
 }
 
-fn write_break(buffer: &mut String) {
+pub fn write_break(buffer: &mut String) {
     writeln!(
         buffer,
         "====================================================================================",
@@ -103,17 +103,17 @@ fn write_break(buffer: &mut String) {
     .unwrap();
 }
 
-fn write_ed25519_key(storage: &Storage, buffer: &mut String, key: &'static str) {
+pub fn write_ed25519_key(storage: &Storage, buffer: &mut String, key: &'static str) {
     let value = ed25519_from_storage(key, storage).map_or_else(|e| e, |v| v.to_string());
     writeln!(buffer, "{} - {}", key, value).unwrap();
 }
 
-fn write_x25519_key(storage: &Storage, buffer: &mut String, key: &'static str) {
+pub fn write_x25519_key(storage: &Storage, buffer: &mut String, key: &'static str) {
     let value = ed25519_from_storage(key, storage).map_or_else(|e| e, |v| v.to_string());
     writeln!(buffer, "{} - {}", key, value).unwrap();
 }
 
-fn write_string(storage: &Storage, buffer: &mut String, key: &str) {
+pub fn write_string(storage: &Storage, buffer: &mut String, key: &str) {
     let value = storage
         .get(key)
         .and_then(|c| c.value.string())
@@ -121,7 +121,7 @@ fn write_string(storage: &Storage, buffer: &mut String, key: &str) {
     writeln!(buffer, "{} - {}", key, value).unwrap();
 }
 
-fn write_u64(storage: &Storage, buffer: &mut String, key: &str) {
+pub fn write_u64(storage: &Storage, buffer: &mut String, key: &str) {
     let value = storage
         .get(key)
         .and_then(|c| c.value.u64())
@@ -130,7 +130,7 @@ fn write_u64(storage: &Storage, buffer: &mut String, key: &str) {
     writeln!(buffer, "{} - {}", key, value).unwrap();
 }
 
-fn write_waypoint(storage: &Storage, buffer: &mut String, key: &str) {
+pub fn write_waypoint(storage: &Storage, buffer: &mut String, key: &str) {
     let value = storage
         .get(key)
         .and_then(|c| c.value.string())
@@ -148,7 +148,7 @@ fn write_waypoint(storage: &Storage, buffer: &mut String, key: &str) {
     writeln!(buffer, "{} - {}", key, value).unwrap();
 }
 
-fn compare_genesis(
+pub fn compare_genesis(
     storage: &Storage,
     buffer: &mut String,
     genesis_path: &PathBuf,
@@ -203,7 +203,7 @@ fn compare_genesis(
 
 /// Compute the ledger given a genesis writeset transaction and return access to that ledger and
 /// the waypoint for that state.
-fn compute_genesis(
+pub fn compute_genesis(
     genesis_path: &PathBuf,
     db_path: &Path,
 ) -> Result<(DbReaderWriter, Waypoint), Error> {
@@ -227,7 +227,7 @@ fn compute_genesis(
 }
 
 /// Read from the ledger the validator config from the validator set for the specified account
-fn validator_config(
+pub fn validator_config(
     validator_account: AccountAddress,
     reader: Arc<dyn DbReader>,
 ) -> Result<ValidatorConfig, Error> {
@@ -256,7 +256,7 @@ fn validator_config(
     Ok(info.config().clone())
 }
 
-fn validator_account(
+pub fn validator_account(
     storage: &Storage,
     storage_name: &'static str,
 ) -> Result<AccountAddress, Error> {
@@ -300,7 +300,7 @@ fn validator_account(
     }
 }
 
-fn ed25519_from_storage(
+pub fn ed25519_from_storage(
     key_name: &'static str,
     storage: &Storage,
 ) -> Result<Ed25519PublicKey, String> {
@@ -310,7 +310,7 @@ fn ed25519_from_storage(
         .map_err(|e| e.to_string())
 }
 
-fn x25519_from_storage(
+pub fn x25519_from_storage(
     key_name: &'static str,
     storage: &Storage,
 ) -> Result<x25519::PublicKey, String> {

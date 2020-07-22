@@ -16,7 +16,7 @@ pub fn get_registry() -> Result<Registry> {
     let samples = Samples::new();
     // 1. Record samples for types with custom deserializers.
 
-    // 2. Trace the main entry point(s) + every enum separately.
+    // 2. Trace the main entry point(s) + everypub enum separately.
     tracer.trace_type::<transaction::ScriptABI>(&samples)?;
     tracer.trace_type::<language_storage::TypeTag>(&samples)?;
     tracer.registry()

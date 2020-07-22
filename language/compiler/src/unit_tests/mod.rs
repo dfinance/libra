@@ -3,11 +3,11 @@
 
 // Needs to be at the top to allow macros defined in here to be used in tests.
 #[macro_use]
-pub(crate) mod testutils;
+pub mod testutils;
 
-mod branch_tests;
-mod cfg_tests;
-mod expression_tests;
-mod function_tests;
-mod import_tests;
-mod serializer_tests;
+pub mod branch_tests;
+pub mod cfg_tests;
+pub mod expression_tests;
+pub mod function_tests;
+pub mod import_tests;
+pub mod serializer_tests;

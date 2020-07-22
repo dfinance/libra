@@ -10,14 +10,14 @@ use rand::{rngs::OsRng, RngCore};
 use serde::{de, ser, Deserialize, Serialize};
 use std::{convert::TryFrom, fmt};
 
-/// A struct that represents a globally unique id for an Event stream that a user can listen to.
+/// A pub struct that represents a globally unique id for an Event stream that a user can listen to.
 /// By design, the lower part of EventKey is the same as account address.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct EventKey([u8; EventKey::LENGTH]);
 
 impl EventKey {
-    /// Construct a new EventKey from a byte array slice.
+    /// Conpub struct a new EventKey from a byte array slice.
     pub fn new(key: [u8; Self::LENGTH]) -> Self {
         EventKey(key)
     }
@@ -107,7 +107,7 @@ impl<'de> de::Deserialize<'de> for EventKey {
             // See comment in serialize.
             #[derive(::serde::Deserialize)]
             #[serde(rename = "EventKey")]
-            struct Value<'a>(&'a [u8]);
+            pub struct Value<'a>(&'a [u8]);
 
             let value = Value::deserialize(deserializer)?;
             Self::try_from(value.0).map_err(<D::Error as ::serde::de::Error>::custom)

@@ -48,7 +48,7 @@ macro_rules! debug_writeln {
 ///
 /// An `Interpreter` instance is a stand alone execution context for a function.
 /// It mimics execution on a single thread, with an call stack and an operand stack.
-pub(crate) struct Interpreter {
+pub struct Interpreter {
     /// Operand stack, where Move `Value`s are stored for stack operations.
     operand_stack: Stack,
     /// The stack of active functions.
@@ -58,7 +58,7 @@ pub(crate) struct Interpreter {
 impl Interpreter {
     /// Entrypoint into the interpreter. All external calls need to be routed through this
     /// function.
-    pub(crate) fn entrypoint(
+    pub fn entrypoint(
         function: Arc<Function>,
         ty_args: Vec<Type>,
         args: Vec<Value>,
@@ -74,7 +74,7 @@ impl Interpreter {
 
     /// Create a new instance of an `Interpreter` in the context of a transaction with a
     /// given module cache and gas schedule.
-    fn new() -> Self {
+    pub fn new() -> Self {
         Interpreter {
             operand_stack: Stack::new(),
             call_stack: CallStack::new(),
@@ -82,7 +82,7 @@ impl Interpreter {
     }
 
     /// Internal execution entry point.
-    fn execute(
+    pub fn execute(
         &mut self,
         loader: &Loader,
         data_store: &mut dyn DataStore,
@@ -104,7 +104,7 @@ impl Interpreter {
     /// at the top of the stack (return). If the call stack is empty execution is completed.
     // REVIEW: create account will be removed in favor of a native function (no opcode) and
     // we can simplify this code quite a bit.
-    fn execute_main(
+    pub fn execute_main(
         &mut self,
         loader: &Loader,
         data_store: &mut dyn DataStore,
@@ -199,7 +199,7 @@ impl Interpreter {
     ///
     /// Native functions do not push a frame at the moment and as such errors from a native
     /// function are incorrectly attributed to the caller.
-    fn make_call_frame(&mut self, func: Arc<Function>, ty_args: Vec<Type>) -> VMResult<Frame> {
+    pub fn make_call_frame(&mut self, func: Arc<Function>, ty_args: Vec<Type>) -> VMResult<Frame> {
         let mut locals = Locals::new(func.local_count());
         let arg_count = func.arg_count();
         for i in 0..arg_count {
@@ -214,7 +214,7 @@ impl Interpreter {
     }
 
     /// Call a native functions.
-    fn call_native(
+    pub fn call_native(
         &mut self,
         resolver: &Resolver,
         data_store: &mut dyn DataStore,
@@ -242,7 +242,7 @@ impl Interpreter {
         })
     }
 
-    fn call_native_impl(
+    pub fn call_native_impl(
         &mut self,
         resolver: &Resolver,
         data_store: &mut dyn DataStore,
@@ -269,7 +269,7 @@ impl Interpreter {
     }
 
     /// Perform a binary operation to two values at the top of the stack.
-    fn binop<F, T>(&mut self, f: F) -> PartialVMResult<()>
+    pub fn binop<F, T>(&mut self, f: F) -> PartialVMResult<()>
     where
         Value: VMValueCast<T>,
         F: FnOnce(T, T) -> PartialVMResult<Value>,
@@ -281,7 +281,7 @@ impl Interpreter {
     }
 
     /// Perform a binary operation for integer values.
-    fn binop_int<F>(&mut self, f: F) -> PartialVMResult<()>
+    pub fn binop_int<F>(&mut self, f: F) -> PartialVMResult<()>
     where
         F: FnOnce(IntegerValue, IntegerValue) -> PartialVMResult<IntegerValue>,
     {
@@ -295,7 +295,7 @@ impl Interpreter {
     }
 
     /// Perform a binary operation for boolean values.
-    fn binop_bool<F, T>(&mut self, f: F) -> PartialVMResult<()>
+    pub fn binop_bool<F, T>(&mut self, f: F) -> PartialVMResult<()>
     where
         Value: VMValueCast<T>,
         F: FnOnce(T, T) -> PartialVMResult<bool>,
@@ -304,7 +304,7 @@ impl Interpreter {
     }
 
     /// BorrowGlobal (mutable and not) opcode.
-    fn borrow_global(
+    pub fn borrow_global(
         &mut self,
         data_store: &mut dyn DataStore,
         addr: AccountAddress,
@@ -317,7 +317,7 @@ impl Interpreter {
     }
 
     /// Exists opcode.
-    fn exists(
+    pub fn exists(
         &mut self,
         data_store: &mut dyn DataStore,
         addr: AccountAddress,
@@ -329,7 +329,7 @@ impl Interpreter {
     }
 
     /// MoveFrom opcode.
-    fn move_from(
+    pub fn move_from(
         &mut self,
         data_store: &mut dyn DataStore,
         addr: AccountAddress,
@@ -342,7 +342,7 @@ impl Interpreter {
     }
 
     /// MoveTo opcode.
-    fn move_to(
+    pub fn move_to(
         resource: Struct,
     ) -> impl FnOnce(
         &mut Interpreter,
@@ -362,7 +362,7 @@ impl Interpreter {
     //
 
     /// Given an `VMStatus` generate a core dump if the error is an `InvariantViolation`.
-    fn maybe_core_dump(&self, mut err: VMError, current_frame: &Frame) -> VMError {
+    pub fn maybe_core_dump(&self, mut err: VMError, current_frame: &Frame) -> VMError {
         // a verification error cannot happen at runtime so change it into an invariant violation.
         if err.status_type() == StatusType::Verification {
             crit!("Verification error during runtime: {:?}", err);
@@ -385,7 +385,7 @@ impl Interpreter {
     }
 
     #[allow(dead_code)]
-    fn debug_print_frame<B: Write>(
+    pub fn debug_print_frame<B: Write>(
         &self,
         buf: &mut B,
         resolver: &Resolver,
@@ -453,7 +453,7 @@ impl Interpreter {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn debug_print_stack_trace<B: Write>(
+    pub fn debug_print_stack_trace<B: Write>(
         &self,
         buf: &mut B,
         resolver: &Resolver,
@@ -479,7 +479,7 @@ impl Interpreter {
     /// It is used when generating a core dump but can be used for debugging of the interpreter.
     /// It will be exposed via a debug module to give developers a way to print the internals
     /// of an execution.
-    fn get_internal_state(&self, current_frame: &Frame) -> String {
+    pub fn get_internal_state(&self, current_frame: &Frame) -> String {
         let mut internal_state = "Call stack:\n".to_string();
         for (i, frame) in self.call_stack.0.iter().enumerate() {
             internal_state.push_str(
@@ -519,7 +519,7 @@ impl Interpreter {
         internal_state
     }
 
-    fn set_location(&self, err: PartialVMError) -> VMError {
+    pub fn set_location(&self, err: PartialVMError) -> VMError {
         err.finish(self.call_stack.current_location())
     }
 }
@@ -529,17 +529,17 @@ const OPERAND_STACK_SIZE_LIMIT: usize = 1024;
 const CALL_STACK_SIZE_LIMIT: usize = 1024;
 
 /// The operand stack.
-struct Stack(Vec<Value>);
+pub struct Stack(Vec<Value>);
 
 impl Stack {
     /// Create a new empty operand stack.
-    fn new() -> Self {
+    pub fn new() -> Self {
         Stack(vec![])
     }
 
     /// Push a `Value` on the stack if the max stack size has not been reached. Abort execution
     /// otherwise.
-    fn push(&mut self, value: Value) -> PartialVMResult<()> {
+    pub fn push(&mut self, value: Value) -> PartialVMResult<()> {
         if self.0.len() < OPERAND_STACK_SIZE_LIMIT {
             self.0.push(value);
             Ok(())
@@ -549,7 +549,7 @@ impl Stack {
     }
 
     /// Pop a `Value` off the stack or abort execution if the stack is empty.
-    fn pop(&mut self) -> PartialVMResult<Value> {
+    pub fn pop(&mut self) -> PartialVMResult<Value> {
         self.0
             .pop()
             .ok_or_else(|| PartialVMError::new(StatusCode::EMPTY_VALUE_STACK))
@@ -557,7 +557,7 @@ impl Stack {
 
     /// Pop a `Value` of a given type off the stack. Abort if the value is not of the given
     /// type or if the stack is empty.
-    fn pop_as<T>(&mut self) -> PartialVMResult<T>
+    pub fn pop_as<T>(&mut self) -> PartialVMResult<T>
     where
         Value: VMValueCast<T>,
     {
@@ -565,7 +565,7 @@ impl Stack {
     }
 
     /// Pop n values off the stack.
-    fn popn(&mut self, n: u16) -> PartialVMResult<Vec<Value>> {
+    pub fn popn(&mut self, n: u16) -> PartialVMResult<Vec<Value>> {
         let remaining_stack_size = self
             .0
             .len()
@@ -578,16 +578,16 @@ impl Stack {
 
 /// A call stack.
 #[derive(Debug)]
-struct CallStack(Vec<Frame>);
+pub struct CallStack(Vec<Frame>);
 
 impl CallStack {
     /// Create a new empty call stack.
-    fn new() -> Self {
+    pub fn new() -> Self {
         CallStack(vec![])
     }
 
     /// Push a `Frame` on the call stack.
-    fn push(&mut self, frame: Frame) -> ::std::result::Result<(), Frame> {
+    pub fn push(&mut self, frame: Frame) -> ::std::result::Result<(), Frame> {
         if self.0.len() < CALL_STACK_SIZE_LIMIT {
             self.0.push(frame);
             Ok(())
@@ -597,11 +597,11 @@ impl CallStack {
     }
 
     /// Pop a `Frame` off the call stack.
-    fn pop(&mut self) -> Option<Frame> {
+    pub fn pop(&mut self) -> Option<Frame> {
         self.0.pop()
     }
 
-    fn current_location(&self) -> Location {
+    pub fn current_location(&self) -> Location {
         let location_opt = self.0.last().map(|frame| frame.location());
         location_opt.unwrap_or(Location::Undefined)
     }
@@ -610,7 +610,7 @@ impl CallStack {
 /// A `Frame` is the execution context for a function. It holds the locals of the function and
 /// the function itself.
 #[derive(Debug)]
-struct Frame {
+pub struct Frame {
     pc: u16,
     locals: Locals,
     function: Arc<Function>,
@@ -619,7 +619,7 @@ struct Frame {
 
 /// An `ExitCode` from `execute_code_unit`.
 #[derive(Debug)]
-enum ExitCode {
+pub enum ExitCode {
     Return,
     Call(FunctionHandleIndex),
     CallGeneric(FunctionInstantiationIndex),
@@ -629,7 +629,7 @@ impl Frame {
     /// Create a new `Frame` given a `Function` and the function `Locals`.
     ///
     /// The locals must be loaded before calling this.
-    fn new(function: Arc<Function>, ty_args: Vec<Type>, locals: Locals) -> Self {
+    pub fn new(function: Arc<Function>, ty_args: Vec<Type>, locals: Locals) -> Self {
         Frame {
             pc: 0,
             locals,
@@ -639,7 +639,7 @@ impl Frame {
     }
 
     /// Execute a Move function until a return or a call opcode is found.
-    fn execute_code(
+    pub fn execute_code(
         &mut self,
         resolver: &Resolver,
         interpreter: &mut Interpreter,
@@ -653,7 +653,7 @@ impl Frame {
             })
     }
 
-    fn execute_code_impl(
+    pub fn execute_code_impl(
         &mut self,
         resolver: &Resolver,
         interpreter: &mut Interpreter,
@@ -1080,15 +1080,15 @@ impl Frame {
         }
     }
 
-    fn ty_args(&self) -> &[Type] {
+    pub fn ty_args(&self) -> &[Type] {
         &self.ty_args
     }
 
-    fn resolver<'a>(&self, loader: &'a Loader) -> Resolver<'a> {
+    pub fn resolver<'a>(&self, loader: &'a Loader) -> Resolver<'a> {
         self.function.get_resolver(loader)
     }
 
-    fn location(&self) -> Location {
+    pub fn location(&self) -> Location {
         match self.function.module_id() {
             None => Location::Script,
             Some(id) => Location::Module(id.clone()),
@@ -1099,7 +1099,7 @@ impl Frame {
 // Verify the the type of the arguments in input from the outside is restricted (`is_valid_arg()`)
 // and it honors the signature of the function invoked.
 // TODO: we need to check the instantiation, once we expose signatures with generic argument
-fn verify_args(signature: &Signature, _ty_args: &[Type], args: &[Value]) -> PartialVMResult<()> {
+pub fn verify_args(signature: &Signature, _ty_args: &[Type], args: &[Value]) -> PartialVMResult<()> {
     if signature.len() != args.len() {
         return Err(
             PartialVMError::new(StatusCode::TYPE_MISMATCH).with_message(format!(

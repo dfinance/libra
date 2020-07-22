@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 pub mod ast;
-pub(crate) mod core;
-mod expand;
-mod globals;
-mod infinite_instantiations;
-mod recursive_structs;
-pub(crate) mod translate;
+pub mod core;
+pub mod expand;
+pub mod globals;
+pub mod infinite_instantiations;
+pub mod recursive_structs;
+pub mod translate;

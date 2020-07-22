@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -173,7 +173,7 @@ impl Client {
     }
 
     /// Simple wrapper around requests to add default parameters to the request
-    fn upgrade_request(&self, mut request: ureq::Request) -> ureq::Request {
+    pub fn upgrade_request(&self, mut request: ureq::Request) -> ureq::Request {
         request
             .set("Authorization", &format!("token {}", self.token))
             .set(ACCEPT_HEADER, ACCEPT_VALUE)
@@ -190,7 +190,7 @@ impl Client {
     }
 
     /// Get can read files or directories, this makes it easier to use
-    fn get_internal(&self, path: &str) -> Result<Vec<GetResponse>, Error> {
+    pub fn get_internal(&self, path: &str) -> Result<Vec<GetResponse>, Error> {
         let resp = self.upgrade_request(ureq::get(&self.url(path))).call();
         match resp.status() {
             200 => {
@@ -216,7 +216,7 @@ impl Client {
     }
 
     /// Returns the sha hash of a file according to GitHub
-    fn get_sha(&self, path: &str) -> Result<String, Error> {
+    pub fn get_sha(&self, path: &str) -> Result<String, Error> {
         let value = self.get_internal(path)?;
         if let Some(value) = value.iter().find(|entry| entry.path == path) {
             Ok(value.sha.clone())
@@ -229,7 +229,7 @@ impl Client {
         }
     }
 
-    fn url(&self, path: &str) -> String {
+    pub fn url(&self, path: &str) -> String {
         format!(
             "{}/repos/{}/{}/contents/{}",
             URL, self.owner, self.repository, path
@@ -238,12 +238,12 @@ impl Client {
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct Branch {
+pub struct Branch {
     name: String,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
-struct GetResponse {
+pub struct GetResponse {
     #[serde(rename = "type")]
     content_type: String,
     path: String,
@@ -261,7 +261,7 @@ struct GetResponse {
 // failed update. Therefore these tests must be run in series via:
 // `cargo xtest -- --ignored --test-threads=1`
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
 
     const OWNER: &str = "OWNER";

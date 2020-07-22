@@ -60,7 +60,7 @@ type FunctionInstIndexToBytecode = fn(FunctionInstantiationIndex) -> Bytecode;
 
 /// There are six types of bytecode instructions
 #[derive(Debug, Clone)]
-enum BytecodeType {
+pub enum BytecodeType {
     /// Instructions that do not take an argument
     NoArg(Bytecode),
 
@@ -103,7 +103,7 @@ enum BytecodeType {
 
 /// Abstraction for change to the stack size
 #[derive(Debug, Copy, Clone, PartialEq)]
-enum StackEffect {
+pub enum StackEffect {
     /// Represents an increase in stack size
     Add,
 
@@ -301,7 +301,7 @@ impl<'a> BytecodeGenerator<'a> {
         Self { instructions, rng }
     }
 
-    fn index_or_none<T>(table: &[T], rng: &mut StdRng) -> Option<TableIndex> {
+    pub fn index_or_none<T>(table: &[T], rng: &mut StdRng) -> Option<TableIndex> {
         if table.is_empty() {
             None
         } else {
@@ -312,7 +312,7 @@ impl<'a> BytecodeGenerator<'a> {
     // Soft cutoff: We starting making it less likely for the stack size to be increased once it
     // becomes greater than VALUE_STACK_LIMIT - 24. Once we reach the stack limit then we have a
     // hard cutoff.
-    fn value_backpressure(state: &AbstractState, probability: f32) -> f32 {
+    pub fn value_backpressure(state: &AbstractState, probability: f32) -> f32 {
         let len = state.stack_len();
 
         if len <= VALUE_STACK_LIMIT - 24 {
@@ -328,7 +328,7 @@ impl<'a> BytecodeGenerator<'a> {
 
     // Tight cutoff: calls can be generated as long as it's less than the max call stack height. If
     // the call would cause the call stack to overflow then it can't be generated.
-    fn call_stack_backpressure(
+    pub fn call_stack_backpressure(
         state: &AbstractState,
         fn_context: &FunctionGenerationContext,
         call: FunctionHandleIndex,
@@ -347,7 +347,7 @@ impl<'a> BytecodeGenerator<'a> {
     /// Given an `AbstractState`, `state`, and a the number of locals the function has,
     /// this function returns a list of instructions whose preconditions are satisfied for
     /// the state.
-    fn candidate_instructions(
+    pub fn candidate_instructions(
         &mut self,
         fn_context: &FunctionGenerationContext,
         state: AbstractState,
@@ -390,7 +390,7 @@ impl<'a> BytecodeGenerator<'a> {
                         .map(|x| instruction(ConstantPoolIndex::new(x)))
                 }
                 BytecodeType::StructIndex(instruction) => {
-                    // Select a random struct definition and local signature
+                    // Select a random pub struct definition and local signature
                     Self::index_or_none(&module.struct_defs, &mut self.rng)
                         .map(|x| instruction(StructDefinitionIndex::new(x)))
                 }
@@ -453,7 +453,7 @@ impl<'a> BytecodeGenerator<'a> {
 
     /// Select an instruction from the list of candidates based on the current state's
     /// stack size and the expected number of function return parameters.
-    fn select_candidate(
+    pub fn select_candidate(
         &mut self,
         return_len: usize,
         state: &AbstractState,
@@ -506,7 +506,7 @@ impl<'a> BytecodeGenerator<'a> {
 
     /// Transition an abstract state, `state` to the next state by applying all of the effects
     /// of a particular bytecode instruction, `instruction`.
-    fn abstract_step(
+    pub fn abstract_step(
         &self,
         mut state: AbstractState,
         instruction: Bytecode,
@@ -878,7 +878,7 @@ impl<'a> BytecodeGenerator<'a> {
                     .iter()
                     .position(|struct_def| struct_def.struct_handle == *handle_idx)
                     .expect(
-                        "struct def should exist for every struct handle in the test generator",
+                        "pub struct def should exist for every pub struct handle in the test generator",
                     );
                 let struct_def = module
                     .module
@@ -906,7 +906,7 @@ impl<'a> BytecodeGenerator<'a> {
                     .iter()
                     .position(|struct_def| struct_def.struct_handle == *handle_idx)
                     .expect(
-                        "struct def should exist for every struct handle in the test generator",
+                        "pub struct def should exist for every pub struct handle in the test generator",
                     );
                 let struct_def = module
                     .module

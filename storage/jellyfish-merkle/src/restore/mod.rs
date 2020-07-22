@@ -5,7 +5,7 @@
 //! of accounts.
 
 #[cfg(test)]
-mod restore_test;
+pub mod restore_test;
 
 use crate::{
     nibble_path::{NibbleIterator, NibblePath},
@@ -28,7 +28,7 @@ use libra_types::{
 use mirai_annotations::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-enum ChildInfo {
+pub enum ChildInfo {
     /// This child is an internal node. The hash of the internal node is stored here if it is
     /// known, otherwise it is `None`. In the process of restoring a tree, we will only know the
     /// hash of an internal node after we see all the keys that share the same prefix.
@@ -40,7 +40,7 @@ enum ChildInfo {
 
 impl ChildInfo {
     /// Converts `self` to a child, assuming the hash is known if it's an internal node.
-    fn into_child(self, version: Version) -> Child {
+    pub fn into_child(self, version: Version) -> Child {
         match self {
             Self::Internal { hash } => {
                 Child::new(
@@ -57,7 +57,7 @@ impl ChildInfo {
 }
 
 #[derive(Clone, Debug)]
-struct InternalInfo {
+pub struct InternalInfo {
     /// The node key of this internal node.
     node_key: NodeKey,
 
@@ -68,21 +68,21 @@ struct InternalInfo {
 
 impl InternalInfo {
     /// Creates an empty internal node with no children.
-    fn new_empty(node_key: NodeKey) -> Self {
+    pub fn new_empty(node_key: NodeKey) -> Self {
         Self {
             node_key,
             children: Default::default(),
         }
     }
 
-    fn set_child(&mut self, index: usize, child_info: ChildInfo) {
+    pub fn set_child(&mut self, index: usize, child_info: ChildInfo) {
         precondition!(index < 16);
         self.children[index] = Some(child_info);
     }
 
     /// Converts `self` to an internal node, assuming all of its children are already known and
     /// fully initialized.
-    fn into_internal_node(mut self, version: Version) -> (NodeKey, InternalNode) {
+    pub fn into_internal_node(mut self, version: Version) -> (NodeKey, InternalNode) {
         let mut children = Children::new();
 
         // Calling `into_iter` on an array is equivalent to calling `iter`:
@@ -187,7 +187,7 @@ where
 
     /// Recovers partial nodes from storage. We do this by looking at all the ancestors of the
     /// rightmost leaf. The ones do not exist in storage are the partial nodes.
-    fn recover_partial_nodes(
+    pub fn recover_partial_nodes(
         store: &'a S,
         version: Version,
         rightmost_leaf_node_key: NodeKey,
@@ -206,7 +206,7 @@ where
             node_key = node_key.gen_parent_node_key();
         }
 
-        // Next we reconstruct all the partial nodes up to the root node, starting from the bottom.
+        // Next we reconpub struct all the partial nodes up to the root node, starting from the bottom.
         // For all of them, we scan all its possible child positions and see if there is one at
         // each position. If the node is not the bottom one, there is additionally a partial node
         // child at the position `previous_child_index`.
@@ -285,7 +285,7 @@ where
     }
 
     /// Restores one account.
-    fn add_one(&mut self, new_key: HashValue, new_value: AccountStateBlob) {
+    pub fn add_one(&mut self, new_key: HashValue, new_value: AccountStateBlob) {
         let nibble_path = NibblePath::new(new_key.to_vec());
         let mut nibbles = nibble_path.nibbles();
 
@@ -339,7 +339,7 @@ where
     /// Inserts a new account at the position of the existing leaf node. We may need to create
     /// multiple internal nodes depending on the length of the common prefix of the existing key
     /// and the new key.
-    fn insert_at_leaf<'b>(
+    pub fn insert_at_leaf<'b>(
         &mut self,
         child_index: usize,
         existing_leaf: LeafNode,
@@ -410,14 +410,14 @@ where
     }
 
     /// Puts the nodes that will not be changed later in `self.frozen_nodes`.
-    fn freeze(&mut self, num_remaining_partial_nodes: usize) {
+    pub fn freeze(&mut self, num_remaining_partial_nodes: usize) {
         self.freeze_previous_leaf();
         self.freeze_internal_nodes(num_remaining_partial_nodes);
     }
 
     /// Freezes the previously added leaf node. It should always be the rightmost leaf node on the
     /// lowest level, inserted in the previous `add_one` call.
-    fn freeze_previous_leaf(&mut self) {
+    pub fn freeze_previous_leaf(&mut self) {
         // If this is the very first key, there is no previous leaf to freeze.
         if self.num_keys_received == 0 {
             return;
@@ -447,7 +447,7 @@ where
 
     /// Freeze extra internal nodes. Only `num_remaining_nodes` partial internal nodes will be kept
     /// and the ones on the lower level will be frozen.
-    fn freeze_internal_nodes(&mut self, num_remaining_nodes: usize) {
+    pub fn freeze_internal_nodes(&mut self, num_remaining_nodes: usize) {
         while self.partial_nodes.len() > num_remaining_nodes {
             let last_node = self.partial_nodes.pop().expect("This node must exist.");
             let (node_key, internal_node) = last_node.into_internal_node(self.version);
@@ -479,10 +479,10 @@ where
     }
 
     /// Verifies that all accounts that have been added so far (from the leftmost one to
-    /// `self.previous_leaf`) are correct, i.e., we are able to construct `self.expected_root_hash`
+    /// `self.previous_leaf`) are correct, i.e., we are able to conpub struct `self.expected_root_hash`
     /// by combining all existing accounts and `proof`.
     #[allow(clippy::collapsible_if)]
-    fn verify(&self, proof: SparseMerkleRangeProof) -> Result<()> {
+    pub fn verify(&self, proof: SparseMerkleRangeProof) -> Result<()> {
         let previous_leaf = self
             .previous_leaf
             .as_ref()
@@ -581,7 +581,7 @@ where
     }
 
     /// Computes the sibling on the left for the `n`-th child.
-    fn compute_left_sibling(partial_node: &InternalInfo, n: Nibble, height: u8) -> HashValue {
+    pub fn compute_left_sibling(partial_node: &InternalInfo, n: Nibble, height: u8) -> HashValue {
         assert!(height < 4);
         let width = 1usize << height;
         let start = get_child_and_sibling_half_start(n, height).1 as usize;
@@ -589,7 +589,7 @@ where
     }
 
     /// Returns the hash for given portion of the subtree and whether this part is a leaf node.
-    fn compute_left_sibling_impl(children: &[Option<ChildInfo>]) -> (HashValue, bool) {
+    pub fn compute_left_sibling_impl(children: &[Option<ChildInfo>]) -> (HashValue, bool) {
         assert!(!children.is_empty());
 
         let num_children = children.len();

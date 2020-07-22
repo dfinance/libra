@@ -18,13 +18,13 @@ use serde::{ser, Serialize};
 /// use serde::Serialize;
 ///
 /// #[derive(Serialize)]
-/// struct Ip([u8; 4]);
+/// pub struct Ip([u8; 4]);
 ///
 /// #[derive(Serialize)]
-/// struct Port(u16);
+/// pub struct Port(u16);
 ///
 /// #[derive(Serialize)]
-/// struct Service {
+/// pub struct Service {
 ///     ip: Ip,
 ///     port: Vec<Port>,
 ///     connection_max: Option<u32>,
@@ -65,7 +65,7 @@ where
     value.serialize(serializer)
 }
 
-struct WriteCounter(usize);
+pub struct WriteCounter(usize);
 
 impl std::io::Write for WriteCounter {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
@@ -96,7 +96,7 @@ pub fn is_human_readable() -> bool {
 }
 
 /// Serialization implementation for LCS
-struct Serializer<'a, W> {
+pub struct Serializer<'a, W> {
     output: &'a mut W,
     max_remaining_depth: usize,
 }
@@ -106,14 +106,14 @@ where
     W: std::io::Write,
 {
     /// Creates a new `Serializer` which will emit LCS.
-    fn new(output: &'a mut W, max_remaining_depth: usize) -> Self {
+    pub fn new(output: &'a mut W, max_remaining_depth: usize) -> Self {
         Self {
             output,
             max_remaining_depth,
         }
     }
 
-    fn output_u32_as_uleb128(&mut self, mut value: u32) -> Result<()> {
+    pub fn output_u32_as_uleb128(&mut self, mut value: u32) -> Result<()> {
         while value >= 0x80 {
             // Write 7 (lowest) bits of data and set the 8th bit to 1.
             let byte = (value & 0x7f) as u8;
@@ -125,19 +125,19 @@ where
         Ok(())
     }
 
-    fn output_variant_index(&mut self, v: u32) -> Result<()> {
+    pub fn output_variant_index(&mut self, v: u32) -> Result<()> {
         self.output_u32_as_uleb128(v)
     }
 
     /// Serialize a sequence length as a u32.
-    fn output_seq_len(&mut self, len: usize) -> Result<()> {
+    pub fn output_seq_len(&mut self, len: usize) -> Result<()> {
         if len > crate::MAX_SEQUENCE_LENGTH {
             return Err(Error::ExceededMaxLen(len));
         }
         self.output_u32_as_uleb128(len as u32)
     }
 
-    fn enter_named_container(&mut self, name: &'static str) -> Result<()> {
+    pub fn enter_named_container(&mut self, name: &'static str) -> Result<()> {
         if self.max_remaining_depth == 0 {
             return Err(Error::ExceededContainerDepthLimit(name));
         }
@@ -435,7 +435,7 @@ where
 }
 
 #[doc(hidden)]
-struct MapSerializer<'a, W> {
+pub struct MapSerializer<'a, W> {
     serializer: Serializer<'a, W>,
     entries: Vec<(Vec<u8>, Vec<u8>)>,
     next_key: Option<Vec<u8>>,

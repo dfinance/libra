@@ -14,8 +14,8 @@ use move_vm_types::{gas_schedule::CostStrategy, values::Value};
 use vm::errors::*;
 
 pub struct Session<'r, 'l, R> {
-    pub(crate) runtime: &'l VMRuntime,
-    pub(crate) data_cache: TransactionDataCache<'r, 'l, R>,
+    pub runtime: &'l VMRuntime,
+    pub data_cache: TransactionDataCache<'r, 'l, R>,
 }
 
 impl<'r, 'l, R: RemoteCache> Session<'r, 'l, R> {

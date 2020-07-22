@@ -19,13 +19,13 @@ use structopt::StructOpt;
 
 #[derive(StructOpt)]
 #[structopt(about = "Libra backup tool.")]
-enum Command {
+pub enum Command {
     #[structopt(about = "Manually run one shot commands.")]
     OneShot(OneShotCommand),
 }
 
 #[derive(StructOpt)]
-enum OneShotCommand {
+pub enum OneShotCommand {
     #[structopt(about = "Query the backup service builtin in the local Libra node.")]
     Query(OneShotQueryOpt),
     #[structopt(about = "Do a one shot backup.")]
@@ -33,7 +33,7 @@ enum OneShotCommand {
 }
 
 #[derive(StructOpt)]
-struct OneShotQueryOpt {
+pub struct OneShotQueryOpt {
     #[structopt(flatten)]
     client: BackupServiceClientOpt,
     #[structopt(
@@ -44,7 +44,7 @@ struct OneShotQueryOpt {
 }
 
 #[derive(StructOpt)]
-struct OneShotBackupOpt {
+pub struct OneShotBackupOpt {
     #[structopt(flatten)]
     global: GlobalBackupOpt,
 
@@ -56,7 +56,7 @@ struct OneShotBackupOpt {
 }
 
 #[derive(StructOpt)]
-enum BackupType {
+pub enum BackupType {
     EpochEnding {
         #[structopt(flatten)]
         opt: EpochEndingBackupOpt,

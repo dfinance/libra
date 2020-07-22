@@ -270,7 +270,7 @@ impl Arbitrary for RawNetworkAddress {
 ////////////////////
 
 impl NetworkAddress {
-    fn new(protocols: Vec<Protocol>) -> Self {
+    pub fn new(protocols: Vec<Protocol>) -> Self {
         Self(protocols)
     }
 
@@ -488,7 +488,7 @@ impl Serialize for NetworkAddress {
     {
         #[derive(Serialize)]
         #[serde(rename = "NetworkAddress")]
-        struct SerializeWrapper<'a>(&'a [Protocol]);
+        pub struct SerializeWrapper<'a>(&'a [Protocol]);
 
         if serializer.is_human_readable() {
             serializer.serialize_str(&self.to_string())
@@ -506,7 +506,7 @@ impl<'de> Deserialize<'de> for NetworkAddress {
     {
         #[derive(Deserialize)]
         #[serde(rename = "NetworkAddress")]
-        struct DeserializeWrapper(Vec<Protocol>);
+        pub struct DeserializeWrapper(Vec<Protocol>);
 
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -584,7 +584,7 @@ impl fmt::Display for Protocol {
     }
 }
 
-fn parse_one<'a, T>(args: &mut impl Iterator<Item = &'a str>) -> Result<T, ParseError>
+pub fn parse_one<'a, T>(args: &mut impl Iterator<Item = &'a str>) -> Result<T, ParseError>
 where
     T: FromStr,
     T::Err: Into<ParseError>,
@@ -594,7 +594,7 @@ where
 }
 
 impl Protocol {
-    fn parse<'a>(
+    pub fn parse<'a>(
         protocol_type: &str,
         args: &mut impl Iterator<Item = &'a str>,
     ) -> Result<Protocol, ParseError> {
@@ -630,7 +630,7 @@ impl From<IpAddr> for Protocol {
 /////////////
 
 impl DnsName {
-    fn validate(s: &str) -> Result<(), ParseError> {
+    pub fn validate(s: &str) -> Result<(), ParseError> {
         if s.is_empty() {
             Err(ParseError::EmptyDnsNameString)
         } else if s.as_bytes().len() > MAX_DNS_NAME_SIZE {
@@ -684,7 +684,7 @@ impl<'de> Deserialize<'de> for DnsName {
     {
         #[derive(Deserialize)]
         #[serde(rename = "DnsName")]
-        struct DeserializeWrapper(String);
+        pub struct DeserializeWrapper(String);
 
         let wrapper = DeserializeWrapper::deserialize(deserializer)?;
         let name = DnsName::try_from(wrapper.0).map_err(de::Error::custom)?;
@@ -805,7 +805,7 @@ pub fn parse_handshake(protos: &[Protocol]) -> Option<(u8, &[Protocol])> {
 /// parse canonical libranet protocols
 ///
 /// See: `NetworkAddress::is_libranet_addr(&self)`
-fn parse_libranet_protos(protos: &[Protocol]) -> Option<&[Protocol]> {
+pub fn parse_libranet_protos(protos: &[Protocol]) -> Option<&[Protocol]> {
     // parse base transport layer
     // ---
     // parse_ip_tcp
@@ -847,7 +847,7 @@ fn parse_libranet_protos(protos: &[Protocol]) -> Option<&[Protocol]> {
 ///////////
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use anyhow::format_err;
     use lcs::test_helpers::assert_canonical_encode_decode;

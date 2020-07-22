@@ -180,7 +180,7 @@ pub struct EliminateMutRefs<'a> {
 }
 
 impl<'a> EliminateMutRefs<'a> {
-    fn new(
+    pub fn new(
         func_target: &'a FunctionTarget,
         param_proxy_map: BTreeMap<TempIndex, TempIndex>,
         ref_param_proxy_map: BTreeMap<TempIndex, TempIndex>,
@@ -196,7 +196,7 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn transform_type(ty: Type) -> Type {
+    pub fn transform_type(ty: Type) -> Type {
         if let Type::Reference(_, y) = ty {
             *y
         } else {
@@ -204,7 +204,7 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn transform_index(&self, idx: TempIndex) -> TempIndex {
+    pub fn transform_index(&self, idx: TempIndex) -> TempIndex {
         if self.ref_param_proxy_map.contains_key(&idx) {
             self.ref_param_proxy_map[&idx]
         } else if self.param_proxy_map.contains_key(&idx) {
@@ -214,7 +214,7 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn transform_index_for_local_root(&self, idx: TempIndex) -> TempIndex {
+    pub fn transform_index_for_local_root(&self, idx: TempIndex) -> TempIndex {
         if self.param_proxy_map.contains_key(&idx) {
             self.param_proxy_map[&idx]
         } else {
@@ -222,14 +222,14 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn transform_indices(&self, indices: Vec<TempIndex>) -> Vec<TempIndex> {
+    pub fn transform_indices(&self, indices: Vec<TempIndex>) -> Vec<TempIndex> {
         indices
             .into_iter()
             .map(|idx| self.transform_index(idx))
             .collect()
     }
 
-    fn transform_bytecode_indices(&self, bytecode: Bytecode) -> Bytecode {
+    pub fn transform_bytecode_indices(&self, bytecode: Bytecode) -> Bytecode {
         use BorrowNode::*;
         match bytecode {
             Assign(attr_id, dest, src, kind) => Assign(
@@ -268,13 +268,13 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn new_attr_id(&mut self) -> AttrId {
+    pub fn new_attr_id(&mut self) -> AttrId {
         let attr_id = AttrId::new(self.next_attr_id);
         self.next_attr_id += 1;
         attr_id
     }
 
-    fn transform_bytecode(&mut self, bytecode: Bytecode) -> Vec<Bytecode> {
+    pub fn transform_bytecode(&mut self, bytecode: Bytecode) -> Vec<Bytecode> {
         let bytecode = self.transform_bytecode_indices(bytecode);
         match bytecode {
             Call(attr_id, mut dests, Function(mid, fid, type_actuals), mut srcs) => {
@@ -335,7 +335,7 @@ impl<'a> EliminateMutRefs<'a> {
         }
     }
 
-    fn transform_bytecodes(&mut self, instrs: &[Bytecode]) -> Vec<Bytecode> {
+    pub fn transform_bytecodes(&mut self, instrs: &[Bytecode]) -> Vec<Bytecode> {
         instrs
             .iter()
             .map(|bytecode| self.transform_bytecode(bytecode.clone()))

@@ -33,10 +33,10 @@ pub trait PersistentLivenessStorage: Send + Sync {
     /// Persist consensus' state
     fn save_vote(&self, vote: &Vote) -> Result<()>;
 
-    /// Construct data that can be recovered from ledger
+    /// Conpub struct data that can be recovered from ledger
     fn recover_from_ledger(&self) -> LedgerRecoveryData;
 
-    /// Construct necessary data to start consensus.
+    /// Conpub struct necessary data to start consensus.
     fn start(&self) -> LivenessStorageData;
 
     /// Persist the highest timeout certificate for improved liveness - proof for other replicas
@@ -73,7 +73,7 @@ impl LedgerRecoveryData {
     /// and the ledger info for the root block, return an error if it can not be found.
     ///
     /// We guarantee that the block corresponding to the storage's latest ledger info always exists.
-    fn find_root(
+    pub fn find_root(
         &self,
         blocks: &mut Vec<Block>,
         quorum_certs: &mut Vec<QuorumCert>,
@@ -246,7 +246,7 @@ impl RecoveryData {
         self.highest_timeout_certificate.clone()
     }
 
-    fn find_blocks_to_prune(
+    pub fn find_blocks_to_prune(
         root_id: HashValue,
         blocks: &mut Vec<Block>,
         quorum_certs: &mut Vec<QuorumCert>,
@@ -393,7 +393,7 @@ impl PersistentLivenessStorage for StorageWriteProxy {
                 LivenessStorageData::RecoveryData(initial_data)
             }
             Err(e) => {
-                error!("Failed to construct recovery data: {}", e);
+                error!("Failed to conpub struct recovery data: {}", e);
                 LivenessStorageData::LedgerRecoveryData(ledger_recovery_data)
             }
         }

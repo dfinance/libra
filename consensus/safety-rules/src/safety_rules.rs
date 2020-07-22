@@ -63,20 +63,20 @@ impl SafetyRules {
         }
     }
 
-    fn signer(&self) -> Result<&ValidatorSigner, Error> {
+    pub fn signer(&self) -> Result<&ValidatorSigner, Error> {
         self.validator_signer
             .as_ref()
             .ok_or_else(|| Error::NotInitialized("validator_signer".into()))
     }
 
-    fn epoch_state(&self) -> Result<&EpochState, Error> {
+    pub fn epoch_state(&self) -> Result<&EpochState, Error> {
         self.epoch_state
             .as_ref()
             .ok_or_else(|| Error::NotInitialized("epoch_state".into()))
     }
 
     /// Check if the executed result extends the parent result.
-    fn extension_check(&self, vote_proposal: &VoteProposal) -> Result<VoteData, Error> {
+    pub fn extension_check(&self, vote_proposal: &VoteProposal) -> Result<VoteData, Error> {
         let proposed_block = vote_proposal.block();
         let new_tree = vote_proposal
             .accumulator_extension_proof()
@@ -127,7 +127,7 @@ impl SafetyRules {
     }
 
     /// Second voting rule
-    fn verify_and_update_preferred_round(&mut self, quorum_cert: &QuorumCert) -> Result<(), Error> {
+    pub fn verify_and_update_preferred_round(&mut self, quorum_cert: &QuorumCert) -> Result<(), Error> {
         let preferred_round = self.persistent_storage.preferred_round()?;
         let one_chain_round = quorum_cert.certified_block().round();
         let two_chain_round = quorum_cert.parent_block().round();
@@ -155,7 +155,7 @@ impl SafetyRules {
     }
 
     /// This verifies whether the author of one proposal is the validator signer
-    fn verify_author(&self, author: Option<Author>) -> Result<(), Error> {
+    pub fn verify_author(&self, author: Option<Author>) -> Result<(), Error> {
         let validator_signer_author = &self.signer()?.author();
         let author = author
             .ok_or_else(|| Error::InvalidProposal("No author found in the proposal".into()))?;
@@ -168,7 +168,7 @@ impl SafetyRules {
     }
 
     /// This verifies the epoch given against storage for consistent verification
-    fn verify_epoch(&self, epoch: u64) -> Result<(), Error> {
+    pub fn verify_epoch(&self, epoch: u64) -> Result<(), Error> {
         let expected_epoch = self.persistent_storage.epoch()?;
         if epoch != expected_epoch {
             Err(Error::IncorrectEpoch(epoch, expected_epoch))
@@ -178,7 +178,7 @@ impl SafetyRules {
     }
 
     /// First voting rule
-    fn verify_last_vote_round(&self, proposed_block: &BlockData) -> Result<(), Error> {
+    pub fn verify_last_vote_round(&self, proposed_block: &BlockData) -> Result<(), Error> {
         let last_voted_round = self.persistent_storage.last_voted_round()?;
         if proposed_block.round() > last_voted_round {
             return Ok(());
@@ -191,7 +191,7 @@ impl SafetyRules {
     }
 
     /// This verifies a QC has valid signatures.
-    fn verify_qc(&self, qc: &QuorumCert) -> Result<(), Error> {
+    pub fn verify_qc(&self, qc: &QuorumCert) -> Result<(), Error> {
         let epoch_state = self.epoch_state()?;
 
         qc.verify(&epoch_state.verifier)
@@ -201,7 +201,7 @@ impl SafetyRules {
 
     // Internal functions mapped to the public interface to enable exhaustive logging and metrics
 
-    fn guarded_consensus_state(&mut self) -> Result<ConsensusState, Error> {
+    pub fn guarded_consensus_state(&mut self) -> Result<ConsensusState, Error> {
         Ok(ConsensusState::new(
             self.persistent_storage.epoch()?,
             self.persistent_storage.last_voted_round()?,
@@ -211,7 +211,7 @@ impl SafetyRules {
         ))
     }
 
-    fn guarded_initialize(&mut self, proof: &EpochChangeProof) -> Result<(), Error> {
+    pub fn guarded_initialize(&mut self, proof: &EpochChangeProof) -> Result<(), Error> {
         let waypoint = self.persistent_storage.waypoint()?;
         let last_li = proof
             .verify(&waypoint)
@@ -276,7 +276,7 @@ impl SafetyRules {
         Ok(())
     }
 
-    fn guarded_construct_and_sign_vote(
+    pub fn guarded_construct_and_sign_vote(
         &mut self,
         maybe_signed_vote_proposal: &MaybeSignedVoteProposal,
     ) -> Result<Vote, Error> {
@@ -329,7 +329,7 @@ impl SafetyRules {
         Ok(vote)
     }
 
-    fn guarded_sign_proposal(&mut self, block_data: BlockData) -> Result<Block, Error> {
+    pub fn guarded_sign_proposal(&mut self, block_data: BlockData) -> Result<Block, Error> {
         self.signer()?;
         self.verify_author(block_data.author())?;
         self.verify_epoch(block_data.epoch())?;
@@ -343,7 +343,7 @@ impl SafetyRules {
         ))
     }
 
-    fn guarded_sign_timeout(&mut self, timeout: &Timeout) -> Result<Ed25519Signature, Error> {
+    pub fn guarded_sign_timeout(&mut self, timeout: &Timeout) -> Result<Ed25519Signature, Error> {
         self.signer()?;
         self.verify_epoch(timeout.epoch())?;
 
@@ -446,7 +446,7 @@ impl TSafetyRules for SafetyRules {
     }
 }
 
-fn run_and_log<F, L, R>(
+pub fn run_and_log<F, L, R>(
     callback: F,
     entry_counter: &libra_secure_push_metrics::Counter,
     success_counter: &libra_secure_push_metrics::Counter,

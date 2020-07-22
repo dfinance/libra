@@ -96,7 +96,7 @@ pub fn bootstrap_from_config(
 /// JSON RPC entry point
 /// Handles all incoming rpc requests
 /// Performs routing based on methods defined in `registry`
-async fn rpc_endpoint(
+pub async fn rpc_endpoint(
     data: Value,
     service: JsonRpcService,
     registry: Arc<RpcRegistry>,
@@ -129,7 +129,7 @@ async fn rpc_endpoint(
 
 /// Handler of single RPC request
 /// Performs validation and executes corresponding rpc handler
-async fn rpc_request_handler(
+pub async fn rpc_request_handler(
     req: Value,
     service: JsonRpcService,
     registry: Arc<RpcRegistry>,
@@ -255,7 +255,7 @@ async fn rpc_request_handler(
 
 // Sets the JSON RPC error value for a given response.
 // If a counter label is supplied, also increments the invalid request counter using the label,
-fn set_response_error(response: &mut Map<String, Value>, error: JsonRpcError, label: Option<&str>) {
+pub fn set_response_error(response: &mut Map<String, Value>, error: JsonRpcError, label: Option<&str>) {
     response.insert("error".to_string(), error.serialize());
 
     if let Some(label) = label {
@@ -263,7 +263,7 @@ fn set_response_error(response: &mut Map<String, Value>, error: JsonRpcError, la
     }
 }
 
-fn parse_request_id(request: &Map<String, Value>) -> Result<Value, JsonRpcError> {
+pub fn parse_request_id(request: &Map<String, Value>) -> Result<Value, JsonRpcError> {
     match request.get("id") {
         Some(req_id) => {
             if req_id.is_string() || req_id.is_number() || req_id.is_null() {
@@ -276,7 +276,7 @@ fn parse_request_id(request: &Map<String, Value>) -> Result<Value, JsonRpcError>
     }
 }
 
-fn verify_protocol(request: &Map<String, Value>) -> Result<(), JsonRpcError> {
+pub fn verify_protocol(request: &Map<String, Value>) -> Result<(), JsonRpcError> {
     if let Some(Value::String(protocol)) = request.get("jsonrpc") {
         if protocol == "2.0" {
             return Ok(());
@@ -287,6 +287,6 @@ fn verify_protocol(request: &Map<String, Value>) -> Result<(), JsonRpcError> {
 
 /// Warp rejection types
 #[derive(Debug)]
-struct DatabaseError;
+pub struct DatabaseError;
 
 impl Reject for DatabaseError {}

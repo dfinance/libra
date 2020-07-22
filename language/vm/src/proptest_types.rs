@@ -17,9 +17,9 @@ use proptest::{
     sample::Index as PropIndex,
 };
 
-mod constants;
-mod functions;
-mod signature;
+pub mod constants;
+pub mod functions;
+pub mod signature;
 
 use crate::proptest_types::{
     constants::ConstantPoolGen,
@@ -103,7 +103,7 @@ impl CompiledModuleStrategyGen {
         }
     }
 
-    /// Zero out all fields, type parameters, arguments and return types of struct and functions.
+    /// Zero out all fields, type parameters, arguments and return types of pub struct and functions.
     #[inline]
     pub fn zeros_all(&mut self) -> &mut Self {
         self.field_count = 0.into();
@@ -208,7 +208,7 @@ impl CompiledModuleStrategyGen {
                     let module_handles_len = module_handles.len();
 
                     //
-                    // struct handles
+                    // pub struct handles
                     let mut struct_handles = vec![];
                     if module_handles_len > 1 {
                         let mut struct_handles_set = BTreeSet::new();
@@ -332,17 +332,17 @@ impl CompiledModuleStrategyGen {
 }
 
 #[derive(Debug)]
-struct TypeSignatureIndex(u16);
+pub struct TypeSignatureIndex(u16);
 
 #[derive(Debug)]
-struct StDefnMaterializeState {
+pub struct StDefnMaterializeState {
     identifiers_len: usize,
     struct_handles: Vec<StructHandle>,
     new_handles: BTreeSet<(ModuleHandleIndex, IdentifierIndex)>,
 }
 
 impl StDefnMaterializeState {
-    fn new(identifiers_len: usize, struct_handles: Vec<StructHandle>) -> Self {
+    pub fn new(identifiers_len: usize, struct_handles: Vec<StructHandle>) -> Self {
         Self {
             identifiers_len,
             struct_handles,
@@ -350,7 +350,7 @@ impl StDefnMaterializeState {
         }
     }
 
-    fn add_struct_handle(&mut self, handle: StructHandle) -> Option<StructHandleIndex> {
+    pub fn add_struct_handle(&mut self, handle: StructHandle) -> Option<StructHandleIndex> {
         if self.new_handles.insert((handle.module, handle.name)) {
             self.struct_handles.push(handle);
             Some(StructHandleIndex((self.struct_handles.len() - 1) as u16))
@@ -359,7 +359,7 @@ impl StDefnMaterializeState {
         }
     }
 
-    fn contains_nominal_resource(&self, signature: &SignatureToken) -> bool {
+    pub fn contains_nominal_resource(&self, signature: &SignatureToken) -> bool {
         use SignatureToken::*;
 
         match signature {
@@ -379,7 +379,7 @@ impl StDefnMaterializeState {
 }
 
 #[derive(Clone, Debug)]
-struct StructDefinitionGen {
+pub struct StructDefinitionGen {
     name_idx: PropIndex,
     is_nominal_resource: bool,
     type_parameters: Vec<KindGen>,
@@ -388,7 +388,7 @@ struct StructDefinitionGen {
 }
 
 impl StructDefinitionGen {
-    fn strategy(field_count: impl Into<SizeRange>) -> impl Strategy<Value = Self> {
+    pub fn strategy(field_count: impl Into<SizeRange>) -> impl Strategy<Value = Self> {
         (
             any::<PropIndex>(),
             any::<bool>(),
@@ -409,7 +409,7 @@ impl StructDefinitionGen {
             )
     }
 
-    fn materialize(self, state: &mut StDefnMaterializeState) -> (Option<StructDefinition>, usize) {
+    pub fn materialize(self, state: &mut StDefnMaterializeState) -> (Option<StructDefinition>, usize) {
         let mut field_names = HashSet::new();
         let mut fields = vec![];
         match self.field_defs {
@@ -471,13 +471,13 @@ impl StructDefinitionGen {
 }
 
 #[derive(Clone, Debug)]
-struct FieldDefinitionGen {
+pub struct FieldDefinitionGen {
     name_idx: PropIndex,
     signature_gen: SignatureTokenGen,
 }
 
 impl FieldDefinitionGen {
-    fn strategy() -> impl Strategy<Value = Self> {
+    pub fn strategy() -> impl Strategy<Value = Self> {
         (any::<PropIndex>(), SignatureTokenGen::atom_strategy()).prop_map(
             |(name_idx, signature_gen)| Self {
                 name_idx,
@@ -486,7 +486,7 @@ impl FieldDefinitionGen {
         )
     }
 
-    fn materialize(self, state: &StDefnMaterializeState) -> FieldDefinition {
+    pub fn materialize(self, state: &StDefnMaterializeState) -> FieldDefinition {
         FieldDefinition {
             name: IdentifierIndex(self.name_idx.index(state.identifiers_len) as TableIndex),
             signature: TypeSignature(self.signature_gen.materialize(state.struct_handles.len())),

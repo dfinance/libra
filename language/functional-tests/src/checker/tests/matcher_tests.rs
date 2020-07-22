@@ -14,7 +14,7 @@ macro_rules! log {
 }
 
 #[derive(Error)]
-struct DummyError(String);
+pub struct DummyError(String);
 
 impl fmt::Display for DummyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

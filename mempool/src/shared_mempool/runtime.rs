@@ -32,7 +32,7 @@ use vm_validator::vm_validator::{TransactionValidation, VMValidator};
 ///   - outbound_sync_task (task that periodically broadcasts transactions to peers)
 ///   - inbound_network_task (task that handles inbound mempool messages and network events)
 ///   - gc_task (task that performs GC of all expired transactions by SystemTTL)
-pub(crate) fn start_shared_mempool<V>(
+pub fn start_shared_mempool<V>(
     executor: &Handle,
     config: &NodeConfig,
     mempool: Arc<Mutex<CoreMempool>>,

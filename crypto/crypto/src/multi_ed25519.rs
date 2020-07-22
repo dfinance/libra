@@ -55,7 +55,7 @@ pub struct MultiEd25519Signature {
 }
 
 impl MultiEd25519PrivateKey {
-    /// Construct a new MultiEd25519PrivateKey.
+    /// Conpub struct a new MultiEd25519PrivateKey.
     pub fn new(
         private_keys: Vec<Ed25519PrivateKey>,
         threshold: u8,
@@ -80,7 +80,7 @@ impl MultiEd25519PrivateKey {
 }
 
 impl MultiEd25519PublicKey {
-    /// Construct a new MultiEd25519PublicKey.
+    /// Conpub struct a new MultiEd25519PublicKey.
     /// --- Rules ---
     /// a) threshold cannot be zero.
     /// b) public_keys.len() should be equal to or larger than threshold.
@@ -535,7 +535,7 @@ impl From<Ed25519Signature> for MultiEd25519Signature {
 //////////////////////
 
 // Helper function required to MultiEd25519 keys to_bytes to add the threshold.
-fn to_bytes<T: ValidCryptoMaterial>(keys: &[T], threshold: u8) -> Vec<u8> {
+pub fn to_bytes<T: ValidCryptoMaterial>(keys: &[T], threshold: u8) -> Vec<u8> {
     let mut bytes: Vec<u8> = keys
         .iter()
         .flat_map(ValidCryptoMaterial::to_bytes)
@@ -545,7 +545,7 @@ fn to_bytes<T: ValidCryptoMaterial>(keys: &[T], threshold: u8) -> Vec<u8> {
 }
 
 // Helper method to get threshold from a serialized MultiEd25519 key payload.
-fn check_and_get_threshold(
+pub fn check_and_get_threshold(
     bytes: &[u8],
     key_size: usize,
 ) -> std::result::Result<u8, CryptoMaterialError> {
@@ -566,7 +566,7 @@ fn check_and_get_threshold(
     }
 }
 
-fn bitmap_set_bit(input: &mut [u8; BITMAP_NUM_OF_BYTES], index: usize) {
+pub fn bitmap_set_bit(input: &mut [u8; BITMAP_NUM_OF_BYTES], index: usize) {
     let bucket = index / 8;
     // It's always invoked with index < 32, thus there is no need to check range.
     let bucket_pos = index - (bucket * 8);
@@ -574,7 +574,7 @@ fn bitmap_set_bit(input: &mut [u8; BITMAP_NUM_OF_BYTES], index: usize) {
 }
 
 // Helper method to get the input's bit at index.
-fn bitmap_get_bit(input: [u8; BITMAP_NUM_OF_BYTES], index: usize) -> bool {
+pub fn bitmap_get_bit(input: [u8; BITMAP_NUM_OF_BYTES], index: usize) -> bool {
     let bucket = index / 8;
     // It's always invoked with index < 32, thus there is no need to check range.
     let bucket_pos = index - (bucket * 8);
@@ -582,12 +582,12 @@ fn bitmap_get_bit(input: [u8; BITMAP_NUM_OF_BYTES], index: usize) -> bool {
 }
 
 // Returns the number of set bits.
-fn bitmap_count_ones(input: [u8; BITMAP_NUM_OF_BYTES]) -> u32 {
+pub fn bitmap_count_ones(input: [u8; BITMAP_NUM_OF_BYTES]) -> u32 {
     input.iter().map(|a| a.count_ones()).sum()
 }
 
 // Find the last set bit.
-fn bitmap_last_set_bit(input: [u8; BITMAP_NUM_OF_BYTES]) -> Option<u8> {
+pub fn bitmap_last_set_bit(input: [u8; BITMAP_NUM_OF_BYTES]) -> Option<u8> {
     input
         .iter()
         .rev()
@@ -597,7 +597,7 @@ fn bitmap_last_set_bit(input: [u8; BITMAP_NUM_OF_BYTES]) -> Option<u8> {
 }
 
 #[test]
-fn bitmap_tests() {
+pub fn bitmap_tests() {
     let mut bitmap = [0b0100_0000u8, 0b1111_1111u8, 0u8, 0b1000_0000u8];
     assert!(!bitmap_get_bit(bitmap, 0));
     assert!(bitmap_get_bit(bitmap, 1));

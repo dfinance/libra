@@ -12,10 +12,10 @@ const INPUT: &[u8] = &[1u8; 120];
 
 // Main use case
 #[derive(CryptoHasher, Serialize, Deserialize, LCSCryptoHash)]
-struct HashBencher(&'static [u8]);
+pub struct HashBencher(&'static [u8]);
 
 // Similar with an hand-written implementation of CryptoHash.
-struct HashBencherBase(&'static [u8]);
+pub struct HashBencherBase(&'static [u8]);
 
 impl CryptoHash for HashBencherBase {
     type Hasher = HashBencherHasher;

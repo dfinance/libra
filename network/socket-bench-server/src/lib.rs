@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use futures::{
     future::Future,
@@ -35,14 +35,14 @@ pub struct Args {
     pub msg_lens: Option<Vec<usize>>,
 }
 
-fn parse_addr(s: OsString) -> NetworkAddress {
+pub fn parse_addr(s: OsString) -> NetworkAddress {
     s.to_str()
         .expect("Error: Address should be valid Unicode")
         .parse()
         .expect("Error: Address should be a multiaddr")
 }
 
-fn parse_msg_lens(s: OsString) -> Vec<usize> {
+pub fn parse_msg_lens(s: OsString) -> Vec<usize> {
     let s = s
         .into_string()
         .expect("Error: $MSG_LENS should be valid Unicode");

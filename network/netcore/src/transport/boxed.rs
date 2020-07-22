@@ -50,7 +50,7 @@ impl<O, E> BoxedTransport<O, E>
 where
     E: ::std::error::Error + Send + Sync + 'static,
 {
-    pub(crate) fn new<T>(transport: T) -> Self
+    pub fn new<T>(transport: T) -> Self
     where
         T: Transport<Output = O, Error = E> + Send + 'static,
         T::Listener: Send + 'static,

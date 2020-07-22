@@ -5,9 +5,9 @@ pub mod command_adapter;
 pub mod local_fs;
 
 #[cfg(test)]
-mod test_util;
+pub mod test_util;
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 use crate::storage::{
     command_adapter::{CommandAdapter, CommandAdapterOpt},
@@ -36,7 +36,7 @@ pub struct ShellSafeName(String);
 impl ShellSafeName {
     const PATTERN: &'static str = r"\A[a-zA-Z0-9][a-zA-Z0-9._-]{0,126}\z";
 
-    fn sanitize(name: &str) -> Result<()> {
+    pub fn sanitize(name: &str) -> Result<()> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(ShellSafeName::PATTERN).unwrap());
         ensure!(RE.is_match(&name), "Illegal name: {}", name,);
         Ok(())

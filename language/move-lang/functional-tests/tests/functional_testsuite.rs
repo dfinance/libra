@@ -19,7 +19,7 @@ use tempfile::NamedTempFile;
 pub const STD_LIB_DIR: &str = "../../stdlib/modules";
 pub const FUNCTIONAL_TEST_DIR: &str = "tests";
 
-struct MoveSourceCompiler {
+pub struct MoveSourceCompiler {
     deps: Vec<String>,
     temp_files: Vec<NamedTempFile>,
 }
@@ -34,7 +34,7 @@ impl MoveSourceCompiler {
 }
 
 #[derive(Debug)]
-struct MoveSourceCompilerError(pub String);
+pub struct MoveSourceCompilerError(pub String);
 
 impl fmt::Display for MoveSourceCompilerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

@@ -19,7 +19,7 @@ use std::u64;
 use storage_interface::DbReaderWriter;
 use transaction_builder::encode_peer_to_peer_with_metadata_script;
 
-struct TestValidator {
+pub struct TestValidator {
     vm_validator: VMValidator,
 }
 

@@ -111,13 +111,13 @@ pub fn remap_labels(
     (remapping[&start], blocks)
 }
 
-fn remap_labels_block(remapping: &BTreeMap<Label, Label>, block: &mut BasicBlock) {
+pub fn remap_labels_block(remapping: &BTreeMap<Label, Label>, block: &mut BasicBlock) {
     for cmd in block {
         remap_labels_cmd(remapping, cmd)
     }
 }
 
-fn remap_labels_cmd(remapping: &BTreeMap<Label, Label>, sp!(_, cmd_): &mut Command) {
+pub fn remap_labels_cmd(remapping: &BTreeMap<Label, Label>, sp!(_, cmd_): &mut Command) {
     use Command_::*;
     match cmd_ {
         Break | Continue => panic!("ICE break/continue not translated to jumps"),
@@ -234,7 +234,7 @@ impl AstDebug for MoveValue {
                 w.comma(vs, |w, v| v.ast_debug(w));
                 w.write("]");
             }
-            V::Struct(_) => panic!("ICE struct constants not supported"),
+            V::Struct(_) => panic!("ICE pub struct constants not supported"),
             V::Signer(_) => panic!("ICE signer constants not supported"),
         }
     }

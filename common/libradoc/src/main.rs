@@ -18,7 +18,7 @@ use structopt::StructOpt;
     name = "libra documentation tool",
     about = "Tool to help maintaining libra specifications"
 )]
-struct Options {
+pub struct Options {
     /// Path to the YAML-encoded Serde formats.
     #[structopt(parse(from_os_str))]
     input: PathBuf,
@@ -28,7 +28,7 @@ struct Options {
     update_libra_specs_dir: Option<PathBuf>,
 }
 
-fn process_specs(dir: PathBuf, definitions: &BTreeMap<String, String>) -> std::io::Result<()> {
+pub fn process_specs(dir: PathBuf, definitions: &BTreeMap<String, String>) -> std::io::Result<()> {
     for entry in std::fs::read_dir(dir.as_path())? {
         let entry = entry?;
         let path = entry.path();

@@ -66,7 +66,7 @@ impl OwnerKey {
     }
 }
 
-fn submit_key(
+pub fn submit_key(
     key_name: &'static str,
     account_name: Option<&'static str>,
     validator_backend: ValidatorBackend,

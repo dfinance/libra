@@ -26,7 +26,7 @@ use proptest::{collection::vec, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[derive(CryptoHasher, LCSCryptoHash, Serialize, Deserialize)]
-struct CryptoHashable(pub usize);
+pub struct CryptoHashable(pub usize);
 
 proptest! {
 
@@ -68,7 +68,7 @@ proptest! {
     fn convert_from_ed25519_publickey(keypair in uniform_keypair_strategy::<Ed25519PrivateKey, Ed25519PublicKey>()) {
         let x25519_public_key = x25519::PublicKey::from_ed25519_public_bytes(&keypair.public_key.to_bytes()[..]).unwrap();
 
-        // Let's construct an x25519 private key from the ed25519 private key.
+        // Let's conpub struct an x25519 private key from the ed25519 private key.
         let x25519_privatekey = x25519::PrivateKey::from_ed25519_private_bytes(&keypair.private_key.to_bytes()[..]);
 
         // This is the important part! We abandon the entire test if an x25519 private
@@ -231,12 +231,12 @@ proptest! {
         serialized[32..].copy_from_slice(&malleable_s_bytes);
 
         // Check that malleable signatures will pass verification and deserialization in dalek.
-        // Construct the corresponding dalek public key.
+        // Conpub struct the corresponding dalek public key.
         let _dalek_public_key = ed25519_dalek::PublicKey::from_bytes(
             &keypair.public_key.to_bytes()
         ).unwrap();
 
-        // Construct the corresponding dalek Signature. This signature is malleable.
+        // Conpub struct the corresponding dalek Signature. This signature is malleable.
         let dalek_sig = ed25519_dalek::Signature::from_bytes(&serialized);
 
         // ed25519_dalek will (post 2.0) no longer deserialize the malleable signature. It does detect it.
@@ -251,7 +251,7 @@ proptest! {
         );
 
         // We expect from_bytes_unchecked deserialization to fail, as dalek checks
-        // for signature malleability. This method is pub(crate) and only used for test purposes.
+        // for signature malleability. This method is pub and only used for test purposes.
         let sig_unchecked = Ed25519Signature::from_bytes_unchecked(&serialized);
         prop_assert!(sig_unchecked.is_err());
 
@@ -328,9 +328,9 @@ const EIGHT_TORSION: [[u8; 32]; 8] = [
     ],
 ];
 
-/// The `Scalar52` struct represents an element in
+/// The `Scalar52` pub struct represents an element in
 /// ℤ/ℓℤ as 5 52-bit limbs.
-struct Scalar52(pub [u64; 5]);
+pub struct Scalar52(pub [u64; 5]);
 
 /// `L` is the order of base point, i.e. 2^252 + 27742317777372353535851937790883648493
 const L: Scalar52 = Scalar52([
@@ -409,7 +409,7 @@ impl Scalar52 {
         s
     }
 
-    /// Compute `a + b` (without mod ℓ)
+    /// Compute `a + b` (without pub mod ℓ)
     fn add(a: &Scalar52, b: &Scalar52) -> Scalar52 {
         let mut sum = Scalar52::zero();
         let mask = (1u64 << 52) - 1;

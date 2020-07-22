@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use libra_logger::debug;
 use std::{future::Future, pin::Pin, thread, time::Duration};
@@ -61,7 +61,7 @@ pub struct FixedDelay {
 
 impl FixedDelay {
     /// Create a new `FixedDelay` using the given duration in milliseconds.
-    fn new(millis: u64) -> Self {
+    pub fn new(millis: u64) -> Self {
         FixedDelay {
             duration: Duration::from_millis(millis),
         }
@@ -77,7 +77,7 @@ impl Iterator for FixedDelay {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
 
     #[test]

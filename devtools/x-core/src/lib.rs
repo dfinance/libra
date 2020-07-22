@@ -8,10 +8,10 @@ use guppy::graph::PackageGraph;
 use once_cell::sync::OnceCell;
 use std::path::Path;
 
-mod debug_ignore;
-mod errors;
-mod graph;
-mod workspace_subset;
+pub mod debug_ignore;
+pub mod errors;
+pub mod graph;
+pub mod workspace_subset;
 
 pub use debug_ignore::*;
 pub use errors::*;

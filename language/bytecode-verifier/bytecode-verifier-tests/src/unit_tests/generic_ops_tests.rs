@@ -22,7 +22,7 @@ fn make_module() -> CompiledModuleMut {
         identifiers: vec![
             Identifier::new("M").unwrap(),       // Module name
             Identifier::new("S").unwrap(),       // Struct name
-            Identifier::new("GS").unwrap(),      // Generic struct name
+            Identifier::new("GS").unwrap(),      // Generic pub struct name
             Identifier::new("R").unwrap(),       // Resource name
             Identifier::new("GR").unwrap(),      // Generic resource name
             Identifier::new("f").unwrap(),       // Field name
@@ -60,7 +60,7 @@ fn make_module() -> CompiledModuleMut {
             },
         ],
         struct_defs: vec![
-            // struct S { f: u64 }
+            // pub struct S { f: u64 }
             StructDefinition {
                 struct_handle: StructHandleIndex(0),
                 field_information: StructFieldInformation::Declared(vec![FieldDefinition {
@@ -68,7 +68,7 @@ fn make_module() -> CompiledModuleMut {
                     signature: TypeSignature(SignatureToken::U64),
                 }]),
             },
-            // struct GS<T> { f: T }
+            // pub struct GS<T> { f: T }
             StructDefinition {
                 struct_handle: StructHandleIndex(1),
                 field_information: StructFieldInformation::Declared(vec![FieldDefinition {
@@ -233,7 +233,7 @@ fn generic_pack_on_non_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("PackGeneric to non generic struct must fail");
+            .expect_err("PackGeneric to non generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -255,7 +255,7 @@ fn non_generic_pack_on_generic_struct() {
     });
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("Pack to generic struct must fail");
+            .expect_err("Pack to generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -285,7 +285,7 @@ fn generic_unpack_on_non_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("UnpackGeneric to non generic struct must fail");
+            .expect_err("UnpackGeneric to non generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -315,7 +315,7 @@ fn non_generic_unpack_on_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("Unpack to generic struct must fail");
+            .expect_err("Unpack to generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -347,7 +347,7 @@ fn generic_mut_borrow_field_on_non_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("MutBorrowFieldGeneric to non generic struct must fail");
+            .expect_err("MutBorrowFieldGeneric to non generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -381,7 +381,7 @@ fn non_generic_mut_borrow_field_on_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("MutBorrowField to generic struct must fail");
+            .expect_err("MutBorrowField to generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -413,7 +413,7 @@ fn generic_borrow_field_on_non_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("ImmBorrowFieldGeneric to non generic struct must fail");
+            .expect_err("ImmBorrowFieldGeneric to non generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -447,7 +447,7 @@ fn non_generic_borrow_field_on_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("ImmBorrowField to generic struct must fail");
+            .expect_err("ImmBorrowField to generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -708,7 +708,7 @@ fn generic_move_to_on_non_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("MoveToGeneric to non generic struct must fail");
+            .expect_err("MoveToGeneric to non generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH
@@ -738,7 +738,7 @@ fn non_generic_move_to_on_generic_struct() {
     module.signatures.push(Signature(vec![SignatureToken::U64]));
     let err =
         InstructionConsistency::verify_module(&module.freeze().expect("module must be valid"))
-            .expect_err("MoveTo to generic struct must fail");
+            .expect_err("MoveTo to generic pub struct must fail");
     assert_eq!(
         err.major_status(),
         StatusCode::GENERIC_MEMBER_OPCODE_MISMATCH

@@ -119,7 +119,7 @@ pub fn boogie_type_value(env: &GlobalEnv, ty: &Type) -> String {
     }
 }
 
-/// Create boogie type value for a struct with given type actuals.
+/// Create boogie type value for a pub struct with given type actuals.
 pub fn boogie_struct_type_value(
     env: &GlobalEnv,
     module_id: ModuleId,
@@ -204,7 +204,7 @@ pub fn boogie_well_formed_expr(
     boogie_well_formed_expr_impl(env, name, ty, mode, 0)
 }
 
-fn boogie_well_formed_expr_impl(
+pub fn boogie_well_formed_expr_impl(
     env: &GlobalEnv,
     name: &str,
     ty: &Type,
@@ -371,7 +371,7 @@ pub fn boogie_byte_blob(options: &Options, val: &[u8]) -> String {
         }
         res
     } else {
-        // Repeated push backs very expensive in map representation, so construct the value
+        // Repeated push backs very expensive in map representation, so conpub struct the value
         // array directly.
         let mut ctor_expr = "$MapConstValue($DefaultValue())".to_owned();
         for (i, b) in val.iter().enumerate() {

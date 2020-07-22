@@ -132,7 +132,7 @@ pub struct ReadWriteTestSocket<'a> {
 }
 
 impl<'a> ReadWriteTestSocket<'a> {
-    fn new(memory_socket: MemorySocket) -> Self {
+    pub fn new(memory_socket: MemorySocket) -> Self {
         Self {
             inner: memory_socket,
             written: None,
@@ -212,7 +212,7 @@ impl<'a> AsyncRead for ReadWriteTestSocket<'a> {
 //
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use futures::{
         executor::block_on,

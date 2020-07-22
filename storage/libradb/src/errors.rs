@@ -5,7 +5,7 @@
 
 use thiserror::Error;
 
-/// This enum defines errors commonly used among [`LibraDB`](crate::LibraDB) APIs.
+/// Thispub enum defines errors commonly used among [`LibraDB`](crate::LibraDB) APIs.
 #[derive(Debug, Error)]
 pub enum LibraDbError {
     /// A requested item is not found.

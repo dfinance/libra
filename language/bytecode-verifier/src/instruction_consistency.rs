@@ -25,7 +25,7 @@ impl<'a> InstructionConsistency<'a> {
         Self::verify_module_impl(module).map_err(|e| e.finish(Location::Module(module.self_id())))
     }
 
-    fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
+    pub fn verify_module_impl(module: &'a CompiledModule) -> PartialVMResult<()> {
         let resolver = BinaryIndexedView::Module(module);
 
         for (idx, func_def) in module.function_defs().iter().enumerate() {
@@ -55,7 +55,7 @@ impl<'a> InstructionConsistency<'a> {
         checker.check_instructions(&script.as_inner().code)
     }
 
-    fn check_instructions(&self, code: &CodeUnit) -> PartialVMResult<()> {
+    pub fn check_instructions(&self, code: &CodeUnit) -> PartialVMResult<()> {
         for (offset, instr) in code.code.iter().enumerate() {
             match instr {
                 Bytecode::MutBorrowField(field_handle_index) => {
@@ -140,7 +140,7 @@ impl<'a> InstructionConsistency<'a> {
     // a non generic one.
     //
 
-    fn check_field_op(
+    pub fn check_field_op(
         &self,
         offset: usize,
         field_handle_index: FieldHandleIndex,
@@ -150,11 +150,11 @@ impl<'a> InstructionConsistency<'a> {
         self.check_type_op(offset, field_handle.owner, generic)
     }
 
-    fn current_function(&self) -> FunctionDefinitionIndex {
+    pub fn current_function(&self) -> FunctionDefinitionIndex {
         self.current_function.unwrap_or(FunctionDefinitionIndex(0))
     }
 
-    fn check_type_op(
+    pub fn check_type_op(
         &self,
         offset: usize,
         struct_def_index: StructDefinitionIndex,
@@ -171,7 +171,7 @@ impl<'a> InstructionConsistency<'a> {
         Ok(())
     }
 
-    fn check_function_op(
+    pub fn check_function_op(
         &self,
         offset: usize,
         func_handle_index: FunctionHandleIndex,

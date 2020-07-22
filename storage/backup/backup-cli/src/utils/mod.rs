@@ -30,6 +30,6 @@ pub struct GlobalRestoreOpt {
     pub target_version: Version,
 }
 
-pub(crate) fn should_cut_chunk(chunk: &[u8], record: &[u8], max_chunk_size: usize) -> bool {
+pub fn should_cut_chunk(chunk: &[u8], record: &[u8], max_chunk_size: usize) -> bool {
     !chunk.is_empty() && chunk.len() + record.len() + size_of::<u32>() > max_chunk_size
 }

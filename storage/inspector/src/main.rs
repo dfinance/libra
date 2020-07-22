@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use anyhow::Result;
 use libra_logger::info;
@@ -17,7 +17,7 @@ use std::convert::TryFrom;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-struct Opt {
+pub struct Opt {
     #[structopt(long, parse(from_os_str))]
     db: PathBuf,
 
@@ -26,7 +26,7 @@ struct Opt {
 }
 
 #[derive(Debug, StructOpt)]
-enum Command {
+pub enum Command {
     #[structopt(name = "list-txns")]
     ListTXNs,
     #[structopt(name = "print-txn")]
@@ -41,7 +41,7 @@ enum Command {
 }
 
 /// Print out latest information stored in the DB.
-fn print_head(db: &LibraDB) -> Result<()> {
+pub fn print_head(db: &LibraDB) -> Result<()> {
     let si = db
         .get_startup_info()
         .expect("Can't get startup info")
@@ -69,7 +69,7 @@ fn print_head(db: &LibraDB) -> Result<()> {
     Ok(())
 }
 
-fn print_txn(db: &LibraDB, version: u64) {
+pub fn print_txn(db: &LibraDB, version: u64) {
     let tx = db
         .get_transaction_with_proof(version, version, false)
         .expect("Unable to load latest TXN");
@@ -80,7 +80,7 @@ fn print_txn(db: &LibraDB, version: u64) {
     );
 }
 
-fn print_account(db: &LibraDB, addr: AccountAddress) {
+pub fn print_account(db: &LibraDB, addr: AccountAddress) {
     let maybe_blob = db
         .get_latest_account_state(addr)
         .expect("Unable to read AccountState");
@@ -101,7 +101,7 @@ fn print_account(db: &LibraDB, addr: AccountAddress) {
     }
 }
 
-fn list_txns(db: &LibraDB) {
+pub fn list_txns(db: &LibraDB) {
     let version = db
         .get_latest_version()
         .expect("Unable to get latest version");
@@ -120,7 +120,7 @@ fn list_txns(db: &LibraDB) {
     }
 }
 
-fn list_accounts(db: &LibraDB) {
+pub fn list_accounts(db: &LibraDB) {
     let version = db
         .get_latest_version()
         .expect("Unable to get latest version");

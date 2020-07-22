@@ -17,7 +17,7 @@ pub fn code(blocks: &mut IR::BytecodeBlocks) {
     }
 }
 
-fn remove_fall_through(blocks: &mut IR::BytecodeBlocks) -> bool {
+pub fn remove_fall_through(blocks: &mut IR::BytecodeBlocks) -> bool {
     use IR::Bytecode_ as B;
     let mut changed = false;
     for idx in 0..(blocks.len() - 1) {
@@ -33,7 +33,7 @@ fn remove_fall_through(blocks: &mut IR::BytecodeBlocks) -> bool {
     changed
 }
 
-fn remove_empty_blocks(blocks: &mut IR::BytecodeBlocks) -> bool {
+pub fn remove_empty_blocks(blocks: &mut IR::BytecodeBlocks) -> bool {
     let mut label_map = HashMap::new();
     let mut cur_label = None;
     let mut removed = false;

@@ -336,7 +336,7 @@ pub fn get_response_from_batch(
     })
 }
 
-fn fetch_id(response: &Value) -> Result<usize> {
+pub fn fetch_id(response: &Value) -> Result<usize> {
     match response.get("id") {
         Some(id) => Ok(serde_json::from_value::<usize>(id.clone())?),
         None => Err(format_err!("request id is missing")),

@@ -39,7 +39,7 @@ impl LibraVMValidator {
         LibraVMValidator(LibraVMImpl::init_with_config(version, on_chain_config))
     }
 
-    fn verify_transaction_impl(
+    pub fn verify_transaction_impl(
         &self,
         transaction: &SignatureCheckedTransaction,
         remote_cache: &StateViewCache,
@@ -158,7 +158,7 @@ impl VMValidator for LibraVMValidator {
     }
 }
 
-fn is_prioritized_txn(sender: AccountAddress, remote_cache: &StateViewCache) -> bool {
+pub fn is_prioritized_txn(sender: AccountAddress, remote_cache: &StateViewCache) -> bool {
     let role_access_path = create_access_path(sender, RoleId::struct_tag());
     if let Ok(Some(blob)) = remote_cache.get(&role_access_path) {
         return lcs::from_bytes::<account_config::RoleId>(&blob)
@@ -168,7 +168,7 @@ fn is_prioritized_txn(sender: AccountAddress, remote_cache: &StateViewCache) -> 
     false
 }
 
-fn normalize_gas_price(
+pub fn normalize_gas_price(
     gas_price: u64,
     currency_code: &IdentStr,
     remote_cache: &StateViewCache,

@@ -137,7 +137,7 @@ impl Block {
         Self::make_genesis_block_from_ledger_info(&LedgerInfo::mock_genesis(None))
     }
 
-    /// Construct new genesis block for next epoch deterministically from the end-epoch LedgerInfo
+    /// Conpub struct new genesis block for next epoch deterministically from the end-epoch LedgerInfo
     /// We carry over most fields except round and block id
     pub fn make_genesis_block_from_ledger_info(ledger_info: &LedgerInfo) -> Self {
         let block_data = BlockData::new_genesis_from_ledger_info(ledger_info);
@@ -262,7 +262,7 @@ impl<'de> Deserialize<'de> for Block {
     {
         #[derive(Deserialize)]
         #[serde(rename = "Block")]
-        struct BlockWithoutId {
+        pub struct BlockWithoutId {
             block_data: BlockData,
             signature: Option<Ed25519Signature>,
         };

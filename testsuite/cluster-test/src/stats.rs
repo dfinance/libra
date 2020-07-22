@@ -38,7 +38,7 @@ impl<'a> PrometheusRangeView<'a> {
 impl<'a> PrometheusRangeView<'a> {
     const STEP: u64 = 10;
 
-    fn query_avg(&self, name: &str, query: String) -> Option<f64> {
+    pub fn query_avg(&self, name: &str, query: String) -> Option<f64> {
         self.prometheus
             .query_range_avg(query, &self.start, &self.end, Self::STEP)
             .map_err(|e| format_err!("No {} data: {}", name, e))

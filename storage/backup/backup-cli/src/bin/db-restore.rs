@@ -16,7 +16,7 @@ use std::sync::Arc;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
-struct Opt {
+pub struct Opt {
     #[structopt(flatten)]
     global: GlobalRestoreOpt,
 
@@ -25,7 +25,7 @@ struct Opt {
 }
 
 #[derive(StructOpt)]
-enum RestoreType {
+pub enum RestoreType {
     EpochEnding {
         #[structopt(flatten)]
         opt: EpochEndingRestoreOpt,

@@ -21,7 +21,7 @@ pub fn optimize(cfg: &mut BlockCFG) -> bool {
     changed
 }
 
-fn optimize_cmd(sp!(_, cmd_): &mut Command) -> bool {
+pub fn optimize_cmd(sp!(_, cmd_): &mut Command) -> bool {
     use Command_ as C;
     use UnannotatedExp_ as E;
     use Value_ as V;

@@ -9,7 +9,7 @@ use schemadb::SchemaBatch;
 /// To be specific it carries a batch of db alternations and counter increases that'll be converted
 /// to DB alternations on "sealing". This is required to be converted to `SealedChangeSet` before
 /// committing to the DB.
-pub(crate) struct ChangeSet {
+pub struct ChangeSet {
     /// A batch of db alternations.
     pub batch: SchemaBatch,
     /// Counter bumps to be made on commit.
@@ -29,7 +29,7 @@ impl ChangeSet {
 /// ChangeSet that's ready to be committed to the DB.
 ///
 /// This is a wrapper type just to make sure `ChangeSet` to be committed is sealed properly.
-pub(crate) struct SealedChangeSet {
+pub struct SealedChangeSet {
     /// A batch of db alternations.
     pub batch: SchemaBatch,
 }

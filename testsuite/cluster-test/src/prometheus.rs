@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use anyhow::{bail, format_err, Result};
 use reqwest::Url;
@@ -48,7 +48,7 @@ impl Prometheus {
         )
     }
 
-    fn query_range(
+    pub fn query_range(
         &self,
         query: String,
         start: &Duration,
@@ -151,7 +151,7 @@ impl TimeSeries {
 }
 
 #[derive(Debug, Deserialize)]
-struct PrometheusResponse {
+pub struct PrometheusResponse {
     data: Option<PrometheusData>,
     #[serde(default)]
     error: String,
@@ -162,24 +162,24 @@ struct PrometheusResponse {
 }
 
 #[derive(Debug, Deserialize)]
-struct PrometheusData {
+pub struct PrometheusData {
     result: Vec<PrometheusResult>,
 }
 
 #[derive(Debug, Deserialize)]
-struct PrometheusResult {
+pub struct PrometheusResult {
     metric: PrometheusMetric,
     values: Vec<(u64, String)>,
 }
 
 #[derive(Debug, Deserialize)]
-struct PrometheusMetric {
+pub struct PrometheusMetric {
     op: Option<String>,
     peer_id: String,
 }
 
 impl MatrixResponse {
-    fn from_prometheus(data: PrometheusData) -> Result<Self> {
+    pub fn from_prometheus(data: PrometheusData) -> Result<Self> {
         let mut inner = HashMap::new();
         for entry in data.result {
             let peer_id = entry.metric.peer_id;
@@ -194,7 +194,7 @@ impl MatrixResponse {
 }
 
 impl TimeSeries {
-    fn from_prometheus(values: Vec<(u64, String)>) -> Result<Self> {
+    pub fn from_prometheus(values: Vec<(u64, String)>) -> Result<Self> {
         let mut inner = vec![];
         for (ts, value) in values {
             let value = value.parse().map_err(|e| {

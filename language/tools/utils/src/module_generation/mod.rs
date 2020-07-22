@@ -1,10 +1,10 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-mod generator;
-mod options;
-mod padding;
-mod utils;
+pub mod generator;
+pub mod options;
+pub mod padding;
+pub mod utils;
 
 pub use generator::{
     generate_module, generate_modules, generate_verified_modules, ModuleGenerator,

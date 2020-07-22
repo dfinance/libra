@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! This provides a simple networking substrate between a client and server. It is assumed that all
 //! operations are blocking and return only complete blocks of data. The intended use case has the
@@ -83,7 +83,7 @@ impl NetworkClient {
         result
     }
 
-    fn server(&mut self) -> Result<&mut NetworkStream, Error> {
+    pub fn server(&mut self) -> Result<&mut NetworkStream, Error> {
         if self.stream.is_none() {
             let timeout = std::time::Duration::from_millis(self.timeout_ms);
             debug!("Attempting to connect to upstream {}", self.server);
@@ -156,7 +156,7 @@ impl NetworkServer {
         result
     }
 
-    fn client(&mut self) -> Result<&mut NetworkStream, Error> {
+    pub fn client(&mut self) -> Result<&mut NetworkStream, Error> {
         if self.stream.is_none() {
             debug!("Waiting for downstream to connect");
             let listener = self
@@ -173,7 +173,7 @@ impl NetworkServer {
     }
 }
 
-struct NetworkStream {
+pub struct NetworkStream {
     stream: TcpStream,
     buffer: Vec<u8>,
     temp_buffer: [u8; 1024],
@@ -243,7 +243,7 @@ impl NetworkStream {
     /// Data sent on a TCP socket may not necessarily be delivered at the exact time. So a read may
     /// only include a subset of what was sent. This wraps around the TCP read buffer to ensure
     /// that only full messages are received.
-    fn read_buffer(&mut self) -> Vec<u8> {
+    pub fn read_buffer(&mut self) -> Vec<u8> {
         if self.buffer.len() < 4 {
             return Vec::new();
         }
@@ -264,7 +264,7 @@ impl NetworkStream {
 
     /// Writing to a TCP socket will take in as much data as the underlying buffer has space for.
     /// This wraps around that buffer and blocks until all the data has been pushed.
-    fn write_all(&mut self, data: &[u8]) -> Result<(), Error> {
+    pub fn write_all(&mut self, data: &[u8]) -> Result<(), Error> {
         let mut unwritten = &data[..];
         let mut total_written = 0;
 
@@ -278,7 +278,7 @@ impl NetworkStream {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use libra_config::utils;
     use std::net::{IpAddr, Ipv4Addr, SocketAddr};

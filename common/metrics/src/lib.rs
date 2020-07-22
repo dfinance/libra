@@ -1,20 +1,20 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 #![recursion_limit = "128"]
 
 pub mod counters;
-mod json_encoder;
-mod json_metrics;
+pub mod json_encoder;
+pub mod json_metrics;
 pub mod metric_server;
-mod public_metrics;
+pub mod public_metrics;
 
-mod op_counters;
+pub mod op_counters;
 pub use op_counters::{DurationHistogram, OpMetrics};
 
 #[cfg(test)]
-mod unit_tests;
+pub mod unit_tests;
 
 // Re-export counter types from prometheus crate
 pub use prometheus::{
@@ -34,7 +34,7 @@ use std::{
     thread, time,
 };
 
-fn get_metrics_file<P: AsRef<Path>>(dir_path: &P, file_name: &str) -> File {
+pub fn get_metrics_file<P: AsRef<Path>>(dir_path: &P, file_name: &str) -> File {
     create_dir_all(dir_path).expect("Create metrics dir failed");
 
     let metrics_file_path = dir_path.as_ref().join(file_name);
@@ -48,7 +48,7 @@ fn get_metrics_file<P: AsRef<Path>>(dir_path: &P, file_name: &str) -> File {
         .expect("Open metrics file failed")
 }
 
-fn get_all_metrics_as_serialized_string() -> Result<Vec<u8>> {
+pub fn get_all_metrics_as_serialized_string() -> Result<Vec<u8>> {
     let all_metrics = prometheus::gather();
 
     let encoder = TextEncoder::new();

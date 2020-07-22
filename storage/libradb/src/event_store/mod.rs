@@ -32,7 +32,7 @@ use schemadb::{schema::ValueCodec, ReadOptions, DB};
 use std::{convert::TryFrom, sync::Arc};
 
 #[derive(Debug)]
-pub(crate) struct EventStore {
+pub struct EventStore {
     db: Arc<DB>,
 }
 
@@ -87,7 +87,7 @@ impl EventStore {
         Ok((event, proof))
     }
 
-    fn get_txn_ver_by_seq_num(&self, event_key: &EventKey, seq_num: u64) -> Result<u64> {
+    pub fn get_txn_ver_by_seq_num(&self, event_key: &EventKey, seq_num: u64) -> Result<u64> {
         let (ver, _) = self
             .db
             .get::<EventByKeySchema>(&(*event_key, seq_num))?
@@ -224,7 +224,7 @@ impl EventStore {
 
 type Accumulator<'a> = MerkleAccumulator<EventHashReader<'a>, EventAccumulatorHasher>;
 
-struct EventHashReader<'a> {
+pub struct EventHashReader<'a> {
     store: &'a EventStore,
     version: Version,
 }
@@ -246,7 +246,7 @@ impl<'a> HashReader for EventHashReader<'a> {
 
 type EmptyAccumulator = MerkleAccumulator<EmptyReader, EventAccumulatorHasher>;
 
-struct EmptyReader;
+pub struct EmptyReader;
 
 // Asserts `get()` is never called.
 impl HashReader for EmptyReader {
@@ -256,4 +256,4 @@ impl HashReader for EmptyReader {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

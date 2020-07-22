@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[cfg(test)]
-mod consensusdb_test;
-mod schema;
+pub mod consensusdb_test;
+pub mod schema;
 
 use crate::consensusdb::schema::{
     block::{BlockSchema, SchemaBlock},
@@ -129,12 +129,12 @@ impl ConsensusDB {
 
     /// Write the whole schema batch including all data necessary to mutate the ledger
     /// state of some transaction by leveraging rocksdb atomicity support.
-    fn commit(&self, batch: SchemaBatch) -> Result<()> {
+    pub fn commit(&self, batch: SchemaBatch) -> Result<()> {
         self.db.write_schemas(batch)
     }
 
     /// Get latest timeout certificates (we only store the latest highest timeout certificates).
-    fn get_highest_timeout_certificate(&self) -> Result<Option<Vec<u8>>> {
+    pub fn get_highest_timeout_certificate(&self) -> Result<Option<Vec<u8>>> {
         self.db
             .get::<SingleEntrySchema>(&SingleEntryKey::HighestTimeoutCertificate)
     }
@@ -147,7 +147,7 @@ impl ConsensusDB {
     }
 
     /// Get serialized latest vote (if available)
-    fn get_last_vote(&self) -> Result<Option<Vec<u8>>> {
+    pub fn get_last_vote(&self) -> Result<Option<Vec<u8>>> {
         self.db
             .get::<SingleEntrySchema>(&SingleEntryKey::LastVoteMsg)
     }
@@ -159,7 +159,7 @@ impl ConsensusDB {
     }
 
     /// Get all consensus blocks.
-    fn get_blocks(&self) -> Result<HashMap<HashValue, Block>> {
+    pub fn get_blocks(&self) -> Result<HashMap<HashValue, Block>> {
         let mut iter = self.db.iter::<BlockSchema>(ReadOptions::default())?;
         iter.seek_to_first();
         iter.map(|value| value.map(|(k, v)| (k, v.borrow_into_block().clone())))
@@ -167,7 +167,7 @@ impl ConsensusDB {
     }
 
     /// Get all consensus QCs.
-    fn get_quorum_certificates(&self) -> Result<HashMap<HashValue, QuorumCert>> {
+    pub fn get_quorum_certificates(&self) -> Result<HashMap<HashValue, QuorumCert>> {
         let mut iter = self.db.iter::<QCSchema>(ReadOptions::default())?;
         iter.seek_to_first();
         iter.collect::<Result<HashMap<HashValue, QuorumCert>>>()

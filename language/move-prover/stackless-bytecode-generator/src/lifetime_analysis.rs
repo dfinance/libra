@@ -66,7 +66,7 @@ impl FunctionTargetProcessor for LifetimeAnalysisProcessor {
 
 /// Represents a node in the borrow graph.
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-enum Node {
+pub enum Node {
     /// Root means global storage or local storage. For example when there's BorrowLoc(dest, _) or
     /// BorrowGlobal(dest,_,_) then an edge will be added between Root -> Local(dest)
     Root,
@@ -77,14 +77,14 @@ enum Node {
 }
 
 #[derive(Clone, Debug, Default)]
-struct BorrowGraph {
+pub struct BorrowGraph {
     graph: BTreeMap<Node, BTreeSet<Node>>,
     reverse_graph: BTreeMap<Node, BTreeSet<Node>>,
     moved_locals: BTreeSet<TempIndex>,
 }
 
 impl BorrowGraph {
-    fn new() -> Self {
+    pub fn new() -> Self {
         BorrowGraph {
             graph: BTreeMap::new(),
             reverse_graph: BTreeMap::new(),
@@ -93,7 +93,7 @@ impl BorrowGraph {
     }
 
     /// Add an edge in the graph
-    fn add_edge(&mut self, from: Node, to: Node) {
+    pub fn add_edge(&mut self, from: Node, to: Node) {
         // Fancy statement that modifies the value of key from if it exists, and inserts otherwise.
         self.graph
             .entry(from)
@@ -113,7 +113,7 @@ impl BorrowGraph {
 
     /// Mark a local as moved. Notice that moving the local doesn't mean
     /// it's dead and can be removed
-    fn move_local(&mut self, local: TempIndex) {
+    pub fn move_local(&mut self, local: TempIndex) {
         let node = Node::Local(local);
 
         // Only mark local if it actually exists in the graph
@@ -123,7 +123,7 @@ impl BorrowGraph {
     }
 
     /// Replace all appearances of before with after in the graph
-    fn replace_local(&mut self, before: Node, after: Node) {
+    pub fn replace_local(&mut self, before: Node, after: Node) {
         if let Some(to_neighbors) = self.graph.remove(&before) {
             for to in &to_neighbors {
                 self.reverse_graph.entry(*to).and_modify(|e| {
@@ -145,7 +145,7 @@ impl BorrowGraph {
     }
 
     /// Copy all appearances of src to dest in the graph
-    fn copy_local(&mut self, dest: Node, src: Node) {
+    pub fn copy_local(&mut self, dest: Node, src: Node) {
         if self.graph.contains_key(&src) {
             let to_neighbors = self.graph[&src].clone();
             for to in &to_neighbors {
@@ -168,7 +168,7 @@ impl BorrowGraph {
 
     /// Join two borrow graphs, so that self is mutated into a graph consisting of
     /// edges in both graphs
-    fn join(&mut self, other: &Self) {
+    pub fn join(&mut self, other: &Self) {
         for (n, to_neighbors) in &other.graph {
             self.graph
                 .entry(*n)
@@ -191,14 +191,14 @@ impl BorrowGraph {
     }
 
     /// If the BorrowGraph is a subset of other
-    fn is_subset(&self, other: &Self) -> bool {
+    pub fn is_subset(&self, other: &Self) -> bool {
         self.graph
             .keys()
             .all(|k| other.graph.contains_key(k) && self.graph[&k].is_subset(&other.graph[&k]))
     }
 
     /// Remove a node from the graph
-    fn remove_node(&mut self, node: Node) {
+    pub fn remove_node(&mut self, node: Node) {
         if let Node::Local(l) = node {
             self.moved_locals.remove(&l);
         }
@@ -215,7 +215,7 @@ impl BorrowGraph {
     }
 
     /// Find all the moved sink nodes, nodes that don't have any incoming edges
-    fn find_sink_nodes(&mut self) -> BTreeSet<Node> {
+    pub fn find_sink_nodes(&mut self) -> BTreeSet<Node> {
         let mut res = BTreeSet::new();
         for l in &self.moved_locals {
             let n = Node::Local(*l);
@@ -228,7 +228,7 @@ impl BorrowGraph {
 
     /// Trim the borrow graph by iteratively deleting moved sink nodes from the graph
     /// Return the deleted nodes
-    fn trim_graph(&mut self) -> BTreeSet<TempIndex> {
+    pub fn trim_graph(&mut self) -> BTreeSet<TempIndex> {
         let mut sink_nodes = self.find_sink_nodes();
         let mut trimmed_nodes = BTreeSet::new();
         while !sink_nodes.is_empty() {
@@ -244,12 +244,12 @@ impl BorrowGraph {
     }
 }
 
-struct LifetimeAnalysis<'a> {
+pub struct LifetimeAnalysis<'a> {
     local_types: &'a [Type],
 }
 
 #[derive(Clone, Debug)]
-struct LifetimeState {
+pub struct LifetimeState {
     borrow_graph: BorrowGraph,
 
     /// Mutable references that * just * go out of scope at the end of line CodeOffset
@@ -260,7 +260,7 @@ impl LifetimeState {
     /// For each key in the maps, union the values corresponding to the key in two maps
     /// e.g., if one = {1: {2,3}, 2: {4}} and other = {1: {2,4}, 3: {5}},
     ///       then this function will mutate one into {1: {2,3,4}, 2: {4}, 3: {5}}
-    fn dead_ref_join(
+    pub fn dead_ref_join(
         one: &mut BTreeMap<CodeOffset, BTreeSet<TempIndex>>,
         other: &BTreeMap<CodeOffset, BTreeSet<TempIndex>>,
     ) {
@@ -291,7 +291,7 @@ impl AbstractDomain for LifetimeState {
 }
 
 impl<'a> LifetimeAnalysis<'a> {
-    fn analyze(
+    pub fn analyze(
         cfg: &StacklessControlFlowGraph,
         instrs: &[Bytecode],
         local_types: &'a [Type],
@@ -306,7 +306,7 @@ impl<'a> LifetimeAnalysis<'a> {
     }
 
     /// Union the set of dead references at each CodeOffset
-    fn post_process(
+    pub fn post_process(
         state_map: StateMap<LifetimeState, ()>,
     ) -> BTreeMap<CodeOffset, BTreeSet<TempIndex>> {
         let mut res = BTreeMap::new();

@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::cluster_swarm::cluster_swarm_kube::ClusterSwarmKube;
 use anyhow::{format_err, Result};
@@ -78,13 +78,13 @@ pub struct Instance {
 }
 
 #[derive(Clone)]
-enum InstanceBackend {
+pub enum InstanceBackend {
     K8S(K8sInstanceInfo),
     Swarm,
 }
 
 #[derive(Clone)]
-struct K8sInstanceInfo {
+pub struct K8sInstanceInfo {
     k8s_node: String,
     instance_config: InstanceConfig,
     kube: ClusterSwarmKube,
@@ -255,7 +255,7 @@ impl Instance {
         Url::from_str(&format!("http://{}:{}/v1", self.ip(), self.ac_port())).expect("Invalid URL.")
     }
 
-    fn k8s_backend(&self) -> &K8sInstanceInfo {
+    pub fn k8s_backend(&self) -> &K8sInstanceInfo {
         if let InstanceBackend::K8S(ref k8s) = self.backend {
             return k8s;
         }

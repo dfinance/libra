@@ -44,7 +44,7 @@ use std::{collections::HashMap, sync::Arc, time::Duration};
 
 pub mod builder;
 #[cfg(test)]
-mod test;
+pub mod test;
 
 /// The interface from Network to HealthChecker layer.
 ///
@@ -255,7 +255,7 @@ where
         crit!("{} Health checker actor terminated", self.network_context,);
     }
 
-    fn handle_ping_request(
+    pub fn handle_ping_request(
         &mut self,
         peer_id: PeerId,
         ping: Ping,
@@ -280,7 +280,7 @@ where
         let _ = res_tx.send(Ok(message.into()));
     }
 
-    async fn handle_ping_response(
+    pub async fn handle_ping_response(
         &mut self,
         peer_id: PeerId,
         round: u64,
@@ -360,7 +360,7 @@ where
         }
     }
 
-    async fn ping_peer(
+    pub async fn ping_peer(
         network_context: Arc<NetworkContext>,
         mut network_tx: HealthCheckerNetworkSender,
         peer_id: PeerId,
@@ -384,12 +384,12 @@ where
         (peer_id, round, nonce, res_pong_msg)
     }
 
-    fn sample_random_peer(&mut self) -> Option<PeerId> {
+    pub fn sample_random_peer(&mut self) -> Option<PeerId> {
         let peers: Vec<_> = self.connected.keys().cloned().collect();
         peers.choose(&mut self.rng).cloned()
     }
 
-    fn sample_nonce(&mut self) -> u32 {
+    pub fn sample_nonce(&mut self) -> u32 {
         self.rng.gen::<u32>()
     }
 }

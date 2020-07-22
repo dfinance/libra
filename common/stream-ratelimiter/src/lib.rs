@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 //! `RateLimiter` converts any [`futures::stream::Stream`] into a rate-limited
 //! stream, allowing only a certain number of elements to be polled in a given time interval.
@@ -57,7 +57,7 @@ pub struct RateLimiter<T: Stream> {
 }
 
 impl<T: Stream> RateLimiter<T> {
-    fn new(stream: T, refill_interval: Duration, capacity: usize) -> RateLimiter<T> {
+    pub fn new(stream: T, refill_interval: Duration, capacity: usize) -> RateLimiter<T> {
         RateLimiter {
             inner: stream,
             interval: interval(refill_interval).fuse(),
@@ -114,7 +114,7 @@ impl<T: Stream> Stream for RateLimiter<T> {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use futures::stream;
     use tokio::time::delay_for;

@@ -297,7 +297,7 @@ impl<'input> Lexer<'input> {
 }
 
 // Find the next token and its length without changing the state of the lexer.
-fn find_token(file: &'static str, text: &str, start_offset: usize) -> Result<(Tok, usize), Error> {
+pub fn find_token(file: &'static str, text: &str, start_offset: usize) -> Result<(Tok, usize), Error> {
     let c: char = match text.chars().next() {
         Some(next_char) => next_char,
         None => {
@@ -426,7 +426,7 @@ fn find_token(file: &'static str, text: &str, start_offset: usize) -> Result<(To
 // this does not do any special check for whether the first character
 // starts with a number, so the caller is responsible for any additional
 // checks on the first character.
-fn get_name_len(text: &str) -> usize {
+pub fn get_name_len(text: &str) -> usize {
     text.chars()
         .position(|c| match c {
             'a'..='z' | 'A'..='Z' | '_' | '0'..='9' => false,
@@ -435,7 +435,7 @@ fn get_name_len(text: &str) -> usize {
         .unwrap_or_else(|| text.len())
 }
 
-fn get_decimal_number(text: &str) -> (Tok, usize) {
+pub fn get_decimal_number(text: &str) -> (Tok, usize) {
     let len = text
         .chars()
         .position(|c| match c {
@@ -456,7 +456,7 @@ fn get_decimal_number(text: &str) -> (Tok, usize) {
 }
 
 // Return the length of the substring containing characters in [0-9a-fA-F].
-fn get_hex_digits_len(text: &str) -> usize {
+pub fn get_hex_digits_len(text: &str) -> usize {
     text.find(|c| match c {
         'a'..='f' | 'A'..='F' | '0'..='9' => false,
         _ => true,
@@ -465,7 +465,7 @@ fn get_hex_digits_len(text: &str) -> usize {
 }
 
 // Return the length of the quoted string, or None if there is no closing quote.
-fn get_string_len(text: &str) -> Option<usize> {
+pub fn get_string_len(text: &str) -> Option<usize> {
     let mut pos = 0;
     let mut iter = text.chars();
     while let Some(chr) = iter.next() {
@@ -482,7 +482,7 @@ fn get_string_len(text: &str) -> Option<usize> {
     None
 }
 
-fn get_name_token(name: &str) -> Tok {
+pub fn get_name_token(name: &str) -> Tok {
     match name {
         "abort" => Tok::Abort,
         "acquires" => Tok::Acquires,

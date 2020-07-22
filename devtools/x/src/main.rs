@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use chrono::Local;
 use env_logger::{self, fmt::Color};
@@ -9,29 +9,29 @@ use log::Level;
 use std::io::Write;
 use structopt::StructOpt;
 
-mod bench;
-mod cargo;
-mod check;
-mod clippy;
-mod config;
-mod context;
-mod fix;
-mod fmt;
-mod generate_summaries;
-mod lint;
-mod test;
-mod utils;
+pub mod bench;
+pub mod cargo;
+pub mod check;
+pub mod clippy;
+pub mod config;
+pub mod context;
+pub mod fix;
+pub mod fmt;
+pub mod generate_summaries;
+pub mod lint;
+pub mod test;
+pub mod utils;
 
 type Result<T> = anyhow::Result<T>;
 
 #[derive(Debug, StructOpt)]
-struct Args {
+pub struct Args {
     #[structopt(subcommand)]
     cmd: Command,
 }
 
 #[derive(Debug, StructOpt)]
-enum Command {
+pub enum Command {
     #[structopt(name = "bench")]
     /// Run `cargo bench`
     Bench(bench::Args),

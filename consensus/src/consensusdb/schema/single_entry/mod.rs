@@ -4,7 +4,7 @@
 //! This module defines physical storage schema for any single-entry data.
 //!
 //! There will be only one row in this column family for each type of data.
-//! The key will be a serialized enum type designating the data type and should not have any meaning
+//! The key will be a serializedpub enum type designating the data type and should not have any meaning
 //! and be used. ```text
 //! |<-------key------->|<-----value----->|
 //! | single entry key  | raw value bytes |
@@ -62,4 +62,4 @@ impl ValueCodec<SingleEntrySchema> for Vec<u8> {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

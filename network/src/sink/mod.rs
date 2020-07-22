@@ -4,7 +4,7 @@
 use crate::sink::buffered_send::BufferedSend;
 use futures::sink::Sink;
 
-mod buffered_send;
+pub mod buffered_send;
 
 // blanket trait impl for NetworkSinkExt
 impl<T: ?Sized, Item> NetworkSinkExt<Item> for T where T: Sink<Item> {}

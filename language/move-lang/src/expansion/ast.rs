@@ -437,7 +437,7 @@ impl AstDebug for (StructName, &StructDefinition) {
         if resource_opt.is_some() {
             w.write("resource ");
         }
-        w.write(&format!("struct {}", name));
+        w.write(&format!("pub struct {}", name));
         type_parameters.ast_debug(w);
         if let StructFields::Defined(fields) = fields {
             w.block(|w| {

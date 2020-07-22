@@ -124,7 +124,7 @@ impl CompiledUnit {
     }
 }
 
-fn verify_module(loc: Loc, cm: F::CompiledModule) -> (F::CompiledModule, Errors) {
+pub fn verify_module(loc: Loc, cm: F::CompiledModule) -> (F::CompiledModule, Errors) {
     match move_bytecode_verifier::verifier::verify_module(&cm) {
         Ok(_) => (cm, vec![]),
         Err(e) => (
@@ -137,7 +137,7 @@ fn verify_module(loc: Loc, cm: F::CompiledModule) -> (F::CompiledModule, Errors)
     }
 }
 
-fn verify_script(loc: Loc, cs: F::CompiledScript) -> (F::CompiledScript, Errors) {
+pub fn verify_script(loc: Loc, cs: F::CompiledScript) -> (F::CompiledScript, Errors) {
     match move_bytecode_verifier::verifier::verify_script(&cs) {
         Ok(_) => (cs, vec![]),
         Err(e) => (

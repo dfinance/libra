@@ -93,7 +93,7 @@ pub enum VerifiedEvent {
 
 #[cfg(test)]
 #[path = "round_manager_test.rs"]
-mod round_manager_test;
+pub mod round_manager_test;
 
 #[cfg(feature = "fuzzing")]
 #[path = "round_manager_fuzzing.rs"]
@@ -141,7 +141,7 @@ impl RecoveryManager {
         self.sync_up(&sync_info, author).await
     }
 
-    async fn sync_up(&mut self, sync_info: &SyncInfo, peer: Author) -> Result<RecoveryData> {
+    pub async fn sync_up(&mut self, sync_info: &SyncInfo, peer: Author) -> Result<RecoveryData> {
         sync_info.verify(&self.epoch_state.verifier)?;
         ensure!(
             sync_info.highest_round() > self.last_committed_round,
@@ -210,7 +210,7 @@ impl RoundManager {
         }
     }
 
-    fn create_block_retriever(&self, author: Author) -> BlockRetriever {
+    pub fn create_block_retriever(&self, author: Author) -> BlockRetriever {
         BlockRetriever::new(self.network.clone(), author)
     }
 
@@ -226,7 +226,7 @@ impl RoundManager {
     /// Replica:
     ///
     /// Do nothing
-    async fn process_new_round_event(
+    pub async fn process_new_round_event(
         &mut self,
         new_round_event: NewRoundEvent,
     ) -> anyhow::Result<()> {
@@ -253,7 +253,7 @@ impl RoundManager {
         Ok(())
     }
 
-    async fn generate_proposal(
+    pub async fn generate_proposal(
         &mut self,
         new_round_event: NewRoundEvent,
     ) -> anyhow::Result<ProposalMsg> {
@@ -302,7 +302,7 @@ impl RoundManager {
 
     /// Sync to the sync info sending from peer if it has newer certificates, if we have newer certificates
     /// and help_remote is set, send it back the local sync info.
-    async fn sync_up(
+    pub async fn sync_up(
         &mut self,
         sync_info: &SyncInfo,
         author: Author,
@@ -435,7 +435,7 @@ impl RoundManager {
     }
 
     /// This function is called only after all the dependencies of the given QC have been retrieved.
-    async fn process_certificates(&mut self) -> anyhow::Result<()> {
+    pub async fn process_certificates(&mut self) -> anyhow::Result<()> {
         let sync_info = self.block_store.sync_info();
         if let Some(new_round_event) = self.round_state.process_certificates(sync_info) {
             self.process_new_round_event(new_round_event).await?;
@@ -449,7 +449,7 @@ impl RoundManager {
     /// 3. Try to vote for it following the safety rules.
     /// 4. In case a validator chooses to vote, send the vote to the representatives at the next
     /// round.
-    async fn process_proposal(&mut self, proposal: Block) -> Result<()> {
+    pub async fn process_proposal(&mut self, proposal: Block) -> Result<()> {
         ensure!(
             self.proposer_election.is_valid_proposal(&proposal),
             "[RoundManager] Proposer {} for block {} is not a valid proposer for this round",
@@ -498,7 +498,7 @@ impl RoundManager {
     /// * then verify the voting rules
     /// * save the updated state to consensus DB
     /// * return a VoteMsg with the LedgerInfo to be committed in case the vote gathers QC.
-    async fn execute_and_vote(&mut self, proposed_block: Block) -> anyhow::Result<Vote> {
+    pub async fn execute_and_vote(&mut self, proposed_block: Block) -> anyhow::Result<Vote> {
         trace_code_block!("round_manager::execute_and_vote", {"block", proposed_block.id()});
         let executed_block = self
             .block_store
@@ -573,7 +573,7 @@ impl RoundManager {
     /// If a new QC / TC is formed then
     /// 1) fetch missing dependencies if required, and then
     /// 2) call process_certificates(), which will start a new round in return.
-    async fn process_vote(&mut self, vote: &Vote) -> anyhow::Result<()> {
+    pub async fn process_vote(&mut self, vote: &Vote) -> anyhow::Result<()> {
         if !vote.is_timeout() {
             // Unlike timeout votes regular votes are sent to the leaders of the next round only.
             let next_round = vote.vote_data().proposed().round() + 1;
@@ -617,7 +617,7 @@ impl RoundManager {
         }
     }
 
-    async fn new_qc_aggregated(
+    pub async fn new_qc_aggregated(
         &mut self,
         qc: Arc<QuorumCert>,
         preferred_peer: Author,
@@ -631,7 +631,7 @@ impl RoundManager {
         result
     }
 
-    async fn new_tc_aggregated(&mut self, tc: Arc<TimeoutCertificate>) -> anyhow::Result<()> {
+    pub async fn new_tc_aggregated(&mut self, tc: Arc<TimeoutCertificate>) -> anyhow::Result<()> {
         let result = self
             .block_store
             .insert_timeout_certificate(tc.clone())

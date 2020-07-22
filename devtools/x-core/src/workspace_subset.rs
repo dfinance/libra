@@ -50,13 +50,13 @@ impl<'g> WorkspaceSubset<'g> {
     /// This does not include dev-dependencies.
     pub fn default_members(package_graph: &'g PackageGraph, project_root: &Path) -> Result<Self> {
         #[derive(Deserialize)]
-        struct RootToml<'a> {
+        pub struct RootToml<'a> {
             #[serde(borrow)]
             workspace: Workspace<'a>,
         }
 
         #[derive(Deserialize)]
-        struct Workspace<'a> {
+        pub struct Workspace<'a> {
             #[serde(borrow)]
             #[serde(rename = "default-members")]
             default_members: Vec<&'a Path>,

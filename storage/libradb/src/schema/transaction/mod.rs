@@ -46,4 +46,4 @@ impl ValueCodec<TransactionSchema> for Transaction {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

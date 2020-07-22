@@ -9,7 +9,7 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "fuzzer", about = "Libra fuzzer")]
-struct Opt {
+pub struct Opt {
     /// Print extended debug output
     #[structopt(long = "debug")]
     debug: bool,
@@ -25,7 +25,7 @@ const GENERATE_DEFAULT_ITEMS: usize = 128;
 static GENERATE_DEFAULT_ITEMS_STR: Lazy<String> = Lazy::new(|| GENERATE_DEFAULT_ITEMS.to_string());
 
 #[derive(Debug, StructOpt)]
-enum Command {
+pub enum Command {
     /// Generate corpus for a particular fuzz target
     #[structopt(name = "generate")]
     Generate {
@@ -70,16 +70,16 @@ enum Command {
 }
 
 /// The default directory for corpuses. Also return whether the directory was freshly created.
-fn default_corpus_dir(target: FuzzTarget) -> (PathBuf, bool) {
+pub fn default_corpus_dir(target: FuzzTarget) -> (PathBuf, bool) {
     default_dir(target, "corpus")
 }
 
 /// The default directory for artifacts.
-fn default_artifact_dir(target: FuzzTarget) -> PathBuf {
+pub fn default_artifact_dir(target: FuzzTarget) -> PathBuf {
     default_dir(target, "artifacts").0
 }
 
-fn default_dir(target: FuzzTarget, intermediate_dir: &str) -> (PathBuf, bool) {
+pub fn default_dir(target: FuzzTarget, intermediate_dir: &str) -> (PathBuf, bool) {
     let mut dir = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").expect(
         "--corpus-dir not set and this binary is not running under cargo run. \
          Either use cargo run or pass in the --corpus-dir flag.",

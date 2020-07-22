@@ -17,8 +17,8 @@ pub fn fix_syntax_and_write(out_path: &Path, contents: String) {
     let contents = replace!(contents, r"move\((\w+)\)", "move $1");
     // copy(x) ~> copy x
     let contents = replace!(contents, r"copy\((\w+)\)", "copy $1");
-    // resource StructName ~> resource struct StructName
-    let contents = replace!(contents, r"resource\s+(\w)", "resource struct $1");
+    // resource StructName ~> resource pub struct StructName
+    let contents = replace!(contents, r"resource\s+(\w)", "resource pub struct $1");
     // copyable ~> copyable
     let contents = replace!(contents, r":\s*copyable", NoExpand(": copyable"));
     // import ~> use

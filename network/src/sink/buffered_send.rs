@@ -64,7 +64,7 @@ impl<S: Sink<Item> + Unpin + ?Sized, Item> Future for BufferedSend<'_, S, Item> 
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use crate::sink::NetworkSinkExt;
     use futures::{
         channel::mpsc, executor::block_on, future::join, sink::SinkExt, stream::StreamExt,

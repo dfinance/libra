@@ -18,7 +18,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use vm::file_format::CodeOffset;
 
 #[derive(Debug, Clone, Eq, Ord, PartialEq, PartialOrd)]
-struct Field {
+pub struct Field {
     struct_decl: StructDecl,
     field_offset: usize,
 }
@@ -97,7 +97,7 @@ impl BorrowAnnotation {
 }
 
 #[derive(Debug, Clone)]
-struct PackError {
+pub struct PackError {
     code_offset: CodeOffset,
     indices: Vec<TempIndex>,
 }
@@ -134,14 +134,14 @@ impl FunctionTargetProcessor for BorrowAnalysisProcessor {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-struct BorrowState {
+pub struct BorrowState {
     borrow_graph: BorrowGraph,
     dead_edges: BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
 }
 
 impl BorrowState {}
 
-struct BorrowAnalysis<'a> {
+pub struct BorrowAnalysis<'a> {
     func_target: &'a FunctionTarget<'a>,
     livevar_annotation: &'a LiveVarAnnotation,
     ref_id_to_borrow_node: BTreeMap<RefID, BorrowNode>,
@@ -149,7 +149,7 @@ struct BorrowAnalysis<'a> {
 }
 
 impl<'a> BorrowAnalysis<'a> {
-    fn new(func_target: &'a FunctionTarget<'a>) -> Self {
+    pub fn new(func_target: &'a FunctionTarget<'a>) -> Self {
         let livevar_annotation = func_target
             .get_annotations()
             .get::<LiveVarAnnotation>()
@@ -195,7 +195,7 @@ impl<'a> BorrowAnalysis<'a> {
         }
     }
 
-    fn analyze(&mut self, instrs: &[Bytecode]) -> BTreeMap<CodeOffset, BorrowInfoAtCodeOffset> {
+    pub fn analyze(&mut self, instrs: &[Bytecode]) -> BTreeMap<CodeOffset, BorrowInfoAtCodeOffset> {
         let cfg = StacklessControlFlowGraph::new_forward(instrs);
         let mut borrow_graph = BorrowGraph::new();
         for (ref_id, _) in self
@@ -227,12 +227,12 @@ impl<'a> BorrowAnalysis<'a> {
         self.post_process(&cfg, instrs, state_map)
     }
 
-    fn ref_param_proxy_root_idx(func_target: &FunctionTarget, ref_param_idx: usize) -> usize {
+    pub fn ref_param_proxy_root_idx(func_target: &FunctionTarget, ref_param_idx: usize) -> usize {
         assert!(ref_param_idx < func_target.get_parameter_count());
         func_target.get_local_count() + ref_param_idx
     }
 
-    fn post_process(
+    pub fn post_process(
         &mut self,
         cfg: &StacklessControlFlowGraph,
         instrs: &[Bytecode],
@@ -252,7 +252,7 @@ impl<'a> BorrowAnalysis<'a> {
         result
     }
 
-    fn convert_state_to_info(&self, borrow_state: &BorrowState) -> BorrowInfo {
+    pub fn convert_state_to_info(&self, borrow_state: &BorrowState) -> BorrowInfo {
         let all_ref_ids = borrow_state.borrow_graph.all_refs();
         let live_refs = (0..self.func_target.get_local_count())
             .filter(|idx| {
@@ -289,7 +289,7 @@ impl<'a> BorrowAnalysis<'a> {
         }
     }
 
-    fn add_edge(
+    pub fn add_edge(
         edges: &mut BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
         at: &BorrowNode,
         node: &BorrowNode,
@@ -300,7 +300,7 @@ impl<'a> BorrowAnalysis<'a> {
         });
     }
 
-    fn add_edges(
+    pub fn add_edges(
         edges: &mut BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
         other: &BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
     ) {
@@ -311,7 +311,7 @@ impl<'a> BorrowAnalysis<'a> {
         }
     }
 
-    fn is_subset(
+    pub fn is_subset(
         other: &BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
         edges: &BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
     ) -> bool {
@@ -320,7 +320,7 @@ impl<'a> BorrowAnalysis<'a> {
             .all(|(x, y)| edges.contains_key(x) && y.is_subset(&edges[x]))
     }
 
-    fn error_indices(&self, state: &BorrowState, dests: Vec<TempIndex>) -> Vec<TempIndex> {
+    pub fn error_indices(&self, state: &BorrowState, dests: Vec<TempIndex>) -> Vec<TempIndex> {
         let mut indices = vec![];
         let all_refs = state.borrow_graph.all_refs();
         for idx in dests {
@@ -334,7 +334,7 @@ impl<'a> BorrowAnalysis<'a> {
         indices
     }
 
-    fn remap_borrow_node(&self, node: &BorrowNode, id_map: &BTreeMap<RefID, RefID>) -> BorrowNode {
+    pub fn remap_borrow_node(&self, node: &BorrowNode, id_map: &BTreeMap<RefID, RefID>) -> BorrowNode {
         match node {
             BorrowNode::Reference(idx) => {
                 let ref_id = RefID::new(*idx);
@@ -349,7 +349,7 @@ impl<'a> BorrowAnalysis<'a> {
         }
     }
 
-    fn remap_edges(
+    pub fn remap_edges(
         &self,
         edges: &mut BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
         id_map: &BTreeMap<RefID, RefID>,
@@ -368,7 +368,7 @@ impl<'a> BorrowAnalysis<'a> {
             .collect();
     }
 
-    fn execute(
+    pub fn execute(
         &mut self,
         pre: BorrowState,
         instr: &Bytecode,
@@ -542,7 +542,7 @@ impl<'a> BorrowAnalysis<'a> {
         Ok(post)
     }
 
-    fn remove_leaves(
+    pub fn remove_leaves(
         dead_edges: BTreeMap<BorrowNode, BTreeSet<BorrowNode>>,
     ) -> (BTreeMap<BorrowNode, BTreeSet<BorrowNode>>, Vec<BorrowNode>) {
         let mut new_dead_edges = BTreeMap::new();

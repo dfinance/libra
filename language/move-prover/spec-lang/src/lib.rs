@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{
     ast::ModuleName,
@@ -23,7 +23,7 @@ pub mod ast;
 pub mod code_writer;
 pub mod env;
 pub mod symbol;
-mod translate;
+pub mod translate;
 pub mod ty;
 
 use crate::env::SCRIPT_MODULE_NAME;
@@ -50,7 +50,7 @@ pub fn run_spec_lang_compiler(
         .transpose()
         .map_err(|s| anyhow!(s))?;
 
-    // Construct all sources from targets and deps, as we need bytecode for all of them.
+    // Conpub struct all sources from targets and deps, as we need bytecode for all of them.
     let mut all_sources = targets;
     all_sources.extend(deps.clone());
     let mut env = GlobalEnv::new();
@@ -91,7 +91,7 @@ pub fn run_spec_lang_compiler(
     Ok(env)
 }
 
-fn add_move_lang_errors(env: &mut GlobalEnv, errors: Errors) {
+pub fn add_move_lang_errors(env: &mut GlobalEnv, errors: Errors) {
     let mk_label = |env: &mut GlobalEnv, err: (move_ir_types::location::Loc, String)| {
         let loc = env.to_loc(&err.0);
         Label::new(loc.file_id(), loc.span(), err.1)
@@ -105,7 +105,7 @@ fn add_move_lang_errors(env: &mut GlobalEnv, errors: Errors) {
 }
 
 #[allow(deprecated)]
-fn run_spec_checker(
+pub fn run_spec_checker(
     env: &mut GlobalEnv,
     units: Vec<CompiledUnit>,
     mut eprog: Program,
@@ -173,7 +173,7 @@ fn run_spec_checker(
                     function_infos
                         .add(FunctionName(Name { loc, value: key }), function_info)
                         .unwrap();
-                    // Construct a pseudo module definition.
+                    // Conpub struct a pseudo module definition.
                     let mut functions = UniqueMap::new();
                     functions.add(function_name.clone(), function).unwrap();
                     // As we now know the real function name and address, replace it in the
@@ -223,11 +223,11 @@ fn run_spec_checker(
 // Crate Helpers
 
 /// Helper to project the 1st element from a vector of pairs.
-pub(crate) fn project_1st<T: Clone, R>(v: &[(T, R)]) -> Vec<T> {
+pub fn project_1st<T: Clone, R>(v: &[(T, R)]) -> Vec<T> {
     v.iter().map(|(x, _)| x.clone()).collect()
 }
 
 /// Helper to project the 2nd element from a vector of pairs.
-pub(crate) fn project_2nd<T, R: Clone>(v: &[(T, R)]) -> Vec<R> {
+pub fn project_2nd<T, R: Clone>(v: &[(T, R)]) -> Vec<R> {
     v.iter().map(|(_, x)| x.clone()).collect()
 }

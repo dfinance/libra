@@ -52,4 +52,4 @@ impl ValueCodec<LedgerInfoSchema> for LedgerInfoWithSignatures {
 }
 
 #[cfg(test)]
-mod test;
+pub mod test;

@@ -1,8 +1,8 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
+
+
 // Increase recursion limit to allow for use of select! macro.
 #![recursion_limit = "1024"]
 
@@ -58,7 +58,7 @@
 
 /// This module provides mocks of shared mempool for tests.
 #[cfg(any(test, feature = "fuzzing"))]
-mod tests;
+pub mod tests;
 pub use shared_mempool::{
     bootstrap, network,
     types::{
@@ -70,9 +70,9 @@ pub use shared_mempool::{
 #[cfg(any(test, feature = "fuzzing"))]
 pub use tests::mocks;
 
-mod core_mempool;
-mod counters;
-mod shared_mempool;
+pub mod core_mempool;
+pub mod counters;
+pub mod shared_mempool;
 
 // module op counters
 use libra_metrics::OpMetrics;

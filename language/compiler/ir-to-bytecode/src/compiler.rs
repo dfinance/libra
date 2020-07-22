@@ -117,7 +117,7 @@ macro_rules! make_record_nop_label {
 }
 
 #[derive(Debug, Default)]
-struct LoopInfo {
+pub struct LoopInfo {
     start_loc: usize,
     breaks: Vec<usize>,
 }
@@ -125,7 +125,7 @@ struct LoopInfo {
 // Ideally, we should capture all of this info into a CFG, but as we only have structured control
 // flow currently, it would be a bit overkill. It will be a necessity if we add arbitrary branches
 // in the IR, as is expressible in the bytecode
-struct ControlFlowInfo {
+pub struct ControlFlowInfo {
     // A `break` is reachable iff it was used before a terminal node
     reachable_break: bool,
     // A terminal node is an infinite loop or a path that always returns
@@ -133,13 +133,13 @@ struct ControlFlowInfo {
 }
 
 impl ControlFlowInfo {
-    fn join(f1: ControlFlowInfo, f2: ControlFlowInfo) -> ControlFlowInfo {
+    pub fn join(f1: ControlFlowInfo, f2: ControlFlowInfo) -> ControlFlowInfo {
         ControlFlowInfo {
             reachable_break: f1.reachable_break || f2.reachable_break,
             terminal_node: f1.terminal_node && f2.terminal_node,
         }
     }
-    fn successor(prev: ControlFlowInfo, next: ControlFlowInfo) -> ControlFlowInfo {
+    pub fn successor(prev: ControlFlowInfo, next: ControlFlowInfo) -> ControlFlowInfo {
         if prev.terminal_node {
             prev
         } else {
@@ -154,7 +154,7 @@ impl ControlFlowInfo {
 // Inferred representation of SignatureToken's
 // In essence, it's a signature token with a "bottom" type added
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-enum InferredType {
+pub enum InferredType {
     // Result of the compiler failing to infer the type of an expression
     // Not translatable to a signature token
     Anything,
@@ -174,7 +174,7 @@ enum InferredType {
 }
 
 impl InferredType {
-    fn from_signature_token_with_subst(
+    pub fn from_signature_token_with_subst(
         subst: &HashMap<TypeParameterIndex, InferredType>,
         sig_token: &SignatureToken,
     ) -> Self {
@@ -213,7 +213,7 @@ impl InferredType {
         }
     }
 
-    fn from_signature_tokens_with_subst(
+    pub fn from_signature_tokens_with_subst(
         subst: &HashMap<TypeParameterIndex, InferredType>,
         sig_tokens: &[SignatureToken],
     ) -> Vec<Self> {
@@ -223,33 +223,33 @@ impl InferredType {
             .collect()
     }
 
-    fn from_signature_token(sig_token: &SignatureToken) -> Self {
+    pub fn from_signature_token(sig_token: &SignatureToken) -> Self {
         Self::from_signature_token_with_subst(&HashMap::new(), sig_token)
     }
 
-    fn from_signature_tokens(sig_tokens: &[SignatureToken]) -> Vec<Self> {
+    pub fn from_signature_tokens(sig_tokens: &[SignatureToken]) -> Vec<Self> {
         Self::from_signature_tokens_with_subst(&HashMap::new(), sig_tokens)
     }
 
-    fn get_struct_handle(&self) -> Result<(StructHandleIndex, &Vec<InferredType>)> {
+    pub fn get_struct_handle(&self) -> Result<(StructHandleIndex, &Vec<InferredType>)> {
         match self {
-            InferredType::Anything => bail!("could not infer struct type"),
-            InferredType::Bool => bail!("no struct type for Bool"),
-            InferredType::U8 => bail!("no struct type for U8"),
-            InferredType::U64 => bail!("no struct type for U64"),
-            InferredType::U128 => bail!("no struct type for U128"),
-            InferredType::Address => bail!("no struct type for Address"),
-            InferredType::Signer => bail!("no struct type for Signer"),
-            InferredType::Vector(_) => bail!("no struct type for vector"),
+            InferredType::Anything => bail!("could not infer pub struct type"),
+            InferredType::Bool => bail!("no pub struct type for Bool"),
+            InferredType::U8 => bail!("no pub struct type for U8"),
+            InferredType::U64 => bail!("no pub struct type for U64"),
+            InferredType::U128 => bail!("no pub struct type for U128"),
+            InferredType::Address => bail!("no pub struct type for Address"),
+            InferredType::Signer => bail!("no pub struct type for Signer"),
+            InferredType::Vector(_) => bail!("no pub struct type for vector"),
             InferredType::Reference(inner) | InferredType::MutableReference(inner) => {
                 inner.get_struct_handle()
             }
             InferredType::Struct(idx, tys) => Ok((*idx, tys)),
-            InferredType::TypeParameter(_) => bail!("no struct type for type parameter"),
+            InferredType::TypeParameter(_) => bail!("no pub struct type for type parameter"),
         }
     }
 
-    fn to_signature_token(ty: &Self) -> Result<SignatureToken> {
+    pub fn to_signature_token(ty: &Self) -> Result<SignatureToken> {
         use InferredType as I;
         use SignatureToken as S;
         Ok(match ty {
@@ -276,7 +276,7 @@ impl InferredType {
         })
     }
 
-    fn build_signature_tokens(tys: &[InferredType]) -> Result<Vec<SignatureToken>> {
+    pub fn build_signature_tokens(tys: &[InferredType]) -> Result<Vec<SignatureToken>> {
         tys.iter()
             .map(|sig_ty| Self::to_signature_token(sig_ty))
             .collect()
@@ -285,7 +285,7 @@ impl InferredType {
 
 // Holds information about a function being compiled.
 #[derive(Debug)]
-struct FunctionFrame {
+pub struct FunctionFrame {
     locals: HashMap<Var_, u8>,
     local_types: Signature,
     // i64 to allow the bytecode verifier to catch errors of
@@ -300,7 +300,7 @@ struct FunctionFrame {
 }
 
 impl FunctionFrame {
-    fn new(type_parameters: HashMap<TypeVar_, TypeParameterIndex>) -> FunctionFrame {
+    pub fn new(type_parameters: HashMap<TypeVar_, TypeParameterIndex>) -> FunctionFrame {
         FunctionFrame {
             locals: HashMap::new(),
             local_types: Signature(vec![]),
@@ -312,7 +312,7 @@ impl FunctionFrame {
     }
 
     // Manage the stack info for the function
-    fn push(&mut self) -> Result<()> {
+    pub fn push(&mut self) -> Result<()> {
         if self.cur_stack_depth == i64::max_value() {
             bail!("ICE Stack depth accounting overflow. The compiler can only support a maximum stack depth of up to i64::max_value")
         }
@@ -321,7 +321,7 @@ impl FunctionFrame {
         Ok(())
     }
 
-    fn pop(&mut self) -> Result<()> {
+    pub fn pop(&mut self) -> Result<()> {
         if self.cur_stack_depth == i64::min_value() {
             bail!("ICE Stack depth accounting underflow. The compiler can only support a minimum stack depth of up to i64::min_value")
         }
@@ -329,21 +329,21 @@ impl FunctionFrame {
         Ok(())
     }
 
-    fn get_local(&self, var: &Var_) -> Result<u8> {
+    pub fn get_local(&self, var: &Var_) -> Result<u8> {
         match self.locals.get(var) {
             None => bail!("variable {} undefined", var),
             Some(idx) => Ok(*idx),
         }
     }
 
-    fn get_local_type(&self, idx: u8) -> Result<&SignatureToken> {
+    pub fn get_local_type(&self, idx: u8) -> Result<&SignatureToken> {
         self.local_types
             .0
             .get(idx as usize)
             .ok_or_else(|| format_err!("variable {} undefined", idx))
     }
 
-    fn define_local(&mut self, var: &Var_, type_: SignatureToken) -> Result<u8> {
+    pub fn define_local(&mut self, var: &Var_, type_: SignatureToken) -> Result<u8> {
         if self.locals.len() >= TABLE_MAX_SIZE {
             bail!("Max number of locals reached");
         }
@@ -361,7 +361,7 @@ impl FunctionFrame {
         Ok(cur_loc_idx)
     }
 
-    fn push_loop(&mut self, start_loc: usize) -> Result<()> {
+    pub fn push_loop(&mut self, start_loc: usize) -> Result<()> {
         self.loops.push(LoopInfo {
             start_loc,
             breaks: Vec::new(),
@@ -369,21 +369,21 @@ impl FunctionFrame {
         Ok(())
     }
 
-    fn pop_loop(&mut self) -> Result<()> {
+    pub fn pop_loop(&mut self) -> Result<()> {
         match self.loops.pop() {
             Some(_) => Ok(()),
             None => bail!("Impossible: failed to pop loop!"),
         }
     }
 
-    fn get_loop_start(&self) -> Result<usize> {
+    pub fn get_loop_start(&self) -> Result<usize> {
         match self.loops.last() {
             Some(loop_) => Ok(loop_.start_loc),
             None => bail!("continue outside loop"),
         }
     }
 
-    fn push_loop_break(&mut self, loc: usize) -> Result<()> {
+    pub fn push_loop_break(&mut self, loc: usize) -> Result<()> {
         match self.loops.last_mut() {
             Some(loop_) => {
                 loop_.breaks.push(loc);
@@ -393,14 +393,14 @@ impl FunctionFrame {
         }
     }
 
-    fn get_loop_breaks(&self) -> Result<&Vec<usize>> {
+    pub fn get_loop_breaks(&self) -> Result<&Vec<usize>> {
         match self.loops.last() {
             Some(loop_) => Ok(&loop_.breaks),
             None => bail!("Impossible: failed to get loop breaks (no loops in stack)"),
         }
     }
 
-    fn type_parameters(&self) -> &HashMap<TypeVar_, TypeParameterIndex> {
+    pub fn type_parameters(&self) -> &HashMap<TypeVar_, TypeParameterIndex> {
         &self.type_parameters
     }
 }
@@ -562,7 +562,7 @@ pub fn compile_module<'a, T: 'a + ModuleAccess>(
         .map(|frozen_module| (frozen_module, source_map))
 }
 
-fn compile_explicit_dependency_declarations(
+pub fn compile_explicit_dependency_declarations(
     context: &mut Context,
     dependencies: Vec<ModuleDependency>,
 ) -> Result<()> {
@@ -591,7 +591,7 @@ fn compile_explicit_dependency_declarations(
     Ok(())
 }
 
-fn compile_imports(
+pub fn compile_imports(
     context: &mut Context,
     address_opt: Option<AccountAddress>,
     imports: Vec<ImportDefinition>,
@@ -612,7 +612,7 @@ fn compile_imports(
     Ok(())
 }
 
-fn type_parameter_indexes(
+pub fn type_parameter_indexes(
     ast_tys: &[(TypeVar, ast::Kind)],
 ) -> Result<HashMap<TypeVar_, TypeParameterIndex>> {
     let mut m = HashMap::new();
@@ -628,7 +628,7 @@ fn type_parameter_indexes(
     Ok(m)
 }
 
-fn make_type_argument_subst(
+pub fn make_type_argument_subst(
     tokens: &[InferredType],
 ) -> Result<HashMap<TypeParameterIndex, InferredType>> {
     let mut subst = HashMap::new();
@@ -641,11 +641,11 @@ fn make_type_argument_subst(
     Ok(subst)
 }
 
-fn type_parameter_kinds(ast_tys: &[(TypeVar, ast::Kind)]) -> Vec<Kind> {
+pub fn type_parameter_kinds(ast_tys: &[(TypeVar, ast::Kind)]) -> Vec<Kind> {
     ast_tys.iter().map(|(_, k)| kind(k)).collect()
 }
 
-fn kind(ast_k: &ast::Kind) -> Kind {
+pub fn kind(ast_k: &ast::Kind) -> Kind {
     match ast_k {
         ast::Kind::All => Kind::All,
         ast::Kind::Resource => Kind::Resource,
@@ -653,7 +653,7 @@ fn kind(ast_k: &ast::Kind) -> Kind {
     }
 }
 
-fn compile_types(
+pub fn compile_types(
     context: &mut Context,
     type_parameters: &HashMap<TypeVar_, TypeParameterIndex>,
     tys: &[Type],
@@ -663,7 +663,7 @@ fn compile_types(
         .collect::<Result<_>>()
 }
 
-fn compile_type(
+pub fn compile_type(
     context: &mut Context,
     type_parameters: &HashMap<TypeVar_, TypeParameterIndex>,
     ty: &Type,
@@ -708,7 +708,7 @@ fn compile_type(
     })
 }
 
-fn function_signature(
+pub fn function_signature(
     context: &mut Context,
     f: &ast::FunctionSignature,
 ) -> Result<FunctionSignature> {
@@ -727,7 +727,7 @@ fn function_signature(
     })
 }
 
-fn compile_structs(
+pub fn compile_structs(
     context: &mut Context,
     self_name: &ModuleName,
     structs: Vec<ast::StructDefinition>,
@@ -752,7 +752,7 @@ fn compile_structs(
     Ok(struct_defs)
 }
 
-fn compile_fields(
+pub fn compile_fields(
     context: &mut Context,
     type_parameters: &HashMap<TypeVar_, TypeParameterIndex>,
     sh_idx: StructHandleIndex,
@@ -778,7 +778,7 @@ fn compile_fields(
     })
 }
 
-fn compile_functions(
+pub fn compile_functions(
     context: &mut Context,
     self_name: &ModuleName,
     functions: Vec<(FunctionName, Function)>,
@@ -792,7 +792,7 @@ fn compile_functions(
         .collect()
 }
 
-fn compile_function_body_impl(
+pub fn compile_function_body_impl(
     context: &mut Context,
     ast_function: Function_,
 ) -> Result<Option<CodeUnit>> {
@@ -827,7 +827,7 @@ fn compile_function_body_impl(
     })
 }
 
-fn compile_function(
+pub fn compile_function(
     context: &mut Context,
     self_name: &ModuleName,
     name: FunctionName,
@@ -863,7 +863,7 @@ fn compile_function(
     })
 }
 
-fn compile_function_body(
+pub fn compile_function_body(
     context: &mut Context,
     type_parameters: HashMap<TypeVar_, TypeParameterIndex>,
     formals: Vec<(Var, Type)>,
@@ -894,7 +894,7 @@ fn compile_function_body(
     })
 }
 
-fn compile_block(
+pub fn compile_block(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -924,7 +924,7 @@ fn compile_block(
     Ok(cf_info)
 }
 
-fn compile_if_else(
+pub fn compile_if_else(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -968,7 +968,7 @@ fn compile_if_else(
     Ok(cf_info)
 }
 
-fn compile_while(
+pub fn compile_while(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1011,7 +1011,7 @@ fn compile_while(
     })
 }
 
-fn compile_loop(
+pub fn compile_loop(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1043,7 +1043,7 @@ fn compile_loop(
     })
 }
 
-fn compile_command(
+pub fn compile_command(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1123,7 +1123,7 @@ fn compile_command(
     })
 }
 
-fn compile_lvalues(
+pub fn compile_lvalues(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1158,7 +1158,7 @@ macro_rules! vec_deque {
     }
 }
 
-fn infer_int_bin_op_result_ty(
+pub fn infer_int_bin_op_result_ty(
     tys1: &VecDeque<InferredType>,
     tys2: &VecDeque<InferredType>,
 ) -> InferredType {
@@ -1174,7 +1174,7 @@ fn infer_int_bin_op_result_ty(
     }
 }
 
-fn compile_expression(
+pub fn compile_expression(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1276,7 +1276,7 @@ fn compile_expression(
                 // Check that the fields are specified in order matching the definition.
                 let (_, _, decl_order) = context.field(sh_idx, field.value.clone())?;
                 if field_order != decl_order {
-                    bail!("Field {} defined out of order for struct {}", field, name);
+                    bail!("Field {} defined out of order for pub struct {}", field, name);
                 }
 
                 compile_expression(context, function_frame, code, e)?;
@@ -1455,7 +1455,7 @@ fn compile_expression(
     })
 }
 
-fn compile_call(
+pub fn compile_call(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1639,8 +1639,8 @@ fn compile_call(
     })
 }
 
-fn compile_constant(_context: &mut Context, ty: Type, value: MoveValue) -> Result<Constant> {
-    fn type_layout(ty: Type) -> Result<MoveTypeLayout> {
+pub fn compile_constant(_context: &mut Context, ty: Type, value: MoveValue) -> Result<Constant> {
+    pub fn type_layout(ty: Type) -> Result<MoveTypeLayout> {
         Ok(match ty {
             Type::Address => MoveTypeLayout::Address,
             Type::Signer => MoveTypeLayout::Signer,
@@ -1667,7 +1667,7 @@ fn compile_constant(_context: &mut Context, ty: Type, value: MoveValue) -> Resul
 // Bytecode
 //**************************************************************************************************
 
-fn compile_function_body_bytecode(
+pub fn compile_function_body_bytecode(
     context: &mut Context,
     type_parameters: HashMap<TypeVar_, TypeParameterIndex>,
     formals: Vec<(Var, Type)>,
@@ -1704,7 +1704,7 @@ fn compile_function_body_bytecode(
     })
 }
 
-fn compile_bytecode_block(
+pub fn compile_bytecode_block(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1716,7 +1716,7 @@ fn compile_bytecode_block(
     Ok(())
 }
 
-fn compile_bytecode(
+pub fn compile_bytecode(
     context: &mut Context,
     function_frame: &mut FunctionFrame,
     code: &mut Vec<Bytecode>,
@@ -1956,7 +1956,7 @@ fn compile_bytecode(
     Ok(())
 }
 
-fn remap_branch_offsets(code: &mut Vec<Bytecode>, fake_to_actual: &HashMap<u16, u16>) {
+pub fn remap_branch_offsets(code: &mut Vec<Bytecode>, fake_to_actual: &HashMap<u16, u16>) {
     for instr in code {
         match instr {
             Bytecode::BrTrue(offset) | Bytecode::BrFalse(offset) | Bytecode::Branch(offset) => {

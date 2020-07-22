@@ -1,14 +1,14 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 #[cfg(test)]
-mod executor_test;
+pub mod executor_test;
 #[cfg(test)]
-mod mock_vm;
-mod speculation_cache;
-mod types;
+pub mod mock_vm;
+pub mod speculation_cache;
+pub mod types;
 
 pub mod db_bootstrapper;
 
@@ -87,7 +87,7 @@ where
         }
     }
 
-    fn reset_cache(&mut self) -> Result<(), Error> {
+    pub fn reset_cache(&mut self) -> Result<(), Error> {
         let startup_info = self
             .db
             .reader
@@ -106,7 +106,7 @@ where
     }
 
     /// In case there is a new LI to be added to a LedgerStore, verify and return it.
-    fn find_chunk_li(
+    pub fn find_chunk_li(
         verified_target_li: LedgerInfoWithSignatures,
         epoch_change_li: Option<LedgerInfoWithSignatures>,
         new_output: &ProcessedVMOutput,
@@ -158,7 +158,7 @@ where
     ///  1. Verify that input transactions belongs to the ledger represented by the ledger info.
     ///  2. Verify that transactions to skip match what's already persisted (no fork).
     ///  3. Return Transactions to be applied.
-    fn verify_chunk(
+    pub fn verify_chunk(
         &self,
         txn_list_with_proof: TransactionListWithProof,
         verified_target_li: &LedgerInfoWithSignatures,
@@ -233,7 +233,7 @@ where
     }
 
     /// Post-processing of what the VM outputs. Returns the entire block's output.
-    fn process_vm_outputs(
+    pub fn process_vm_outputs(
         mut account_to_state: HashMap<AccountAddress, AccountState>,
         account_to_proof: HashMap<HashValue, SparseMerkleProof>,
         transactions: &[Transaction],
@@ -371,7 +371,7 @@ where
     /// For all accounts modified by this transaction, find the previous blob and update it based
     /// on the write set. Returns the blob value of all these accounts as well as the newly
     /// constructed state tree.
-    fn process_write_set(
+    pub fn process_write_set(
         transaction: &Transaction,
         account_to_state: &mut HashMap<AccountAddress, AccountState>,
         proof_reader: &ProofReader,
@@ -437,14 +437,14 @@ where
         Ok((updated_blobs, state_tree))
     }
 
-    fn update_account_state(account_state: &mut AccountState, path: Vec<u8>, write_op: WriteOp) {
+    pub fn update_account_state(account_state: &mut AccountState, path: Vec<u8>, write_op: WriteOp) {
         match write_op {
             WriteOp::Value(new_value) => account_state.insert(path, new_value),
             WriteOp::Deletion => account_state.remove(&path),
         };
     }
 
-    fn extract_reconfig_events(events: Vec<ContractEvent>) -> Vec<ContractEvent> {
+    pub fn extract_reconfig_events(events: Vec<ContractEvent>) -> Vec<ContractEvent> {
         let new_epoch_event_key = on_chain_config::new_epoch_event_key();
         events
             .into_iter()
@@ -452,7 +452,7 @@ where
             .collect()
     }
 
-    fn get_executed_trees(&self, block_id: HashValue) -> Result<ExecutedTrees, Error> {
+    pub fn get_executed_trees(&self, block_id: HashValue) -> Result<ExecutedTrees, Error> {
         let executed_trees = if block_id == self.cache.committed_block_id() {
             self.cache.committed_trees().clone()
         } else {
@@ -468,7 +468,7 @@ where
         Ok(executed_trees)
     }
 
-    fn get_executed_state_view<'a>(
+    pub fn get_executed_state_view<'a>(
         &self,
         id: StateViewId,
         executed_trees: &'a ExecutedTrees,
@@ -482,7 +482,7 @@ where
         )
     }
 
-    fn execute_chunk(
+    pub fn execute_chunk(
         &mut self,
         first_version: u64,
         transactions: Vec<Transaction>,
@@ -492,7 +492,7 @@ where
         Vec<TransactionToCommit>,
         Vec<ContractEvent>,
     )> {
-        // Construct a StateView and pass the transactions to VM.
+        // Conpub struct a StateView and pass the transactions to VM.
         let state_view = VerifiedStateView::new(
             StateViewId::ChunkExecution { first_version },
             Arc::clone(&self.db.reader),

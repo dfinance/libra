@@ -21,10 +21,10 @@ pub fn output_file() -> Option<&'static str> {
 
 /// This aims at signing canonically serializable LCS data
 #[derive(CryptoHasher, LCSCryptoHash, Serialize, Deserialize)]
-struct TestLibraCrypto(String);
+pub struct TestLibraCrypto(String);
 
 /// Record sample values for crypto types used by transactions.
-fn trace_crypto_values(tracer: &mut Tracer, samples: &mut Samples) -> Result<()> {
+pub fn trace_crypto_values(tracer: &mut Tracer, samples: &mut Samples) -> Result<()> {
     let mut hasher = TestOnlyHasher::default();
     hasher.update(b"Test message");
     let hashed_message = hasher.finish();
@@ -52,7 +52,7 @@ pub fn get_registry() -> Result<Registry> {
     trace_crypto_values(&mut tracer, &mut samples)?;
     tracer.trace_value(&mut samples, &event::EventKey::random())?;
 
-    // 2. Trace the main entry point(s) + every enum separately.
+    // 2. Trace the main entry point(s) + everypub enum separately.
     tracer.trace_type::<contract_event::ContractEvent>(&samples)?;
     tracer.trace_type::<language_storage::TypeTag>(&samples)?;
     tracer.trace_type::<transaction::metadata::Metadata>(&samples)?;

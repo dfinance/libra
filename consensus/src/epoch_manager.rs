@@ -110,7 +110,7 @@ impl EpochManager {
         }
     }
 
-    fn epoch_state(&self) -> &EpochState {
+    pub fn epoch_state(&self) -> &EpochState {
         match self
             .processor
             .as_ref()
@@ -121,11 +121,11 @@ impl EpochManager {
         }
     }
 
-    fn epoch(&self) -> u64 {
+    pub fn epoch(&self) -> u64 {
         self.epoch_state().epoch
     }
 
-    fn create_round_state(
+    pub fn create_round_state(
         &self,
         time_service: Arc<dyn TimeService>,
         timeout_sender: channel::Sender<Round>,
@@ -141,7 +141,7 @@ impl EpochManager {
     }
 
     /// Create a proposer election handler based on proposers
-    fn create_proposer_election(
+    pub fn create_proposer_election(
         &self,
         epoch_state: &EpochState,
     ) -> Box<dyn ProposerElection + Send + Sync> {
@@ -184,7 +184,7 @@ impl EpochManager {
         }
     }
 
-    async fn process_epoch_retrieval(
+    pub async fn process_epoch_retrieval(
         &mut self,
         request: EpochRetrievalRequest,
         peer_id: AccountAddress,
@@ -201,7 +201,7 @@ impl EpochManager {
         ))
     }
 
-    async fn process_different_epoch(
+    pub async fn process_different_epoch(
         &mut self,
         different_epoch: u64,
         peer_id: AccountAddress,
@@ -236,7 +236,7 @@ impl EpochManager {
         }
     }
 
-    async fn start_new_epoch(&mut self, proof: EpochChangeProof) -> anyhow::Result<()> {
+    pub async fn start_new_epoch(&mut self, proof: EpochChangeProof) -> anyhow::Result<()> {
         let ledger_info = proof
             .verify(self.epoch_state())
             .context("[EpochManager] Invalid EpochChangeProof")?;
@@ -256,7 +256,7 @@ impl EpochManager {
         // state_computer notifies reconfiguration in another channel
     }
 
-    async fn start_round_manager(&mut self, recovery_data: RecoveryData, epoch_state: EpochState) {
+    pub async fn start_round_manager(&mut self, recovery_data: RecoveryData, epoch_state: EpochState) {
         // Release the previous RoundManager, especially the SafetyRule client
         self.processor = None;
         counters::EPOCH.set(epoch_state.epoch as i64);
@@ -327,9 +327,9 @@ impl EpochManager {
 
     // Depending on what data we can extract from consensusdb, we may or may not have an
     // event processor at startup. If we need to sync up with peers for blocks to construct
-    // a valid block store, which is required to construct an event processor, we will take
+    // a valid block store, which is required to conpub struct an event processor, we will take
     // care of the sync up here.
-    async fn start_recovery_manager(
+    pub async fn start_recovery_manager(
         &mut self,
         ledger_recovery_data: LedgerRecoveryData,
         epoch_state: EpochState,
@@ -399,7 +399,7 @@ impl EpochManager {
         Ok(())
     }
 
-    async fn process_epoch(
+    pub async fn process_epoch(
         &mut self,
         peer_id: AccountAddress,
         msg: ConsensusMsg,
@@ -435,7 +435,7 @@ impl EpochManager {
         Ok(None)
     }
 
-    async fn process_event(
+    pub async fn process_event(
         &mut self,
         peer_id: AccountAddress,
         event: VerifiedEvent,
@@ -467,7 +467,7 @@ impl EpochManager {
         }
     }
 
-    fn processor_mut(&mut self) -> &mut RoundProcessor {
+    pub fn processor_mut(&mut self) -> &mut RoundProcessor {
         self.processor
             .as_mut()
             .expect("[EpochManager] not started yet")

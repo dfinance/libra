@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use move_coverage::coverage_map::{output_map_to_file, CoverageMap};
 use std::path::Path;
@@ -12,7 +12,7 @@ use structopt::StructOpt;
     name = "Move VM Coverage",
     about = "Creates a coverage map from the raw data collected from the Move VM"
 )]
-struct Args {
+pub struct Args {
     /// The path to the input file
     #[structopt(long = "input-file-path", short = "f")]
     pub input_file_path: String,

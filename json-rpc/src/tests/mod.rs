@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[cfg(test)]
-mod unit_tests;
-mod utils;
+pub mod unit_tests;
+pub mod utils;
 
 pub use utils::test_bootstrap;

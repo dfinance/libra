@@ -1,21 +1,21 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod cached_storage;
-mod crypto_kv_storage;
-mod crypto_storage;
-mod error;
-mod github;
-mod in_memory;
-mod kv_storage;
-mod namespaced_storage;
-mod on_disk;
-mod policy;
-mod storage;
-mod value;
-mod vault;
+
+pub mod cached_storage;
+pub mod crypto_kv_storage;
+pub mod crypto_storage;
+pub mod error;
+pub mod github;
+pub mod in_memory;
+pub mod kv_storage;
+pub mod namespaced_storage;
+pub mod on_disk;
+pub mod policy;
+pub mod storage;
+pub mod value;
+pub mod vault;
 
 pub use crate::{
     cached_storage::CachedStorage,
@@ -34,4 +34,4 @@ pub use crate::{
 };
 
 #[cfg(test)]
-mod tests;
+pub mod tests;

@@ -1,9 +1,9 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
 
-mod error;
+
+pub mod error;
 pub use error::Error;
 
 use anyhow::Result;

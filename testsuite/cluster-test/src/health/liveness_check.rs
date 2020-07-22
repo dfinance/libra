@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 use crate::{
     cluster::Cluster,
@@ -17,7 +17,7 @@ pub struct LivenessHealthCheck {
 const MAX_BEHIND: Duration = Duration::from_secs(120);
 
 #[derive(Default)]
-struct LastCommitInfo {
+pub struct LastCommitInfo {
     ve: Option<ValidatorEvent>,
     timestamp: Duration,
 }

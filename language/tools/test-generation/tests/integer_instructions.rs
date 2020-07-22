@@ -6,7 +6,7 @@ use itertools::Itertools;
 use test_generation::abstract_state::{AbstractState, AbstractValue};
 use vm::file_format::{Bytecode, SignatureToken};
 
-mod common;
+pub mod common;
 
 const INTEGER_TYPES: &[SignatureToken] = &[
     SignatureToken::U8,

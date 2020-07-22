@@ -256,7 +256,7 @@ fn zero_amount_peer_to_peer() {
 }
 
 // Holder for transaction data; arguments to transactions.
-struct TxnInfo {
+pub struct TxnInfo {
     pub sender: Account,
     pub receiver: Account,
     pub transfer_amount: u64,

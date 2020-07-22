@@ -21,7 +21,7 @@ use vm::{
     },
 };
 
-pub(crate) struct AcquiresVerifier<'a> {
+pub struct AcquiresVerifier<'a> {
     module: &'a CompiledModule,
     current_function: FunctionDefinitionIndex,
     annotated_acquires: BTreeSet<StructDefinitionIndex>,
@@ -30,7 +30,7 @@ pub(crate) struct AcquiresVerifier<'a> {
 }
 
 impl<'a> AcquiresVerifier<'a> {
-    pub(crate) fn verify(
+    pub fn verify(
         module: &'a CompiledModule,
         index: FunctionDefinitionIndex,
         function_definition: &'a FunctionDefinition,
@@ -82,7 +82,7 @@ impl<'a> AcquiresVerifier<'a> {
         Ok(())
     }
 
-    fn verify_instruction(
+    pub fn verify_instruction(
         &mut self,
         instruction: &Bytecode,
         offset: CodeOffset,
@@ -106,7 +106,7 @@ impl<'a> AcquiresVerifier<'a> {
         }
     }
 
-    fn call_acquire(
+    pub fn call_acquire(
         &mut self,
         fh_idx: FunctionHandleIndex,
         offset: CodeOffset,
@@ -127,7 +127,7 @@ impl<'a> AcquiresVerifier<'a> {
         Ok(())
     }
 
-    fn struct_acquire(
+    pub fn struct_acquire(
         &mut self,
         sd_idx: StructDefinitionIndex,
         offset: CodeOffset,
@@ -143,7 +143,7 @@ impl<'a> AcquiresVerifier<'a> {
         }
     }
 
-    fn function_acquired_resources(
+    pub fn function_acquired_resources(
         &self,
         function_handle: &FunctionHandle,
         fh_idx: FunctionHandleIndex,
@@ -157,7 +157,7 @@ impl<'a> AcquiresVerifier<'a> {
         }
     }
 
-    fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
+    pub fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
         PartialVMError::new(status).at_code_offset(self.current_function, offset)
     }
 }

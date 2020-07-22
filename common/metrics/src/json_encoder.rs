@@ -84,7 +84,7 @@ Result: errors
 
 This is useful when exporting metric data to flat time series.
 */
-fn flatten_metric_with_labels(name: &str, metric: &Metric) -> String {
+pub fn flatten_metric_with_labels(name: &str, metric: &Metric) -> String {
     let res = String::from(name);
 
     if metric.get_label().is_empty() {
@@ -107,7 +107,7 @@ fn flatten_metric_with_labels(name: &str, metric: &Metric) -> String {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use prometheus::{
         core::{Collector, Metric},

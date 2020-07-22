@@ -19,14 +19,14 @@ use vm::{
     },
 };
 
-struct Locals<'a> {
+pub struct Locals<'a> {
     param_count: usize,
     parameters: &'a Signature,
     locals: &'a Signature,
 }
 
 impl<'a> Locals<'a> {
-    fn new(parameters: &'a Signature, locals: &'a Signature) -> Self {
+    pub fn new(parameters: &'a Signature, locals: &'a Signature) -> Self {
         Self {
             param_count: parameters.len(),
             parameters,
@@ -34,7 +34,7 @@ impl<'a> Locals<'a> {
         }
     }
 
-    fn local_at(&self, i: LocalIndex) -> &SignatureToken {
+    pub fn local_at(&self, i: LocalIndex) -> &SignatureToken {
         let idx = i as usize;
         if idx < self.param_count {
             &self.parameters.0[idx]
@@ -44,7 +44,7 @@ impl<'a> Locals<'a> {
     }
 }
 
-struct TypeSafetyChecker<'a> {
+pub struct TypeSafetyChecker<'a> {
     resolver: &'a BinaryIndexedView<'a>,
     function_view: &'a FunctionView<'a>,
     locals: Locals<'a>,
@@ -52,7 +52,7 @@ struct TypeSafetyChecker<'a> {
 }
 
 impl<'a> TypeSafetyChecker<'a> {
-    fn new(resolver: &'a BinaryIndexedView<'a>, function_view: &'a FunctionView<'a>) -> Self {
+    pub fn new(resolver: &'a BinaryIndexedView<'a>, function_view: &'a FunctionView<'a>) -> Self {
         let locals = Locals::new(function_view.parameters(), function_view.locals());
         Self {
             resolver,
@@ -62,11 +62,11 @@ impl<'a> TypeSafetyChecker<'a> {
         }
     }
 
-    fn local_at(&self, i: LocalIndex) -> &SignatureToken {
+    pub fn local_at(&self, i: LocalIndex) -> &SignatureToken {
         self.locals.local_at(i)
     }
 
-    fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
+    pub fn error(&self, status: StatusCode, offset: CodeOffset) -> PartialVMError {
         PartialVMError::new(status).at_code_offset(
             self.function_view
                 .index()
@@ -76,7 +76,7 @@ impl<'a> TypeSafetyChecker<'a> {
     }
 }
 
-pub(crate) fn verify<'a>(
+pub fn verify<'a>(
     resolver: &'a BinaryIndexedView<'a>,
     function_view: &'a FunctionView<'a>,
 ) -> PartialVMResult<()> {
@@ -93,7 +93,7 @@ pub(crate) fn verify<'a>(
 }
 
 // helper for both `ImmBorrowField` and `MutBorrowField`
-fn borrow_field(
+pub fn borrow_field(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     mut_: bool,
@@ -138,7 +138,7 @@ fn borrow_field(
 }
 
 // helper for both `ImmBorrowLoc` and `MutBorrowLoc`
-fn borrow_loc(
+pub fn borrow_loc(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     mut_: bool,
@@ -158,7 +158,7 @@ fn borrow_loc(
     Ok(())
 }
 
-fn borrow_global(
+pub fn borrow_global(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     mut_: bool,
@@ -186,7 +186,7 @@ fn borrow_global(
     Ok(())
 }
 
-fn call(
+pub fn call(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     function_handle: &FunctionHandle,
@@ -205,7 +205,7 @@ fn call(
     Ok(())
 }
 
-fn type_fields_signature(
+pub fn type_fields_signature(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     struct_def: &StructDefinition,
@@ -226,7 +226,7 @@ fn type_fields_signature(
     }
 }
 
-fn pack(
+pub fn pack(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     struct_def: &StructDefinition,
@@ -245,7 +245,7 @@ fn pack(
     Ok(())
 }
 
-fn unpack(
+pub fn unpack(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     struct_def: &StructDefinition,
@@ -267,7 +267,7 @@ fn unpack(
     Ok(())
 }
 
-fn exists(
+pub fn exists(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     struct_def: &StructDefinition,
@@ -290,7 +290,7 @@ fn exists(
     Ok(())
 }
 
-fn move_from(
+pub fn move_from(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     def_idx: StructDefinitionIndex,
@@ -315,7 +315,7 @@ fn move_from(
     Ok(())
 }
 
-fn move_to(
+pub fn move_to(
     verifier: &mut TypeSafetyChecker,
     offset: CodeOffset,
     struct_def: &StructDefinition,
@@ -344,7 +344,7 @@ fn move_to(
     }
 }
 
-fn verify_instr(
+pub fn verify_instr(
     verifier: &mut TypeSafetyChecker,
     bytecode: &Bytecode,
     offset: CodeOffset,
@@ -704,7 +704,7 @@ fn verify_instr(
 // Helpers functions for types
 //
 
-fn materialize_type(struct_handle: StructHandleIndex, type_args: &Signature) -> SignatureToken {
+pub fn materialize_type(struct_handle: StructHandleIndex, type_args: &Signature) -> SignatureToken {
     if type_args.is_empty() {
         ST::Struct(struct_handle)
     } else {
@@ -712,7 +712,7 @@ fn materialize_type(struct_handle: StructHandleIndex, type_args: &Signature) -> 
     }
 }
 
-fn instantiate(token: &SignatureToken, subst: &Signature) -> SignatureToken {
+pub fn instantiate(token: &SignatureToken, subst: &Signature) -> SignatureToken {
     use SignatureToken::*;
 
     match token {

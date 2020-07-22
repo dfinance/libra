@@ -17,7 +17,7 @@ use rand::{rngs::StdRng, Rng, SeedableRng};
 use std::{collections::HashMap, ops::Bound};
 use test_helper::{init_mock_db, plus_one};
 
-fn update_nibble(original_key: &HashValue, n: usize, nibble: u8) -> HashValue {
+pub fn update_nibble(original_key: &HashValue, n: usize, nibble: u8) -> HashValue {
     assert!(nibble < 16);
     let mut key = original_key.to_vec();
     key[n / 2] = if n % 2 == 0 {
@@ -528,7 +528,7 @@ fn test_put_blob_sets() {
     }
 }
 
-fn many_keys_get_proof_and_verify_tree_root(seed: &[u8], num_keys: usize) {
+pub fn many_keys_get_proof_and_verify_tree_root(seed: &[u8], num_keys: usize) {
     assert!(seed.len() < 32);
     let mut actual_seed = [0u8; 32];
     actual_seed[..seed.len()].copy_from_slice(&seed);
@@ -560,7 +560,7 @@ fn test_1000_keys() {
     many_keys_get_proof_and_verify_tree_root(seed, 1000);
 }
 
-fn many_versions_get_proof_and_verify_tree_root(seed: &[u8], num_versions: usize) {
+pub fn many_versions_get_proof_and_verify_tree_root(seed: &[u8], num_versions: usize) {
     assert!(seed.len() < 32);
     let mut actual_seed = [0u8; 32];
     actual_seed[..seed.len()].copy_from_slice(&seed);
@@ -691,7 +691,7 @@ proptest! {
     }
 }
 
-fn test_existent_keys_impl<'a>(
+pub fn test_existent_keys_impl<'a>(
     tree: &JellyfishMerkleTree<'a, MockTreeStore>,
     version: Version,
     existent_kvs: &HashMap<HashValue, AccountStateBlob>,
@@ -705,7 +705,7 @@ fn test_existent_keys_impl<'a>(
     }
 }
 
-fn test_nonexistent_keys_impl<'a>(
+pub fn test_nonexistent_keys_impl<'a>(
     tree: &JellyfishMerkleTree<'a, MockTreeStore>,
     version: Version,
     nonexistent_keys: &[HashValue],
@@ -719,8 +719,8 @@ fn test_nonexistent_keys_impl<'a>(
     }
 }
 
-/// Checks if we can construct the expected root hash using the entries in the btree and the proof.
-fn verify_range_proof(
+/// Checks if we can conpub struct the expected root hash using the entries in the btree and the proof.
+pub fn verify_range_proof(
     expected_root_hash: HashValue,
     btree: BTreeMap<HashValue, AccountStateBlob>,
     proof: SparseMerkleRangeProof,
@@ -752,7 +752,7 @@ fn verify_range_proof(
     // discarded. In this example, we assume `btree` has the keys `a` to `e` and the proof has `X`
     // and `h` in the siblings.
 
-    // Now we want to construct a set of key-value pairs that covers the entire set of leaves. For
+    // Now we want to conpub struct a set of key-value pairs that covers the entire set of leaves. For
     // `a` to `e` this is simple -- we just insert them directly into this set. For the rest of the
     // leaves, they are represented by the siblings, so we just make up some keys that make sense.
     // For example, for `X` we just use 101000... (more zeros omitted), because that is one key
@@ -813,7 +813,7 @@ fn verify_range_proof(
 
 /// Computes the root hash of a sparse Merkle tree. `kvs` consists of the entire set of key-value
 /// pairs stored in the tree.
-fn compute_root_hash(kvs: Vec<(Vec<bool>, HashValue)>) -> HashValue {
+pub fn compute_root_hash(kvs: Vec<(Vec<bool>, HashValue)>) -> HashValue {
     let mut kv_ref = vec![];
     for (key, value) in &kvs {
         kv_ref.push((&key[..], *value));
@@ -821,7 +821,7 @@ fn compute_root_hash(kvs: Vec<(Vec<bool>, HashValue)>) -> HashValue {
     compute_root_hash_impl(kv_ref)
 }
 
-fn compute_root_hash_impl(kvs: Vec<(&[bool], HashValue)>) -> HashValue {
+pub fn compute_root_hash_impl(kvs: Vec<(&[bool], HashValue)>) -> HashValue {
     assert!(!kvs.is_empty());
 
     // If there is only one entry, it is the root.
@@ -856,12 +856,12 @@ fn compute_root_hash_impl(kvs: Vec<(&[bool], HashValue)>) -> HashValue {
 }
 
 /// Reduces the problem by removing the first bit of every key.
-fn reduce<'a>(kvs: &'a [(&[bool], HashValue)]) -> Vec<(&'a [bool], HashValue)> {
+pub fn reduce<'a>(kvs: &'a [(&[bool], HashValue)]) -> Vec<(&'a [bool], HashValue)> {
     kvs.iter().map(|(key, value)| (&key[1..], *value)).collect()
 }
 
 /// Returns the key immediately before `key` in `btree`.
-fn prev_key<K, V>(btree: &BTreeMap<K, V>, key: &K) -> Option<K>
+pub fn prev_key<K, V>(btree: &BTreeMap<K, V>, key: &K) -> Option<K>
 where
     K: Clone + Ord,
 {
@@ -872,7 +872,7 @@ where
 }
 
 /// Returns the key immediately after `key` in `btree`.
-fn next_key<K, V>(btree: &BTreeMap<K, V>, key: &K) -> Option<K>
+pub fn next_key<K, V>(btree: &BTreeMap<K, V>, key: &K) -> Option<K>
 where
     K: Clone + Ord,
 {

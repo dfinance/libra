@@ -68,7 +68,7 @@ impl ContentLinter for RootToml {
 }
 
 /// Creates a lint message indicating the differences between the two TOML structs.
-pub(super) fn toml_mismatch_message<T: Serialize>(
+pub fn toml_mismatch_message<T: Serialize>(
     expected: &T,
     actual: &T,
     header: &str,
@@ -103,14 +103,14 @@ fn to_toml_string<T: Serialize>(data: &T) -> Result<String, ser::Error> {
 }
 
 #[derive(Debug, Deserialize)]
-struct RootTomlContents<'a> {
+pub struct RootTomlContents<'a> {
     #[serde(borrow)]
     workspace: Workspace<'a>,
     // Add other fields as necessary.
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-struct Workspace<'a> {
+pub struct Workspace<'a> {
     #[serde(borrow)]
     members: Vec<&'a Path>,
     // Add other fields as necessary.

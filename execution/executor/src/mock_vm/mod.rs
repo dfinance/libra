@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[cfg(test)]
-mod mock_vm_test;
+pub mod mock_vm_test;
 
 use libra_crypto::{ed25519::Ed25519PrivateKey, PrivateKey, Uniform};
 use libra_state_view::StateView;
@@ -29,7 +29,7 @@ use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
 #[derive(Debug)]
-enum MockVMTransaction {
+pub enum MockVMTransaction {
     Mint {
         sender: AccountAddress,
         amount: u64,
@@ -167,7 +167,7 @@ impl VMExecutor for MockVM {
     }
 }
 
-fn read_balance(
+pub fn read_balance(
     output_cache: &HashMap<AccessPath, u64>,
     state_view: &dyn StateView,
     account: AccountAddress,
@@ -179,7 +179,7 @@ fn read_balance(
     }
 }
 
-fn read_seqnum(
+pub fn read_seqnum(
     output_cache: &HashMap<AccessPath, u64>,
     state_view: &dyn StateView,
     account: AccountAddress,
@@ -191,36 +191,36 @@ fn read_seqnum(
     }
 }
 
-fn read_balance_from_storage(state_view: &dyn StateView, balance_access_path: &AccessPath) -> u64 {
+pub fn read_balance_from_storage(state_view: &dyn StateView, balance_access_path: &AccessPath) -> u64 {
     read_u64_from_storage(state_view, &balance_access_path)
 }
 
-fn read_seqnum_from_storage(state_view: &dyn StateView, seqnum_access_path: &AccessPath) -> u64 {
+pub fn read_seqnum_from_storage(state_view: &dyn StateView, seqnum_access_path: &AccessPath) -> u64 {
     read_u64_from_storage(state_view, &seqnum_access_path)
 }
 
-fn read_u64_from_storage(state_view: &dyn StateView, access_path: &AccessPath) -> u64 {
+pub fn read_u64_from_storage(state_view: &dyn StateView, access_path: &AccessPath) -> u64 {
     state_view
         .get(&access_path)
         .expect("Failed to query storage.")
         .map_or(0, |bytes| decode_bytes(&bytes))
 }
 
-fn decode_bytes(bytes: &[u8]) -> u64 {
+pub fn decode_bytes(bytes: &[u8]) -> u64 {
     let mut buf = [0; 8];
     buf.copy_from_slice(bytes);
     u64::from_le_bytes(buf)
 }
 
-fn balance_ap(account: AccountAddress) -> AccessPath {
+pub fn balance_ap(account: AccountAddress) -> AccessPath {
     AccessPath::new(account, b"balance".to_vec())
 }
 
-fn seqnum_ap(account: AccountAddress) -> AccessPath {
+pub fn seqnum_ap(account: AccountAddress) -> AccessPath {
     AccessPath::new(account, b"seqnum".to_vec())
 }
 
-fn gen_genesis_writeset() -> WriteSet {
+pub fn gen_genesis_writeset() -> WriteSet {
     let mut write_set = WriteSetMut::default();
     let validator_set_ap = ValidatorSet::CONFIG_ID.access_path();
     write_set.push((
@@ -236,7 +236,7 @@ fn gen_genesis_writeset() -> WriteSet {
         .expect("genesis writeset should be valid")
 }
 
-fn gen_mint_writeset(sender: AccountAddress, balance: u64, seqnum: u64) -> WriteSet {
+pub fn gen_mint_writeset(sender: AccountAddress, balance: u64, seqnum: u64) -> WriteSet {
     let mut write_set = WriteSetMut::default();
     write_set.push((
         balance_ap(sender),
@@ -249,7 +249,7 @@ fn gen_mint_writeset(sender: AccountAddress, balance: u64, seqnum: u64) -> Write
     write_set.freeze().expect("mint writeset should be valid")
 }
 
-fn gen_payment_writeset(
+pub fn gen_payment_writeset(
     sender: AccountAddress,
     sender_balance: u64,
     sender_seqnum: u64,
@@ -274,7 +274,7 @@ fn gen_payment_writeset(
         .expect("payment write set should be valid")
 }
 
-fn gen_events(sender: AccountAddress) -> Vec<ContractEvent> {
+pub fn gen_events(sender: AccountAddress) -> Vec<ContractEvent> {
     vec![ContractEvent::new(
         EventKey::new_from_address(&sender, 0),
         0,
@@ -306,7 +306,7 @@ pub fn encode_transfer_transaction(
     encode_transaction(sender, encode_transfer_program(recipient, amount))
 }
 
-fn encode_transaction(sender: AccountAddress, program: Script) -> Transaction {
+pub fn encode_transaction(sender: AccountAddress, program: Script) -> Transaction {
     let raw_transaction = RawTransaction::new_script(
         sender,
         0,
@@ -340,7 +340,7 @@ pub fn encode_reconfiguration_transaction(sender: AccountAddress) -> Transaction
     )
 }
 
-fn decode_transaction(txn: &SignedTransaction) -> MockVMTransaction {
+pub fn decode_transaction(txn: &SignedTransaction) -> MockVMTransaction {
     let sender = txn.sender();
     match txn.payload() {
         TransactionPayload::Script(script) => {

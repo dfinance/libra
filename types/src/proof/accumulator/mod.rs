@@ -11,7 +11,7 @@
 //! obtain a new accumulator instance and the old one remains unchanged.
 
 #[cfg(test)]
-mod accumulator_test;
+pub mod accumulator_test;
 
 use super::MerkleTreeInternalNode;
 use crate::proof::definition::{LeafCount, MAX_ACCUMULATOR_LEAVES};
@@ -98,7 +98,7 @@ where
 
     /// Appends one leaf. This will update `frozen_subtree_roots` to store new frozen root nodes
     /// and remove old nodes if they are now part of a larger frozen subtree.
-    fn append_one(
+    pub fn append_one(
         frozen_subtree_roots: &mut Vec<HashValue>,
         num_existing_leaves: LeafCount,
         leaf: HashValue,
@@ -243,7 +243,7 @@ where
 
     /// Computes the root hash of an accumulator given the frozen subtree roots and the number of
     /// leaves in this accumulator.
-    fn compute_root_hash(frozen_subtree_roots: &[HashValue], num_leaves: LeafCount) -> HashValue {
+    pub fn compute_root_hash(frozen_subtree_roots: &[HashValue], num_leaves: LeafCount) -> HashValue {
         match frozen_subtree_roots.len() {
             0 => return *ACCUMULATOR_PLACEHOLDER_HASH,
             1 => return frozen_subtree_roots[0],

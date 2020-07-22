@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-//! This library defines a BitVec struct that represents a bit vector.
+//! This library defines a BitVec pub struct that represents a bit vector.
 
 use serde::{de::Error, Deserialize, Deserializer, Serialize};
 use std::ops::BitAnd;
@@ -137,7 +137,7 @@ impl<'de> Deserialize<'de> for BitVec {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
 
     use super::*;
     use proptest::{arbitrary::any, collection::vec, prelude::*};
@@ -251,7 +251,7 @@ mod test {
 
     // Constructs a bit vector by setting the positions specified in the argument vector. The
     // vector can have duplicates and need not be sorted.
-    fn construct_bitvec(posns: &[u8]) -> BitVec {
+    pub fn construct_bitvec(posns: &[u8]) -> BitVec {
         let mut bv = BitVec::default();
         posns.iter().for_each(|x| bv.set(*x));
         bv

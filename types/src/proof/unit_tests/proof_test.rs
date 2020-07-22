@@ -209,7 +209,7 @@ fn test_verify_three_element_sparse_merkle() {
     assert_eq!(non_existing_key2[0], 0b1000_1110);
 
     {
-        // Construct a proof of key1.
+        // Conpub struct a proof of key1.
         let proof = SparseMerkleProof::new(
             Some(leaf1),
             vec![internal_b_hash, *SPARSE_MERKLE_PLACEHOLDER_HASH],
@@ -234,7 +234,7 @@ fn test_verify_three_element_sparse_merkle() {
     }
 
     {
-        // Construct a proof of the default node.
+        // Conpub struct a proof of the default node.
         let proof = SparseMerkleProof::new(None, vec![internal_a_hash]);
 
         // This proof can't be used to show that a key starting with 0 doesn't exist.
@@ -386,7 +386,7 @@ fn test_verify_account_state_and_event() {
     let root_hash =
         TransactionAccumulatorInternalNode::new(internal_a_hash, internal_b_hash).hash();
 
-    // consensus_data_hash isn't used in proofs, but we need it to construct LedgerInfo.
+    // consensus_data_hash isn't used in proofs, but we need it to conpub struct LedgerInfo.
     let consensus_data_hash = b"consensus_data".test_only_hash();
     let ledger_info = LedgerInfo::new(
         BlockInfo::new(0, 0, *GENESIS_BLOCK_ID, root_hash, 2, 10000, None),

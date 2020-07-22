@@ -39,7 +39,7 @@ impl BackupServiceClient {
         }
     }
 
-    async fn get(&self, path: &str) -> Result<impl AsyncRead> {
+    pub async fn get(&self, path: &str) -> Result<impl AsyncRead> {
         Ok(self
             .client
             .get(&format!("http://localhost:{}/{}", self.port, path))

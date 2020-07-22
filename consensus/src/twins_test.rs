@@ -36,8 +36,8 @@ use network::{
 use std::{collections::HashMap, num::NonZeroUsize, sync::Arc};
 use tokio::runtime::{Builder, Runtime};
 
-/// Auxiliary struct that is preparing SMR for the test
-struct SMRNode {
+/// Auxiliary pub struct that is preparing SMR for the test
+pub struct SMRNode {
     _runtime: Runtime,
     commit_cb_receiver: mpsc::UnboundedReceiver<LedgerInfoWithSignatures>,
     storage: Arc<MockStorage>,

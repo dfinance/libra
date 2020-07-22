@@ -1,7 +1,7 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+
 
 pub mod abstract_state;
 pub mod borrow_graph;
@@ -43,7 +43,7 @@ use vm::{
 };
 
 /// This function calls the Bytecode verifier to test it
-fn run_verifier(module: CompiledModule) -> Result<CompiledModule, String> {
+pub fn run_verifier(module: CompiledModule) -> Result<CompiledModule, String> {
     match panic::catch_unwind(|| verify_module(&module)) {
         Ok(res) => match res {
             Ok(_) => Ok(module),
@@ -54,7 +54,7 @@ fn run_verifier(module: CompiledModule) -> Result<CompiledModule, String> {
 }
 
 /// This function runs a verified module in the VM runtime
-fn run_vm(module: CompiledModule) -> Result<(), VMStatus> {
+pub fn run_vm(module: CompiledModule) -> Result<(), VMStatus> {
     // By convention the 0'th index function definition is the entrypoint to the module (i.e. that
     // will contain only simply-typed arguments).
     let entry_idx = FunctionDefinitionIndex::new(0);
@@ -88,7 +88,7 @@ fn run_vm(module: CompiledModule) -> Result<(), VMStatus> {
 }
 
 /// Execute the first function in a module
-fn execute_function_in_module<S: StateView>(
+pub fn execute_function_in_module<S: StateView>(
     module: CompiledModule,
     idx: FunctionDefinitionIndex,
     ty_args: Vec<TypeTag>,
@@ -131,7 +131,7 @@ fn execute_function_in_module<S: StateView>(
 
 /// Serialize a module to `path` if `output_path` is `Some(path)`. If `output_path` is `None`
 /// print the module out as debug output.
-fn output_error_case(module: CompiledModule, output_path: Option<String>, case_id: u64, tid: u64) {
+pub fn output_error_case(module: CompiledModule, output_path: Option<String>, case_id: u64, tid: u64) {
     match output_path {
         Some(path) => {
             let mut out = vec![];
@@ -150,7 +150,7 @@ fn output_error_case(module: CompiledModule, output_path: Option<String>, case_i
     }
 }
 
-fn seed(seed: Option<String>) -> [u8; 32] {
+pub fn seed(seed: Option<String>) -> [u8; 32] {
     let mut array = [0u8; 32];
     match seed {
         Some(string) => {
@@ -176,7 +176,7 @@ pub enum Status {
     Valid,
 }
 
-fn bytecode_module(rng: &mut StdRng, module: CompiledModuleMut) -> CompiledModuleMut {
+pub fn bytecode_module(rng: &mut StdRng, module: CompiledModuleMut) -> CompiledModuleMut {
     let mut generated_module = BytecodeGenerator::new(rng).generate_module(module.clone());
     // Module generation can retry under certain circumstances
     while generated_module.is_none() {
@@ -355,7 +355,7 @@ pub fn run_generation(args: Args) {
     }
 }
 
-pub(crate) fn substitute(token: &SignatureToken, tys: &[SignatureToken]) -> SignatureToken {
+pub fn substitute(token: &SignatureToken, tys: &[SignatureToken]) -> SignatureToken {
     use SignatureToken::*;
 
     match token {
@@ -410,19 +410,19 @@ pub fn kind(module: &impl ModuleAccess, ty: &SignatureToken, constraints: &[Kind
                 .map(|ty| kind(module, ty, constraints))
                 .collect::<Vec<_>>();
             // Derive the kind of the struct.
-            //   - If any of the type actuals is `all`, then the struct is `all`.
+            //   - If any of the type actuals is `all`, then the pub struct is `all`.
             //     - `all` means some part of the type can be either `resource` or
             //       `unrestricted`.
             //     - Therefore it is also impossible to determine the kind of the type as a
             //       whole, and thus `all`.
-            //   - If none of the type actuals is `all`, then the struct is a resource if
+            //   - If none of the type actuals is `all`, then the pub struct is a resource if
             //     and only if one of the type actuals is `resource`.
             kinds.iter().cloned().fold(Kind::Copyable, Kind::join)
         }
     }
 }
 
-pub(crate) fn get_struct_handle_from_reference(
+pub fn get_struct_handle_from_reference(
     reference_signature: &SignatureToken,
 ) -> Option<StructHandleIndex> {
     match reference_signature {
@@ -438,7 +438,7 @@ pub(crate) fn get_struct_handle_from_reference(
     }
 }
 
-pub(crate) fn get_type_actuals_from_reference(
+pub fn get_type_actuals_from_reference(
     token: &SignatureToken,
 ) -> Option<Vec<SignatureToken>> {
     use SignatureToken::*;

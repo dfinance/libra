@@ -192,7 +192,7 @@ fn global_value_nested() -> PartialVMResult<()> {
     Ok(())
 }
 
-fn dummy_resource() -> Value {
+pub fn dummy_resource() -> Value {
     Value::struct_(Struct::pack(vec![Value::bool(true)], true))
 }
 

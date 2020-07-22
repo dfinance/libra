@@ -21,7 +21,7 @@ pub fn new() -> (Sender, Receiver) {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::peer::DisconnectReason;
     use futures::{executor::block_on, future::FutureExt, stream::StreamExt};
@@ -29,7 +29,7 @@ mod test {
     use libra_network_address::NetworkAddress;
     use netcore::transport::ConnectionOrigin;
 
-    fn send_new_peer(sender: &mut Sender, peer_id: PeerId) {
+    pub fn send_new_peer(sender: &mut Sender, peer_id: PeerId) {
         let notif = ConnectionNotification::NewPeer(
             peer_id,
             NetworkAddress::mock(),
@@ -39,7 +39,7 @@ mod test {
         sender.push(peer_id, notif).unwrap()
     }
 
-    fn send_lost_peer(sender: &mut Sender, peer_id: PeerId, reason: DisconnectReason) {
+    pub fn send_lost_peer(sender: &mut Sender, peer_id: PeerId, reason: DisconnectReason) {
         let notif = ConnectionNotification::LostPeer(
             peer_id,
             NetworkAddress::mock(),

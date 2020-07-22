@@ -13,7 +13,7 @@ use vm::{
 
 /// LocalState represents the current assignment state of a local
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum LocalState {
+pub enum LocalState {
     /// The local does not have a value
     Unavailable,
     /// The local was assigned a resource in at least one control flow path, but was `Unavailable`
@@ -26,7 +26,7 @@ use crate::binary_views::{BinaryIndexedView, FunctionView};
 use LocalState::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct AbstractState {
+pub struct AbstractState {
     current_function: Option<FunctionDefinitionIndex>,
     local_kinds: Vec<Kind>,
     local_states: Vec<LocalState>,
@@ -88,7 +88,7 @@ impl AbstractState {
         )
     }
 
-    fn join_(&self, other: &Self) -> Self {
+    pub fn join_(&self, other: &Self) -> Self {
         checked_precondition!(self.current_function == other.current_function);
         checked_precondition!(self.local_kinds.len() == other.local_kinds.len());
         checked_precondition!(self.local_states.len() == other.local_states.len());

@@ -226,7 +226,7 @@ impl PersistentSafetyStorage {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use libra_crypto::Uniform;
     use libra_types::validator_signer::ValidatorSigner;

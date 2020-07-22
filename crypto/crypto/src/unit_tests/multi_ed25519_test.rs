@@ -189,7 +189,7 @@ fn test_multi_ed25519_signature_serialization() {
     // Test 32 of 32
     test_successful_signature_serialization(&priv_keys_32, 32);
 
-    // Construct from single Ed25519Signature.
+    // Conpub struct from single Ed25519Signature.
     let single_signature = priv_keys_3[0].sign(message());
     let multi_signature = MultiEd25519Signature::from(single_signature.clone());
     assert_eq!(1, multi_signature.signatures().len());
@@ -201,7 +201,7 @@ fn test_multi_ed25519_signature_serialization() {
         .verify(message(), &multi_pub_key_1of3)
         .is_ok());
 
-    // We can construct signatures from 32 single signatures.
+    // We can conpub struct signatures from 32 single signatures.
     let sigs_32 = vec![single_signature.clone(); 32];
     let indices: Vec<u8> = (0..32).collect();
     let sig32_tuple = sigs_32.into_iter().zip(indices.into_iter()).collect();
@@ -219,7 +219,7 @@ fn test_multi_ed25519_signature_serialization() {
         .verify(message(), &multi_pub_key_32)
         .is_ok());
 
-    // Fail to construct a MultiEd25519Signature object from 33 or more single signatures.
+    // Fail to conpub struct a MultiEd25519Signature object from 33 or more single signatures.
     let sigs_33 = vec![single_signature.clone(); 33];
     let indices: Vec<u8> = (0..33).collect();
     let sig33_tuple = sigs_33.into_iter().zip(indices.into_iter()).collect();
@@ -231,7 +231,7 @@ fn test_multi_ed25519_signature_serialization() {
         CryptoMaterialError::ValidationError
     );
 
-    // Fail to construct a MultiEd25519Signature object if there are duplicated indexes.
+    // Fail to conpub struct a MultiEd25519Signature object if there are duplicated indexes.
     let sigs_3 = vec![single_signature; 3];
     let indices_with_duplicate = vec![0u8, 1u8, 1u8];
     let sig3_tuple = sigs_3
@@ -247,7 +247,7 @@ fn test_multi_ed25519_signature_serialization() {
         CryptoMaterialError::BitVecError("Duplicate signature index".to_string())
     );
 
-    // Fail to construct a MultiEd25519Signature object if an index is out of range.
+    // Fail to conpub struct a MultiEd25519Signature object if an index is out of range.
     let indices_with_out_of_range = vec![0u8, 33u8, 1u8];
     let sig3_tuple = sigs_3
         .into_iter()

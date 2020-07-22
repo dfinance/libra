@@ -48,7 +48,7 @@ pub fn extract_execution_prikey(config: &NodeConfig) -> Option<Ed25519PrivateKey
     }
 }
 
-enum ExecutionCorrectnessWrapper {
+pub enum ExecutionCorrectnessWrapper {
     Local(Arc<Mutex<LocalService>>),
     Process(ProcessService),
     Serializer(Arc<Mutex<SerializerService>>),

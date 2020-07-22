@@ -27,8 +27,8 @@ pub enum NamedChain {
 }
 
 impl NamedChain {
-    fn str_to_chain_id(s: &str) -> Result<ChainId> {
-        // TODO implement custom macro that derives FromStr impl for enum (similar to libra/common/num-variants)
+    pub fn str_to_chain_id(s: &str) -> Result<ChainId> {
+        // TODO implement custom macro that derives FromStr impl forpub enum (similar to libra/common/num-variants)
         let reserved_chain = match s {
             "MAINNET" => NamedChain::MAINNET,
             "TESTNET" => NamedChain::TESTNET,
@@ -41,7 +41,7 @@ impl NamedChain {
         Ok(ChainId::new(reserved_chain.id()))
     }
 
-    fn id(&self) -> u8 {
+    pub fn id(&self) -> u8 {
         *self as u8
     }
 }
@@ -57,7 +57,7 @@ pub fn deserialize_config_chain_id<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    struct ChainIdVisitor;
+    pub struct ChainIdVisitor;
 
     impl<'de> Visitor<'de> for ChainIdVisitor {
         type Value = ChainId;

@@ -304,7 +304,7 @@ pub enum InvariantKind {
 //**************************************************************************************************
 
 // A ModuleAccess references a local or global name or something from a module,
-// either a struct type or a function.
+// either a pub struct type or a function.
 #[derive(Debug, PartialEq)]
 pub enum ModuleAccess_ {
     // N
@@ -843,7 +843,7 @@ impl AstDebug for StructDefinition {
         if resource_opt.is_some() {
             w.write("resource ");
         }
-        w.write(&format!("struct {}", name));
+        w.write(&format!("pub struct {}", name));
         type_parameters.ast_debug(w);
         if let StructFields::Defined(fields) = fields {
             w.block(|w| {
@@ -872,7 +872,7 @@ impl AstDebug for SpecBlockTarget_ {
             SpecBlockTarget_::Code => {}
             SpecBlockTarget_::Module => w.write("module "),
             SpecBlockTarget_::Function(n) => w.write(&format!("fun {} ", n.0.value)),
-            SpecBlockTarget_::Structure(n) => w.write(&format!("struct {} ", n.0.value)),
+            SpecBlockTarget_::Structure(n) => w.write(&format!("pub struct {} ", n.0.value)),
             SpecBlockTarget_::Schema(n, tys) => {
                 w.write(&format!("schema {}", n.value));
                 if !tys.is_empty() {

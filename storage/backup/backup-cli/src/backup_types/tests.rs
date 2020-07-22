@@ -30,7 +30,7 @@ use storage_interface::DbReader;
 use tokio::time::Duration;
 
 #[derive(Debug)]
-struct TestData {
+pub struct TestData {
     db: Arc<LibraDB>,
     txn_start_ver: Version,
     state_snapshot_ver: Option<Version>,

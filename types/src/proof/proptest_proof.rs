@@ -14,26 +14,26 @@ use libra_crypto::{
 };
 use proptest::{collection::vec, prelude::*};
 
-fn arb_non_placeholder_accumulator_sibling() -> impl Strategy<Value = HashValue> {
+pub fn arb_non_placeholder_accumulator_sibling() -> impl Strategy<Value = HashValue> {
     any::<HashValue>().prop_filter("Filter out placeholder sibling.", |x| {
         *x != *ACCUMULATOR_PLACEHOLDER_HASH
     })
 }
 
-fn arb_accumulator_sibling() -> impl Strategy<Value = HashValue> {
+pub fn arb_accumulator_sibling() -> impl Strategy<Value = HashValue> {
     prop_oneof![
         arb_non_placeholder_accumulator_sibling(),
         Just(*ACCUMULATOR_PLACEHOLDER_HASH),
     ]
 }
 
-fn arb_non_placeholder_sparse_merkle_sibling() -> impl Strategy<Value = HashValue> {
+pub fn arb_non_placeholder_sparse_merkle_sibling() -> impl Strategy<Value = HashValue> {
     any::<HashValue>().prop_filter("Filter out placeholder sibling.", |x| {
         *x != *SPARSE_MERKLE_PLACEHOLDER_HASH
     })
 }
 
-fn arb_sparse_merkle_sibling() -> impl Strategy<Value = HashValue> {
+pub fn arb_sparse_merkle_sibling() -> impl Strategy<Value = HashValue> {
     prop_oneof![
         arb_non_placeholder_sparse_merkle_sibling(),
         Just(*SPARSE_MERKLE_PLACEHOLDER_HASH),

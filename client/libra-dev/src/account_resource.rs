@@ -79,7 +79,7 @@ pub unsafe extern "C" fn libra_LibraAccountResource_from(
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use libra_types::account_config::{
         from_currency_code_string, type_tag_for_currency_code, LBR_NAME,

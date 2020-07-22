@@ -24,7 +24,7 @@ pub fn update_mapping() {
     module_file.write_all(b"\n").unwrap();
 }
 
-pub(crate) fn build_mapping() -> BTreeMap<Vec<u8>, FatStructType> {
+pub fn build_mapping() -> BTreeMap<Vec<u8>, FatStructType> {
     serde_json::from_slice::<Vec<(String, FatStructType)>>(STAGED_TYPE_MAP_BYTES)
         .unwrap()
         .into_iter()
@@ -32,7 +32,7 @@ pub(crate) fn build_mapping() -> BTreeMap<Vec<u8>, FatStructType> {
         .collect()
 }
 
-pub(crate) fn resource_vec_to_type_tag(resource_vec: &[u8]) -> Result<FatStructType> {
+pub fn resource_vec_to_type_tag(resource_vec: &[u8]) -> Result<FatStructType> {
     STAGED_TYPE_MAP
         .get(resource_vec)
         .cloned()

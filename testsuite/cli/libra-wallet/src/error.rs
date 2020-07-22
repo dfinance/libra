@@ -3,7 +3,7 @@
 
 use thiserror::Error;
 
-/// Libra Wallet Error is a convenience enum for generating arbitrary WalletErrors. Currently, only
+/// Libra Wallet Error is a conveniencepub enum for generating arbitrary WalletErrors. Currently, only
 /// the LibraWalletGeneric error is being used, but there are plans to add more specific errors as
 /// the Libra Wallet matures
 #[derive(Debug, Error)]

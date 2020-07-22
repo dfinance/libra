@@ -17,7 +17,7 @@ use std::{
 };
 use tokio::runtime;
 
-fn encode_metrics(encoder: impl Encoder, whitelist: &'static [&'static str]) -> Vec<u8> {
+pub fn encode_metrics(encoder: impl Encoder, whitelist: &'static [&'static str]) -> Vec<u8> {
     let mut metric_families = prometheus::gather();
     if !whitelist.is_empty() {
         metric_families = whitelist_metrics(metric_families, whitelist);
@@ -29,7 +29,7 @@ fn encode_metrics(encoder: impl Encoder, whitelist: &'static [&'static str]) -> 
 
 // filtering metrics from the prometheus collections
 // only return the whitelisted metrics
-fn whitelist_metrics(
+pub fn whitelist_metrics(
     metric_families: Vec<MetricFamily>,
     whitelist: &'static [&'static str],
 ) -> Vec<MetricFamily> {
@@ -45,7 +45,7 @@ fn whitelist_metrics(
 
 // filtering metrics from the Json format metrics
 // only return the whitelisted metrics
-fn whitelist_json_metrics(
+pub fn whitelist_json_metrics(
     json_metrics: HashMap<String, String>,
     whitelist: &'static [&'static str],
 ) -> HashMap<&'static str, String> {
@@ -58,7 +58,7 @@ fn whitelist_json_metrics(
     whitelist_metrics
 }
 
-async fn serve_metrics(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub async fn serve_metrics(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let mut resp = Response::new(Body::empty());
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/metrics") => {
@@ -87,7 +87,7 @@ async fn serve_metrics(req: Request<Body>) -> Result<Response<Body>, hyper::Erro
     Ok(resp)
 }
 
-async fn serve_public_metrics(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub async fn serve_public_metrics(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let mut resp = Response::new(Body::empty());
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/metrics") => {

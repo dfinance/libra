@@ -15,7 +15,7 @@
 //! This module implements `SpeculationCache` that is an in-memory representation of this tree.
 
 #[cfg(test)]
-mod test;
+pub mod test;
 
 use crate::types::ProcessedVMOutput;
 use anyhow::{format_err, Result};
@@ -30,8 +30,8 @@ use std::{
 };
 use storage_interface::{StartupInfo, TreeState};
 
-/// The struct that stores all speculation result of its counterpart in consensus.
-pub(crate) struct SpeculationBlock {
+/// The pub struct that stores all speculation result of its counterpart in consensus.
+pub struct SpeculationBlock {
     // The block id of which the output is computed from.
     id: HashValue,
     // The transactions in the block.
@@ -100,7 +100,7 @@ impl Drop for SpeculationBlock {
 /// with ref_count = 1. For the chidren of the root, the sole owner is `heads`. For the rest, the sole
 /// owner is their parent block. So when a block is dropped, all its descendants will be dropped
 /// recursively. In the meanwhile, wheir entries in the block map will be removed by each block's drop().
-pub(crate) struct SpeculationCache {
+pub struct SpeculationCache {
     synced_trees: ExecutedTrees,
     committed_trees: ExecutedTrees,
     // The id of root block.

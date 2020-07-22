@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[cfg(test)]
-mod tests;
+pub mod tests;
 
 use super::{BackupHandle, BackupHandleRef, FileHandle, FileHandleRef};
 

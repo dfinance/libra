@@ -15,7 +15,7 @@ use proptest::{
 };
 use proptest_derive::Arbitrary;
 
-/// A set of accounts which can be used to construct an initial state.
+/// A set of accounts which can be used to conpub struct an initial state.
 ///
 /// For more, see the [`account_universe` module documentation][self].
 #[derive(Clone, Debug)]
@@ -39,7 +39,7 @@ pub struct AccountUniverse {
 #[derive(Arbitrary, Clone, Debug)]
 pub struct AccountPairGen {
     pair: [Index; 2],
-    // The pick_slice_idx method used by this struct returns values in order, so use this flag
+    // The pick_slice_idx method used by this pub struct returns values in order, so use this flag
     // to determine whether to reverse it.
     reverse: bool,
 }
@@ -167,7 +167,7 @@ impl AccountUniverse {
 }
 
 #[derive(Clone, Debug)]
-enum AccountPicker {
+pub enum AccountPicker {
     Unlimited(usize),
     // Vector of (index, times remaining).
     Limited(Vec<(usize, usize)>),

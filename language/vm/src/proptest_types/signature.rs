@@ -91,7 +91,7 @@ impl SignatureTokenGen {
         ]
     }
 
-    /// Generates a signature token for a non-struct owned type.
+    /// Generates a signature token for a non-pub struct owned type.
     pub fn owned_non_struct_strategy() -> impl Strategy<Value = Self> {
         use SignatureTokenGen::*;
 
@@ -131,7 +131,7 @@ impl SignatureTokenGen {
             Signer => SignatureToken::Signer,
             Struct(idx) => {
                 if struct_handles_len == 0 {
-                    // we are asked to create a type of a struct that cannot exist
+                    // we are asked to create a type of a pub struct that cannot exist
                     // so we fake a U64 instead...
                     SignatureToken::U64
                 } else {
