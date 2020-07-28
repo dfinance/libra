@@ -23,6 +23,8 @@ use move_core_types::{
 };
 use std::fmt::Write;
 use vm::errors::PartialVMResult;
+use move_core_types::language_storage::ModuleId;
+use move_core_types::account_address::AccountAddress;
 
 /// `NativeContext` - Native function context.
 ///
@@ -42,11 +44,17 @@ pub trait NativeContext {
         count: u64,
         ty: Type,
         val: Value,
+        caller: Option<ModuleId>
     ) -> PartialVMResult<()>;
     /// Get the a data layout via the type.
     fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout>;
+    /// Load from state view.
     /// Whether a type is a resource or not.
     fn is_resource(&self, ty: &Type) -> PartialVMResult<bool>;
+    /// Caller module.
+    fn caller(&self) -> Option<&ModuleId>;
+    /// Tx sender.
+    fn sender(&self) -> AccountAddress;
 }
 
 /// Result of a native function execution requires charges for execution cost.

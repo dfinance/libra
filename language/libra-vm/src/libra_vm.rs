@@ -445,13 +445,13 @@ pub fn txn_effects_to_writeset_and_events_cached<C: AccessPathCache>(
     let events = effects
         .events
         .into_iter()
-        .map(|(guid, seq_num, ty_tag, ty_layout, val)| {
+        .map(|(guid, seq_num, ty_tag, ty_layout, val, caller)| {
             let msg = val
                 .simple_serialize(&ty_layout)
                 .ok_or_else(|| VMStatus::Error(StatusCode::DATA_FORMAT_ERROR))?;
             let key = EventKey::try_from(guid.as_slice())
                 .map_err(|_| VMStatus::Error(StatusCode::EVENT_KEY_MISMATCH))?;
-            Ok(ContractEvent::new(key, seq_num, ty_tag, msg))
+            Ok(ContractEvent::with_caller(key, seq_num, ty_tag, msg, caller))
         })
         .collect::<Result<Vec<_>, VMStatus>>()?;
 
