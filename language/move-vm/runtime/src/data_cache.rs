@@ -75,7 +75,7 @@ pub struct TransactionEffects {
 impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
     /// Create a `TransactionDataCache` with a `RemoteCache` that provides access to data
     /// not updated in the transaction.
-    pub(crate) fn new(remote: &'r R, loader: &'l Loader) -> Self {
+    pub fn new(remote: &'r R, loader: &'l Loader) -> Self {
         TransactionDataCache {
             remote,
             loader,
