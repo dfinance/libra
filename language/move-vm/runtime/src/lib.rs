@@ -15,7 +15,7 @@ extern crate mirai_annotations;
 pub mod data_cache;
 mod data_operations;
 mod interpreter;
-mod loader;
+pub mod loader;
 pub mod move_vm;
 mod native_functions;
 mod runtime;

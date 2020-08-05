@@ -25,6 +25,7 @@ use vm::{
     file_format::{Bytecode, FunctionHandleIndex, FunctionInstantiationIndex, Signature},
     file_format_common::Opcodes,
 };
+use move_core_types::language_storage::ModuleId;
 
 macro_rules! debug_write {
     ($($toks: tt)*) => {
@@ -53,6 +54,7 @@ pub(crate) struct Interpreter {
     operand_stack: Stack,
     /// The stack of active functions.
     call_stack: CallStack,
+    sender: AccountAddress,
 }
 
 impl Interpreter {
@@ -65,19 +67,21 @@ impl Interpreter {
         data_store: &mut dyn DataStore,
         cost_strategy: &mut CostStrategy,
         loader: &Loader,
+        sender: AccountAddress,
     ) -> VMResult<()> {
         // We count the intrinsic cost of the transaction here, since that needs to also cover the
         // setup of the function.
-        let mut interp = Self::new();
+        let mut interp = Self::new(sender);
         interp.execute(loader, data_store, cost_strategy, function, ty_args, args)
     }
 
     /// Create a new instance of an `Interpreter` in the context of a transaction with a
     /// given module cache and gas schedule.
-    fn new() -> Self {
+    fn new(sender: AccountAddress) -> Self {
         Interpreter {
             operand_stack: Stack::new(),
             call_stack: CallStack::new(),
+            sender
         }
     }
 
@@ -155,7 +159,14 @@ impl Interpreter {
                         .map_err(|e| set_err_info!(current_frame, e))?;
                     let func = resolver.function_from_handle(fh_idx);
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, vec![])?;
+                        self.call_native(
+                            &resolver,
+                            data_store,
+                            cost_strategy,
+                            func,
+                            vec![],
+                            current_frame.function.module_id()
+                        )?;
                         continue;
                     }
                     let frame = self
@@ -183,7 +194,14 @@ impl Interpreter {
                         .map_err(|e| set_err_info!(current_frame, e))?;
                     let func = resolver.function_from_instantiation(idx);
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, ty_args)?;
+                        self.call_native(
+                            &resolver,
+                            data_store,
+                            cost_strategy,
+                            func,
+                            ty_args,
+                            current_frame.function.module_id()
+                        )?;
                         continue;
                     }
                     let frame = self
@@ -227,6 +245,7 @@ impl Interpreter {
         cost_strategy: &mut CostStrategy,
         function: Arc<Function>,
         ty_args: Vec<Type>,
+        caller: Option<&ModuleId>
     ) -> VMResult<()> {
         // Note: refactor if native functions push a frame on the stack
         self.call_native_impl(
@@ -235,6 +254,7 @@ impl Interpreter {
             cost_strategy,
             function.clone(),
             ty_args,
+            caller
         )
         .map_err(|e| match function.module_id() {
             Some(id) => e
@@ -255,13 +275,22 @@ impl Interpreter {
         cost_strategy: &mut CostStrategy,
         function: Arc<Function>,
         ty_args: Vec<Type>,
+        caller: Option<&ModuleId>,
     ) -> PartialVMResult<()> {
         let mut arguments = VecDeque::new();
         let expected_args = function.arg_count();
         for _ in 0..expected_args {
             arguments.push_front(self.operand_stack.pop()?);
         }
-        let mut native_context = FunctionContext::new(self, data_store, cost_strategy, resolver);
+
+        let mut native_context = FunctionContext::new(
+            self,
+            data_store,
+            cost_strategy,
+            resolver,
+            caller,
+            self.sender,
+        );
         let native_function = function.get_native()?;
         let result = native_function.dispatch(&mut native_context, ty_args, arguments)?;
         cost_strategy.deduct_gas(result.cost)?;
@@ -584,7 +613,7 @@ impl Stack {
 
 /// A call stack.
 #[derive(Debug)]
-struct CallStack(Vec<Frame>);
+struct CallStack(pub Vec<Frame>);
 
 impl CallStack {
     /// Create a new empty call stack.
