@@ -17,6 +17,7 @@ use move_vm_types::{
 };
 use std::{collections::VecDeque, fmt::Write};
 use vm::errors::PartialVMResult;
+use move_core_types::language_storage::ModuleId;
 
 // The set of native functions the VM supports.
 // The functions can line in any crate linked in but the VM declares them here.
@@ -45,6 +46,8 @@ pub(crate) enum NativeFunction {
     SignerBorrowAddress,
     CreateSigner,
     DestroySigner,
+    DfinanceCreateSigner,
+    DfinanceDestroySigner,
 }
 
 impl NativeFunction {
@@ -70,12 +73,14 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Vector", "pop_back") => VectorPopBack,
             (&CORE_CODE_ADDRESS, "Vector", "destroy_empty") => VectorDestroyEmpty,
             (&CORE_CODE_ADDRESS, "Vector", "swap") => VectorSwap,
-            (&CORE_CODE_ADDRESS, "Event", "write_to_event_store") => AccountWriteEvent,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "create_signer") => CreateSigner,
-            (&CORE_CODE_ADDRESS, "LibraAccount", "destroy_signer") => DestroySigner,
+            (&CORE_CODE_ADDRESS, "Event", "emit") => AccountWriteEvent,
+            (&CORE_CODE_ADDRESS, "Account", "create_signer") => CreateSigner,
+            (&CORE_CODE_ADDRESS, "Account", "destroy_signer") => DestroySigner,
             (&CORE_CODE_ADDRESS, "Debug", "print") => DebugPrint,
             (&CORE_CODE_ADDRESS, "Debug", "print_stack_trace") => DebugPrintStackTrace,
             (&CORE_CODE_ADDRESS, "Signer", "borrow_address") => SignerBorrowAddress,
+            (&CORE_CODE_ADDRESS, "Dfinance", "create_signer") => DfinanceCreateSigner,
+            (&CORE_CODE_ADDRESS, "Dfinance", "destroy_signer") => DfinanceDestroySigner,
             _ => return None,
         })
     }
@@ -108,6 +113,8 @@ impl NativeFunction {
             Self::SignerBorrowAddress => signer::native_borrow_address(ctx, t, v),
             Self::CreateSigner => account::native_create_signer(ctx, t, v),
             Self::DestroySigner => account::native_destroy_signer(ctx, t, v),
+            Self::DfinanceCreateSigner => account::native_create_signer(ctx, t, v),
+            Self::DfinanceDestroySigner => account::native_destroy_signer(ctx, t, v),
         };
         debug_assert!(match &result {
             Err(e) => e.major_status().status_type() == StatusType::InvariantViolation,
@@ -122,6 +129,7 @@ pub(crate) struct FunctionContext<'a> {
     data_store: &'a mut dyn DataStore,
     cost_strategy: &'a CostStrategy<'a>,
     resolver: &'a Resolver<'a>,
+    caller: Option<&'a ModuleId>,
 }
 
 impl<'a> FunctionContext<'a> {
@@ -130,12 +138,14 @@ impl<'a> FunctionContext<'a> {
         data_store: &'a mut dyn DataStore,
         cost_strategy: &'a mut CostStrategy,
         resolver: &'a Resolver<'a>,
+        caller: Option<&'a ModuleId>,
     ) -> FunctionContext<'a> {
         FunctionContext {
             interpreter,
             data_store,
             cost_strategy,
             resolver,
+            caller,
         }
     }
 }
@@ -156,8 +166,9 @@ impl<'a> NativeContext for FunctionContext<'a> {
         seq_num: u64,
         ty: Type,
         val: Value,
+        caller: Option<ModuleId>
     ) -> PartialVMResult<bool> {
-        match self.data_store.emit_event(guid, seq_num, ty, val) {
+        match self.data_store.emit_event(guid, seq_num, ty, val, caller) {
             Ok(()) => Ok(true),
             Err(e) if e.major_status().status_type() == StatusType::InvariantViolation => Err(e),
             Err(_) => Ok(false),
@@ -174,5 +185,9 @@ impl<'a> NativeContext for FunctionContext<'a> {
 
     fn is_resource(&self, ty: &Type) -> bool {
         self.resolver.is_resource(ty)
+    }
+
+    fn caller(&self) -> Option<&ModuleId> {
+        self.caller
     }
 }

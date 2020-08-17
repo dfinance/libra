@@ -89,7 +89,7 @@ enum Command {
 
 /// Store modules under move_src without an explicit `address {}` block under 0x2.
 const MOVE_SRC: Address = Address::new([
-    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 2u8,
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 2u8,
 ]);
 
 /// Create a directory at ./`dir_name` if one does not already exist
@@ -224,7 +224,7 @@ fn explain_effects(effects: &TransactionEffects, state: &OnDiskStateView) -> Res
     if !effects.events.is_empty() {
         println!("Emitted {:?} events:", effects.events.len());
         // TODO: better event printing
-        for (event_handle, event_sequence_number, _event_type, _event_layout, event_data) in
+        for (event_handle, event_sequence_number, _event_type, _event_layout, event_data, _) in
             &effects.events
         {
             println!(
