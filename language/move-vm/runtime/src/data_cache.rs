@@ -60,7 +60,7 @@ pub struct TransactionDataCache<'r, 'l, R> {
     pub remote: &'r R,
     pub loader: &'l Loader,
     pub account_map: BTreeMap<AccountAddress, AccountDataCache>,
-    pub event_data: Vec<(Vec<u8>, u64, Type, Value)>,
+    pub event_data: Vec<(Vec<u8>, u64, Type, Value, Option<ModuleId>)>,
 }
 
 pub struct TransactionEffects {
@@ -69,7 +69,7 @@ pub struct TransactionEffects {
         Vec<(TypeTag, Option<(MoveTypeLayout, Value)>)>,
     )>,
     pub modules: Vec<(ModuleId, Vec<u8>)>,
-    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value)>,
+    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value, Option<ModuleId>)>,
 }
 
 impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
@@ -120,10 +120,10 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
         }
 
         let mut events = vec![];
-        for (guid, seq_num, ty, val) in self.event_data {
+        for (guid, seq_num, ty, val, caller) in self.event_data {
             let ty_tag = self.loader.type_to_type_tag(&ty)?;
             let ty_layout = self.loader.type_to_type_layout(&ty)?;
-            events.push((guid, seq_num, ty_tag, ty_layout, val))
+            events.push((guid, seq_num, ty_tag, ty_layout, val, caller))
         }
 
         Ok(TransactionEffects {
@@ -220,7 +220,7 @@ impl<'r, 'l, C: RemoteCache> DataStore for TransactionDataCache<'r, 'l, C> {
         Ok(self.remote.get_module(module_id)?.is_some())
     }
 
-    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value) {
-        self.event_data.push((guid, seq_num, ty, val))
+    fn emit_event(&mut self, guid: Vec<u8>, seq_num: u64, ty: Type, val: Value, caller: Option<ModuleId>) {
+        self.event_data.push((guid, seq_num, ty, val, caller))
     }
 }

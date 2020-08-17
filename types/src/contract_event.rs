@@ -21,6 +21,7 @@ use move_core_types::{language_storage::TypeTag, move_resource::MoveResource};
 use proptest_derive::Arbitrary;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, ops::Deref};
+use move_core_types::language_storage::ModuleId;
 
 /// Support versioning of the data structure.
 #[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, LCSCryptoHash)]
@@ -40,6 +41,21 @@ impl ContractEvent {
             sequence_number,
             type_tag,
             event_data,
+            None
+        ))
+    }
+
+    pub fn with_caller(key: EventKey,
+                       sequence_number: u64,
+                       type_tag: TypeTag,
+                       event_data: Vec<u8>,
+                       caller: Option<ModuleId>) -> Self {
+        ContractEvent::V0(ContractEventV0::new(
+            key,
+            sequence_number,
+            type_tag,
+            event_data,
+            caller
         ))
     }
 }
@@ -57,7 +73,7 @@ impl Deref for ContractEvent {
 }
 
 /// Entry produced via a call to the `emit_event` builtin.
-#[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, CryptoHasher)]
+#[derive(Hash, Clone, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, Debug)]
 pub struct ContractEventV0 {
     /// The unique key that the event was emitted to
     pub key: EventKey,
@@ -66,8 +82,9 @@ pub struct ContractEventV0 {
     /// The type of the data
     pub type_tag: TypeTag,
     /// The data payload of the event
-    #[serde(with = "serde_bytes")]
+   #[serde(with = "serde_bytes")]
     pub event_data: Vec<u8>,
+    pub caller_module: Option<ModuleId>,
 }
 
 impl ContractEventV0 {
@@ -76,12 +93,14 @@ impl ContractEventV0 {
         sequence_number: u64,
         type_tag: TypeTag,
         event_data: Vec<u8>,
+        caller_module: Option<ModuleId>,
     ) -> Self {
         Self {
             key,
             sequence_number,
             type_tag,
             event_data,
+            caller_module
         }
     }
 
@@ -99,6 +118,10 @@ impl ContractEventV0 {
 
     pub fn type_tag(&self) -> &TypeTag {
         &self.type_tag
+    }
+
+    pub fn caller(&self) -> Option<&ModuleId> {
+        self.caller_module.as_ref()
     }
 }
 
@@ -227,11 +250,12 @@ impl std::fmt::Debug for ContractEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "ContractEvent {{ key: {:?}, index: {:?}, type: {:?}, event_data: {:?} }}",
+            "ContractEvent {{ key: {:?}, index: {:?}, type: {:?}, event_data: {:?}, caller: {:?} }}",
             self.key,
             self.sequence_number,
             self.type_tag,
-            hex::encode(&self.event_data)
+            hex::encode(&self.event_data),
+            self.caller()
         )
     }
 }
@@ -259,7 +283,8 @@ impl std::fmt::Display for ContractEvent {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(any(test, feature = "fuzzing"), derive(Arbitrary))]
 pub struct EventWithProof {
-    pub transaction_version: u64, // Should be `Version`
+    pub transaction_version: u64,
+    // Should be `Version`
     pub event_index: u64,
     pub event: ContractEvent,
     pub proof: EventProof,
