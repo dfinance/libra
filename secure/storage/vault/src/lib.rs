@@ -1,8 +1,5 @@
 // Copyright (c) The Libra Core Contributors
 // SPDX-License-Identifier: Apache-2.0
-
-#![forbid(unsafe_code)]
-
 pub mod dev;
 
 use libra_crypto::{
@@ -18,6 +15,7 @@ use std::{
 };
 use thiserror::Error;
 use ureq::Response;
+use std::intrinsics::transmute;
 
 #[cfg(any(test, feature = "fuzzing"))]
 pub mod fuzzing;
@@ -354,7 +352,7 @@ impl Client {
     fn upgrade_request_without_token(&self, mut request: ureq::Request) -> ureq::Request {
         request.timeout_connect(TIMEOUT);
         if let Some(tls_config) = self.tls_config.as_ref() {
-            request.set_tls_config(tls_config.clone());
+            request.set_tls_config(unsafe { transmute(tls_config.clone())});
         }
         request
     }
