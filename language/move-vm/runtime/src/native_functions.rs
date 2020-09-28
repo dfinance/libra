@@ -4,10 +4,10 @@
 use crate::{interpreter::Interpreter, loader::Resolver};
 use libra_types::account_config::CORE_CODE_ADDRESS;
 use move_core_types::{
-    account_address::AccountAddress, gas_schedule::CostTable, value::MoveTypeLayout,
-    vm_status::StatusType,
+    account_address::AccountAddress, gas_schedule::CostTable, language_storage::ModuleId,
+    value::MoveTypeLayout, vm_status::StatusType,
 };
-use move_vm_natives::{account, debug, event, hash, lcs, signature, signer, vector};
+use move_vm_natives::{account, debug, event, hash, lcs, signature, signer, u256, vector};
 use move_vm_types::{
     data_store::DataStore,
     gas_schedule::CostStrategy,
@@ -17,7 +17,6 @@ use move_vm_types::{
 };
 use std::{collections::VecDeque, fmt::Write};
 use vm::errors::PartialVMResult;
-use move_core_types::language_storage::ModuleId;
 
 // The set of native functions the VM supports.
 // The functions can line in any crate linked in but the VM declares them here.
@@ -48,6 +47,17 @@ pub(crate) enum NativeFunction {
     DestroySigner,
     DfinanceCreateSigner,
     DfinanceDestroySigner,
+
+    U256FromU8,
+    U256FromU64,
+    U256FromU128,
+    U256AsU8,
+    U256AsU64,
+    U256AsU128,
+    U256Mul,
+    U256Div,
+    U256Sub,
+    U256Add,
 }
 
 impl NativeFunction {
@@ -81,6 +91,18 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "Signer", "borrow_address") => SignerBorrowAddress,
             (&CORE_CODE_ADDRESS, "Dfinance", "create_signer") => DfinanceCreateSigner,
             (&CORE_CODE_ADDRESS, "Dfinance", "destroy_signer") => DfinanceDestroySigner,
+
+            (&CORE_CODE_ADDRESS, "U256", "from_u8") => U256FromU8,
+            (&CORE_CODE_ADDRESS, "U256", "from_u64") => U256FromU64,
+            (&CORE_CODE_ADDRESS, "U256", "from_u128") => U256FromU128,
+            (&CORE_CODE_ADDRESS, "U256", "as_u8") => U256AsU8,
+            (&CORE_CODE_ADDRESS, "U256", "as_u64") => U256AsU64,
+            (&CORE_CODE_ADDRESS, "U256", "as_u128") => U256AsU128,
+
+            (&CORE_CODE_ADDRESS, "U256", "mul") => U256Mul,
+            (&CORE_CODE_ADDRESS, "U256", "div") => U256Div,
+            (&CORE_CODE_ADDRESS, "U256", "sub") => U256Sub,
+            (&CORE_CODE_ADDRESS, "U256", "add") => U256Add,
             _ => return None,
         })
     }
@@ -115,11 +137,25 @@ impl NativeFunction {
             Self::DestroySigner => account::native_destroy_signer(ctx, t, v),
             Self::DfinanceCreateSigner => account::native_create_signer(ctx, t, v),
             Self::DfinanceDestroySigner => account::native_destroy_signer(ctx, t, v),
+            // u256
+            Self::U256FromU8 => u256::from_u8(ctx, t, v),
+            Self::U256FromU64 => u256::from_u64(ctx, t, v),
+            Self::U256FromU128 => u256::from_u128(ctx, t, v),
+
+            Self::U256AsU8 => u256::as_u8(ctx, t, v),
+            Self::U256AsU64 => u256::as_u64(ctx, t, v),
+            Self::U256AsU128 => u256::as_u128(ctx, t, v),
+
+            Self::U256Mul => u256::mul(ctx, t, v),
+            Self::U256Div => u256::div(ctx, t, v),
+            Self::U256Sub => u256::sub(ctx, t, v),
+            Self::U256Add => u256::add(ctx, t, v),
         };
-        debug_assert!(match &result {
-            Err(e) => e.major_status().status_type() == StatusType::InvariantViolation,
-            Ok(_) => true,
-        });
+        // Allows to send all status types.
+        // debug_assert!(match &result {
+        //     Err(e) => e.major_status().status_type() == StatusType::InvariantViolation,
+        //     Ok(_) => true,
+        // });
         result
     }
 }
@@ -166,7 +202,7 @@ impl<'a> NativeContext for FunctionContext<'a> {
         seq_num: u64,
         ty: Type,
         val: Value,
-        caller: Option<ModuleId>
+        caller: Option<ModuleId>,
     ) -> PartialVMResult<bool> {
         match self.data_store.emit_event(guid, seq_num, ty, val, caller) {
             Ok(()) => Ok(true),
