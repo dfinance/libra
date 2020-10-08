@@ -22,7 +22,7 @@ lcs = { path = "../common/lcs", package = "libra-canonical-serialization", versi
 compiler = { path = "../language/compiler", version = "0.1.0" }
 move-lang = { path = "../language/move-lang", version = "0.0.1" }
 move-vm-types = { path = "../language/move-vm/types", version = "0.1.0" }
-move-vm-runtime = { path = "../language/move-vm/runtime", version = "0.1.0" }
+move-vm-runtime = { path = "../language/move-vm/runtime", version = "0.1.0", features = ["debug_module"]}
 move-vm-natives = { path = "../language/move-vm/natives", version = "0.1.0" }
 libra-vm = { path = "../language/libra-vm", version = "0.1.0" }
 libra-state-view = { path = "../storage/state-view", version = "0.1.0" }

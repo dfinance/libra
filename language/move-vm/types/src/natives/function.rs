@@ -23,7 +23,7 @@ use move_core_types::{
 };
 use std::fmt::Write;
 use vm::errors::PartialVMResult;
-use move_core_types::language_storage::ModuleId;
+use move_core_types::language_storage::{ModuleId, TypeTag};
 
 pub use move_core_types::vm_status::StatusCode;
 pub use vm::errors::PartialVMError;
@@ -50,6 +50,7 @@ pub trait NativeContext {
     ) -> PartialVMResult<bool>;
     /// Get the a data layout via the type.
     fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<Option<MoveTypeLayout>>;
+    fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag>;
     /// Whether a type is a resource or not.
     fn is_resource(&self, ty: &Type) -> bool;
     /// Caller module.
