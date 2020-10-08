@@ -17,6 +17,7 @@ use move_vm_types::{
 };
 use std::{collections::VecDeque, fmt::Write};
 use vm::errors::PartialVMResult;
+use move_core_types::language_storage::TypeTag;
 
 // The set of native functions the VM supports.
 // The functions can line in any crate linked in but the VM declares them here.
@@ -217,6 +218,10 @@ impl<'a> NativeContext for FunctionContext<'a> {
             Err(e) if e.major_status().status_type() == StatusType::InvariantViolation => Err(e),
             Err(_) => Ok(None),
         }
+    }
+
+    fn type_to_type_tag(&self, ty: &Type) -> PartialVMResult<TypeTag> {
+        self.resolver.type_to_type_tag(ty)
     }
 
     fn is_resource(&self, ty: &Type) -> bool {

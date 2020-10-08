@@ -197,7 +197,7 @@ pub fn add(
     Ok(NativeResult::ok(cost, vec![wrap_u256(res)]))
 }
 
-fn unwrap_u256(u256: Struct) -> PartialVMResult<U256> {
+pub fn unwrap_u256(u256: Struct) -> PartialVMResult<U256> {
     u256.unpack()?
         .next()
         .ok_or_else(|| {
