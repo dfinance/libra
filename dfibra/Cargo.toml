@@ -21,7 +21,7 @@ vm = { package = "vm", path = "../language/vm", version = "0.1.0" }
 compiler = { path = "../language/compiler", version = "0.1.0" }
 move-lang = { path = "../language/move-lang", version = "0.0.1" }
 move-vm-types = { path = "../language/move-vm/types", version = "0.1.0" }
-move-vm-runtime = { path = "../language/move-vm/runtime", version = "0.1.0" }
+move-vm-runtime = { path = "../language/move-vm/runtime", version = "0.1.0", features = ["debug_module"]}
 move-vm-natives = { path = "../language/move-vm/natives", version = "0.1.0" }
 diem-vm = { path = "../language/diem-vm", version = "0.1.0" }
 diem-state-view = { path = "../storage/state-view", version = "0.1.0" }
