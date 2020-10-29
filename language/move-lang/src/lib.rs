@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-#![forbid(unsafe_code)]
+// ༼ つ ◕_◕ ༽つ  #![forbid(unsafe_code)]
 
 #[macro_use(sp)]
 extern crate move_ir_types;
@@ -14,12 +14,14 @@ pub mod expansion;
 pub mod hlir;
 pub mod interface_generator;
 pub mod ir_translation;
+pub mod name_pool;
 pub mod naming;
 pub mod parser;
 pub mod shared;
 pub mod to_bytecode;
 pub mod typing;
 
+use crate::name_pool::ConstPool;
 use anyhow::anyhow;
 use codespan::{ByteIndex, Span};
 use compiled_unit::CompiledUnit;
@@ -463,7 +465,7 @@ fn run(cur: PassResult, until: Pass) -> Result<PassResult, Errors> {
 // Parsing
 //**************************************************************************************************
 
-fn parse_program(
+pub fn parse_program(
     targets: &[String],
     deps: &[String],
 ) -> anyhow::Result<(
@@ -472,11 +474,11 @@ fn parse_program(
 )> {
     let targets = find_move_filenames(targets, true)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     let deps = find_move_filenames(deps, true)?
         .iter()
-        .map(|s| leak_str(s))
+        .map(|s| ConstPool::push(s))
         .collect::<Vec<&'static str>>();
     check_targets_deps_dont_intersect(&targets, &deps)?;
     let mut files: FilesSourceText = HashMap::new();
@@ -588,11 +590,6 @@ pub fn find_filenames<Predicate: FnMut(&Path) -> bool>(
         }
     }
     Ok(result)
-}
-
-// TODO replace with some sort of intern table
-fn leak_str(s: &str) -> &'static str {
-    Box::leak(Box::new(s.to_owned()))
 }
 
 fn parse_file(

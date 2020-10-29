@@ -30,7 +30,7 @@ pub fn native_emit_event(
         msg.size().get() as usize,
     );
 
-    if !context.save_event(guid, seq_num, ty, msg)? {
+    if !context.save_event(guid, seq_num, ty, msg, None)? {
         return Ok(NativeResult::err(cost, 0));
     }
 

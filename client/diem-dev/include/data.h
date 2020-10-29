@@ -14,7 +14,7 @@ extern "C" {
 #define DIEM_PRIVKEY_SIZE 32
 #define DIEM_AUTHKEY_SIZE 32
 #define DIEM_SIGNATURE_SIZE 64
-#define DIEM_ADDRESS_SIZE 16
+#define DIEM_ADDRESS_SIZE 20
 
 enum DiemStatus {
     Ok = 0,

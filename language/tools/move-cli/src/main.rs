@@ -490,7 +490,7 @@ fn explain_effects(effects: &TransactionEffects, state: &OnDiskStateView) -> Res
     if !effects.events.is_empty() {
         println!("Emitted {:?} events:", effects.events.len());
         // TODO: better event printing
-        for (event_key, event_sequence_number, _event_type, _event_layout, event_data) in
+        for (event_key, event_sequence_number, _event_type, _event_layout, event_data, _) in
             &effects.events
         {
             println!(
@@ -555,7 +555,7 @@ fn maybe_commit_effects(
                 }
             }
 
-            for (event_key, event_sequence_number, event_type, event_layout, event_data) in
+            for (event_key, event_sequence_number, event_type, event_layout, event_data, _) in
                 effects.events
             {
                 state.save_event(
