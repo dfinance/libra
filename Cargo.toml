@@ -144,6 +144,7 @@ members = [
     "testsuite/smoke-test",
     "types",
     "vm-validator",
+    "dfibra"
 ]
 
 # NOTE: default-members is the complete list of binaries that form the "production Libra codebase". These members should
