@@ -1,0 +1,29 @@
+[package]
+name = "dfibra"
+version = "0.1.0"
+authors = ["Libra Association <opensource@libra.org>"]
+repository = "https://github.com/libra/libra"
+homepage = "https://libra.org"
+license = "Apache-2.0"
+publish = false
+edition = "2018"
+
+[dependencies]
+bytecode-verifier = { path = "../language/bytecode-verifier", version = "0.1.0" }
+bytecode-source-map = { path = "../language/compiler/bytecode-source-map", version = "0.1.0" }
+ir-to-bytecode-syntax = { path = "../language/compiler/ir-to-bytecode/syntax", version = "0.1.0" }
+diem-types = { path = "../types", version = "0.1.0" }
+diem-workspace-hack = { path = "../common/workspace-hack", version = "0.1.0" }
+move-core-types = { path = "../language/move-core/types", version = "0.1.0" }
+move-ir-types = { path = "../language/move-ir/types", version = "0.1.0" }
+move-coverage = { path = "../language/tools/move-coverage", version = "0.1.0" }
+vm = { package = "vm", path = "../language/vm", version = "0.1.0" }
+compiler = { path = "../language/compiler", version = "0.1.0" }
+move-lang = { path = "../language/move-lang", version = "0.0.1" }
+move-vm-types = { path = "../language/move-vm/types", version = "0.1.0" }
+move-vm-runtime = { path = "../language/move-vm/runtime", version = "0.1.0" }
+move-vm-natives = { path = "../language/move-vm/natives", version = "0.1.0" }
+diem-vm = { path = "../language/diem-vm", version = "0.1.0" }
+diem-state-view = { path = "../storage/state-view", version = "0.1.0" }
+diem-logger = { path = "../common/logger", version = "0.1.0" }
+
