@@ -17,7 +17,7 @@ pub mod ir_translation;
 pub mod naming;
 pub mod parser;
 pub mod shared;
-mod to_bytecode;
+pub mod to_bytecode;
 pub mod typing;
 
 use anyhow::anyhow;
@@ -852,7 +852,7 @@ fn strip_comments(fname: &'static str, input: &str) -> Result<(String, FileComme
 
 // We restrict strings to only ascii visual characters (0x20 <= c <= 0x7E) or a permitted newline
 // character--\n--or a tab--\t.
-fn strip_comments_and_verify(
+pub fn strip_comments_and_verify(
     fname: &'static str,
     string: &str,
 ) -> Result<(String, FileCommentMap), Errors> {

@@ -217,7 +217,7 @@ fn load_signature_size(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<u64> {
     read_uleb_internal(cursor, SIGNATURE_SIZE_MAX)
 }
 
-fn load_constant_size(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<usize> {
+pub fn load_constant_size(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<usize> {
     read_uleb_internal(cursor, CONSTANT_SIZE_MAX)
 }
 
@@ -294,7 +294,7 @@ fn deserialize_compiled_module(binary: &[u8]) -> BinaryLoaderResult<CompiledModu
 /// Verifies the correctness of the "static" part of the binary's header.
 ///
 /// Returns the offset where the count of tables in the binary.
-fn check_binary(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<()> {
+pub fn check_binary(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<()> {
     let mut magic = [0u8; BinaryConstants::DIEM_MAGIC_SIZE];
     if let Ok(count) = cursor.read(&mut magic) {
         if count != BinaryConstants::DIEM_MAGIC_SIZE || magic != BinaryConstants::DIEM_MAGIC {
@@ -823,7 +823,7 @@ fn load_signature_tokens(cursor: &mut Cursor<&[u8]>) -> BinaryLoaderResult<Vec<S
 }
 
 /// Deserializes a `SignatureToken`.
-pub(crate) fn load_signature_token(
+pub fn load_signature_token(
     cursor: &mut Cursor<&[u8]>,
 ) -> BinaryLoaderResult<SignatureToken> {
     // The following algorithm works by storing partially constructed types on a stack.
