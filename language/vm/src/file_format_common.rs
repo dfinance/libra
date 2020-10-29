@@ -222,7 +222,7 @@ pub const BINARY_SIZE_LIMIT: usize = usize::max_value();
 
 /// A wrapper for the binary vector
 #[derive(Default, Debug)]
-pub(crate) struct BinaryData {
+pub struct BinaryData {
     _binary: Vec<u8>,
 }
 
@@ -291,7 +291,7 @@ impl From<Vec<u8>> for BinaryData {
     }
 }
 
-pub(crate) fn write_u64_as_uleb128(binary: &mut BinaryData, mut val: u64) -> Result<()> {
+pub fn write_u64_as_uleb128(binary: &mut BinaryData, mut val: u64) -> Result<()> {
     loop {
         let cur = val & 0x7f;
         if cur != val {
