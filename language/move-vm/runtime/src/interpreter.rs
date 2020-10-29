@@ -28,6 +28,7 @@ use vm::{
     file_format::{Bytecode, FunctionHandleIndex, FunctionInstantiationIndex, Signature},
     file_format_common::Opcodes,
 };
+use move_core_types::language_storage::ModuleId;
 
 macro_rules! debug_write {
     ($($toks: tt)*) => {
@@ -58,7 +59,7 @@ macro_rules! set_err_info {
 ///
 /// An `Interpreter` instance is a stand alone execution context for a function.
 /// It mimics execution on a single thread, with an call stack and an operand stack.
-pub(crate) struct Interpreter<L: LogContext> {
+pub struct Interpreter<L: LogContext> {
     /// Operand stack, where Move `Value`s are stored for stack operations.
     operand_stack: Stack,
     /// The stack of active functions.
@@ -170,7 +171,7 @@ impl<L: LogContext> Interpreter<L> {
                         )
                         .map_err(|e| set_err_info!(current_frame, e))?;
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, vec![])?;
+                        self.call_native(&resolver, data_store, cost_strategy, func, vec![], current_frame.function.module_id())?;
                         current_frame.pc += 1; // advance past the Call instruction in the caller
                         continue;
                     }
@@ -205,7 +206,7 @@ impl<L: LogContext> Interpreter<L> {
                         )
                         .map_err(|e| set_err_info!(current_frame, e))?;
                     if func.is_native() {
-                        self.call_native(&resolver, data_store, cost_strategy, func, ty_args)?;
+                        self.call_native(&resolver, data_store, cost_strategy, func, ty_args, current_frame.function.module_id())?;
                         current_frame.pc += 1; // advance past the Call instruction in the caller
                         continue;
                     }
@@ -250,6 +251,7 @@ impl<L: LogContext> Interpreter<L> {
         cost_strategy: &mut CostStrategy,
         function: Arc<Function>,
         ty_args: Vec<Type>,
+        caller: Option<&ModuleId>
     ) -> VMResult<()> {
         // Note: refactor if native functions push a frame on the stack
         self.call_native_impl(
@@ -258,6 +260,7 @@ impl<L: LogContext> Interpreter<L> {
             cost_strategy,
             function.clone(),
             ty_args,
+            caller
         )
         .map_err(|e| match function.module_id() {
             Some(id) => e
@@ -278,13 +281,21 @@ impl<L: LogContext> Interpreter<L> {
         cost_strategy: &mut CostStrategy,
         function: Arc<Function>,
         ty_args: Vec<Type>,
+        caller: Option<&ModuleId>,
     ) -> PartialVMResult<()> {
         let mut arguments = VecDeque::new();
         let expected_args = function.arg_count();
         for _ in 0..expected_args {
             arguments.push_front(self.operand_stack.pop()?);
         }
-        let mut native_context = FunctionContext::new(self, data_store, cost_strategy, resolver);
+
+        let mut native_context = FunctionContext::new(
+            self,
+            data_store,
+            cost_strategy,
+            resolver,
+            caller,
+        );
         let native_function = function.get_native()?;
         let result = native_function.dispatch(&mut native_context, ty_args, arguments)?;
         cost_strategy.deduct_gas(result.cost)?;
@@ -626,7 +637,7 @@ impl Stack {
 
 /// A call stack.
 #[derive(Debug)]
-struct CallStack(Vec<Frame>);
+struct CallStack(pub Vec<Frame>);
 
 impl CallStack {
     /// Create a new empty call stack.

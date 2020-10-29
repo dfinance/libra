@@ -71,12 +71,12 @@ where
 // A script cache is a map from the hash value of a script and the `Script` itself.
 // Script are added in the cache once verified and so getting a script out the cache
 // does not require further verification (except for parameters and type parameters)
-struct ScriptCache {
+pub struct ScriptCache {
     scripts: BinaryCache<HashValue, Script>,
 }
 
 impl ScriptCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             scripts: BinaryCache::new(),
         }
@@ -105,7 +105,7 @@ pub struct ModuleCache {
 }
 
 impl ModuleCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             modules: BinaryCache::new(),
             structs: vec![],
@@ -411,9 +411,9 @@ impl ModuleCache {
 // (operating on values on the stack) and when cache needs updating the mutex must be taken.
 // The `pub(crate)` API is what a Loader offers to the runtime.
 pub struct Loader {
-    scripts: Mutex<ScriptCache>,
-    module_cache: Mutex<ModuleCache>,
-    type_cache: Mutex<TypeCache>,
+    pub scripts: Mutex<ScriptCache>,
+    pub module_cache: Mutex<ModuleCache>,
+    pub type_cache: Mutex<TypeCache>,
 }
 
 impl Loader {
@@ -1349,7 +1349,7 @@ impl Module {
 // When code executes, indexes in instructions are resolved against runtime structures
 // (rather then "compiled") to make available data needed for execution
 #[derive(Debug)]
-struct Script {
+pub struct Script {
     // primitive pools
     script: CompiledScript,
 
@@ -1737,12 +1737,12 @@ impl StructInfo {
     }
 }
 
-pub(crate) struct TypeCache {
+pub struct TypeCache {
     structs: HashMap<usize, HashMap<Vec<Type>, StructInfo>>,
 }
 
 impl TypeCache {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             structs: HashMap::new(),
         }

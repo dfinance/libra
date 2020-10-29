@@ -36,7 +36,7 @@ use vm::{
 
 /// Runtime representation of a Move value.
 #[derive(Debug)]
-enum ValueImpl {
+pub enum ValueImpl {
     Invalid,
 
     U8(u8),
@@ -61,7 +61,7 @@ enum ValueImpl {
 /// Except when not owned by the VM stack, a container always lives inside an Rc<RefCell<>>,
 /// making it possible to be shared by references.
 #[derive(Debug, Clone)]
-enum Container {
+pub enum Container {
     Locals(Rc<RefCell<Vec<ValueImpl>>>),
     VecR(Rc<RefCell<Vec<ValueImpl>>>),
     VecC(Rc<RefCell<Vec<ValueImpl>>>),
@@ -78,7 +78,7 @@ enum Container {
 /// or in global storage. In the latter case, it also keeps a status flag indicating whether
 /// the container has been possibly modified.
 #[derive(Debug)]
-enum ContainerRef {
+pub enum ContainerRef {
     Local(Container),
     Global {
         status: Rc<RefCell<GlobalDataStatus>>,
@@ -90,16 +90,16 @@ enum ContainerRef {
 /// Clean - the data was only read.
 /// Dirty - the data was possibly modified.
 #[derive(Debug, Clone, Copy)]
-enum GlobalDataStatus {
+pub enum GlobalDataStatus {
     Clean,
     Dirty,
 }
 
 /// A Move reference pointing to an element in a container.
 #[derive(Debug)]
-struct IndexedRef {
+pub struct IndexedRef {
     idx: usize,
-    container_ref: ContainerRef,
+    pub container_ref: ContainerRef,
 }
 
 /// An umbrella enum for references. It is used to hide the internals of the public type
@@ -113,7 +113,7 @@ enum ReferenceImpl {
 // A reference to a signer. Clients can attempt a cast to this struct if they are
 // expecting a Signer on the stavk or as an argument.
 #[derive(Debug)]
-pub struct SignerRef(ContainerRef);
+pub struct SignerRef(pub ContainerRef);
 
 // A reference to a vector. This is an alias for a ContainerRef for now but we may change
 // it once Containers are restructured.
@@ -156,7 +156,7 @@ pub struct Reference(ReferenceImpl);
 /// A Move value -- a wrapper around `ValueImpl` which can be created only through valid
 /// means.
 #[derive(Debug)]
-pub struct Value(ValueImpl);
+pub struct Value(pub ValueImpl);
 
 /// The locals for a function frame. It allows values to be read, written or taken
 /// reference from.

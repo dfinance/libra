@@ -4,7 +4,7 @@
 use crate::{data_cache::RemoteCache, runtime::VMRuntime, session::Session};
 
 pub struct MoveVM {
-    runtime: VMRuntime,
+    pub runtime: VMRuntime,
 }
 
 impl MoveVM {

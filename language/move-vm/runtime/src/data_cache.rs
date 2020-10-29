@@ -73,10 +73,10 @@ impl AccountDataCache {
 /// for a data store related to a transaction. Clients should create an instance of this type
 /// and pass it to the Move VM.
 pub struct TransactionDataCache<'r, 'l, R> {
-   pub remote: &'r R,
-   pub loader: &'l Loader,
-   pub account_map: BTreeMap<AccountAddress, AccountDataCache>,
-   pub event_data: Vec<(Vec<u8>, u64, Type, MoveTypeLayout, Value)>,
+    pub remote: &'r R,
+    pub loader: &'l Loader,
+    pub account_map: BTreeMap<AccountAddress, AccountDataCache>,
+    pub event_data: Vec<(Vec<u8>, u64, Type, MoveTypeLayout, Value, Option<ModuleId>)>,
 }
 
 /// Collection of side effects produced by a Session.
@@ -88,7 +88,7 @@ pub struct TransactionEffects {
         Vec<(StructTag, Option<(MoveTypeLayout, Value)>)>,
     )>,
     pub modules: Vec<(ModuleId, Vec<u8>)>,
-    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value)>,
+    pub events: Vec<(Vec<u8>, u64, TypeTag, MoveTypeLayout, Value, Option<ModuleId>)>,
 }
 
 impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
@@ -145,9 +145,9 @@ impl<'r, 'l, R: RemoteCache> TransactionDataCache<'r, 'l, R> {
         }
 
         let mut events = vec![];
-        for (guid, seq_num, ty, ty_layout, val) in self.event_data {
+        for (guid, seq_num, ty, ty_layout, val, caller) in self.event_data {
             let ty_tag = self.loader.type_to_type_tag(&ty)?;
-            events.push((guid, seq_num, ty_tag, ty_layout, val))
+            events.push((guid, seq_num, ty_tag, ty_layout, val, caller))
         }
 
         Ok(TransactionEffects {
@@ -293,8 +293,9 @@ impl<'r, 'l, C: RemoteCache> DataStore for TransactionDataCache<'r, 'l, C> {
         seq_num: u64,
         ty: Type,
         val: Value,
+        caller: Option<ModuleId>
     ) -> PartialVMResult<()> {
         let ty_layout = self.loader.type_to_type_layout(&ty)?;
-        Ok(self.event_data.push((guid, seq_num, ty, ty_layout, val)))
+        Ok(self.event_data.push((guid, seq_num, ty, ty_layout, val, caller)))
     }
 }
