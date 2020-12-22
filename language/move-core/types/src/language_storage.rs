@@ -15,9 +15,21 @@ use std::fmt::{Display, Formatter};
 pub const CODE_TAG: u8 = 0;
 pub const RESOURCE_TAG: u8 = 1;
 
+#[cfg(feature = "dfinance_address")]
 pub const CORE_CODE_ADDRESS: AccountAddress = AccountAddress::new([
     0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
     1u8,
+]);
+
+#[cfg(feature = "libra_address")]
+pub const CORE_CODE_ADDRESS: AccountAddress = AccountAddress::new([
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+]);
+
+#[cfg(feature = "ps_address")]
+pub const CORE_CODE_ADDRESS: AccountAddress = AccountAddress::new([
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
 ]);
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Hash, Eq, Clone, PartialOrd, Ord)]

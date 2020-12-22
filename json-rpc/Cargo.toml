@@ -67,3 +67,12 @@ libra-node = { path = "../libra-node", version = "0.1.0" }
 [features]
 fuzzing = ["proptest", "libra-mempool/fuzzing", "libra-proptest-helpers", "libra-temppath", "libradb/fuzzing", "reqwest"]
 failpoints = ["fail/failpoints"]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

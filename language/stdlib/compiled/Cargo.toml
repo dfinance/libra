@@ -25,3 +25,21 @@ sha2 = "0.9.1"
 [features]
 default = []
 fuzzing = ["libra-types/fuzzing"]
+libra_address = [
+    "bytecode-verifier/libra_address",
+    "libra-types/libra_address",
+    "vm/libra_address",
+    "stdlib/libra_address",
+]
+dfinance_address = [
+    "bytecode-verifier/dfinance_address",
+    "libra-types/dfinance_address",
+    "vm/dfinance_address",
+    "stdlib/dfinance_address",
+]
+ps_address = [
+    "bytecode-verifier/ps_address",
+    "libra-types/ps_address",
+    "vm/ps_address",
+    "stdlib/ps_address",
+]

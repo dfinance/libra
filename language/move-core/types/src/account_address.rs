@@ -26,15 +26,32 @@ impl AccountAddress {
     }
 
     /// The number of bytes in an address.
+    #[cfg(feature = "dfinance_address")]
     pub const LENGTH: usize = 20;
+
+    /// The number of bytes in an address.
+    #[cfg(feature = "libra_address")]
+    pub const LENGTH: usize = 16;
+
+    /// The number of bytes in an address.
+    #[cfg(feature = "ps_address")]
+    pub const LENGTH: usize = 34;
 
     /// Hex address: 0x0
     pub const ZERO: Self = Self([0u8; Self::LENGTH]);
 
     pub fn random() -> Self {
         let mut rng = OsRng;
-        let buf: [u8; Self::LENGTH] = rng.gen();
-        Self(buf)
+
+        #[cfg(any(feature = "dfinance_address", feature = "libra_address"))] {
+            let buf: [u8; Self::LENGTH] = rng.gen();
+            Self(buf)
+        }
+        #[cfg(feature = "ps_address")] {
+            let mut buf = [0u8; Self::LENGTH];
+            buf[0..32].copy_from_slice(&rng.gen::<[u8; 32]>());
+            Self(buf)
+        }
     }
 
     // Helpful in log messages
@@ -85,11 +102,16 @@ impl AccountAddress {
     // public key to generate a peer_id for the peer.
     // See this issue for potential improvements: https://github.com/libra/libra/issues/3960
     pub fn from_identity_public_key(identity_public_key: x25519::PublicKey) -> Self {
-        let mut array = [0u8; Self::LENGTH];
-        let pubkey_slice = identity_public_key.as_slice();
-        // keep only the last 16 bytes
-        array.copy_from_slice(&pubkey_slice[x25519::PUBLIC_KEY_SIZE - Self::LENGTH..]);
-        Self(array)
+        #[cfg(feature = "libra_address")] {
+            let mut array = [0u8; Self::LENGTH];
+            let pubkey_slice = identity_public_key.as_slice();
+            // keep only the last 16 bytes
+            array.copy_from_slice(&pubkey_slice[x25519::PUBLIC_KEY_SIZE - Self::LENGTH..]);
+            Self(array)
+        }
+        #[cfg(not(feature = "libra_address"))] {
+            panic!("Unsupported address format");
+        }
     }
 }
 
@@ -217,10 +239,11 @@ impl FromStr for AccountAddress {
     }
 }
 
+#[cfg(any(feature = "dfinance_address", feature = "libra_address"))]
 impl<'de> Deserialize<'de> for AccountAddress {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
             let s = <String>::deserialize(deserializer)?;
@@ -239,16 +262,45 @@ impl<'de> Deserialize<'de> for AccountAddress {
     }
 }
 
+#[cfg(feature = "ps_address")]
+impl<'de> Deserialize<'de> for AccountAddress {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        if deserializer.is_human_readable() {
+            let s = <String>::deserialize(deserializer)?;
+            AccountAddress::try_from(s).map_err(D::Error::custom)
+        } else {
+            // In order to preserve the Serde data model and help analysis tools,
+            // make sure to wrap our value in a container with the same name
+            // as the original type.
+            #[derive(::serde::Deserialize)]
+            #[serde(rename = "AccountAddress")]
+            struct Value(Vec<u8>);
+
+            let value = Value::deserialize(deserializer)?;
+            AccountAddress::try_from(value.0).map_err(D::Error::custom)
+        }
+    }
+}
+
+
 impl Serialize for AccountAddress {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         if serializer.is_human_readable() {
             self.to_string().serialize(serializer)
         } else {
             // See comment in deserialize.
-            serializer.serialize_newtype_struct("AccountAddress", &self.0)
+            #[cfg(any(feature = "dfinance_address", feature = "libra_address"))] {
+                serializer.serialize_newtype_struct("AccountAddress", &self.0)
+            }
+            #[cfg(feature = "ps_address")] {
+                serializer.serialize_newtype_struct("AccountAddress", &self.0[..])
+            }
         }
     }
 }

@@ -36,3 +36,13 @@ lcs = { path = "../../../common/lcs", version = "0.1.0", package = "libra-canoni
 [[test]]
 name = "cli_testsuite"
 harness = false
+[features]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

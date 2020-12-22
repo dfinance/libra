@@ -29,6 +29,18 @@ which = "4.0.2"
 
 [features]
 default = []
+libra_address = [
+    "move-core-types/libra_address",
+    "libra-types/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "libra-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "libra-types/ps_address",
+]
 
 [[bin]]
 name = "generate-transaction-builders"

@@ -1240,7 +1240,9 @@ version = "0.1.0"
 dependencies = [
  "bytecode-source-map",
  "bytecode-verifier",
+ "compiled-stdlib",
  "compiler",
+ "errmapgen",
  "ir-to-bytecode-syntax",
  "libra-canonical-serialization",
  "libra-logger",
@@ -1255,7 +1257,9 @@ dependencies = [
  "move-vm-natives",
  "move-vm-runtime",
  "move-vm-types",
+ "resource-viewer",
  "vm",
+ "vm-genesis",
 ]
 
 [[package]]

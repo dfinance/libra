@@ -32,3 +32,12 @@ libra-writeset-generator = { path = "../libra-tools/writeset-transaction-generat
 
 [features]
 default = ["transaction-builder-generated/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

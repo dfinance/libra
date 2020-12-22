@@ -24,3 +24,21 @@ codespan-reporting = "0.8.0"
 move-prover = { path = "..", version = "0.1.0" }
 datatest-stable = { path = "../../../common/datatest-stable", version = "0.1.0" }
 test-utils = { path = "../test-utils", version = "0.1.0" }
+
+[features]
+libra_address = [
+    "move-core-types/libra_address",
+    "spec-lang/libra_address",
+    "libra-types/libra_address",
+
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "spec-lang/dfinance_address",
+    "libra-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "spec-lang/ps_address",
+    "libra-types/ps_address",
+]

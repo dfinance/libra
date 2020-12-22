@@ -39,3 +39,15 @@ rand = "0.7.3"
 [features]
 fuzzing = ["libra-crypto/fuzzing"]
 testing = []
+libra_address = [
+    "libra-types/libra_address",
+    "libra-vault-client/libra_address"
+]
+dfinance_address = [
+    "libra-types/dfinance_address",
+    "libra-vault-client/dfinance_address"
+]
+ps_address = [
+    "libra-types/ps_address",
+    "libra-vault-client/ps_address"
+]

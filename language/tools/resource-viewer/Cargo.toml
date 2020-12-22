@@ -26,3 +26,39 @@ serde = { version = "1.0.116", features = ["derive", "rc"] }
 anyhow = "1.0.33"
 once_cell = "1.4.1"
 hex = "0.4.2"
+
+[features]
+libra_address = [
+    "move-core-types/libra_address",
+    "libra-state-view/libra_address",
+    "libra-types/libra_address",
+    "move-core-types/libra_address",
+    "move-vm-runtime/libra_address",
+    "move-vm-types/libra_address",
+    "compiled-stdlib/libra_address",
+    "vm/libra_address",
+    "vm-genesis/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "libra-state-view/dfinance_address",
+    "libra-types/dfinance_address",
+    "move-core-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "vm/dfinance_address",
+    "vm-genesis/dfinance_address"
+]
+
+ps_address = [
+    "move-core-types/libra_address",
+    "libra-state-view/libra_address",
+    "libra-types/libra_address",
+    "move-core-types/libra_address",
+    "move-vm-runtime/libra_address",
+    "move-vm-types/libra_address",
+    "compiled-stdlib/libra_address",
+    "vm/libra_address",
+    "vm-genesis/libra_address"
+]

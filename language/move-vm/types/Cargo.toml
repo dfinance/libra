@@ -30,3 +30,18 @@ proptest = "0.10.1"
 [features]
 default = []
 fuzzing = ["proptest", "vm/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address",
+    "vm/libra_address",
+    "libra-state-view/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "vm/dfinance_address",
+    "libra-state-view/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "vm/ps_address",
+    "libra-state-view/ps_address",
+]

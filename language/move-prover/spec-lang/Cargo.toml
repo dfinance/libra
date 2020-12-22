@@ -35,3 +35,32 @@ test-utils = { path = "../test-utils", version = "0.1.0" }
 [[test]]
 name = "testsuite"
 harness = false
+
+[features]
+libra_address = [
+    "move-core-types/libra_address",
+    "move-lang/libra_address",
+    "bytecode-verifier/libra_address",
+    "vm/libra_address",
+    "libra-types/libra_address",
+    "bytecode-source-map/libra_address",
+    "move-ir-types/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "move-lang/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "vm/dfinance_address",
+    "libra-types/dfinance_address",
+    "bytecode-source-map/dfinance_address",
+    "move-ir-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "move-lang/ps_address",
+    "bytecode-verifier/ps_address",
+    "vm/ps_address",
+    "libra-types/ps_address",
+    "bytecode-source-map/ps_address",
+    "move-ir-types/ps_address",
+]

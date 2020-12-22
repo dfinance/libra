@@ -55,3 +55,12 @@ vm-genesis = { path = "../../language/tools/vm-genesis", version = "0.1.0" }
 default = []
 fuzzing = ["consensus-types/fuzzing", "libra-crypto/fuzzing", "libra-types/fuzzing", "proptest", "storage-interface/fuzzing"]
 failpoints = ["fail/failpoints", "libra-vm/failpoints"]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]
