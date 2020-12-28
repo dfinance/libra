@@ -55,3 +55,12 @@ vm-genesis = { path = "../../language/tools/vm-genesis", version = "0.1.0" }
 default = []
 fuzzing = ["consensus-types/fuzzing", "diem-crypto/fuzzing", "diem-types/fuzzing", "proptest", "storage-interface/fuzzing"]
 failpoints = ["fail/failpoints", "diem-vm/failpoints"]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

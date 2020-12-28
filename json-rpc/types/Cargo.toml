@@ -26,3 +26,14 @@ move-explain = { path = "../../language/tools/move-explain", version = "0.1.0" }
 
 [build-dependencies]
 prost-build = "0.6.1"
+
+[features]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

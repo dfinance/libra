@@ -35,3 +35,12 @@ diem-types = { path = "../../../types", version = "0.1.0" }
 
 [features]
 mirai-contracts = []
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

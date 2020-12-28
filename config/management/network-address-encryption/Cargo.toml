@@ -25,3 +25,20 @@ move-core-types = { path = "../../../language/move-core/types", version = "0.1.0
 
 [dev-dependencies]
 rand = "0.7.3"
+
+[features]
+diem_address = [
+    "move-core-types/diem_address",
+    "diem-network-address/diem_address",
+    "diem-secure-storage/diem_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "diem-network-address/dfinance_address",
+    "diem-secure-storage/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "diem-network-address/ps_address",
+    "diem-secure-storage/ps_address",
+]

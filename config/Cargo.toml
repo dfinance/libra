@@ -38,3 +38,23 @@ diem-crypto = { path = "../crypto/crypto", version = "0.1.0", features = ["fuzzi
 default = []
 fuzzing = ["diem-crypto/fuzzing", "diem-types/fuzzing"]
 testing = []
+diem_address = [
+    "diem-types/diem_address",
+    "diem-network-address/diem_address",
+    "diem-network-address-encryption/diem_address",
+    "diem-secure-storage/diem_address",
+
+]
+dfinance_address = [
+    "diem-types/dfinance_address",
+    "diem-network-address/dfinance_address",
+    "diem-network-address-encryption/dfinance_address",
+    "diem-secure-storage/dfinance_address",
+
+]
+ps_address = [
+    "diem-types/ps_address",
+    "diem-network-address/ps_address",
+    "diem-network-address-encryption/ps_address",
+    "diem-secure-storage/ps_address",
+]

@@ -51,3 +51,26 @@ shell-words = "1.0.0"
 [[test]]
 name = "testsuite"
 harness = false
+
+[features]
+diem_address = [
+    "diem-types/diem_address",
+    "vm/diem_address",
+    "move-lang/diem_address",
+    "bytecode-source-map/diem_address",
+    "move-ir-types/diem_address",
+]
+dfinance_address = [
+    "diem-types/dfinance_address",
+    "vm/dfinance_address",
+    "move-lang/dfinance_address",
+    "bytecode-source-map/dfinance_address",
+    "move-ir-types/dfinance_address",
+]
+ps_address = [
+    "diem-types/ps_address",
+    "vm/ps_address",
+    "move-lang/ps_address",
+    "bytecode-source-map/ps_address",
+    "move-ir-types/ps_address"
+]

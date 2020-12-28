@@ -25,3 +25,36 @@ serde = { version = "1.0.117", features = ["derive", "rc"] }
 anyhow = "1.0.34"
 once_cell = "1.4.1"
 hex = "0.4.2"
+
+[features]
+diem_address = [
+    "move-core-types/diem_address",
+    "diem-state-view/diem_address",
+    "diem-types/diem_address",
+    "move-core-types/diem_address",
+    "move-vm-runtime/diem_address",
+    "move-vm-types/diem_address",
+    "compiled-stdlib/diem_address",
+    "vm/diem_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "diem-state-view/dfinance_address",
+    "diem-types/dfinance_address",
+    "move-core-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "vm/dfinance_address",
+]
+
+ps_address = [
+    "move-core-types/diem_address",
+    "diem-state-view/diem_address",
+    "diem-types/diem_address",
+    "move-core-types/diem_address",
+    "move-vm-runtime/diem_address",
+    "move-vm-types/diem_address",
+    "compiled-stdlib/diem_address",
+    "vm/diem_address",
+]

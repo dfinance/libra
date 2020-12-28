@@ -23,3 +23,21 @@ serde = { version = "1.0.117", features = ["derive"] }
 codespan-reporting = "0.8.0"
 move-prover = { path = "..", version = "0.1.0" }
 datatest-stable = { path = "../../../common/datatest-stable", version = "0.1.0" }
+
+[features]
+diem_address = [
+    "move-core-types/diem_address",
+    "spec-lang/diem_address",
+    "diem-types/diem_address",
+
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "spec-lang/dfinance_address",
+    "diem-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "spec-lang/ps_address",
+    "diem-types/ps_address",
+]

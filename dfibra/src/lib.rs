@@ -1,32 +1,32 @@
 pub extern crate bytecode_verifier;
 pub extern crate bytecode_source_map;
 pub extern crate ir_to_bytecode_syntax;
-pub extern crate libra_types;
-pub extern crate libra_workspace_hack;
+pub extern crate diem_types;
+pub extern crate diem_workspace_hack;
 pub extern crate move_core_types;
 pub extern crate move_ir_types;
-pub extern crate vm as move_vm;
+pub extern crate vm;
 pub extern crate move_coverage;
-
-pub extern crate lcs;
+pub extern crate vm_genesis;
+pub extern crate bcs;
 pub extern crate move_lang;
 pub extern crate move_vm_types;
 pub extern crate move_vm_runtime;
 pub extern crate move_vm_natives;
-
-pub extern crate libra_vm;
-pub extern crate libra_state_view;
-pub extern crate libra_logger;
-
-pub extern crate compiler as move_compiler;
-pub use move_compiler as libra_compiler;
+pub extern crate diem_vm;
+pub extern crate diem_state_view;
+pub extern crate diem_logger;
+pub extern crate compiler;
+pub extern crate compiled_stdlib;
+pub extern crate errmapgen;
+pub extern crate resource_viewer as rv;
 
 pub mod prelude {
     pub use super::account::*;
     pub use super::result::*;
     pub use super::ds::*;
     pub use super::module::*;
-    pub use super::lcs;
+    pub use super::bcs;
 }
 
 pub mod bf {
@@ -35,7 +35,7 @@ pub mod bf {
 
 pub mod module {
     pub use move_core_types::language_storage::ModuleId;
-    pub use libra_types::transaction::Module;
+    pub use diem_types::transaction::Module;
     pub use vm::access::{ModuleAccess, ScriptAccess};
     pub use vm::file_format::{
         Bytecode, CompiledScript, CompiledModule, ModuleHandle, SignatureToken,
@@ -46,8 +46,8 @@ pub mod module {
 }
 
 pub mod account {
-    pub use libra_types::account_address::AccountAddress;
-    pub use libra_types::account_config::CORE_CODE_ADDRESS;
+    pub use diem_types::account_address::AccountAddress;
+    pub use diem_types::account_config::CORE_CODE_ADDRESS;
     pub use move_core_types::identifier::Identifier;
 }
 
@@ -59,25 +59,16 @@ pub mod result {
 }
 
 pub mod ds {
-    pub use libra_types::access_path::AccessPath;
+    pub use diem_types::access_path::AccessPath;
     pub use move_vm_runtime::data_cache::RemoteCache;
-    pub use libra_types::write_set::{WriteOp, WriteSet, WriteSetMut};
+    pub use diem_types::write_set::{WriteOp, WriteSet, WriteSetMut};
     pub use move_vm_runtime::loader::ModuleCache;
     pub use move_vm_runtime::data_cache::TransactionDataCache;
     pub use move_vm_runtime::loader::ScriptCache;
     pub use move_vm_runtime::loader::TypeCache;
     pub use move_vm_types::data_store::DataStore;
-    pub use libra_vm::data_cache::RemoteStorage;
+    pub use diem_vm::data_cache::RemoteStorage;
     pub use move_core_types::language_storage::{TypeTag, ResourceKey};
-}
-
-pub mod compiler {
-    pub use move_lang::{compiled_unit, errors, parse_program, compile_program};
-    pub use move_lang::parser::ast::*;
-    pub use move_lang::shared::Address;
-    pub use move_lang::errors::{FilesSourceText, Errors, output_errors};
-    pub use move_lang::name_pool::ConstPool;
-    pub use move_lang::move_check;
 }
 
 pub mod file_format {
@@ -86,22 +77,11 @@ pub mod file_format {
     pub use vm::access::ModuleAccess;
 }
 
-pub mod vm {
-    pub use libra_types::contract_event::ContractEvent;
-    pub use libra_types::transaction::TransactionStatus;
-    pub use libra_vm::libra_vm::txn_effects_to_writeset_and_events_cached;
-    pub use move_vm_runtime::move_vm::MoveVM;
-    pub use move_core_types::language_storage::StructTag;
-    pub use move_vm_types::values::Value;
-    pub use move_vm_runtime::loader::Loader;
-    pub use move_vm_runtime::{data_cache::TransactionEffects, session::Session};
-}
-
 pub mod gas {
     pub use move_core_types::gas_schedule::*;
     pub use move_vm_types::gas_schedule::*;
 }
 
 pub mod logger {
-    pub use libra_logger::*;
+    pub use diem_logger::*;
 }

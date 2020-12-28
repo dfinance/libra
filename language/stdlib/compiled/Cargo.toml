@@ -25,3 +25,21 @@ sha2 = "0.9.2"
 [features]
 default = []
 fuzzing = ["diem-types/fuzzing"]
+diem_address = [
+    "bytecode-verifier/diem_address",
+    "diem-types/diem_address",
+    "vm/diem_address",
+    "stdlib/diem_address",
+]
+dfinance_address = [
+    "bytecode-verifier/dfinance_address",
+    "diem-types/dfinance_address",
+    "vm/dfinance_address",
+    "stdlib/dfinance_address",
+]
+ps_address = [
+    "bytecode-verifier/ps_address",
+    "diem-types/ps_address",
+    "vm/ps_address",
+    "stdlib/ps_address",
+]

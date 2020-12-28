@@ -9,6 +9,7 @@ publish = false
 edition = "2018"
 
 [dependencies]
+bcs = "0.1.1"
 bytecode-verifier = { path = "../language/bytecode-verifier", version = "0.1.0" }
 bytecode-source-map = { path = "../language/compiler/bytecode-source-map", version = "0.1.0" }
 ir-to-bytecode-syntax = { path = "../language/compiler/ir-to-bytecode/syntax", version = "0.1.0" }
@@ -26,4 +27,66 @@ move-vm-natives = { path = "../language/move-vm/natives", version = "0.1.0" }
 diem-vm = { path = "../language/diem-vm", version = "0.1.0" }
 diem-state-view = { path = "../storage/state-view", version = "0.1.0" }
 diem-logger = { path = "../common/logger", version = "0.1.0" }
+vm-genesis = { path = "../language/tools/vm-genesis", version = "0.1.0", optional = true }
+compiled-stdlib = { path = "../language/stdlib/compiled",  version = "0.1.0" }
+errmapgen = { path = "../language/move-prover/errmapgen", version = "0.1.0" }
+resource-viewer = { path = "../language/tools/resource-viewer", version = "0.1.0" }
 
+[features]
+diem_address = [
+    "move-core-types/diem_address",
+    "bytecode-verifier/diem_address",
+    "ir-to-bytecode-syntax/diem_address",
+    "diem-types/diem_address",
+    "move-ir-types/diem_address",
+    "move-coverage/diem_address",
+    "vm/diem_address",
+    "compiler/diem_address",
+    "move-lang/diem_address",
+    "move-vm-types/diem_address",
+    "move-vm-runtime/diem_address",
+    "move-vm-natives/diem_address",
+    "diem-vm/diem_address",
+    "diem-state-view/diem_address",
+    "vm-genesis/diem_address",
+    "compiled-stdlib/diem_address",
+    "errmapgen/diem_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "ir-to-bytecode-syntax/dfinance_address",
+    "diem-types/dfinance_address",
+    "move-ir-types/dfinance_address",
+    "move-coverage/dfinance_address",
+    "vm/dfinance_address",
+    "compiler/dfinance_address",
+    "move-lang/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "move-vm-natives/dfinance_address",
+    "diem-vm/dfinance_address",
+    "diem-state-view/dfinance_address",
+    "vm-genesis/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "errmapgen/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "bytecode-verifier/ps_address",
+    "ir-to-bytecode-syntax/ps_address",
+    "diem-types/ps_address",
+    "move-ir-types/ps_address",
+    "move-coverage/ps_address",
+    "vm/ps_address",
+    "compiler/ps_address",
+    "move-lang/ps_address",
+    "move-vm-types/ps_address",
+    "move-vm-runtime/ps_address",
+    "move-vm-natives/ps_address",
+    "diem-vm/ps_address",
+    "diem-state-view/ps_address",
+    "vm-genesis/ps_address",
+    "compiled-stdlib/ps_address",
+    "errmapgen/ps_address",
+]

@@ -33,3 +33,12 @@ diem-types = { path = "../../../types", version = "0.1.0", features = ["fuzzing"
 
 [features]
 fuzzing = ["proptest", "diem-proptest-helpers", "diem-types"]
+diem_address = [
+   "diem-types/diem_address"
+]
+dfinance_address = [
+    "diem-types/dfinance_address",
+]
+ps_address = [
+    "diem-types/ps_address",
+]

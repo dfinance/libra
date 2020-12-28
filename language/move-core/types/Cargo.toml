@@ -42,3 +42,7 @@ default = ["fiat"]
 fiat = ["diem-crypto/fiat"]
 vanilla = ["diem-crypto/vanilla-u64"]
 fuzzing = ["proptest", "proptest-derive"]
+
+diem_address = []
+dfinance_address = []
+ps_address = []

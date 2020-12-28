@@ -30,3 +30,13 @@ diem-temppath = { path = "../../../common/temppath", version = "0.1.0" }
 [[test]]
 name = "testsuite"
 harness = false
+[features]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

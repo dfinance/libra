@@ -36,3 +36,12 @@ rand = "0.7.3"
 [features]
 fuzzing = ["diem-crypto/fuzzing"]
 testing = []
+diem_address = [
+    "diem-vault-client/diem_address"
+]
+dfinance_address = [
+    "diem-vault-client/dfinance_address"
+]
+ps_address = [
+    "diem-vault-client/ps_address"
+]

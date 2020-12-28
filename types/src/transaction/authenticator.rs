@@ -177,10 +177,15 @@ impl AuthenticationKey {
     /// Return an address derived from the last `AccountAddress::LENGTH` bytes of this
     /// authentication key.
     pub fn derived_address(&self) -> AccountAddress {
-        // keep only last 16 bytes
-        let mut array = [0u8; AccountAddress::LENGTH];
-        array.copy_from_slice(&self.0[Self::LENGTH - AccountAddress::LENGTH..]);
-        AccountAddress::new(array)
+        #[cfg(feature = "diem_address")] {
+            // keep only last 16 bytes
+            let mut array = [0u8; AccountAddress::LENGTH];
+            array.copy_from_slice(&self.0[Self::LENGTH - AccountAddress::LENGTH..]);
+            AccountAddress::new(array)
+        }
+        #[cfg(not(feature = "diem_address"))] {
+            panic!("Unsupported address format");
+        }
     }
 
     /// Return the first AccountAddress::LENGTH bytes of this authentication key

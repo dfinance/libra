@@ -26,3 +26,12 @@ thiserror = "1.0.22"
 [features]
 default = []
 fuzzing = ["diem-types/fuzzing"]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

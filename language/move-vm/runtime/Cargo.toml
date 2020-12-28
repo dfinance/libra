@@ -40,3 +40,24 @@ default = []
 debug_module = ["move-vm-natives/debug_module"]
 fuzzing = ["move-vm-types/fuzzing"]
 failpoints = ["fail/failpoints"]
+diem_address = [
+    "move-core-types/diem_address",
+    "bytecode-verifier/diem_address",
+    "move-vm-natives/diem_address",
+    "move-vm-types/diem_address",
+    "vm/diem_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "move-vm-natives/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "vm/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "bytecode-verifier/ps_address",
+    "move-vm-natives/ps_address",
+    "move-vm-types/ps_address",
+    "vm/ps_address",
+]

@@ -23,3 +23,12 @@ vm = { path = "../../vm", version = "0.1.0", features = ["fuzzing"] }
 
 [features]
 fuzzing = ["diem-types/fuzzing", "vm/fuzzing"]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

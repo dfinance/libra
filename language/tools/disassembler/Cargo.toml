@@ -23,3 +23,12 @@ structopt = "0.3.21"
 
 [features]
 default = []
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

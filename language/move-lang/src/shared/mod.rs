@@ -18,15 +18,45 @@ pub mod unique_map;
 // Address
 //**************************************************************************************************
 
+/// The number of bytes in an address.
+#[cfg(feature = "dfinance_address")]
 pub const ADDRESS_LENGTH: usize = 20;
 
-#[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Default, Clone, Copy)]
+/// The number of bytes in an address.
+#[cfg(feature = "diem_address")]
+pub const ADDRESS_LENGTH: usize = 16;
+
+/// The number of bytes in an address.
+#[cfg(feature = "ps_address")]
+pub const ADDRESS_LENGTH: usize = 32;
+
+#[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy)]
+#[cfg_attr(any(feature = "dfinance_address", feature = "diem_address"), derive(Default))]
 pub struct Address([u8; ADDRESS_LENGTH]);
 
+#[cfg(feature = "ps_address")]
+impl Default for Address {
+    fn default() -> Self {
+        Address([0u8; ADDRESS_LENGTH])
+    }
+}
+
 impl Address {
+    #[cfg(feature = "dfinance_address")]
     pub const DIEM_CORE: Address = Address::new([
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 1u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        1u8,
+    ]);
+
+    #[cfg(feature = "diem_address")]
+    pub const DIEM_CORE: Address = Address::new([
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+    ]);
+
+    #[cfg(feature = "ps_address")]
+    pub const DIEM_CORE: Address = Address::new([
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
     ]);
 
     pub const fn new(address: [u8; ADDRESS_LENGTH]) -> Self {

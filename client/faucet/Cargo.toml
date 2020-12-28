@@ -35,3 +35,14 @@ serde_json = "1.0.60"
 tempfile = "3.1.0"
 
 diem-config = { path = "../../config", version = "0.1.0" }
+
+[features]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

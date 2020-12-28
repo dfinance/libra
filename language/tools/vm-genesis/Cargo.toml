@@ -38,3 +38,47 @@ diem-proptest-helpers = { path = "../../../common/proptest-helpers", version = "
 [features]
 default = []
 fuzzing = ["diem-types/fuzzing", "move-vm-types/fuzzing"]
+diem_address = [
+    "move-core-types/diem_address",
+    "bytecode-verifier/diem_address",
+    "diem-types/diem_address",
+    "vm/diem_address",
+    "move-vm-types/diem_address",
+    "move-vm-runtime/diem_address",
+    "diem-vm/diem_address",
+    "diem-state-view/diem_address",
+    "diem-config/diem_address",
+    "diem-network-address/diem_address",
+    "compiled-stdlib/diem_address",
+    "transaction-builder/diem_address",
+]
+
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "diem-types/dfinance_address",
+    "vm/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "diem-vm/dfinance_address",
+    "diem-state-view/dfinance_address",
+    "diem-config/dfinance_address",
+    "diem-network-address/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "transaction-builder/dfinance_address",
+]
+
+ps_address = [
+    "move-core-types/ps_address",
+    "bytecode-verifier/ps_address",
+    "diem-types/ps_address",
+    "vm/ps_address",
+    "move-vm-types/ps_address",
+    "move-vm-runtime/ps_address",
+    "diem-vm/ps_address",
+    "diem-state-view/ps_address",
+    "diem-config/ps_address",
+    "diem-network-address/ps_address",
+    'compiled-stdlib/ps_address',
+    "transaction-builder/ps_address",
+]

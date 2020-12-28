@@ -46,3 +46,13 @@ path = "src/main.rs"
 [[test]]
 name = "cli_testsuite"
 harness = false
+[features]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

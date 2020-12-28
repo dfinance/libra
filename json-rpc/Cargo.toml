@@ -67,3 +67,12 @@ diem-node = { path = "../diem-node", version = "0.1.0" }
 [features]
 fuzzing = ["proptest", "diem-mempool/fuzzing", "diemdb/fuzzing", "diem-proptest-helpers", "diem-temppath", "reqwest"]
 failpoints = ["fail/failpoints"]
+diem_address = [
+    "move-core-types/diem_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]
