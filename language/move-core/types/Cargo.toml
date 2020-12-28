@@ -42,3 +42,7 @@ default = ["fiat"]
 fiat = ["libra-crypto/fiat"]
 vanilla = ["libra-crypto/vanilla-u64"]
 fuzzing = ["proptest", "proptest-derive"]
+
+libra_address = []
+dfinance_address = []
+ps_address = []

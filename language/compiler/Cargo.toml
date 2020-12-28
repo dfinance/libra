@@ -26,3 +26,31 @@ serde_json = "1.0.58"
 [features]
 default = []
 fuzzing = ["libra-types/fuzzing"]
+libra_address = [
+    "bytecode-verifier/libra_address",
+    "libra-types/libra_address",
+    "move-ir-types/libra_address",
+    "vm/libra_address",
+    "ir-to-bytecode/libra_address",
+    "bytecode-source-map/libra_address",
+    "compiled-stdlib/libra_address",
+
+]
+dfinance_address = [
+    "bytecode-verifier/dfinance_address",
+    "libra-types/dfinance_address",
+    "move-ir-types/dfinance_address",
+    "vm/dfinance_address",
+    "ir-to-bytecode/dfinance_address",
+    "bytecode-source-map/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+]
+ps_address = [
+    "bytecode-verifier/ps_address",
+    "libra-types/ps_address",
+    "move-ir-types/ps_address",
+    "vm/ps_address",
+    "ir-to-bytecode/ps_address",
+    "bytecode-source-map/ps_address",
+    "compiled-stdlib/ps_address",
+]

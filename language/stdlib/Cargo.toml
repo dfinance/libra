@@ -30,3 +30,27 @@ sha2 = "0.9.1"
 [features]
 default = []
 fuzzing = ["libra-types/fuzzing"]
+libra_address = [
+    "bytecode-verifier/libra_address",
+    "libra-types/libra_address",
+    "vm/libra_address",
+    "move-lang/libra_address",
+    "move-prover/libra_address",
+    "transaction-builder-generator/libra_address",
+]
+dfinance_address = [
+    "bytecode-verifier/dfinance_address",
+    "libra-types/dfinance_address",
+    "vm/dfinance_address",
+    "move-lang/dfinance_address",
+    "move-prover/dfinance_address",
+    "transaction-builder-generator/dfinance_address",
+]
+ps_address = [
+    "bytecode-verifier/ps_address",
+    "libra-types/ps_address",
+    "vm/ps_address",
+    "move-lang/ps_address",
+    "move-prover/ps_address",
+    "transaction-builder-generator/ps_address",
+]

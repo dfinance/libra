@@ -35,3 +35,13 @@ serde_json = "1.0.58"
 tempfile = "3.1.0"
 
 libra-config = { path = "../../config", version = "0.1.0" }
+[features]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

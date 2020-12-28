@@ -21,3 +21,21 @@ serde = { version = "1.0.116", default-features = false }
 [features]
 default = []
 fuzzing = ["libra-types/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address",
+    "libra-types/libra_address",
+    "move-ir-types/libra_address",
+    "vm/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "libra-types/dfinance_address",
+    "move-ir-types/dfinance_address",
+    "vm/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "libra-types/ps_address",
+    "move-ir-types/ps_address",
+    "vm/ps_address",
+]

@@ -5,21 +5,21 @@ pub extern crate libra_types;
 pub extern crate libra_workspace_hack;
 pub extern crate move_core_types;
 pub extern crate move_ir_types;
-pub extern crate vm as move_vm;
+pub extern crate vm;
 pub extern crate move_coverage;
-
+pub extern crate vm_genesis;
 pub extern crate lcs;
 pub extern crate move_lang;
 pub extern crate move_vm_types;
 pub extern crate move_vm_runtime;
 pub extern crate move_vm_natives;
-
 pub extern crate libra_vm;
 pub extern crate libra_state_view;
 pub extern crate libra_logger;
-
-pub extern crate compiler as move_compiler;
-pub use move_compiler as libra_compiler;
+pub extern crate compiler;
+pub extern crate compiled_stdlib;
+pub extern crate errmapgen;
+pub extern crate resource_viewer as rv;
 
 pub mod prelude {
     pub use super::account::*;
@@ -71,30 +71,10 @@ pub mod ds {
     pub use move_core_types::language_storage::{TypeTag, ResourceKey};
 }
 
-pub mod compiler {
-    pub use move_lang::{compiled_unit, errors, parse_program, compile_program};
-    pub use move_lang::parser::ast::*;
-    pub use move_lang::shared::Address;
-    pub use move_lang::errors::{FilesSourceText, Errors, output_errors};
-    pub use move_lang::name_pool::ConstPool;
-    pub use move_lang::move_check;
-}
-
 pub mod file_format {
     pub use vm::file_format::*;
     pub use vm::file_format_common::*;
     pub use vm::access::ModuleAccess;
-}
-
-pub mod vm {
-    pub use libra_types::contract_event::ContractEvent;
-    pub use libra_types::transaction::TransactionStatus;
-    pub use libra_vm::libra_vm::txn_effects_to_writeset_and_events_cached;
-    pub use move_vm_runtime::move_vm::MoveVM;
-    pub use move_core_types::language_storage::StructTag;
-    pub use move_vm_types::values::Value;
-    pub use move_vm_runtime::loader::Loader;
-    pub use move_vm_runtime::{data_cache::TransactionEffects, session::Session};
 }
 
 pub mod gas {

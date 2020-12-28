@@ -27,4 +27,66 @@ move-vm-natives = { path = "../language/move-vm/natives", version = "0.1.0" }
 libra-vm = { path = "../language/libra-vm", version = "0.1.0" }
 libra-state-view = { path = "../storage/state-view", version = "0.1.0" }
 libra-logger = { path = "../common/logger", version = "0.1.0" }
+vm-genesis = { path = "../language/tools/vm-genesis", version = "0.1.0", optional = true }
+compiled-stdlib = { path = "../language/stdlib/compiled",  version = "0.1.0" }
+errmapgen = { path = "../language/move-prover/errmapgen", version = "0.1.0" }
+resource-viewer = { path = "../language/tools/resource-viewer", version = "0.1.0" }
 
+[features]
+libra_address = [
+    "move-core-types/libra_address",
+    "bytecode-verifier/libra_address",
+    "ir-to-bytecode-syntax/libra_address",
+    "libra-types/libra_address",
+    "move-ir-types/libra_address",
+    "move-coverage/libra_address",
+    "vm/libra_address",
+    "compiler/libra_address",
+    "move-lang/libra_address",
+    "move-vm-types/libra_address",
+    "move-vm-runtime/libra_address",
+    "move-vm-natives/libra_address",
+    "libra-vm/libra_address",
+    "libra-state-view/libra_address",
+    "vm-genesis/libra_address",
+    "compiled-stdlib/libra_address",
+    "errmapgen/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "ir-to-bytecode-syntax/dfinance_address",
+    "libra-types/dfinance_address",
+    "move-ir-types/dfinance_address",
+    "move-coverage/dfinance_address",
+    "vm/dfinance_address",
+    "compiler/dfinance_address",
+    "move-lang/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "move-vm-natives/dfinance_address",
+    "libra-vm/dfinance_address",
+    "libra-state-view/dfinance_address",
+    "vm-genesis/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "errmapgen/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "bytecode-verifier/ps_address",
+    "ir-to-bytecode-syntax/ps_address",
+    "libra-types/ps_address",
+    "move-ir-types/ps_address",
+    "move-coverage/ps_address",
+    "vm/ps_address",
+    "compiler/ps_address",
+    "move-lang/ps_address",
+    "move-vm-types/ps_address",
+    "move-vm-runtime/ps_address",
+    "move-vm-natives/ps_address",
+    "libra-vm/ps_address",
+    "libra-state-view/ps_address",
+    "vm-genesis/ps_address",
+    "compiled-stdlib/ps_address",
+    "errmapgen/ps_address",
+]

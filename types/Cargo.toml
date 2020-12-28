@@ -51,3 +51,12 @@ move-core-types = { path = "../language/move-core/types", version = "0.1.0", fea
 [features]
 default = []
 fuzzing = ["proptest", "proptest-derive", "libra-proptest-helpers", "libra-crypto/fuzzing", "libra-network-address/fuzzing", "move-core-types/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

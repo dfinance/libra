@@ -41,3 +41,24 @@ default = []
 mirai-contracts = []
 fuzzing = ["vm/fuzzing","move-vm-types/fuzzing"]
 failpoints = ["fail/failpoints", "move-vm-runtime/failpoints"]
+libra_address = [
+    "move-core-types/libra_address",
+    "libra-state-view/libra_address",
+    "libra-types/libra_address",
+    "move-vm-runtime/libra_address",
+    "move-vm-types/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "libra-state-view/dfinance_address",
+    "libra-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "move-vm-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "libra-state-view/ps_address",
+    "libra-types/ps_address",
+    "move-vm-runtime/ps_address",
+    "move-vm-types/ps_address",
+]

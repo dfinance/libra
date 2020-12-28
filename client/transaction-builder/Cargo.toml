@@ -25,3 +25,18 @@ libra-proptest-helpers = { path = "../../common/proptest-helpers", version = "0.
 [features]
 default = []
 fuzzing = ["proptest", "proptest-derive", "libra-proptest-helpers", "move-core-types/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address",
+    "compiled-stdlib/libra_address",
+    "libra-types/libra_address",
+]
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "libra-types/dfinance_address",
+]
+ps_address = [
+    "move-core-types/ps_address",
+    "compiled-stdlib/ps_address",
+    "libra-types/ps_address"
+]

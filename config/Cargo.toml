@@ -26,6 +26,7 @@ libra-global-constants = { path = "../config/global-constants", version = "0.1.0
 libra-logger = { path = "../common/logger", version = "0.1.0" }
 libra-network-address = { path = "../network/network-address", version = "0.1.0" }
 libra-network-address-encryption = { path = "management/network-address-encryption", version = "0.1.0" }
+
 libra-secure-storage = { path = "../secure/storage", version = "0.1.0" }
 libra-temppath = { path = "../common/temppath", version = "0.1.0" }
 libra-types = { path = "../types", version = "0.1.0" }
@@ -38,3 +39,23 @@ libra-crypto = { path = "../crypto/crypto", version = "0.1.0", features = ["fuzz
 default = []
 fuzzing = ["libra-crypto/fuzzing", "libra-types/fuzzing"]
 testing = []
+libra_address = [
+    "libra-types/libra_address",
+    "libra-network-address/libra_address",
+    "libra-network-address-encryption/libra_address",
+    "libra-secure-storage/libra_address",
+
+]
+dfinance_address = [
+    "libra-types/dfinance_address",
+    "libra-network-address/dfinance_address",
+    "libra-network-address-encryption/dfinance_address",
+    "libra-secure-storage/dfinance_address",
+
+]
+ps_address = [
+    "libra-types/ps_address",
+    "libra-network-address/ps_address",
+    "libra-network-address-encryption/ps_address",
+    "libra-secure-storage/ps_address",
+]

@@ -24,3 +24,12 @@ structopt = "0.3.18"
 
 [features]
 default = []
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

@@ -38,3 +38,47 @@ libra-proptest-helpers = { path = "../../../common/proptest-helpers", version = 
 [features]
 default = []
 fuzzing = ["libra-types/fuzzing", "move-vm-types/fuzzing"]
+libra_address = [
+    "move-core-types/libra_address",
+    "bytecode-verifier/libra_address",
+    "libra-types/libra_address",
+    "vm/libra_address",
+    "move-vm-types/libra_address",
+    "move-vm-runtime/libra_address",
+    "libra-vm/libra_address",
+    "libra-state-view/libra_address",
+    "libra-config/libra_address",
+    "libra-network-address/libra_address",
+    "compiled-stdlib/libra_address",
+    "transaction-builder/libra_address",
+]
+
+dfinance_address = [
+    "move-core-types/dfinance_address",
+    "bytecode-verifier/dfinance_address",
+    "libra-types/dfinance_address",
+    "vm/dfinance_address",
+    "move-vm-types/dfinance_address",
+    "move-vm-runtime/dfinance_address",
+    "libra-vm/dfinance_address",
+    "libra-state-view/dfinance_address",
+    "libra-config/dfinance_address",
+    "libra-network-address/dfinance_address",
+    "compiled-stdlib/dfinance_address",
+    "transaction-builder/dfinance_address",
+]
+
+ps_address = [
+    "move-core-types/ps_address",
+    "bytecode-verifier/ps_address",
+    "libra-types/ps_address",
+    "vm/ps_address",
+    "move-vm-types/ps_address",
+    "move-vm-runtime/ps_address",
+    "libra-vm/ps_address",
+    "libra-state-view/ps_address",
+    "libra-config/ps_address",
+    "libra-network-address/ps_address",
+    'compiled-stdlib/ps_address',
+    "transaction-builder/ps_address",
+]

@@ -33,3 +33,12 @@ libra-types = { path = "../../../types", version = "0.1.0", features = ["fuzzing
 
 [features]
 fuzzing = ["proptest", "libra-proptest-helpers", "libra-types"]
+libra_address = [
+   "libra-types/libra_address"
+]
+dfinance_address = [
+    "libra-types/dfinance_address",
+]
+ps_address = [
+    "libra-types/ps_address",
+]

@@ -28,3 +28,14 @@ bindgen = "0.54.0"
 
 [lib]
 crate-type = ["staticlib", "cdylib"]
+
+[features]
+libra_address = [
+    "move-core-types/libra_address"
+]
+dfinance_address = [
+    "move-core-types/dfinance_address"
+]
+ps_address = [
+    "move-core-types/ps_address"
+]

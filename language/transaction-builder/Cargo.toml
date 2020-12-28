@@ -16,3 +16,12 @@ transaction-builder-generated = { path = "../../client/transaction-builder", ver
 
 [features]
 default = []
+libra_address = [
+  "transaction-builder-generated/libra_address"
+]
+dfinance_address = [
+   "transaction-builder-generated/dfinance_address"
+]
+ps_address = [
+   "transaction-builder-generated/ps_address"
+]
