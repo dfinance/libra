@@ -25,6 +25,13 @@ impl AccountAddress {
         Self(address)
     }
 
+    #[cfg(any(
+        all(feature = "ps_address", feature = "dfinance_address"),
+        all(feature = "ps_address", feature = "libra_address"),
+        all(feature = "dfinance_address", feature = "libra_address"),
+    ))]
+    compile_error!("These features are mutually exclusive and cannot be used together");
+
     /// The number of bytes in an address.
     #[cfg(feature = "dfinance_address")]
     pub const LENGTH: usize = 20;
