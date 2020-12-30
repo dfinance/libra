@@ -28,7 +28,7 @@ pub const ADDRESS_LENGTH: usize = 16;
 
 /// The number of bytes in an address.
 #[cfg(feature = "ps_address")]
-pub const ADDRESS_LENGTH: usize = 34;
+pub const ADDRESS_LENGTH: usize = 32;
 
 #[derive(Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Copy)]
 #[cfg_attr(any(feature = "dfinance_address", feature = "libra_address"), derive(Default))]
@@ -55,8 +55,8 @@ impl Address {
 
     #[cfg(feature = "ps_address")]
     pub const LIBRA_CORE: Address = Address::new([
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
     ]);
 
     pub const fn new(address: [u8; ADDRESS_LENGTH]) -> Self {

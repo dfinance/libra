@@ -1169,11 +1169,11 @@ dependencies = [
 [[package]]
 name = "curve25519-dalek"
 version = "3.0.0"
-source = "git+https://github.com/novifinancial/curve25519-dalek.git?branch=fiat3#2940429efd0e6482af1531cff079e6605cbc9cf2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c8492de420e9e60bc9a1d66e2dbb91825390b738a388606600663fc529b4b307"
 dependencies = [
  "byteorder",
  "digest 0.9.0",
- "fiat-crypto",
  "rand_core 0.5.1",
  "subtle",
  "zeroize",
@@ -1182,11 +1182,11 @@ dependencies = [
 [[package]]
 name = "curve25519-dalek"
 version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8492de420e9e60bc9a1d66e2dbb91825390b738a388606600663fc529b4b307"
+source = "git+https://github.com/novifinancial/curve25519-dalek.git?branch=fiat3#2940429efd0e6482af1531cff079e6605cbc9cf2"
 dependencies = [
  "byteorder",
  "digest 0.9.0",
+ "fiat-crypto",
  "rand_core 0.5.1",
  "subtle",
  "zeroize",
@@ -2751,8 +2751,8 @@ dependencies = [
  "byteorder",
  "bytes",
  "criterion",
- "curve25519-dalek 3.0.0 (git+https://github.com/novifinancial/curve25519-dalek.git?branch=fiat3)",
  "curve25519-dalek 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "curve25519-dalek 3.0.0 (git+https://github.com/novifinancial/curve25519-dalek.git?branch=fiat3)",
  "digest 0.9.0",
  "ed25519-dalek 1.0.0",
  "ed25519-dalek 1.0.1",
