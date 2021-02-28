@@ -1302,6 +1302,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "dfibra"
+version = "0.1.0"
+dependencies = [
+ "bytecode-source-map",
+ "bytecode-verifier",
+ "compiler",
+ "diem-logger",
+ "diem-state-view",
+ "diem-types",
+ "diem-vm",
+ "diem-workspace-hack",
+ "ir-to-bytecode-syntax",
+ "move-core-types",
+ "move-coverage",
+ "move-ir-types",
+ "move-lang",
+ "move-vm-natives",
+ "move-vm-runtime",
+ "move-vm-types",
+ "vm",
+]
+
+[[package]]
 name = "diagen"
 version = "0.1.0"
 dependencies = [
