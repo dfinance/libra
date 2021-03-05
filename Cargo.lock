@@ -876,7 +876,6 @@ dependencies = [
  "include_dir",
  "once_cell",
  "sha2",
- "stdlib",
  "vm",
 ]
 
@@ -1308,7 +1307,6 @@ dependencies = [
  "bcs",
  "bytecode-source-map",
  "bytecode-verifier",
- "compiled-stdlib",
  "compiler",
  "diem-logger",
  "diem-state-view",

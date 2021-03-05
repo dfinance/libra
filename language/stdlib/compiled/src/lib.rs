@@ -9,7 +9,6 @@ use bytecode_verifier::{verify_module, DependencyChecker};
 use include_dir::{include_dir, Dir};
 use once_cell::sync::Lazy;
 use std::collections::BTreeMap;
-use stdlib::build_stdlib;
 use vm::file_format::CompiledModule;
 
 pub const NO_USE_COMPILED: &str = "MOVE_NO_USE_COMPILED";
@@ -17,7 +16,7 @@ pub const NO_USE_COMPILED: &str = "MOVE_NO_USE_COMPILED";
 // The current stdlib that is freshly built. This will never be used in deployment so we don't need
 // to pull the same trick here in order to include this in the Rust binary.
 static FRESH_MOVELANG_STDLIB: Lazy<Vec<CompiledModule>> =
-    Lazy::new(|| build_stdlib().values().cloned().collect());
+    Lazy::new(||vec![]);
 
 // This needs to be a string literal due to restrictions imposed by include_bytes.
 /// The compiled library needs to be included in the Rust binary due to Docker deployment issues.

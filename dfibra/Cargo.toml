@@ -28,7 +28,6 @@ diem-vm = { path = "../language/diem-vm", version = "0.1.0" }
 diem-state-view = { path = "../storage/state-view", version = "0.1.0" }
 diem-logger = { path = "../common/logger", version = "0.1.0" }
 vm-genesis = { path = "../language/tools/vm-genesis", version = "0.1.0", optional = true }
-compiled-stdlib = { path = "../language/stdlib/compiled",  version = "0.1.0" }
 errmapgen = { path = "../language/move-prover/errmapgen", version = "0.1.0" }
 resource-viewer = { path = "../language/tools/resource-viewer", version = "0.1.0" }
 
@@ -49,7 +48,6 @@ diem_address = [
     "diem-vm/diem_address",
     "diem-state-view/diem_address",
     "vm-genesis/diem_address",
-    "compiled-stdlib/diem_address",
     "errmapgen/diem_address",
 ]
 dfinance_address = [
@@ -68,7 +66,6 @@ dfinance_address = [
     "diem-vm/dfinance_address",
     "diem-state-view/dfinance_address",
     "vm-genesis/dfinance_address",
-    "compiled-stdlib/dfinance_address",
     "errmapgen/dfinance_address",
 ]
 ps_address = [
@@ -87,6 +84,5 @@ ps_address = [
     "diem-vm/ps_address",
     "diem-state-view/ps_address",
     "vm-genesis/ps_address",
-    "compiled-stdlib/ps_address",
     "errmapgen/ps_address",
 ]

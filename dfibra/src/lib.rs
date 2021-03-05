@@ -17,7 +17,6 @@ pub extern crate diem_vm;
 pub extern crate diem_state_view;
 pub extern crate diem_logger;
 pub extern crate compiler;
-pub extern crate compiled_stdlib;
 pub extern crate errmapgen;
 pub extern crate resource_viewer as rv;
 
