@@ -13,3 +13,4 @@ pub mod signature;
 pub mod signer;
 pub mod vector;
 pub mod u256;
+pub mod types;

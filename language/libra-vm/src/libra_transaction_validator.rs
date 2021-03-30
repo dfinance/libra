@@ -29,6 +29,7 @@ use move_core_types::{
 
 use crate::logging::AdapterLogSchema;
 use move_vm_types::gas_schedule::CostStrategy;
+use move_vm_types::natives::balance::ZeroBalance;
 
 #[derive(Clone)]
 pub struct LibraVMValidator(LibraVMImpl);
@@ -62,7 +63,7 @@ impl LibraVMValidator {
         account_currency_symbol: &IdentStr,
     ) -> Result<(), VMStatus> {
         let txn_data = TransactionMetadata::new(transaction);
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
         let log_context = AdapterLogSchema::new(remote_cache.id(), 0);
         let mut cost_strategy =
             CostStrategy::system(self.0.get_gas_schedule(&log_context)?, GasUnits::new(0));

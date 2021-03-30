@@ -43,6 +43,7 @@ use std::{
     collections::HashSet,
     convert::{AsMut, AsRef},
 };
+use move_vm_types::natives::balance::ZeroBalance;
 
 pub struct LibraVM(LibraVMImpl);
 
@@ -90,7 +91,7 @@ impl LibraVM {
         log_context: &impl LogContext,
     ) -> (VMStatus, TransactionOutput) {
         let mut cost_strategy = CostStrategy::system(gas_schedule, gas_left);
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
         match TransactionStatus::from(error_code.clone()) {
             TransactionStatus::Keep(status) => {
                 // The transaction should be charged for gas, so run the epilogue to do that.
@@ -166,7 +167,7 @@ impl LibraVM {
         });
 
         let gas_schedule = self.0.get_gas_schedule(log_context)?;
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
 
         // Run the validation logic
         {
@@ -228,7 +229,7 @@ impl LibraVM {
         });
 
         let gas_schedule = self.0.get_gas_schedule(log_context)?;
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
 
         // Run validation logic
         cost_strategy.disable_metering();
@@ -362,7 +363,7 @@ impl LibraVM {
         Ok(match writeset_payload {
             WriteSetPayload::Direct(change_set) => change_set.clone(),
             WriteSetPayload::Script { script, execute_as } => {
-                let mut tmp_session = self.0.new_session(remote_cache);
+                let mut tmp_session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
                 let args = convert_txn_args(script.args());
                 let senders = match txn_sender {
                     None => vec![*execute_as],
@@ -381,7 +382,7 @@ impl LibraVM {
                     .map_err(|e| e.into_vm_status());
                 match execution_result {
                     Ok(effect) => {
-                        let (cs, events) =
+                        let (cs, events, _) =
                             txn_effects_to_writeset_and_events(effect).map_err(Err)?;
                         ChangeSet::new(cs, events)
                     }
@@ -445,7 +446,7 @@ impl LibraVM {
 
         let gas_schedule = zero_cost_schedule();
         let mut cost_strategy = CostStrategy::system(&gas_schedule, GasUnits::new(0));
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
 
         if let Ok((round, timestamp, previous_vote, proposer)) = block_metadata.into_inner() {
             let args = vec![
@@ -497,7 +498,7 @@ impl LibraVM {
 
         let txn_data = TransactionMetadata::new(&txn);
 
-        let mut session = self.0.new_session(remote_cache);
+        let mut session = self.0.new_session(remote_cache, Box::new(ZeroBalance));
 
         if let Err(e) = self
             .0
@@ -543,7 +544,7 @@ impl LibraVM {
         };
 
         let effects = session.finish().map_err(|e| e.into_vm_status())?;
-        let (epilogue_writeset, epilogue_events) =
+        let (epilogue_writeset, epilogue_events, _) =
             txn_effects_to_writeset_and_events_cached(&mut (), effects)?;
 
         // Make sure epilogue WriteSet doesn't intersect with the writeset in TransactionPayload.

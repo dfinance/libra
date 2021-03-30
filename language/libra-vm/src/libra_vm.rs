@@ -41,6 +41,8 @@ use move_vm_types::{
 };
 use std::{convert::TryFrom, sync::Arc};
 use vm::errors::Location;
+use move_vm_types::natives::balance::{NativeBalance, ZeroBalance, WalletId, BalanceOperation};
+use std::collections::HashMap;
 
 #[derive(Clone)]
 /// A wrapper to make VMRuntime standalone and thread safe.
@@ -426,8 +428,8 @@ impl LibraVMImpl {
             })
     }
 
-    pub fn new_session<'r, R: RemoteCache>(&self, r: &'r R) -> Session<'r, '_, R> {
-        self.move_vm.new_session(r)
+    pub fn new_session<'r, R: RemoteCache>(&self, r: &'r R, balance: Box<dyn NativeBalance>) -> Session<'r, '_, R> {
+        self.move_vm.new_session(r, balance)
     }
 }
 
@@ -466,7 +468,7 @@ impl<'a> LibraVMInternals<'a> {
         f: impl for<'txn, 'r> FnOnce(Session<'txn, 'r, RemoteStorage<S>>) -> T,
     ) -> T {
         let remote_storage = RemoteStorage::new(state_view);
-        let session = self.move_vm().new_session(&remote_storage);
+        let session = self.move_vm().new_session(&remote_storage, Box::new(ZeroBalance));
         f(session)
     }
 }
@@ -474,7 +476,7 @@ impl<'a> LibraVMInternals<'a> {
 pub fn txn_effects_to_writeset_and_events_cached<C: AccessPathCache>(
     ap_cache: &mut C,
     effects: TransactionEffects,
-) -> Result<(WriteSet, Vec<ContractEvent>), VMStatus> {
+) -> Result<(WriteSet, Vec<ContractEvent>, HashMap<WalletId, BalanceOperation>), VMStatus> {
     // TODO: Cache access path computations if necessary.
     let mut ops = vec![];
 
@@ -516,7 +518,7 @@ pub fn txn_effects_to_writeset_and_events_cached<C: AccessPathCache>(
         })
         .collect::<Result<Vec<_>, VMStatus>>()?;
 
-    Ok((ws, events))
+    Ok((ws, events, effects.wallet_ops))
 }
 
 pub(crate) fn charge_global_write_gas_usage<R: RemoteCache>(
@@ -553,7 +555,7 @@ pub(crate) fn get_transaction_output<A: AccessPathCache, R: RemoteCache>(
         .get();
 
     let effects = session.finish().map_err(|e| e.into_vm_status())?;
-    let (write_set, events) = txn_effects_to_writeset_and_events_cached(ap_cache, effects)?;
+    let (write_set, events, _) = txn_effects_to_writeset_and_events_cached(ap_cache, effects)?;
 
     Ok(TransactionOutput::new(
         write_set,
@@ -565,7 +567,7 @@ pub(crate) fn get_transaction_output<A: AccessPathCache, R: RemoteCache>(
 
 pub fn txn_effects_to_writeset_and_events(
     effects: TransactionEffects,
-) -> Result<(WriteSet, Vec<ContractEvent>), VMStatus> {
+) -> Result<(WriteSet, Vec<ContractEvent>, HashMap<WalletId, BalanceOperation>), VMStatus> {
     txn_effects_to_writeset_and_events_cached(&mut (), effects)
 }
 

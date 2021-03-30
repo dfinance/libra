@@ -7,6 +7,7 @@ use crate::{
 };
 use move_core_types::{account_address::AccountAddress, language_storage::ModuleId};
 use vm::errors::{PartialVMResult, VMResult};
+use crate::natives::balance::{Balance, WalletId, BalanceOperation};
 
 /// Provide an implementation for bytecodes related to data with a given data store.
 ///
@@ -49,4 +50,14 @@ pub trait DataStore {
         val: Value,
         caller: Option<ModuleId>,
     ) -> PartialVMResult<()>;
+
+    // ---
+    // Balance operations
+    // ---
+
+    /// Returns the balance by balance id.
+    fn get_balance(&self, wallet_id: &WalletId) -> Option<Balance>;
+
+    /// Save balance operation.
+    fn save_balance_operation(&mut self, wallet_id: WalletId, balance_op: BalanceOperation);
 }

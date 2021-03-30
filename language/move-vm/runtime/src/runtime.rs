@@ -22,6 +22,7 @@ use vm::{
     file_format::SignatureToken,
     CompiledModule, IndexKind,
 };
+use move_vm_types::natives::balance::NativeBalance;
 
 /// An instantiation of the MoveVM.
 pub struct VMRuntime {
@@ -35,10 +36,10 @@ impl VMRuntime {
         }
     }
 
-    pub fn new_session<'r, R: RemoteCache>(&self, remote: &'r R) -> Session<'r, '_, R> {
+    pub fn new_session<'r, R: RemoteCache>(&self, remote: &'r R, balance: Box<dyn NativeBalance>) -> Session<'r, '_, R> {
         Session {
             runtime: self,
-            data_cache: TransactionDataCache::new(remote, &self.loader),
+            data_cache: TransactionDataCache::new(remote, &self.loader, balance),
         }
     }
 

@@ -18,6 +18,7 @@ use move_vm_types::{
 use std::{collections::VecDeque, fmt::Write};
 use vm::errors::PartialVMResult;
 use move_core_types::language_storage::TypeTag;
+use move_vm_types::natives::balance::{BalanceOperation, WalletId, Balance};
 
 // The set of native functions the VM supports.
 // The functions can line in any crate linked in but the VM declares them here.
@@ -59,6 +60,10 @@ pub(crate) enum NativeFunction {
     U256Div,
     U256Sub,
     U256Add,
+
+    WithdrawToNative,
+    DepositFromNative,
+    GetNativeBalance,
 }
 
 impl NativeFunction {
@@ -104,6 +109,10 @@ impl NativeFunction {
             (&CORE_CODE_ADDRESS, "U256", "div") => U256Div,
             (&CORE_CODE_ADDRESS, "U256", "sub") => U256Sub,
             (&CORE_CODE_ADDRESS, "U256", "add") => U256Add,
+
+            (&CORE_CODE_ADDRESS, "Account", "deposit_native") => DepositFromNative,
+            (&CORE_CODE_ADDRESS, "Account", "withdraw_native") => WithdrawToNative,
+            (&CORE_CODE_ADDRESS, "Account", "get_native_balance") => GetNativeBalance,
             _ => return None,
         })
     }
@@ -138,6 +147,7 @@ impl NativeFunction {
             Self::DestroySigner => account::native_destroy_signer(ctx, t, v),
             Self::DfinanceCreateSigner => account::native_create_signer(ctx, t, v),
             Self::DfinanceDestroySigner => account::native_destroy_signer(ctx, t, v),
+
             // u256
             Self::U256FromU8 => u256::from_u8(ctx, t, v),
             Self::U256FromU64 => u256::from_u64(ctx, t, v),
@@ -151,6 +161,10 @@ impl NativeFunction {
             Self::U256Div => u256::div(ctx, t, v),
             Self::U256Sub => u256::sub(ctx, t, v),
             Self::U256Add => u256::add(ctx, t, v),
+
+            Self::WithdrawToNative => account::native_withdraw(ctx, t, v),
+            Self::DepositFromNative => account::native_deposit(ctx, t, v),
+            Self::GetNativeBalance => account::get_balance(ctx, t, v),
         };
         // Allows to send all status types.
         // debug_assert!(match &result {
@@ -230,5 +244,14 @@ impl<'a, L: LogContext> NativeContext for FunctionContext<'a, L> {
 
     fn caller(&self) -> Option<&ModuleId> {
         self.caller
+    }
+
+    fn get_balance(&self, wallet_id: &WalletId) -> Option<Balance> {
+        self.data_store.get_balance(wallet_id)
+    }
+
+    fn save_balance_operation(&mut self, wallet_id: WalletId, balance_op: BalanceOperation) {
+        self.data_store
+            .save_balance_operation(wallet_id, balance_op);
     }
 }

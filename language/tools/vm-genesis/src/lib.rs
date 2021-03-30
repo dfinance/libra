@@ -47,6 +47,7 @@ use once_cell::sync::Lazy;
 use rand::prelude::*;
 use transaction_builder::encode_create_designated_dealer_script;
 use vm::{file_format::SignatureToken, CompiledModule};
+use move_vm_types::natives::balance::ZeroBalance;
 
 // The seed is arbitrarily picked to produce a consistent key. XXX make this more formal?
 const GENESIS_SEED: [u8; 32] = [42; 32];
@@ -119,7 +120,7 @@ pub fn encode_genesis_change_set(
     let data_cache = StateViewCache::new(&state_view);
 
     let move_vm = MoveVM::new();
-    let mut session = move_vm.new_session(&data_cache);
+    let mut session = move_vm.new_session(&data_cache, Box::new(ZeroBalance));
     let log_context = NoContextLog::new();
 
     let lbr_ty = TypeTag::Struct(StructTag {
@@ -158,13 +159,13 @@ pub fn encode_genesis_change_set(
 
     let state_view = GenesisStateView::new();
     let data_cache = StateViewCache::new(&state_view);
-    let mut session = move_vm.new_session(&data_cache);
+    let mut session = move_vm.new_session(&data_cache, Box::new(ZeroBalance));
     publish_stdlib(&mut session, &log_context, stdlib_modules);
     let effects_2 = session.finish().unwrap();
 
     let effects = merge_txn_effects(effects_1, effects_2);
 
-    let (write_set, events) = txn_effects_to_writeset_and_events(effects).unwrap();
+    let (write_set, events, _) = txn_effects_to_writeset_and_events(effects).unwrap();
 
     assert!(!write_set.iter().any(|(_, op)| op.is_deletion()));
     verify_genesis_write_set(&events);
